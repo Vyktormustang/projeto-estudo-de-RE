@@ -132,7 +132,7 @@ gba-re/
 | `gba_poketext.py` | Decodifica charset Gen 3 + remap PT-BR; dump de texto. |
 | `gba_disasm.py` | Boot-trace ARM → Thumb, censo de BL → `functions.csv` + callsites. ⚠ `encode_bl_thumb` legado com bug de sinal (fórmula correta no §docs). |
 | `gba_callgraph.py` | Gera DOT/edges/métricas do grafo de chamadas. |
-| `gba_table_probe.py` | Sonda jump-tables e hubs de handlers. |
+| `gba_table_probe.py` | Gera DOT/edges/métricas do grafo de chamadas. |
 | `gba_patch_text.py` | Patch safe de slot de texto (0xFF) + relatório hexdump/SHA-256. |
 | `gba_hook_code.py` | Instalador de trampolim (site bl → run 0xFF); 6 validações. |
 | `gba_libretro_emu.py` | **Driver libretro headless** (mGBA cores via ctypes): frames, `--input f:BTN:hold` multi-janela, `--snap n=arq.png`, save/load-state, mem-read/dump. |
@@ -206,6 +206,12 @@ com prova = **+2 ciclos**.
 - Capstone — desassembly homologação BL.
 - mGBA + docs de scripting — estados/regiões de memória.
 - No-Intro — hashes de referência (uso consultivo apenas).
+
+### Ferramentas / Releases úteis
+
+- REA (agents) — release: [rea-agents-6.5.0](https://github.com/morluto/rea/releases/tag/rea-agents-6.5.0)
+  - Repositório/Release upstream: https://github.com/morluto/rea/releases/tag/rea-agents-6.5.0
+  - Use para: integração com agentes/automação relevante ao fluxo de análise reversa.
 
 <sub>Projeto pessoal de estudo de engenharia reversa. Não afiliado a Nintendo/
 GAME FREAK/The Pokémon Company. **A ROM comercial NÃO faz parte deste repositório.**</sub>
