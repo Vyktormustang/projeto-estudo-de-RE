@@ -1,0 +1,220 @@
+{
+  "_comentario": "Registro de renomeações de funções sobreviventes a regenerações do censo (aplicado por gba_disasm.py --update-functions). Regra: só entra aqui nome com EVIDÊNCIA registrada; endereços preservados.",
+  "0x08000a38": {
+    "nome": "SetGpuReg_like",
+    "confianca": "PROVAVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "escreve u16 em buffer 0x03000000+idx (idx<=0x5F); trata REG_VCOUNT(0x04000006) e DISPCNT bit7; callee 0x080009C0 aplica em 0x04000000+idx com merge especial DISPSTAT(0x04000004, mask 0xFFE7). Assinatura do par buffered-write/commit",
+    "historico": "ciclo5: FUN_08000a38 -> SetGpuReg_like (antes auto por BL x1238)"
+  },
+  "0x080009c0": {
+    "nome": "gpu_commit_idx_like",
+    "confianca": "PROVAVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "idx==4: merge em REG_DISPSTAT (0x04000004, mask 0xFFE7, OR buffer 0x03000004); senão REG(0x04000000+idx)=buffer 0x03000000+idx. Commit imediato do buffer GPU",
+    "historico": "ciclo5: FUN_080009c0 -> gpu_commit_idx_like"
+  },
+  "0x0803fbe8": {
+    "nome": "DISPATCHER_34c_tbl0803FC08",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_probe",
+    "evidencia": "dispatcher GET de 34 casos sobre struct: [0]=+0x50 u32, [1]=+0x54 u8, [2]=+0x56 u16, [3]=+0x58 u16, [4-8]=sel1..5 via 0x08044674, [9]=+0x55 u8, [10-28]=via helper 0x0803FD44 (subdata), [29-33]=+0x5A..+0x62 u16. Layout status/nivel/hp/maxHP/stats (H-0014). Handlers=thumbs s/ prologo (H-0013); wrapper party delega subdados p/ get_boxmondata_84case_like (link confirmado c8)",
+    "historico": "ciclo5: FUN_0803fbe8 -> DISPATCHER_34c_tbl0803FC08 (auto por BL x1363); ciclo6-7: casos 0..33 mapeados por gba_table_probe --n 34"
+  },
+  "0x0804037c": {
+    "nome": "DISPATCHER_34c_tbl0804039C",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_probe",
+    "evidencia": "dispatcher SET espelho do GET (0x0803FBE8): escrita [1]=strb +0x54, [9]=strb +0x55, [0/2-8/29-33]=u16 LE de [r2], [10]=no-op(pop;pop;bx), [11-28]=via helper 0x080404D0 (subdata). H-0015; espelho SET delega p/ set_boxmondata_84case_like (link confirmado c8)",
+    "historico": "ciclo5: FUN_0804037c -> DISPATCHER_34c_tbl0804039C (auto por BL x728); ciclo6-7: casos mapeados: SET espelho da tbl0803FC08"
+  },
+  "0x08074480": {
+    "nome": "DISPATCHER_5c_tbl0807449C",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "r1<=4 (5 casos); tabela @0x0807449C; chama 0x080751D8 (leitor do array 0x02023BD6) e dados 0x083AE01C; casos mapeados c14: [0-2]=wrappers read_u8_arr02023BD6 (0x080751D8), [3,4]=wrappers byte_flag0_arr02023BD6_like — dispatcher do subsistema array 0x02023BD6",
+    "historico": "ciclo5: FUN_08074480 -> DISPATCHER_5c_tbl0807449C (auto por BL x462); ciclo14: 5 casos lidos; subsistema identificado"
+  },
+  "0x0807741c": {
+    "nome": "alloc_slot28_arr03005090_like",
+    "confianca": "PROVAVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "varre elementos de 0x28B em 0x03005090 até achar flag+4==0; grava ptr@+0, byte@+7, zera 0x20B em +8 (via 0x081E5ED8), marca ativo; chama 0x08077470. Padrão alocador de slots (candidata a sistema de objetos/sprites)",
+    "historico": "ciclo5: FUN_0807741c -> alloc_slot28_arr03005090_like (auto por BL x372)"
+  },
+  "0x08077508": {
+    "nome": "free_slot28_arr03005090_like",
+    "confianca": "PROVAVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "mesmo array 0x03005090 passo 0x28; limpa flag+4; se campo+5==0xFE propaga para elemento filho (+6). Padrão liberador de slots (par do alocador)",
+    "historico": "ciclo5: FUN_08077508 -> free_slot28_arr03005090_like"
+  },
+  "0x080751c4": {
+    "nome": "byte_flag0_arr02023BD6_like",
+    "confianca": "PROVAVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "retorna (byte_array_0x02023BD6[idx]) & 1; vizinha 0x080751D8 retorna o byte inteiro; padrão acesso a tabela de flags/permissão",
+    "historico": "ciclo5: FUN_080751c4 -> byte_flag0_arr02023BD6_like (auto por BL x75-region)"
+  },
+  "0x080722cc": {
+    "nome": "gate_wrapper_081DD0F4_like",
+    "confianca": "HIPOTESE",
+    "origem": "inspecao_disasm",
+    "evidencia": "gates: [0x02031DD8]!=0 e [0x0203ADFA]==2 suprimem; senão delega u16 a 0x081DD0F4 (lookup de 2 tabelas 0x084A32CC/0x084A329C -> 0x081DD858). Semântica: em aberto",
+    "historico": "ciclo5: FUN_080722cc -> gate_wrapper_081DD0F4_like"
+  },
+  "0x081dd0f4": {
+    "nome": "lookup_2tabs_084A32CC_329C_like",
+    "confianca": "HIPOTESE",
+    "origem": "inspecao_disasm",
+    "evidencia": "índice = arg >> 0xD (8 grupos) na tabela 0x084A32CC; sub-índice lido do grupo indexa 0x084A329C (registros 12B); despacha campo p/ 0x081DD858. Lookup hierárquico de recursos",
+    "historico": "ciclo5: FUN_081dd0f4 -> lookup_2tabs_084A32CC_329C_like (alcançada via gate_wrapper)"
+  },
+  "0x08044674": {
+    "nome": "acc_sel1-5_read_tbl3FC08_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_probe",
+    "evidencia": "5 stubs consecutivos do dispatcher GET (casos 4-8) chamam com r1=1..5 = sub-accessor com seletor; candidato a leitura de campo indexado (H-0014)",
+    "historico": "ciclo7: renomeado de FUN_08044674 por leitura dos casos da tabela 0x0803FC08"
+  },
+  "0x0803fd44": {
+    "nome": "get_boxmondata_84case_like",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "se r1>0xA: busca 4 substructs (sel 0..3 via 0x0803F940), recalcula checksum (0x0803E3E8) e compara c/ [r8+0x1C]; mismatch → [r8+0x13]|=5 e [sub]+7|=0x40 (flags bad-egg); jump table 84 casos @0x0803FDD8 (mov pc,r0)",
+    "historico": "ciclo8: identificado como núcleo GetBoxMonData-like a partir da leitura 0x0803FD44"
+  },
+  "0x0803f940": {
+    "nome": "get_substruct_0-3_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "selector 0..3 invocado 4x em sequência por checksum/verificação (0x0803E3E8/0x0803FD44) — padrão dos 4 substructs permutáveis",
+    "historico": "ciclo8: FUN_0803f940 -> get_substruct_0-3_like"
+  },
+  "0x0803f91c": {
+    "nome": "decrypt_xor_boxsubdata_like",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "[r3+0x20] ^= [r3+4]; seguido de ldr [r3] (chave personalidade⊕OTID sobre região 0x20 de subdados) — loop XOR",
+    "historico": "ciclo8: identificado por eors/loop XOR em 0x0803F91C"
+  },
+  "0x0803e3e8": {
+    "nome": "checksum_boxsubstructs_like",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "acumula (r6=0) somas de 4 substructs via get_substruct 0..3; retorna u16 — assinatura do checksum de caixa",
+    "historico": "ciclo8: identificado por soma dos 4 substructs"
+  },
+  "0x080404d0": {
+    "nome": "set_boxmondata_84case_like",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_probe",
+    "evidencia": "CABEÇA IDÊNTICA ao GET helper: 4 substructs sel 0..3, decrypt (0x0803F91C), checksum (0x0803E3E8) vs [r7+0x1C], flags bad-egg |=5/sub+7|=0x40 + fixup 0x0803F8F8; dispatch seletor ≤0x50 c/ tabela própria (80 casos) — SET espelho confirmado (c8)",
+    "historico": "ciclo8: nome proposto por simetria GET/SET"
+  },
+  "0x0803f8f8": {
+    "nome": "encrypt_xor_boxsubdata_like",
+    "confianca": "HIPÓTESE",
+    "origem": "inspecao_disasm",
+    "evidencia": "loop XOR com chave [r3]⊕[r3+4] sobre subdados (+0x20) — espelho do decrypt 0x0803F91C; chamado no fixup bad-egg do SET",
+    "historico": "ciclo9: identificado por XOR duplo na rota SET"
+  },
+  "0x08002b80": {
+    "nome": "memzero_ewram_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "init: dst=0x02000000, size=0x1C000 (115 KiB EWRAM) → rotina de zeramento de buffer",
+    "historico": "ciclo9: nomeada no mapeamento do ENTRY_THUMB_main"
+  },
+  "0x080582e0": {
+    "nome": "combo_pred_cb08057ded_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "predicado por-frame (não é corpo de loop): retorna 1 sse 3 preds (0x0805833C, 0x0805642C, 0x0800A00C) ok E [0x03000E84]==0x08057DED (ponteiro p/ callback de estado). Correção ciclo10: nome anterior superestimava o corpo — o loop despacha após esta checagem",
+    "historico": "ciclo9: game_loop_body_like (PROV., leitura parcial) → ciclo10: renomeado combo_pred_cb08057ded_like (corpo completo lido: 35 insns = predicado)"
+  },
+  "0x080005e8": {
+    "nome": "per_frame_update_like",
+    "confianca": "HIPÓTESE",
+    "origem": "inspecao_disasm",
+    "evidencia": "primeira chamada de cada iteração do loop principal (pré key-check): candidato a read-pad/RNG update",
+    "historico": "ciclo9: nomeada no mapeamento do ENTRY_THUMB_main"
+  },
+  "0x0807194c": {
+    "nome": "dispatch8_idx03000FC4like",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "idx u8 [0x03000FC4] ≤7 → tabela 8 ponteiros @0x0807196C, `mov pc,r0` — mesmo idioma dos 34c; casos mapeados c11: [0,2,3,4]=no-op, [1]=avança índice+0x080722A0, [5-7]=`bl 0x08071DD4; if→0x08071C9C…` (máquina de estados)",
+    "historico": "ciclo10: 3º membro da família de despachantes (encadeado no loop principal); ciclo11: 8 casos lidos (state machine com 1 avançador e 3 guardas)"
+  },
+  "0x0805486c": {
+    "nome": "frame_counter59_rollover_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "se [0x03000E7C]==1: [0x0300500C]+0x12++ com rollover em 0x3B (59≈1s a 60fps) → gatilho periódico por frame",
+    "historico": "ciclo10: nomeada no mapeamento do corpo do loop"
+  },
+  "0x08000890": {
+    "nome": "vblank_flag_sync_like",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "clear+poll de bit0 em [0x030030F0+0x1C] até set → sincronização por frame (VBlank)",
+    "historico": "ciclo10: rotina final do loop principal (antes do b loop)"
+  },
+  "0x080579c4": {
+    "nome": "cb_task_state_machine_like",
+    "confianca": "HIPÓTESE",
+    "origem": "inspecao_disasm",
+    "evidencia": "máquina de estados sobre struct 0x03000E80 (nesta: cell cb @+4=0x03000E84); sentinela byte==0x80→0x81; dispatch auxiliar (r8-0x12≤0xA, tabela @0x08057A5C); usa ponteiros Thumb 0x08057DA5/0x08057DED (callback de estado)",
+    "historico": "ciclo11: identificada por varredura de usos da célula 0x03000E84 + leitura do corpo"
+  },
+  "0x08071dd4": {
+    "nome": "pred_flag03007304zero_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "ciclo12: leitura direta",
+    "historico": "u16 [0x03007300+4]==0 → retorna 1 (busy-like guarda do state machine dispatch8)"
+  },
+  "0x08077650": {
+    "nome": "pool_find_bycb_arr03005090like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "ciclo12: evidência cruzada com pool H-0010",
+    "historico": "chamado com arg=ponteiro de função (0x08071CBD) e retorna bool — busca slot por callback no pool 0x03005090 (família alloc/free)"
+  },
+  "0x08071c9c": {
+    "nome": "pred_cbcustom_inpool_like",
+    "confianca": "HIPÓTESE",
+    "origem": "inspecao_disasm",
+    "evidencia": "ciclo12: leitura direta",
+    "historico": "wrapper: pergunta 'existe slot com cb=X no pool?' via pool_find_bycb; usado nos estados 5–7 do dispatch8"
+  },
+  "0x080722a0": {
+    "nome": "lookup_sanitized_idx081dd0f4like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "ciclo12: leitura direta",
+    "historico": "força 0→0xFFFF→0? não: memset: r1=(u16)arg, se [0x03005080]!=0 então r1=0, se r1==0xFFFF então r1=0; despacha para lookup_2tabs_084A32CC_329C_like — sanitização de índice"
+  },
+  "0x080578fc": {
+    "nome": "cb_install_thumbptr_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "ciclo12: evidência por 2 callsites estruturalmente idênticos",
+    "historico": "chamado 2× com ponteiro Thumb de callback (0x08057D99/0x08057DA5) a partir de máquinas de estado — instalador/encadeador de callback"
+  },
+  "0x08057dec": {
+    "nome": "statecb_step_r4{0x11,0x1A}_like",
+    "confianca": "PROVÁVEL",
+    "origem": "inspecao_disasm",
+    "evidencia": "callback-alvo do predicado do loop: consulta pred 0x0805833C, escolhe 0x11/0x1A como próximo estado; no ramo, chama 0x0806994C + instala cb 0x08057D99 via cb_install — padrão passo-init/teardown retornando next-state",
+    "historico": "ciclo12: corpo lido a partir da resolução de 0x08057DED"
+  },
+  "0x080751d8": {
+    "nome": "read_u8_arr02023BD6",
+    "confianca": "CONFIRMADO",
+    "origem": "inspecao_disasm",
+    "evidencia": "idx u8 → arr[0x02023BD6][idx] (ldr literal resolvido); par do byte_flag0_arr02023BD6_like (0x080751C4: &1)",
+    "historico": "ciclo14: leitura direta a partir dos casos da tbl0807449C"
+  }
+}

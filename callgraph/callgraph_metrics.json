@@ -1,0 +1,228 @@
+{
+  "versao": "1.0.0",
+  "nos": 5981,
+  "arestas_diretas_bl": 36578,
+  "arestas_unicas": 21314,
+  "callsites_para_fora_do_universo": 51616,
+  "entry_bfs_alcancaveis": 2609,
+  "entry_bfs_pct": 43.62,
+  "scc_total": 5266,
+  "scc_maior_tamanho": 585,
+  "scc_maior_membros_amostra": [
+    "0x081e9648",
+    "0x081e9450",
+    "0x081e9370",
+    "0x081e92d8",
+    "0x081e916c",
+    "0x081e9158",
+    "0x081e8f60",
+    "0x081e9dcc",
+    "0x081e8ef0",
+    "0x081e737c"
+  ],
+  "top_indegree": [
+    {
+      "addr": "0x0803fbe8",
+      "nome": "DISPATCHER_34c_tbl0803FC08",
+      "chamadas": 1363
+    },
+    {
+      "addr": "0x08000a38",
+      "nome": "SetGpuReg_like",
+      "chamadas": 1238
+    },
+    {
+      "addr": "0x0804037c",
+      "nome": "DISPATCHER_34c_tbl0804039C",
+      "chamadas": 728
+    },
+    {
+      "addr": "0x080722cc",
+      "nome": "gate_wrapper_081DD0F4_like",
+      "chamadas": 651
+    },
+    {
+      "addr": "0x080751c4",
+      "nome": "byte_flag0_arr02023BD6_like",
+      "chamadas": 472
+    },
+    {
+      "addr": "0x08074480",
+      "nome": "DISPATCHER_5c_tbl0807449C",
+      "chamadas": 462
+    },
+    {
+      "addr": "0x08077508",
+      "nome": "free_slot28_arr03005090_like",
+      "chamadas": 432
+    },
+    {
+      "addr": "0x0807741c",
+      "nome": "alloc_slot28_arr03005090_like",
+      "chamadas": 372
+    },
+    {
+      "addr": "0x08003f20",
+      "nome": "FUN_08003f20",
+      "chamadas": 361
+    },
+    {
+      "addr": "0x08002554",
+      "nome": "FUN_08002554",
+      "chamadas": 353
+    },
+    {
+      "addr": "0x081e5e78",
+      "nome": "FUN_081e5e78",
+      "chamadas": 331
+    },
+    {
+      "addr": "0x08003fa0",
+      "nome": "FUN_08003fa0",
+      "chamadas": 318
+    },
+    {
+      "addr": "0x08002bc4",
+      "nome": "FUN_08002bc4",
+      "chamadas": 317
+    },
+    {
+      "addr": "0x08008d84",
+      "nome": "FUN_08008d84",
+      "chamadas": 314
+    },
+    {
+      "addr": "0x080020bc",
+      "nome": "FUN_080020bc",
+      "chamadas": 312
+    },
+    {
+      "addr": "0x08006f8c",
+      "nome": "FUN_08006f8c",
+      "chamadas": 308
+    },
+    {
+      "addr": "0x080703ec",
+      "nome": "FUN_080703ec",
+      "chamadas": 299
+    },
+    {
+      "addr": "0x08070588",
+      "nome": "FUN_08070588",
+      "chamadas": 290
+    },
+    {
+      "addr": "0x08007280",
+      "nome": "FUN_08007280",
+      "chamadas": 248
+    },
+    {
+      "addr": "0x0800445c",
+      "nome": "FUN_0800445c",
+      "chamadas": 239
+    }
+  ],
+  "top_outdegree": [
+    {
+      "addr": "0x0808cff8",
+      "nome": "FUN_0808cff8",
+      "callees": 117
+    },
+    {
+      "addr": "0x0806a40c",
+      "nome": "FUN_0806a40c",
+      "callees": 79
+    },
+    {
+      "addr": "0x081186c8",
+      "nome": "FUN_081186c8",
+      "callees": 76
+    },
+    {
+      "addr": "0x08046ed0",
+      "nome": "FUN_08046ed0",
+      "callees": 72
+    },
+    {
+      "addr": "0x081508ec",
+      "nome": "FUN_081508ec",
+      "callees": 69
+    },
+    {
+      "addr": "0x0806b96c",
+      "nome": "FUN_0806b96c",
+      "callees": 68
+    },
+    {
+      "addr": "0x080b08dc",
+      "nome": "FUN_080b08dc",
+      "callees": 63
+    },
+    {
+      "addr": "0x0812eeb0",
+      "nome": "FUN_0812eeb0",
+      "callees": 63
+    },
+    {
+      "addr": "0x080ce748",
+      "nome": "FUN_080ce748",
+      "callees": 61
+    },
+    {
+      "addr": "0x08024398",
+      "nome": "FUN_08024398",
+      "callees": 58
+    },
+    {
+      "addr": "0x0802ea10",
+      "nome": "FUN_0802ea10",
+      "callees": 54
+    },
+    {
+      "addr": "0x08141180",
+      "nome": "FUN_08141180",
+      "callees": 54
+    },
+    {
+      "addr": "0x08037a28",
+      "nome": "FUN_08037a28",
+      "callees": 52
+    },
+    {
+      "addr": "0x0804c718",
+      "nome": "FUN_0804c718",
+      "callees": 52
+    },
+    {
+      "addr": "0x0803c550",
+      "nome": "FUN_0803c550",
+      "callees": 48
+    },
+    {
+      "addr": "0x08142e58",
+      "nome": "FUN_08142e58",
+      "callees": 47
+    },
+    {
+      "addr": "0x080d5f40",
+      "nome": "FUN_080d5f40",
+      "callees": 46
+    },
+    {
+      "addr": "0x080dec90",
+      "nome": "FUN_080dec90",
+      "callees": 46
+    },
+    {
+      "addr": "0x080f2934",
+      "nome": "FUN_080f2934",
+      "callees": 46
+    },
+    {
+      "addr": "0x0811599c",
+      "nome": "FUN_0811599c",
+      "callees": 46
+    }
+  ],
+  "AVISO": "Apenas BL direto. Handlers por tabela/callback/IRQ estão sub-representados. BFS≠prova de código morto."
+}

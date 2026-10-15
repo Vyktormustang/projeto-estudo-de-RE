@@ -1,0 +1,6 @@
+rom/*.gba
+rom_mod/*.gba
+emu/*.bin
+deliver/
+*.pyc
+__pycache__/

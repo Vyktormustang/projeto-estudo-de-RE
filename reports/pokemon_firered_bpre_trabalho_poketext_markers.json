@@ -1,0 +1,278 @@
+{
+  "nota_metodo": "'ocorrencias' = hits do byte-pattern exato; contextos mostram a string 0xFF-delimitada que contém o hit. PT-BR exige múltiplos marcadores com contexto legível.",
+  "pt_br": {
+    "ção": {
+      "hex": "19f4e3",
+      "ocorrencias": 174,
+      "contextos": [
+        {
+          "offset_hex": "0x00174515",
+          "texto": "Ah, desculpe-me minha agitação. Você¶parece minha irmã mais nova…  "
+        },
+        {
+          "offset_hex": "0x00175226",
+          "texto": "Devo dizer que estou impressionado¶em te ver chegar até aqui.{FB}EQUIPE ROCKET captura POKéMON¶ao redor do mundo.{FB}Som"
+        },
+        {
+          "offset_hex": "0x00175e99",
+          "texto": "Bandidos assumiram nossa¶construção…{FB}O CHEFE disse que estava¶procurando um POKéMON.{FB}Espero que nosso PRESIDENTE¶c"
+        }
+      ]
+    },
+    "você": {
+      "hex": "eae3d71c",
+      "ocorrencias": 719,
+      "contextos": [
+        {
+          "offset_hex": "0x001722c7",
+          "texto": "Ei! você tem POKéMON!¶Vem aqui![FA]Vamos batalhar!  "
+        },
+        {
+          "offset_hex": "0x00172315",
+          "texto": "Psiu! Se não você vai assustar¶os insetos, okay?    "
+        },
+        {
+          "offset_hex": "0x0017234a",
+          "texto": "Ei!¶Não pode passar se você for[FA]TREINADOR POKéMON!"
+        }
+      ]
+    },
+    "Você": {
+      "hex": "d0e3d71c",
+      "ocorrencias": 577,
+      "contextos": [
+        {
+          "offset_hex": "0x00172402",
+          "texto": "Perdi!¶Você é bom nisso!    "
+        },
+        {
+          "offset_hex": "0x001726a3",
+          "texto": "DICA DE INSTRUTOR{FB}Você não pode pegar um POKéMON¶de outra pessoa.{FB}Jogue POKé BOLAS apenas em¶POKéMON selvagens!   "
+        },
+        {
+          "offset_hex": "0x0017279d",
+          "texto": "WHOA!¶Você esbarrou![FA]…Oh, você é uma criança!"
+        }
+      ]
+    },
+    "Olá": {
+      "hex": "c9e017",
+      "ocorrencias": 40,
+      "contextos": [
+        {
+          "offset_hex": "0x00174177",
+          "texto": "Olá, estranho TREINADOR!{FB}Não sei se você é do mar ou¶montanhas, mas paremos de falar.{FB}Todos os meus POKéMON são do"
+        },
+        {
+          "offset_hex": "0x0017858d",
+          "texto": "Olá, jovem.¶Sou AGATHA da ELITE 4.{FB}Você é a criança protegida pelo¶OAK, não é?{FB}Aquele velho já foi muito resistent"
+        },
+        {
+          "offset_hex": "0x00179cab",
+          "texto": "Olá!¶Eu sou um CANALIZADOR.{FB}Há espóritos maus aqui.¶Eu senti algo no alto da TORRE."
+        }
+      ]
+    },
+    "olá": {
+      "hex": "e3e017",
+      "ocorrencias": 16,
+      "contextos": [
+        {
+          "offset_hex": "0x0017fdd2",
+          "texto": "Oh, olá, {BUF}01!¶Como vai você?{FB}Sou assistente do PROF. OAK.{FB}Você conheceu o outro ASSISTENTE?{FB}Ele tinha um pa"
+        },
+        {
+          "offset_hex": "0x00181cae",
+          "texto": "Oh, olá, {BUF}01!¶Bem vindo!{FB}Comecei trazendo itens de terras¶distantes.{FB}Tenho alguns itens raros, também.¶Por fav"
+        },
+        {
+          "offset_hex": "0x0018aa0c",
+          "texto": "Oh, olá.¶Isso é um lindo {BUF}03.{FB}Isso me lembra uma doce menina¶que conheci durante uma viagem.{FB}Ela era adoravel "
+        }
+      ]
+    },
+    "está": {
+      "hex": "d9e7e817",
+      "ocorrencias": 345,
+      "contextos": [
+        {
+          "offset_hex": "0x00172ccb",
+          "texto": "Você me deixou louco!¶Você está na lista negra! "
+        },
+        {
+          "offset_hex": "0x00173035",
+          "texto": "{BUF}06[F0] Bonjour!¶{BUF}01!{FB}Surpresa ver você aqui! {BUF}01,¶você foi realmente convidado?{FB}E como está sua POKéD"
+        },
+        {
+          "offset_hex": "0x00173903",
+          "texto": "Como vencer o enjoo…¶O CAPIT[F1]O está lendo isto!        "
+        }
+      ]
+    },
+    "Está": {
+      "hex": "bfe7e817",
+      "ocorrencias": 53,
+      "contextos": [
+        {
+          "offset_hex": "0x00173382",
+          "texto": "Ahoy, lá!¶Está enjoado?      "
+        },
+        {
+          "offset_hex": "0x00174efa",
+          "texto": "Droga… Está derrotando toda¶EQUIPE ROCKET, não é?"
+        },
+        {
+          "offset_hex": "0x0017503a",
+          "texto": "Está perdido, pequeno rato?    "
+        }
+      ]
+    },
+    "Parabéns": {
+      "hex": "cad5e6d5d61be2e7",
+      "ocorrencias": 10,
+      "contextos": [
+        {
+          "offset_hex": "0x00177dc1",
+          "texto": "Ah! Finalmente!{FB}Você é a primeira pessoa a¶chegar na CASA SECRETA!{FB}Apesar de ter feito uma campanha¶de inauguração"
+        },
+        {
+          "offset_hex": "0x0017922f",
+          "texto": "OAK[F0] Que alegria!    ¶Meus parabéns, {BUF}01!{FB}Este piso é o nosso famoso   ¶HALL da FAMA POKéMON.{FB}Os CAMPE[F2]E"
+        },
+        {
+          "offset_hex": "0x00188c3c",
+          "texto": "Parabéns! Você venceu nossos¶5 TREINADORES!{FB}Quê legal!¶Você ganhou um prêmio fabuloso!"
+        }
+      ]
+    },
+    "obrigad": {
+      "hex": "e3d6e6dddbd5d8",
+      "ocorrencias": 12,
+      "contextos": [
+        {
+          "offset_hex": "0x00176266",
+          "texto": "Oh! Oi! Você não é um ROCKET!¶Veio nos salvar?[FA]Muito obrigado!{FB}Quero que fique com este POKéMON¶por nos salvar. "
+        },
+        {
+          "offset_hex": "0x00176573",
+          "texto": "Muito obrigada!   "
+        },
+        {
+          "offset_hex": "0x00176b90",
+          "texto": "Muito obrigado!   "
+        }
+      ]
+    },
+    "Poké": {
+      "hex": "cae3df1b",
+      "ocorrencias": 2,
+      "contextos": [
+        {
+          "offset_hex": "0x0041d195",
+          "texto": "   Pokémon FireRed Version¶Staff"
+        },
+        {
+          "offset_hex": "0x0041d1b6",
+          "texto": "  Pokémon LeafGreen Version¶Staff"
+        }
+      ]
+    }
+  },
+  "en": {
+    " the ": {
+      "hex": "00e8dcd900",
+      "ocorrencias": 64,
+      "contextos": [
+        {
+          "offset_hex": "0x001879d3",
+          "texto": "I'm looking at the sea to forget¶the bad thing that happened!"
+        },
+        {
+          "offset_hex": "0x003fb8f3",
+          "texto": "{BUF}0F transformed¶into the {BUF}00 type!"
+        },
+        {
+          "offset_hex": "0x003fbb11",
+          "texto": "{BUF}10 was trapped¶in the vortex!"
+        }
+      ]
+    },
+    "You": {
+      "hex": "d3e3e9",
+      "ocorrencias": 26,
+      "contextos": [
+        {
+          "offset_hex": "0x001b05cd",
+          "texto": "{FC}01Ë{FC}03ÌFrom[F0] KOGA¶To[F0] {BUF}01{FB}{FC}06Ç{FC}01Á{FC}03ÂYou and I, we must both set our¶sights higher and wor"
+        },
+        {
+          "offset_hex": "0x003fb806",
+          "texto": "Your team's {BUF}00¶stopped working!"
+        },
+        {
+          "offset_hex": "0x003fd700",
+          "texto": "You missed the POKéMON!"
+        }
+      ]
+    },
+    "Hello": {
+      "hex": "c2d9e0e0e3",
+      "ocorrencias": 0,
+      "contextos": []
+    },
+    "Thank": {
+      "hex": "cedcd5e2df",
+      "ocorrencias": 17,
+      "contextos": [
+        {
+          "offset_hex": "0x0041d783",
+          "texto": " Special Thanks¶¶¶¶¶¶"
+        },
+        {
+          "offset_hex": "0x0041d7db",
+          "texto": " Special Thanks¶¶¶¶¶¶"
+        },
+        {
+          "offset_hex": "0x0041d833",
+          "texto": " Special Thanks¶¶¶¶¶¶"
+        }
+      ]
+    },
+    "POKé": {
+      "hex": "cac9c51b",
+      "ocorrencias": 1982,
+      "contextos": [
+        {
+          "offset_hex": "0x00172208",
+          "texto": " y[75]éË[51]  Â[4F]À m[75]éË[51]  [0F] [72][4D]éËÌÇ[6C]ÁM [0F] N[4D]éËÌÇ[6C]Áúêúêúêúê[30]é[2E]é[2F]é[2D]é¶[6A][5A][30]0["
+        },
+        {
+          "offset_hex": "0x00172208",
+          "texto": " y[75]éË[51]  Â[4F]À m[75]éË[51]  [0F] [72][4D]éËÌÇ[6C]ÁM [0F] N[4D]éËÌÇ[6C]Áúêúêúêúê[30]é[2E]é[2F]é[2D]é¶[6A][5A][30]0["
+        },
+        {
+          "offset_hex": "0x001722c7",
+          "texto": "Ei! você tem POKéMON!¶Vem aqui![FA]Vamos batalhar!  "
+        }
+      ]
+    },
+    "PLAYER": {
+      "hex": "cac6bbd3bfcc",
+      "ocorrencias": 5,
+      "contextos": [
+        {
+          "offset_hex": "0x0023ea4e",
+          "texto": "    PLAYER"
+        },
+        {
+          "offset_hex": "0x004573f4",
+          "texto": "2-PLAYER¶MODE"
+        },
+        {
+          "offset_hex": "0x00457402",
+          "texto": "3-PLAYER¶MODE"
+        }
+      ]
+    }
+  }
+}

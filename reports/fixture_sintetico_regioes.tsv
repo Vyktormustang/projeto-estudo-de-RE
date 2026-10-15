@@ -1,0 +1,2 @@
+offset_hex	endereco_gba_hex	classe	entropia	pct_00_ff	thumb_bl	arm_bl	densidade_bl_por_kib
+0x00000000	0x08000000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	1.9712	0.8076	1026	3	32.16
