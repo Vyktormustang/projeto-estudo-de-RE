@@ -630,3 +630,21 @@ Progresso estimado do projeto: **~62%**.
 * Commit `05b1bc4` + merge com remoto (`d1b9d14`). PR #2 (revert do workflow JDK, obsoleto frente ao PR #3) FECHADO.
 * PENDENTE: aceitação visual completa (overworld/quarto, menu START com bolsa cheia, 60 s estável) e
   mod de preenchimento real (`apply_mod_v3`-equivalente com payload de itens) — o regkey atual só grava 0xAAAA.
+
+### Ciclo 35 — ENCERRAMENTO (2026-10-16)
+
+Projeto encerrado nesta fase. Ponto de entrada para retomar: **`RETOMADA.md`**.
+
+* **FATO, corrigido**: 4 bugs no mod v3 (veneer `00 4b`; retorno `0x08000A41`; máscara `0x3FF`;
+  endereço `0x020258B8`). Mod v4 gerado por `scripts/gen_tramp_v4.py` e provado por
+  `scripts/test_tramp_v4.py` (5/5) e no boot (`reports/c35_v4_nocombo600.png` idêntico ao original;
+  combo no frame 150 grava os 8 slots).
+* **FATO, falha**: combo dentro do jogo não dispara (bolsa zerada após o frame 4000).
+  HIPÓTESE: o hook roda só na inicialização; falta uma rotina por frame.
+* **FATO**: `.sav` do mGBA no Drive está vazio (131072 B, todos `0xFF`). `.st0` do MyBoy é state
+  fechado, não carregável; IWRAM localizada em `0xB8`; EWRAM não localizada; SAVE vazia.
+* **ABERTO**: navegação até o overworld. Estágio do tutorial em `0x02000022`; patch → intro do
+  Pikachu; A não avança essa intro. Ver `scripts/c35_nav_recipe.sh`.
+* Ambiente: `rom/`, `emu/*.bin`, `/tmp` e saves do usuário ficam fora do git (ignorados).
+  Restaure a ROM do Drive e confira o sha256 antes de retomar.
+* Documentos corrigidos: `HANDOFF.md` (veneer e retorno), `README.md` (retorno), `MEMORIA_CONSOLIDADA.md` §5.

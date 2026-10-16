@@ -66,7 +66,7 @@ por prova em frames/screenshots/dumps de RAM.
 - **Trampolim** em `0x08EB0C00` (run 0xFF livre do `freespace_map.tsv`), 158 B:
   ```
   push {r0-r3} ; payload 130 B (combo-gate → writes) ; pop {r0-r3}
-  replay do prólogo original ; constrói 0x08000A43 ; bx r3  (Thumb mantido)
+  replay do prólogo original ; constrói 0x08000A41 (corrigido c35; ver RETOMADA.md §4) ; bx r3  (Thumb mantido)
   ```
 - **Por que veneer e não BL:** BL Thumb só alcança **±4 MB**; o peso-árido fica
   a ~15,4 MB do site. Não existe freespace ≥256 B na janela ±4 MB
@@ -99,7 +99,7 @@ Cenário: overworld → SetGpuReg chamado a cada frame
                                      |                                                    bag[0..7] = ITEMS   # 0x020258B8
                                      |                                                pop {r0-r3}
                                      |                                                push {r4,r5,lr}; lsls..; lsrs..; lsls..
-                                     |                                                bx → 0x08000A43 (Thumb ☑)
+                                     |                                                bx → 0x08000A41 (corrigido c35; ver RETOMADA.md §4) (Thumb ☑)
 ```
 
 ---

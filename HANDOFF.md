@@ -1,3 +1,5 @@
+> **ATENÇÃO (ciclo 35, 2026-10-16):** leia primeiro `RETOMADA.md`. Os valores de veneer e de retorno abaixo foram corrigidos; o restante do histórico está correto como registro.
+
 # HANDOFF — Continue daqui (qualquer agente)
 
 > Se você está pegando este projeto do zero, leia na ordem:
@@ -17,7 +19,7 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
 ## 1. O que NÃO refazer (causas-raiz já provadas)
 - **BL Thumb alcança só ±4 MB.** Hookar `0x08000B08 → 0x08EB0C00` (~15,4 MB) é
   impossível por BL e trava a tela de copyright. Resolvido por **veneer** em
-  `0x08000A38` (`01 4b 18 47 01 0c eb 08`). Não tente BL distante de novo.
+  `0x08000A38` (`00 4b 18 47 01 0c eb 08` (corrigido c35)). Não tente BL distante de novo.
 - `scripts/gba_disasm.py::encode_bl_thumb` e `gba_hook_code.py` têm **bug de sinal**
   em bls negativos (bit-S nunca ligado). Trata qualquer trampo gerado por eles como
   suspeito. Patch a pendência mais valiosa do repo.
@@ -52,9 +54,9 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
    `348025c1...2215a3`.
 
 ## 3. Cheatsheet técnico (números já provados)
-- SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
+- SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `00 4b 18 47 | .word TRAMP+1` (corrigido c35).
 - Tramp @ `0x08EB0C00` (run 0xFF, ver `reports/freespace_map.tsv`), 158 B builder-
-  revisado; salva/restore `{r0-r3}`, replay do prólogo, retorno `bx` pra `0x08000A43`
+  revisado; salva/restore `{r0-r3}`, replay do prólogo, retorno `bx` pra 0x08000A41 (corrigido c35; o valor antigo pulava lsrs)
   (bit0=1 mantém Thumb).
 - BL certo (replicado contra 6.000 BLs reais, ≡ capstone): S-bit + campo 23-bit
   H10:L11 — fórmula em `MEMORIA_CONSOLIDADA.md` §5.
