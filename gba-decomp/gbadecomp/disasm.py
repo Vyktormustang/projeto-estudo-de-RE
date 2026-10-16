@@ -30,6 +30,47 @@ GRUPO_CHAMADA = (capstone.CS_GRP_CALL,)
 GRUPO_RETORNO = (capstone.CS_GRP_RET,)
 
 
+
+# ---------------------------------------------------------------------------
+# O alvo e ARM7TDMI (ARMv4T). Instrucao que NAO existe nessa arquitetura so
+# pode significar uma coisa: a varredura entrou em DADOS e os leu como codigo
+# (ou pulou para uma tabela). Em vez de levantar isso como se fosse codigo --
+# o que produziria C bonito e completamente falso -- a varredura PARA ali e
+# registra o motivo. Foi assim que apareceram `strd`, `cbnz`, `it`, `cdp2` e
+# sufixos `.w` vindos de dados, com aparencia perfeitamente plausivel.
+# ---------------------------------------------------------------------------
+FORA_DO_ARM7TDMI = {
+    "cdp2", "mcr2", "mrc2", "udf", "bkpt", "cbz", "cbnz", "ldrd", "strd",
+    "sdiv", "udiv", "dmb", "dsb", "isb", "wfi", "wfe", "sev", "pld", "pli",
+    "ldrex", "strex", "clz", "bfc", "bfi", "rev16", "revsh", "sxtb", "sxth",
+    "uxtb", "uxth", "smlabb", "smlabt", "smlaltb", "smlaltt", "smulbb",
+    "qadd", "qsub", "qdadd", "qdsub", "bxj", "eret", "rfe", "srs", "blx",
+}
+FORA_DO_V4T_SO_NO_THUMB = {
+    "adr", "rev", "mrs", "msr", "umull", "umlal", "smull", "smlal", "swp",
+    "swpb", "ldc", "stc", "mcr", "mrc", "cdp", "ldmib", "stmib", "mul",
+}
+SUFIXOS_THUMB2 = (".w", ".n")
+
+
+def impossivel_no_arm7tdmi(ins, modo: str) -> str | None:
+    """Motivo pelo qual a instrucao nao pode executar num ARM7TDMI, ou None."""
+    mnemonic = ins.mnemonic.lower()
+    for sufixo in SUFIXOS_THUMB2:
+        if sufixo in mnemonic:
+            return f"forma larga do Thumb-2 ({mnemonic})"
+    base = mnemonic.split(".")[0]
+    if base.startswith("it"):
+        return f"IT block ({base}): nao existe no ARMv4T"
+    if base in FORA_DO_ARM7TDMI:
+        return f"{base}: instrucao inexistente no ARM7TDMI"
+    for prefixo in ("ldc2", "stc2", "cdp2", "mcr2", "mrc2", "blx", "bxns", "vc"):
+        if base.startswith(prefixo):
+            return f"{base}: coprocessador 2 nao existe no ARM7TDMI"
+    if modo == "thumb" and base in FORA_DO_V4T_SO_NO_THUMB:
+        return f"{base}: existe no ARM do ARMv4T, mas nao no Thumb-1"
+    return None
+
 @dataclass
 class Instrucao:
     """Uma instrucao desmontada."""
@@ -161,11 +202,17 @@ def desmontar_por_sementes(
     if not fila:
         alvo = _entrada_de_boot(imagem, base)
         if alvo is None:
-            saida.avisos.append("vetor de boot ilegivel; informe sementes")
-            return saida
-        # O vetor de boot e executado em ARM (`ldr r0,[pc,#0]; bx r0`), e o bit0
-        # do valor carregado diz o modo do codigo de destino -- convencao do ARM.
-        fila.append((alvo & ~1, "thumb" if alvo & 1 else "arm", "vetor de boot"))
+            # Numa ROM de GBA o processador SEMPRE comeca em ARM no inicio do
+            # cartucho (0x08000000), com o branch de entrada nos 4 primeiros
+            # bytes. A heuristica de 0xC0 pode falhar (a ROM de estudo tem zeros
+            # ali), mas isso nao impede a descoberta -- entao o padrao e o reset.
+            saida.avisos.append("sem stub em 0xC0; usando o vetor de reset "
+                                "(0x08000000, ARM) como semente")
+            fila.append((base, "arm", "vetor de reset"))
+        else:
+            # O vetor de boot e executado em ARM (`ldr r0,[pc,#0]; bx r0`), e o
+            # bit0 do valor carregado diz o modo do destino -- convencao do ARM.
+            fila.append((alvo & ~1, "thumb" if alvo & 1 else "arm", "vetor de boot"))
 
     while fila and len(saida.funcoes) < max_funcoes:
         entrada, modo, origem = fila.pop(0)
@@ -218,6 +265,12 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                 funcao.terminacao = f"codigo invalido em 0x{atual:08X}"
                 break
             ins = instrucoes[0]
+            motivo = impossivel_no_arm7tdmi(ins, modo)
+            if motivo is not None:
+                # Nao inventa codigo: registra onde parou e por que.
+                funcao.terminacao = (f"parou em 0x{atual:08X}: {motivo} "
+                                     f"(provavel dado lido como codigo)")
+                break
             funcao.instrucoes.append(Instrucao(ins.address, ins.bytes,
                                                ins.mnemonic, ins.op_str, modo,
                                                alvo=_destino_imediato(ins)))

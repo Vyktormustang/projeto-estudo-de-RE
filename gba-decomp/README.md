@@ -37,6 +37,40 @@ decrescente, classificação por faixas, leitura/escrita de memória, chamadas
 internas). Ela serve para provar o *ferramental* em ARM/Thumb de verdade — não
 diz nada sobre qualquer ROM de terceiros.
 
+## ROM real (Pokemon - Fire Red BR): números medidos
+
+Com a ROM no disco (`/home/user/gba-re/rom/pokemon_firered_bpre_trabalho.gba`,
+sha256 `6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae` — bate
+exatamente com o `inventory.json` do projeto):
+
+| medida | valor |
+|---|---|
+| censo do projeto | 5 981 funções (5 980 Thumb, 1 ARM) |
+| descoberta **só a partir do vetor de reset** | 1 876 funções, 73 792 instruções, 3 432 arestas |
+| …das quais confirmadas no censo | 1 382 · e **494 que o censo não tinha** |
+| descoberta com o censo como semente | **7 717 funções, 353 854 instruções, 16 387 arestas** |
+| censo coberto | 5 981/5 981 (100%) · **1 736 funções fora do censo** |
+| funções levantadas para C | **7 269 de 7 717 (94,2%)** |
+| C gerado | 776 324 linhas / 29 MB — **compila sem erros** com `zig cc -mcpu=arm7tdmi` (objeto ARM de 1,7 MB) |
+| conferência byte a byte | **353 821/353 854 instruções (99,991%)** remontam idênticas ao binário |
+
+Duas descobertas que valem mais que os números:
+
+1. **Metade do que a varredura ingênua produzia era dado lido como código.** A
+   primeira passada devolveu 675 389 "instruções"; ao rejeitar o que *não existe*
+   no ARM7TDMI (`strd`, `cbnz`, `it`, `cdp2`, `.w`) sobraram **353 854**. Os
+   opcodes válidos eram de Thumb-2/ARMv5 — impossíveis no GBA — vinham de tabelas
+   de dados percorridas como código. Sem esse filtro, o levantamento teria
+   gerado C bonito e completamente falso.
+2. **As 28 divergências de bytes são o mesmo `cmp r6, r7`** gravado em outra
+   codificação (`0x453E` vs `0x42BE`): codificação alternativa, semântica
+   idêntica. As 5 restantes o remontador não aceitou na sintaxe usada.
+
+O que esses números **não** dizem: que o C esteja semanticamente certo. Num
+binário de terceiros não existe verdade-terreno, então o que se prova é
+fidelidade (bytes) e compilabilidade — não comportamento. As 448 funções que
+ficaram incompletas (5,8%) aparecem no arquivo com o motivo, uma por uma.
+
 ## O que está provado e o que não está
 
 **Provado:** o ciclo completo funciona em código Thumb real. As armadilhas que
