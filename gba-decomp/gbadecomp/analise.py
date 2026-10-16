@@ -63,22 +63,36 @@ def compilar(caminho_c: Path, zig: str | None) -> dict:
     """
     if not zig:
         return {"compila": None, "motivo": "zig nao encontrado: compilacao nao testada"}
-    with tempfile.TemporaryDirectory() as tmp:
-        objeto = Path(tmp) / "levantado.o"
-        proc = subprocess.run(
-            [zig, "cc", "-target", "thumb-freestanding-eabi", "-mcpu=arm7tdmi",
-             "-Os", "-nostdlib", "-ffreestanding", "-c", str(caminho_c), "-o", str(objeto)],
-            capture_output=True, text=True, timeout=1800)
-        erros = [l for l in proc.stderr.splitlines() if "error:" in l]
-        return {
-            "compila": proc.returncode == 0,
-            "codigo_de_saida": proc.returncode,
-            "n_erros": len(erros),
-            "primeiros_erros": erros[:10],
-            "bytes_objeto": objeto.stat().st_size if objeto.exists() else 0,
-            "comando": f"{zig} cc -target thumb-freestanding-eabi -mcpu=arm7tdmi "
-                       f"-Os -nostdlib -ffreestanding -c",
-        }
+    # DIRETORIO DE BUILD FIXO (nao e' preciosismo): o compilador embute o CAMINHO
+    # do fonte no objeto, entao compilar a partir de um diretorio temporario
+    # aleatorio muda o TAMANHO do objeto entre rodadas com o MESMO C -- medido:
+    # 2 124 636, 2 124 640 e 2 124 644 bytes para o mesmo arquivo. Publicar esse
+    # numero como se fosse constante seria publicar ruido. Com caminho fixo, o
+    # objeto (e o hash dele) fica comparavel de verdade.
+    pasta = Path(tempfile.gettempdir()) / "gbadecomp-build"
+    pasta.mkdir(parents=True, exist_ok=True)
+    fonte = pasta / "levantado.c"
+    fonte.write_text(caminho_c.read_text(encoding="utf-8"), encoding="utf-8")
+    objeto = pasta / "levantado.o"
+    if objeto.exists():
+        objeto.unlink()
+    proc = subprocess.run(
+        [zig, "cc", "-target", "thumb-freestanding-eabi", "-mcpu=arm7tdmi",
+         "-Os", "-nostdlib", "-ffreestanding", "-c", str(fonte), "-o", str(objeto)],
+        capture_output=True, text=True, timeout=1800)
+    erros = [l for l in proc.stderr.splitlines() if "error:" in l]
+    return {
+        "compila": proc.returncode == 0,
+        "codigo_de_saida": proc.returncode,
+        "n_erros": len(erros),
+        "primeiros_erros": erros[:10],
+        "bytes_objeto": objeto.stat().st_size if objeto.exists() else 0,
+        "sha256_objeto": (hashlib.sha256(objeto.read_bytes()).hexdigest()
+                          if objeto.exists() else None),
+        "diretorio_de_build": str(pasta),
+        "comando": f"{zig} cc -target thumb-freestanding-eabi -mcpu=arm7tdmi "
+                   f"-Os -nostdlib -ffreestanding -c",
+    }
 
 
 def _classificar(codigo: decompile_mod.CodigoC) -> dict:
@@ -169,6 +183,12 @@ class Medicao:
                           f"{self.boot.get('descartes')} descartes")
             linhas.append(f"  no censo: {self.boot.get('no_censo')} | "
                           f"fora do censo: {self.boot.get('fora_do_censo')}")
+            linhas.append(f"  saltos para tras (saem da funcao): "
+                          f"{self.boot.get('saidas_para_tras')} | trechos orfaos "
+                          f"recuperados como janela propria: "
+                          f"{self.boot.get('saidas_recuperadas')}")
+            linhas.append(f"  tabelas de casos: {self.boot.get('tabelas_de_casos')} "
+                          f"({self.boot.get('casos_de_tabela')} casos lidos da ROM)")
         if self.completo:
             linhas.append("descoberta com o censo como semente:")
             linhas.append(f"  {self.completo.get('funcoes')} funcoes, "
@@ -178,6 +198,12 @@ class Medicao:
             linhas.append(f"  censo coberto: {self.completo.get('no_censo')}/"
                           f"{self.censo_funcoes} | fora do censo: "
                           f"{self.completo.get('fora_do_censo')}")
+            linhas.append(f"  saltos para tras (saem da funcao): "
+                          f"{self.completo.get('saidas_para_tras')} | trechos orfaos "
+                          f"recuperados como janela propria: "
+                          f"{self.completo.get('saidas_recuperadas')}")
+            linhas.append(f"  tabelas de casos: {self.completo.get('tabelas_de_casos')} "
+                          f"({self.completo.get('casos_de_tabela')} casos lidos da ROM)")
         if self.levantamento:
             lev = self.levantamento
             linhas += [
@@ -224,15 +250,35 @@ class Medicao:
         return self.__dict__
 
 
+def _contar_tabelas(desmontagem) -> tuple[int, int]:
+    """(tabelas de casos reconhecidas, casos lidos delas).
+
+    Existe porque estes dois numeros, antes, saiam de `grep` no .c gerado -- e
+    numero que nao vem da medicao nao e medicao: o `grep` nao distingue tabela
+    reconhecida de `switch` emitido, e nao sobrevive a mudanca de formato do C.
+    Aqui a fonte e' a propria descoberta (cada alvo foi LIDO da ROM).
+    """
+    tabelas = [t for f in desmontagem.funcoes.values() for t in f.tabelas]
+    return len(tabelas), sum(len(t.alvos) for t in tabelas)
+
+
 def _descoberta(rom: rom_mod.GbaRom, sementes: dict[int, str],
                 enderecos_censo: set[int]) -> tuple[dict, object]:
     desmontagem = disasm_mod.desmontar_por_sementes(rom.data, sementes=sementes or None)
     dentro = [a for a in desmontagem.funcoes if a in enderecos_censo]
+    tabelas, casos = _contar_tabelas(desmontagem)
     return {
+        "tabelas_de_casos": tabelas,
+        "casos_de_tabela": casos,
         "funcoes": len(desmontagem.funcoes),
         "instrucoes": desmontagem.total_instrucoes,
         "arestas": len(desmontagem.arestas()),
         "descartes": len(desmontagem.descartes),
+        # A regra do salto para tras (disasm._seguir_funcao, ponto 4): quantos
+        # desvios saem da funcao para um bloco comum de outra rotina e quantos
+        # desses trechos, nao cobertos por ninguem, voltaram como janela propria.
+        "saidas_para_tras": desmontagem.saidas_para_tras,
+        "saidas_recuperadas": desmontagem.saidas_recuperadas,
         "no_censo": len(dentro) if enderecos_censo else None,
         "fora_do_censo": (len(desmontagem.funcoes) - len(dentro)) if enderecos_censo else None,
     }, desmontagem
@@ -322,10 +368,11 @@ def medir(caminho_rom: str | Path, censo: str | Path | None = None,
             "total": resultado.total,
             "identicas": resultado.identicas,
             "taxa": round(resultado.taxa, 3),
-            "divergentes": len(resultado.divergentes),
-            "nao_remontadas": len(resultado.falhas_de_sintaxe),
+            "divergentes": resultado.divergentes,
+            "divergentes_por_mnemonico": resultado.por_mnemonico,
+            "nao_remontadas": resultado.falhas_de_sintaxe_total,
             "divergentes_exemplos": [
                 {"endereco": f"0x{e:08X}", "asm": asm, "binario": orig, "remontado": novo}
-                for e, asm, orig, novo in resultado.divergentes[:5]],
+                for e, asm, orig, novo in resultado.exemplos[:5]],
         }
     return medicao

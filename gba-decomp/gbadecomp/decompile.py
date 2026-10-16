@@ -120,6 +120,10 @@ class FuncaoDec:
     nao_levantadas: list[str] = field(default_factory=list)
     externos: list[str] = field(default_factory=list)   # alvos de chamada sem corpo
     balanceamento: str = "desconhecido"
+    # De ONDE veio esta janela de codigo (chamada, ponteiro de pool, salto para
+    # tras...). Vai no cabecalho do C: sem isso, uma janela que comeca no MEIO
+    # de um corpo parece funcao completa, e o C dela nao tem nem prologo.
+    semente: str = "?"
     terminacao: str = "indefinida"                      # como o fluxo terminou
     declaracoes: list[str] = field(default_factory=list)  # temporarios do switch
 
@@ -224,7 +228,7 @@ class CodigoC:
                     resumo += f", ... (+{len(quem_chama) - 6})"
                 linhas.append(f"/* chamada por {len(quem_chama)}: {resumo} */")
             origem = (f"/* origem: 0x{f.endereco:08X} ({f.modo}), "
-                      f"pilha: {f.balanceamento}")
+                      f"semente: {f.semente}, pilha: {f.balanceamento}")
             if _terminacao_notavel(f.terminacao):
                 origem += f", fim: {f.terminacao}"
             linhas.append(origem + " */")
@@ -349,6 +353,7 @@ class _Emissor:
             externos=sorted(self.externos),
             balanceamento=("balanceada" if self.sp_modelo == 0
                            else f"desequilibrada ({self.sp_modelo} slots)"),
+            semente=self.f.semente,
             terminacao=self.f.terminacao,
             declaracoes=[f"u32 idx_{t.endereco:08X} = 0;  /* indice da tabela de "
                          f"casos em 0x{t.tabela:08X} */"
@@ -537,7 +542,55 @@ class _Emissor:
         if r == "lr" or r in self.lr_regs:
             self._emitir("return r0;")
             return
-        raise _NaoLevantado("desvio indireto por registrador sem origem conhecida")
+        # SEGUNDO CAMINHO, e o que mais aparece na ROM real: `pop {rN}` (ou
+        # `ldr rN, [sp, ...]`) IMEDIATAMENTE antes do `bx rN`. Este e o epilogo
+        # padrao de quem compila para ARM7TDMI: em vez de `pop {pc}`, o retorno
+        # passa por um registrador baixo, porque `bx` aceita registrador baixo
+        # nos dois modos. Aceitar isso NAO depende do livro-caixa de slots, que
+        # so fica correto quando a leitura comeca na ENTRADA da funcao -- e
+        # 61 dos 96 `bx` recusados estavam em janelas que comecam no meio do
+        # corpo (endereco lido de tabela de dados), onde o `push` do `lr` nao
+        # existe dentro do trecho lido. A condicao e' mecanica: quem carrega o
+        # registrador e' uma leitura DA PILHA, e a instrucao e' a anterior.
+        anterior = self._anterior()
+        if anterior is not None and _carrega_da_pilha(anterior, r):
+            self._emitir(f"/* retorno pelo valor que o `{anterior.mnemonic}` "
+                         f"tirou da pilha */")
+            self._emitir("return r0;")
+            return
+        raise _NaoLevantado(self._motivo_bx_sem_origem())
+
+    def _motivo_bx_sem_origem(self) -> str:
+        """Por que este `bx rN` nao vira C -- dito com precisao, caso a caso.
+
+        Tres situacoes MUITO diferentes caem no mesmo "sem origem conhecida", e
+        junta-las faz o relatorio enganar quem le: parece falha do levantador o
+        que na verdade e' uma construcao que nao tem traducao literal (o alvo e'
+        um PARAMETRO, por desenho). Medido na ROM de estudo:
+          * janelas de 4 bytes `bx rN` + nop (`mov r8, r8`), alinhadas a cada 4
+            bytes em 0x081E3BA8.., chamadas por `bl` de dezenas de sitios: sao
+            thunks "chame pelo registrador N" -- o destino vem de quem chamou;
+          * `stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN` (ARM): chamada
+            indireta ARM->Thumb com o endereco de retorno montado a mao (o
+            `add lr, pc, #0` marca o bit do modo Thumb).
+        """
+        if self._indice_instrucao == 0:
+            return ("thunk de salto indireto: a janela comeca em `bx rN` (com nop "
+                    "de alinhamento), ou seja o destino vem NO REGISTRADOR, de "
+                    "quem chamou -- traduzir exigiria inventar a assinatura")
+        anterior = self._anterior()
+        if anterior is not None and _monta_retorno_a_mao(anterior):
+            return ("chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + "
+                    "`add lr, pc, #0` + `bx rN`): o alvo veio de dado lido na ROM, "
+                    "sem assinatura declarada")
+        return "desvio indireto por registrador sem origem conhecida"
+
+    def _anterior(self):
+        """Instrucao imediatamente anterior NA ORDEM EMITIDA (nao por endereco)."""
+        indice = self._indice_instrucao - 1
+        if 0 <= indice < len(self.f.instrucoes):
+            return self.f.instrucoes[indice]
+        return None
 
     def _desvio(self, ins) -> None:
         alvo = ins.operands[0].imm & 0xFFFFFFFF
@@ -554,7 +607,8 @@ class _Emissor:
                 self._emitir(f"r0 = {self.nomes[alvo]}(r0, r1, r2, r3);")
                 self._emitir("return r0;")
             else:
-                raise _NaoLevantado(f"salto para fora da funcao (0x{alvo:08X})")
+                raise _NaoLevantado(_saida_para_tras(alvo, self.f.entrada)
+                                    or f"salto para fora da funcao (0x{alvo:08X})")
             return
         if ins.mnemonic in ("bl", "blx"):
             if (alvo & ~1) not in self.nomes:
@@ -588,8 +642,9 @@ class _Emissor:
                 self._emitir(f"if ({cond}) {{ r0 = {self.nomes[alvo]}(r0, r1, r2, r3); "
                              f"return r0; }}  /* chamada de cauda condicional */")
                 return
-            raise _NaoLevantado(f"desvio para 0x{alvo:08X}, que nao foi desmontado "
-                                f"(rotulo inexistente)")
+            raise _NaoLevantado(
+                _saida_para_tras(alvo, self.f.entrada)
+                or f"desvio para 0x{alvo:08X}, que nao foi desmontado (rotulo inexistente)")
         self._emitir(f"if ({cond}) goto {self._rotulo(alvo)};")
 
     def _aritmetica(self, ins, m: str) -> None:
@@ -871,6 +926,53 @@ def _condicao_direta(sufixo: str, descritor) -> str | None:
         destino = descritor[1]
         return {"eq": f"{destino} == 0", "ne": f"{destino} != 0",
                 "mi": f"(s32){destino} < 0", "pl": f"(s32){destino} >= 0"}.get(sufixo)
+    return None
+
+
+def _monta_retorno_a_mao(instrucao) -> bool:
+    """`add lr, pc, #0` -- o retorno do interworking montado instrucao a instrucao."""
+    return (instrucao.mnemonic in ("add", "adds")
+            and instrucao.operadores.replace(" ", "").startswith("lr,pc,"))
+
+
+def _carrega_da_pilha(instrucao, registrador: str) -> bool:
+    """A instrucao carrega `registrador` de algo que esta NA PILHA?
+
+    Cobre as tres formas que a ROM usa no epilogo: `pop {..., rN, ...}`,
+    `ldr rN, [sp, ...]` e `ldmia sp!, {..., rN, ...}`. Comparar por texto e'
+    proposital: o desmonte ja passou pelo capstone, entao o operando esta na
+    forma canonica (`sp`, nomes de registrador em minusculas) e nao ha
+    ambiguidade de codificacao.
+    """
+    if instrucao.mnemonic in ("pop", "ldmia", "ldm", "ldmfd"):
+        return registrador in _lista_de_registradores(instrucao.operadores)
+    if instrucao.mnemonic in ("ldr", "ldrb", "ldrh", "ldrsb", "ldrsh"):
+        partes = instrucao.operadores.split(",", 1)
+        return (len(partes) == 2 and partes[0].strip() == registrador
+                and "[sp" in partes[1].replace(" ", ""))
+    return False
+
+
+def _lista_de_registradores(operadores: str) -> list[str]:
+    """Nomes dentro de `{...}` (lista de registradores do push/pop/ldm)."""
+    if "{" not in operadores:
+        return []
+    lista = operadores.split("{", 1)[1].split("}", 1)[0]
+    return [nome.strip() for nome in lista.split(",") if nome.strip()]
+
+
+def _saida_para_tras(alvo: int, entrada: int) -> str | None:
+    """Motivo especifico para desvio que sai da funcao PARA TRAS.
+
+    Desvio para endereco abaixo da entrada nao e' "rotulo inexistente" (defeito
+    do lifter) nem "funcao nao descoberta": e' a leitura continuando em outra
+    rotina -- o bloco/epilogo comum que o compilador compartilha entre funcoes.
+    A mensagem tem de dizer isso, porque a acao de quem le e' diferente: aqui
+    nao falta implementar instrucao nenhuma, falta o bloco pertencer a funcao.
+    """
+    if alvo < entrada:
+        return (f"desvio para tras, para fora da funcao (0x{alvo:08X} < entrada "
+                f"0x{entrada:08X}): a leitura continua em bloco comum de outra rotina")
     return None
 
 

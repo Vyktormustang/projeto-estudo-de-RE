@@ -30,8 +30,16 @@ class ConferenciaBytes:
 
     total: int = 0
     identicas: int = 0
+    # CONTAGEM SEPARADA DA AMOSTRA (bug real, achado ao rodar a medicao): antes o
+    # numero de divergencias era `len(exemplos)` e `exemplos` para de crescer no
+    # limite -- com 225 divergencias de verdade o relatorio imprimia "25", que e
+    # exatamente o tipo de numero que mente. Agora o total e' contado sempre e a
+    # lista guardada e' so a amostra para mostrar.
+    divergentes: int = 0
+    por_mnemonico: dict[str, int] = field(default_factory=dict)
     exemplos: list[tuple[int, str, str, str]] = field(default_factory=list)
     falhas_de_sintaxe: list[tuple[int, str, str]] = field(default_factory=list)
+    falhas_de_sintaxe_total: int = 0
     limite_exemplos: int = 25
 
     @property
@@ -41,21 +49,19 @@ class ConferenciaBytes:
     def texto(self) -> str:
         linhas = [f"conferencia de bytes: {self.identicas}/{self.total} "
                   f"({self.taxa:.2f}%) remontam identicas ao binario"]
-        if self.falhas_de_sintaxe:
-            linhas.append(f"  {len(self.falhas_de_sintaxe)} instrucoes que o "
+        if self.falhas_de_sintaxe_total:
+            linhas.append(f"  {self.falhas_de_sintaxe_total} instrucoes que o "
                           f"remontador nao aceitou na sintaxe usada (nao contam "
                           f"como divergencia de bytes):")
             for endereco, texto, erro in self.falhas_de_sintaxe[:5]:
                 linhas.append(f"    {endereco:08X} {texto}  -> {erro}")
-        if self.exemplos:
+        if self.divergentes:
             # Agrupar por mnemonico: interessa saber se as divergencias sao uma
             # classe so (mesma instrucao com codificacao alternativa, que e o
-            # esperado) ou varias (o que indicaria leitura errada).
-            por_mnemonico: dict[str, int] = {}
-            for _, texto, _, _ in self.exemplos:
-                por_mnemonico[texto.split(" ")[0]] = por_mnemonico.get(texto.split(" ")[0], 0) + 1
-            linhas.append(f"  {len(self.exemplos)} divergencias, por mnemonico: "
-                          f"{por_mnemonico}")
+            # esperado) ou varias (o que indicaria leitura errada). O agrupamento
+            # conta TODAS as divergencias, nao so a amostra guardada.
+            linhas.append(f"  {self.divergentes} divergencias, por mnemonico: "
+                          f"{dict(sorted(self.por_mnemonico.items(), key=lambda x: -x[1]))}")
             for endereco, texto, original, remontado in self.exemplos[:8]:
                 linhas.append(f"    {endereco:08X} {texto}: binario {original}, "
                               f"remonta {remontado}")
@@ -90,21 +96,28 @@ def conferir(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE,
             try:
                 montado, _ = ks.asm(texto, instrucao.endereco)
             except keystone.KsError as exc:
+                resultado.falhas_de_sintaxe_total += 1
                 if len(resultado.falhas_de_sintaxe) < 200:
                     resultado.falhas_de_sintaxe.append(
                         (instrucao.endereco, texto, str(exc)))
                 continue
             if not montado:
+                resultado.falhas_de_sintaxe_total += 1
                 if len(resultado.falhas_de_sintaxe) < 200:
                     resultado.falhas_de_sintaxe.append(
                         (instrucao.endereco, texto, "sem bytes"))
                 continue
             if bytes(montado) == instrucao.bytes_:
                 resultado.identicas += 1
-            elif len(resultado.exemplos) < limite_exemplos:
-                pass
-                resultado.exemplos.append((instrucao.endereco, texto,
-                                           instrucao.bytes_.hex(), bytes(montado).hex()))
+            else:
+                resultado.divergentes += 1
+                mnemonico = instrucao.mnemonic
+                resultado.por_mnemonico[mnemonico] = \
+                    resultado.por_mnemonico.get(mnemonico, 0) + 1
+                if len(resultado.exemplos) < limite_exemplos:
+                    resultado.exemplos.append((instrucao.endereco, texto,
+                                               instrucao.bytes_.hex(),
+                                               bytes(montado).hex()))
     return resultado
 
 

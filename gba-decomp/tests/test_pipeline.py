@@ -23,6 +23,7 @@ sys.path.insert(0, str(RAIZ))
 
 from gbadecomp import (  # noqa: E402
     analise as analise_mod,
+    conferir_bytes as conferir_mod,
     corpus,
     decompile,
     disasm,
@@ -385,3 +386,232 @@ def test_tabela_sem_guarda_que_bata_nao_vira_switch():
     assert not levantada.completa
     assert "nao reconhecida" in levantada.corpo
     assert "switch" not in levantada.corpo
+
+
+def _imagem_com_salto_para_tras() -> bytes:
+    """Imagem minima com o idioma REAL que a ROM de estudo usa em toda parte:
+
+        0x08000010  movs r0, #1      } funcao A ("anterior")
+        0x08000012  bx lr            } -> este `bx lr` e o EPILOGO COMPARTILHADO
+        0x08000014  movs r1, #2      } funcao B
+        0x08000016  b 0x08000012     } salto PARA TRAS, para o epilogo de A
+
+    O compilador reaproveita o epilogo da funcao anterior, entao o corpo de B
+    "termina" fora de B. E o mesmo caso medido na ROM: FUN_08018258 saltava para
+    0x08017B92 (dentro da rotina anterior) e engolia 651 instrucoes dela.
+    """
+    base = rom.ROM_BASE
+    imagem = bytearray(0x40)
+    imagem[0x10:0x12] = (0x2001).to_bytes(2, "little")     # movs r0, #1
+    imagem[0x12:0x14] = (0x4770).to_bytes(2, "little")     # bx lr
+    imagem[0x14:0x16] = (0x2102).to_bytes(2, "little")     # movs r1, #2
+    # b 0x08000012: offset = alvo - (endereco + 4) = 0x12 - 0x1A = -8 -> imm11 = -4
+    offset = (0x08000012 - (0x08000016 + 4)) // 2
+    imagem[0x16:0x18] = (0xE000 | (offset & 0x7FF)).to_bytes(2, "little")
+    imagem[0x18:0x40] = b"\xff" * 0x28
+    return bytes(imagem)
+
+
+def test_salto_para_tras_sai_da_funcao_em_vez_de_engolir_a_anterior():
+    """A descoberta de B NAO pode mudar o corpo de A -- nem reivindicar bytes dele.
+
+    Antes desta regra, a leitura seguia o salto para tras e a "funcao" ficava com
+    faixa 0x08017B92..0x08018C86 (1 722 instrucoes), 651 delas ANTES da propria
+    entrada. Efeito colateral medido: 13 780 enderecos apareciam em mais de uma
+    funcao e 65 dos 100 `bx rN` recusados eram `pop {r1}; bx r1` cujo `push` que
+    marca o retorno estava antes da entrada.
+    """
+    imagem = _imagem_com_salto_para_tras()
+    so_a = disasm.desmontar_por_sementes(imagem, sementes={0x08000010: "thumb"})
+    ambas = disasm.desmontar_por_sementes(
+        imagem, sementes={0x08000010: "thumb", 0x08000014: "thumb"})
+    a_sozinha = so_a.funcoes[0x08000010].instrucoes
+    assert [i.endereco for i in a_sozinha] == [0x08000010, 0x08000012]
+    b = ambas.funcoes[0x08000014]
+    assert [i.endereco for i in b.instrucoes] == [0x08000014, 0x08000016], \
+        "B nao pode conter as instrucoes de A (0x08000012 e o epilogo de A)"
+    assert b.saidas == [(0x08000016, 0x08000012)]
+    assert "para tras" in b.terminacao
+    for funcao in ambas.funcoes.values():
+        assert all(i.endereco >= funcao.entrada for i in funcao.instrucoes), \
+            f"0x{funcao.entrada:08X} tem instrucao antes da propria entrada"
+    assert ambas.saidas_para_tras == 1
+    assert ambas.saidas_recuperadas == 0, \
+        "0x08000012 ja esta coberto por A: recuperar de novo duplicaria endereco"
+
+
+def test_salto_para_tras_para_trecho_orfaos_volta_como_semente():
+    """O preco da regra: trecho alcancado SO por salto para tras nao pode sumir.
+
+    Se nenhuma funcao cobre o destino, ele volta como semente propria, marcado
+    com a origem (`salto para tras em 0x...`) -- e nao como se fosse uma entrada
+    descoberta por chamada, que seria mentira sobre como se chegou ali.
+    """
+    imagem = _imagem_com_salto_para_tras()
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000014: "thumb"})
+    assert set(desmontagem.funcoes) == {0x08000014, 0x08000012}
+    orfa = desmontagem.funcoes[0x08000012]
+    assert [i.endereco for i in orfa.instrucoes] == [0x08000012]
+    assert orfa.semente == "salto para tras em 0x08000016"
+    assert desmontagem.saidas_recuperadas == 1
+    # e o trecho nao coberto continua auditavel no JSON (com a semente de origem)
+    registros = json.loads(desmontagem.para_json())["funcoes"]
+    orfao = next(r for r in registros if r["entrada"] == "0x08000012")
+    assert orfao["semente"] == "salto para tras em 0x08000016"
+
+
+def test_lift_diz_que_o_desvio_para_tras_sai_da_funcao():
+    """O C nao pode fingir que o salto para tras e' rotulo interno nem chamada.
+
+    Aqui nao falta implementar instrucao: falta o bloco ser da funcao. A mensagem
+    tem de dizer isso -- e a funcao sai PARCIAL, marcada.
+    """
+    imagem = _imagem_com_salto_para_tras()
+    desmontagem = disasm.desmontar_por_sementes(
+        imagem, sementes={0x08000010: "thumb", 0x08000014: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    por_entrada = {f.endereco: f for f in codigo.funcoes}
+    b = por_entrada[0x08000014]
+    assert not b.completa and b.parcial
+    assert any("desvio para tras, para fora da funcao (0x08000012" in item
+               for item in b.nao_levantadas), b.nao_levantadas
+    assert "goto L_08000012" not in b.corpo
+    # E nada de `return r0;` inventado depois da lacuna: o C diz que a leitura sai
+    # pelo salto para tras e para por ali (nao finge um retorno que nao existe).
+    assert "NAO LEVANTADO: b #0x8000012" in b.corpo
+    assert "return r0;" not in b.corpo
+
+
+def test_conferencia_conta_todas_as_divergencias_e_nao_so_a_amostra():
+    """Divergencia de bytes: o numero total nao pode ser o tamanho da amostra.
+
+    Bug real, achado ao rodar a medicao da ROM: `divergentes` era
+    `len(exemplos)` e `exemplos` para de crescer no limite -- com 225
+    divergencias o relatorio imprimia "25 divergencias". O que mente nao e a
+    fidelidade medida, e o resumo dela.
+
+    Os bytes aqui sao ARM de verdade: `mov r4, #2` (e3a04002) listado como
+    `mov r4, #1` -- remonta e3a04001, ou seja, diverge dos bytes do binario.
+    """
+    base = rom.ROM_BASE
+    imagem = bytearray(0x40)
+    desmontagem = disasm.Desmontagem(base=base)
+    funcao = disasm.FuncaoDesmontada(entrada=base, modo="arm")
+    for numero in range(3):
+        endereco = base + 4 * numero
+        imagem[4 * numero:4 * numero + 4] = bytes.fromhex("0240a0e3")   # mov r4, #2
+        funcao.instrucoes.append(disasm.Instrucao(
+            endereco, bytes.fromhex("0240a0e3"), "mov", "r4, #1", "arm"))
+    desmontagem.funcoes[base] = funcao
+    resultado = conferir_mod.conferir(desmontagem, bytes(imagem), limite_exemplos=1)
+    assert resultado.total == 3
+    assert resultado.identicas == 0
+    assert len(resultado.exemplos) == 1, "a amostra guardada respeita o limite"
+    assert resultado.divergentes == 3, "o total tem de contar tudo, nao a amostra"
+    assert resultado.por_mnemonico == {"mov": 3}
+    assert "3 divergencias" in resultado.texto()
+    # e as decodificacoes realmente conferem (a imagem e os bytes sao ARM)
+    lidas = [(i.mnemonic, i.operadores) for i in funcao.instrucoes]
+    assert lidas == [("mov", "r4, #1")] * 3
+
+
+def _imagem_de_janela(*meias: int, base_off: int = 0x20) -> bytes:
+    """Imagem minima com as meias-palavras Thumb dadas, a partir de 0x08000020."""
+    imagem = bytearray(0x40)
+    for numero, valor in enumerate(meias):
+        imagem[base_off + 2 * numero:base_off + 2 * numero + 2] = valor.to_bytes(2, "little")
+    imagem[base_off + 2 * len(meias):] = b"\xff" * (0x40 - base_off - 2 * len(meias))
+    return bytes(imagem)
+
+
+def test_bx_apos_pop_e_retorno_mesmo_em_janela_que_comeca_no_meio():
+    """`pop {rN}; bx rN` e o epilogo: nao pode depender do `push` ter sido visto.
+
+    Caso medido na ROM: 61 dos 96 `bx rN` recusados estavam em janelas que
+    comecam no MEIO do corpo (endereco lido de tabela de dados). Nessas janelas
+    nao existe `push` do `lr` no trecho lido, entao o livro-caixa de slots nao
+    tem como marcar nada -- e o `bx` virava "sem origem conhecida" mesmo sendo o
+    retorno mais comum que existe. A condicao aceita e mecanica: quem carrega o
+    registrador do `bx` e uma leitura DA PILHA na instrucao imediatamente antes.
+    """
+    imagem = _imagem_de_janela(0xBC10, 0xBC01, 0x4700)     # pop {r4}; pop {r0}; bx r0
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert levantada.semente == "informada"
+    assert levantada.completa, levantada.nao_levantadas
+    assert "tirou da pilha" in levantada.corpo
+    assert "return r0;" in levantada.corpo
+    # a janela nao tem prologo: o cabecalho do C diz o desequilibrio, nao esconde
+    assert "desequilibrada" in codigo.texto()
+
+
+def test_bx_por_registrador_calculado_continua_recusado():
+    """Desvio indireto CALCULADO nao vira retorno so para o numero ficar bonito.
+
+    `mov r0, r1; bx r0` nao e retorno: e chamada indireta despachada por valor
+    que o C nao modela (tabela de ponteiros de funcao, por exemplo). Nao aceitar
+    isso e' o que separa "levei 61 `bx` a menos" de "escondi 61 lacunas".
+    """
+    imagem = _imagem_de_janela(0x2001, 0x4608, 0x4700)     # movs r0, #1; mov r0, r1; bx r0
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert not levantada.completa
+    assert any("sem origem conhecida" in item for item in levantada.nao_levantadas)
+    assert "NAO LEVANTADO: bx r0" in levantada.corpo
+
+
+def test_medicao_conta_tabelas_lidas_da_rom_e_nao_switch_no_texto():
+    """O numero de tabelas/casos vem da descoberta, nao de `grep` no C gerado.
+
+    Antes esses dois numeros saiam de contar `switch` no arquivo .c -- e o
+    `grep` nao distingue tabela reconhecida de `switch` emitido (tabela sem
+    escala conhecida e' reconhecida mas nao vira `switch`). Aqui se conta o que
+    foi LIDO da imagem: 1 tabela, 3 casos, nesta imagem de teste.
+    """
+    imagem = _imagem_com_tabela_de_casos()
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    assert analise_mod._contar_tabelas(desmontagem) == (1, 3)
+
+
+def test_bx_como_primeira_instrucao_e_thunk_e_o_motivo_diz_isso():
+    """`bx rN` + nop no inicio da janela nao e' falha do levantador: e' thunk.
+
+    Medido na ROM: 0x081E3BA8.. e' uma sequencia de 4 em 4 bytes com
+    `bx r0 ; mov r8, r8`, `bx r1 ; mov r8, r8`, ... chamada por `bl` de dezenas
+    de sitios. O alvo do salto e' um PARAMETRO (vem do registrador em quem
+    chamou), entao nao existe traducao literal -- o que a funcao pode fazer e
+    dizer exatamente isso, em vez de "sem origem conhecida" (que sugere defeito).
+    """
+    imagem = _imagem_de_janela(0x4700, 0x46C0)      # bx r0 ; mov r8, r8 (nop)
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert not levantada.completa
+    assert any("thunk de salto indireto" in item for item in levantada.nao_levantadas)
+    # continua sendo recusa registrada, nao `return r0;` inventado
+
+
+def test_chamada_indireta_interworking_tem_motivo_proprio():
+    """`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN` (ARM) tem motivo proprio.
+
+    O `add lr, pc, #0` e' o retorno do interworking montado a mao (e' ele que
+    marca o modo Thumb no endereco de retorno): a chamada nao passa por `bl`, o
+    alvo veio de dado lido da ROM e nao ha assinatura declarada. Nao existe C
+    fiel a emitir; existe motivo a dizer -- e diferente de "sem origem
+    conhecida", que sugere defeito do levantador.
+    """
+    base = rom.ROM_BASE
+    imagem = bytearray(0x40)
+    imagem[0x20:0x24] = bytes.fromhex("00402de9")     # stmdb sp!, {lr}
+    imagem[0x24:0x28] = bytes.fromhex("00e08fe2")     # add lr, pc, #0
+    imagem[0x28:0x2C] = bytes.fromhex("10ff2fe1")     # bx r0
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "arm"})
+    (funcao,) = desmontagem.funcoes.values()
+    lidas = [(i.mnemonic, i.operadores) for i in funcao.instrucoes]
+    assert ("add", "lr, pc, #0") in lidas, lidas       # a imagem e o que ela promete
+    codigo = decompile.decompilar(desmontagem, imagem)
+    levantada = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
+    assert any("chamada indireta ARM->Thumb montada a mao" in item
+               for item in levantada.nao_levantadas), levantada.nao_levantadas

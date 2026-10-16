@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 24/24 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **59/59** |
 | C compilado (tamanho do modulo) | 1 092 bytes |
-| testes automatizados | `23 passed` |
+| testes automatizados | `32 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -48,15 +48,17 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 
 | medida | valor |
 |---|---|
-| descoberta partindo **so do vetor de reset** | 2 006 funcoes · 1 429 das 5 981 do censo (23,9%) |
-| descoberta usando o **censo como sementes** | **7 998 funcoes**, 442 971 instrucoes listadas, 20 393 arestas |
-| cobertura do censo | 5 981/5 981 (100%) · **2 017 funcoes que o censo nao tinha** |
-| instrucoes em enderecos unicos | 404 237 (13 780 enderecos aparecem em mais de uma funcao) |
-| tabelas de casos | **377 reconhecidas**, 5 789 casos → `switch` de verdade no C |
-| funcoes com C para ler | **7 838 completas + 160 parciais = 100%** |
-| C levantado | 1 025 643 linhas / 38,3 MB |
+| descoberta partindo **so do vetor de reset** | 3 544 funcoes · 2 590 das 5 981 do censo (43,3%) |
+| descoberta usando o **censo como sementes** | **8 151 funcoes**, 439 869 instrucoes listadas, 20 379 arestas |
+| cobertura do censo | 5 981/5 981 (100%) · **2 170 funcoes que o censo nao tinha** |
+| enderecos descartados | 170 (nenhuma instrucao valida do ARM7TDMI no inicio) |
+| saltos que saem da funcao para tras | 245 · 154 trechos orfaos voltaram como janela propria |
+| tabelas de casos | **375 reconhecidas**, 5 767 casos lidos da ROM → `switch` no C |
+| funcoes com C para ler | **8 005 completas + 146 parciais = 100%** |
+| C levantado | 1 020 566 linhas / 38,4 MB |
 | conferencia byte a byte | **99,948%** das instrucoes remontam identicas ao binario |
-| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 121 016 bytes) |
+| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 124 636 bytes) |
+| determinismo | C, JSON e objeto compilado **identicos** em duas rodadas (`ferramentas/checar_determinismo.py`) |
 
 ### Achados que valem mais que os números
 
@@ -80,8 +82,9 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    desmontagem: o dispatcher `0x0803FBE8` tinha 19 dos 34 alvos desmontados.
    Agora o desmontador reconhece o idioma (`lsls` → `ldr rB,[pc,#N]` → `adds` →
    `ldr rI,[rI]` → `mov pc, rI`), lê a tabela da ROM e **segue os alvos**:
-   +90 053 instruções (+25,5%) e **406 → 160 funções parciais**, com 377
-   `switch` no C. O critério de aceitação é duplo e verificável: o guarda
+   +90 053 instruções (+25,5%) e **406 → 160 funções parciais**, com 375
+   `switch` no C (número recalculado hoje pela própria descoberta: a contagem de
+   `grep` daquela rodada dizia 377 e não era medição). O critério de aceitação é duplo e verificável: o guarda
    `cmp rN, #k` que o próprio compilador emitiu antes **tem de bater exatamente**
    com o número de entradas lidas da tabela, e cada alvo tem de começar com
    instrução que existe no ARM7TDMI. Se qualquer critério falhar, não se
@@ -89,12 +92,52 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    `test_tabela_sem_guarda_que_bata_nao_vira_switch`). A sonda que mediu isso
    antes de implementar está em `ferramentas/estudo_switch.py`.
 
+4. **A leitura de uma funcao andava para tras e engolia a funcao anterior.** Nao
+   era um detalhe de estilo: a sonda (`ferramentas/onde_estao_as_lacunas.py`)
+   mostrou que a "funcao" de `0x08018258` tinha 1 722 instrucoes e faixa
+   `0x08017B92..0x08018C86` — **651 instrucoes antes da propria entrada**, o mesmo
+   endereco aparecendo em tres funcoes. O estrago nao era so cosmetico: o `push`
+   que guarda o endereco de retorno estava antes da entrada, entao o
+   `pop {r1}; bx r1` do fim ficava sem marcador e virava recusa — **65 das 100
+   recusas de `bx rN` vinham dai**. Agora um desvio para endereco ABAIXO da
+   entrada e tratado como saida (o bloco comum pertence a outra rotina): a
+   contagem de instrucoes caiu 3 102 (eram instrucoes fantasma, contadas duas
+   vezes) e o numero de funcoes subiu, porque 154 trechos alcancados so por esses
+   saltos voltaram como janela propria — com a origem marcada
+   (`salto para tras em 0x...`), nao como se fossem entradas descobertas por
+   chamada (testes `test_salto_para_tras_*`).
+5. **Metade das recusas restantes de `bx rN` era o epilogo padrao.** Em Thumb o
+   compilador volta por `pop {rN}; bx rN` (registrador baixo, para funcionar nos
+   dois modos) em vez de `pop {pc}`. O lifter so aceitava o retorno quando o
+   livro-caixa de slots da pilha tinha marcado aquele slot — e em 61 dos 96 casos
+   a janela **comecava no meio do corpo** (endereco lido de tabela de dados),
+   onde nao existe `push` nenhum no trecho lido. A condicao passou a ser mecanica
+   (quem carrega o registrador e uma leitura da pilha na instrucao anterior):
+   **96 → 35 `bx` recusados**, 146 parciais em vez de 205. E o que continua
+   recusado ganhou motivo proprio, em vez de um rotulo so: 20 delas sao **thunks
+   de 4 bytes `bx rN` + `mov r8, r8`** (nop de alinhamento) em `0x081E3BA8..`,
+   chamados por `bl` de dezenas de sitios — ali o alvo e *parametro*, nao ha
+   traducao literal a fazer; e ha a chamada indireta ARM→Thumb montada a mao
+   (`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN`).
+6. **Um contador do proprio projeto mentia.** O relatorio de conferencia de bytes
+   imprimia "25 divergencias" para 225 reais: o total era `len(exemplos)` e a
+   lista de exemplos parava no limite de amostra. Achado ao *rodar* a medicao
+   depois de mexer no codigo — nao por revisao. Agora o total e' contado sempre e
+   agrupado por mnemonico (o que prova que as 225 sao so duas classes:
+   `cmp` 219 escritos na outra codificacao valida, `bx` 6 repeticoes do mesmo
+   endereco), com teste `test_conferencia_conta_todas_as_divergencias_...`.
+7. **Dois numeros publicados nao vinham de medicao.** As "377 tabelas / 5 789
+   casos" da rodada anterior saiam de `grep` no `.c` gerado — que nao distingue
+   tabela reconhecida de `switch` emitido. Agora `analise._contar_tabelas` conta o
+   que foi **lido da ROM** pela propria descoberta: **375 tabelas, 5 767 casos**.
+   O numero mudou porque a fonte do numero mudou — o antigo nao era reproduzivel.
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
 (99,948% remontam byte a byte; as 225 divergencias sao `cmp`/`bx` escritos com a
 outra codificacao valida da mesma instrucao), e o C gerado e **C valido para o
-alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 025 643
+alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 020 566
 linhas).
 
 Nao prova: **semantica**. Nesta ROM nao existe verdade-terreno, entao nao se pode
@@ -106,11 +149,11 @@ binario e no C levantado e recompilado.
 
 | lacuna | ocorrencias |
 |---|---|
-| `bx rN` com origem nao rastreada (salto indireto) | 100 |
-| desvio para endereco que nao foi desmontado | 42 |
-| desvio condicional sem o `cmp` correspondente | 56 |
-| instrucao de ARM v4T ainda nao implementada (`mrs`, `stmdb`...) | 20 |
+| `bx rN` com origem nao rastreada | 35 (20 sao `bx rN`+nop *thunk*; o resto, salto calculado) |
+| desvio que sai da funcao (bloco comum de outra rotina) | 130 · 71 para tras, 28 para fora, 31 para endereco nao desmontado |
+| instrucao de ARM v4T ainda nao implementada (`mrs`, `stmdb`, `ldcl`...) | 20 |
 | salto calculado por tabela que nao passou nos criterios | 4 |
+| **total** | **189** (14 em funcao do censo, 175 fora dele) |
 
 Cada uma aparece no ponto exato do C como `/* NAO LEVANTADO: ... */`, com o
 endereco e o motivo. A funcao continua legivel ate ali — e o que faltou esta
@@ -124,7 +167,16 @@ python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
         --json evidencias/rom_bpre_analise.json -o levantado_rom.c
 python -m gbadecomp.conferir_bytes ROM.gba --censo censo/functions.csv
 python ferramentas/estudo_switch.py ROM.gba --censo censo/functions.csv
+python ferramentas/onde_estao_as_lacunas.py ROM.gba --censo censo/functions.csv
+python ferramentas/checar_determinismo.py ROM.gba --censo censo/functions.csv
 ```
+
+`onde_estao_as_lacunas.py` responde o que o resumo nao responde: onde as lacunas
+se concentram (por pagina de 4 KB), se cairam em funcao do censo ou fora dele, e
+**de onde vem o registrador de cada `bx rN`** — foi ele que separou "falta
+implementar" de "a leitura estava engolindo a funcao anterior". Com
+`--regiao 0x...-0x...` ele lista o desmonte de uma faixa mostrando **todas** as
+funcoes donas de cada endereco (o caso que mais confunde).
 
 ## Como usar
 

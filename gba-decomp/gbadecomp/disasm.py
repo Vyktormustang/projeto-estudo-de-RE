@@ -103,6 +103,9 @@ class FuncaoDesmontada:
     terminacao: str = "indefinida"
     semente: str = "?"               # de onde veio esta funcao
     tabelas: list[TabelaCasos] = field(default_factory=list)
+    # Saltos para endereco ABAIXO da entrada: a leitura saiu desta funcao (bloco
+    # comum de outra rotina). Ver a regra no ponto 4 de _seguir_funcao.
+    saidas: list[tuple[int, int]] = field(default_factory=list)
 
     @property
     def fim(self) -> int:
@@ -119,7 +122,9 @@ class FuncaoDesmontada:
         cab = (f"func {self.entrada:08X} ({self.modo}, {self.tamanho} B, "
                f"semente: {self.semente}, fim: {self.terminacao})")
         tabelas = [f"    {t.texto()}" for t in self.tabelas]
-        return [cab] + tabelas + [f"    {i}" for i in self.instrucoes]
+        saidas = [f"    saida: desvio em 0x{e:08X} -> 0x{a:08X} (fora da funcao, "
+                  f"para tras)" for e, a in self.saidas]
+        return [cab] + tabelas + saidas + [f"    {i}" for i in self.instrucoes]
 
 
 @dataclass
@@ -176,6 +181,11 @@ class Desmontagem:
     dados_lidos: dict[int, int] = field(default_factory=dict)      # pool -> valor
     descartes: dict[int, Descartado] = field(default_factory=dict)
     avisos: list[str] = field(default_factory=list)
+    # Contabilidade da regra do salto para tras (ver _seguir_funcao, ponto 4):
+    # quantos saltos sairam de uma funcao e quantos desses trechos, por nao
+    # estarem cobertos por nenhuma outra, voltaram como semente propria.
+    saidas_para_tras: int = 0
+    saidas_recuperadas: int = 0
 
     @property
     def total_instrucoes(self) -> int:
@@ -198,6 +208,11 @@ class Desmontagem:
             linhas.append(f"  {len(self.descartes)} enderecos tentados como funcao e "
                           f"descartados: nenhuma instrucao valida do ARM7TDMI no inicio "
                           f"(provavel ponteiro para tabela; lista completa no JSON)")
+        if self.saidas_para_tras:
+            linhas.append(f"  {self.saidas_para_tras} saltos saem da funcao para tras "
+                          f"(bloco comum de outra rotina); desses, "
+                          f"{self.saidas_recuperadas} trechos nao cobertos por ninguem "
+                          f"voltaram como semente propria")
         for f in sorted(self.funcoes.values(), key=lambda x: x.entrada):
             linhas.extend(f.texto())
             linhas.append("")
@@ -215,6 +230,7 @@ class Desmontagem:
                         "semente": f.semente,
                         "terminacao": f.terminacao,
                         "chamadas": [f"0x{d:08X}" for _, d in f.chamadas],
+                        "saidas": [f"0x{a:08X}" for _, a in f.saidas],
                         "tabelas": [
                             {"salto": f"0x{t.endereco:08X}", "tabela": f"0x{t.tabela:08X}",
                              "casos": len(t.alvos), "deslocamento": t.deslocamento,
@@ -235,6 +251,8 @@ class Desmontagem:
                      "motivo": d.motivo, "bytes": d.bytes_.hex(" ")}
                     for d in sorted(self.descartes.values(), key=lambda x: x.entrada)
                 ],
+                "saidas_para_tras": self.saidas_para_tras,
+                "saidas_recuperadas": self.saidas_recuperadas,
                 "avisos": self.avisos,
             },
             indent=2,
@@ -281,11 +299,16 @@ def desmontar_por_sementes(
             # bit0 do valor carregado diz o modo do destino -- convencao do ARM.
             fila.append((alvo & ~1, "thumb" if alvo & 1 else "arm", "vetor de boot"))
 
-    while fila and len(saida.funcoes) < max_funcoes:
-        entrada, modo, origem = fila.pop(0)
-        if (entrada in saida.funcoes or entrada in saida.descartes
-                or not (base <= entrada < base + len(imagem))):
-            continue
+    def _drenar_fila() -> None:
+        """Processa a fila ate esvaziar (a fila e mutada aqui dentro)."""
+        while fila and len(saida.funcoes) < max_funcoes:
+            entrada, modo, origem = fila.pop(0)
+            if (entrada in saida.funcoes or entrada in saida.descartes
+                    or not (base <= entrada < base + len(imagem))):
+                continue
+            _uma_funcao(entrada, modo, origem)
+
+    def _uma_funcao(entrada: int, modo: str, origem: str) -> None:
         funcao, novas, origens = _seguir_funcao(imagem, base, entrada, modo, origem,
                                                  saida.dados_lidos if seguir_pool else None)
         if not funcao.instrucoes:
@@ -300,11 +323,35 @@ def desmontar_por_sementes(
             saida.descartes[entrada] = Descartado(
                 entrada=entrada, modo=modo, semente=origem,
                 motivo=funcao.terminacao, bytes_=imagem[inicio:inicio + 8])
-            continue
+            return   # era `continue` quando este corpo era o proprio laco
         saida.funcoes[entrada] = funcao
         for destino, modo_destino in novas.items():
             if destino not in saida.funcoes and destino not in saida.descartes:
                 fila.append((destino, modo_destino, origens.get(destino, "referencia")))
+
+    _drenar_fila()
+
+    # -- segunda passada: trecho alcancado SO por salto para tras -------------
+    # A regra do ponto 4 impede uma funcao de engolir a anterior, mas o preco
+    # seria deixar de fora um trecho alcancado apenas por um desses saltos. Aqui
+    # ele volta como semente -- e SOMENTE se nenhuma funcao o cobriu, porque
+    # recobrir e exatamente o defeito que a regra foi consertar. Cada passada
+    # acrescenta funcoes ou descartes, entao isto termina.
+    while True:
+        cobertos = {i.endereco for f in saida.funcoes.values() for i in f.instrucoes}
+        orfaos = sorted(
+            {(alvo, f.modo, f"salto para tras em 0x{e:08X}")
+             for f in saida.funcoes.values() for e, alvo in f.saidas
+             if alvo not in cobertos and alvo not in saida.funcoes
+             and alvo not in saida.descartes})
+        if not orfaos:
+            break
+        fila.extend(orfaos)
+        antes = len(saida.funcoes)
+        _drenar_fila()
+        saida.saidas_recuperadas += len(saida.funcoes) - antes
+
+    saida.saidas_para_tras = sum(len(f.saidas) for f in saida.funcoes.values())
     return saida
 
 
@@ -398,20 +445,44 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                     tabela = _tabela_de_casos(imagem, base, anteriores, ins, cs)
                     if tabela is not None:
                         funcao.tabelas.append(tabela)
-                        pendente.extend(tabela.alvos)
+                        # Mesma regra do ponto 4: alvo de tabela abaixo da
+                        # entrada e de OUTRA rotina (a tabela veio de dado lido
+                        # como codigo, ou o `mov pc` pertence a rotina maior).
+                        pendente.extend(a for a in tabela.alvos if a >= entrada)
+                        funcao.saidas.extend((ins.address, a) for a in tabela.alvos
+                                             if a < entrada)
                 funcao.terminacao = f"{ins.mnemonic} {ins.op_str}".strip()
                 break
 
             # 4) saltos: incondicional local continua; condicional anota e segue
+            #
+            # REGRA DO SALTO PARA TRAS (medida na ROM real, nao suposta): desvio
+            # para endereco ABAIXO da entrada desta funcao nao e continuacao dela
+            # -- e a leitura saindo para um bloco comum (o epilogo/laco de outra
+            # rotina, ou o comeco de uma rotina maior que comeca antes). Seguir
+            # esse salto produzia "funcoes" de 1 722 instrucoes que engoliam 651
+            # instrucoes da funcao ANTERIOR: o mesmo endereco aparecia em tres
+            # funcoes e, pior, o `push` que guarda o retorno estava antes da
+            # entrada, entao o `pop {r1}; bx r1` do fim ficava sem marcador e
+            # virava "desvio indireto por registrador sem origem conhecida" --
+            # 65 dos 100 `bx rN` recusados vinham exatamente dai. Aqui o salto e
+            # registrado como SAIDA (com o endereco de quem saltou) e a leitura
+            # da corrente atual termina; os destinos que nao estiverem cobertos
+            # por nenhuma outra funcao voltam como semente na segunda passada.
             if ins.group(capstone.CS_GRP_JUMP):
                 alvo = _destino_imediato(ins)
-                if alvo is not None and not _condicional(ins):
+                if alvo is not None and base <= alvo < entrada:
+                    funcao.saidas.append((ins.address, alvo))
+                    if not _condicional(ins):
+                        funcao.terminacao = f"salto para fora (para tras): 0x{alvo:08X}"
+                        break
+                elif alvo is not None and not _condicional(ins):
                     if base <= alvo < limite:
                         atual = alvo
                         continue
                     funcao.terminacao = f"salto para fora: 0x{alvo:08X}"
                     break
-                if alvo is not None and base <= alvo < limite:
+                elif alvo is not None and base <= alvo < limite:
                     pendente.append(alvo)
                 if _termina_fluxo(ins):
                     funcao.terminacao = f"{ins.mnemonic} {ins.op_str}".strip()

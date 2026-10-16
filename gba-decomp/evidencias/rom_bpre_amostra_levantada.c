@@ -1,379 +1,307 @@
 /* ============================================================================
    AMOSTRA do C levantado da ROM real -- Pokemon Fire Red BR (BPRE).
 
-   A ROM NAO esta no repositorio: e imagem de terceiros (16 MB). O arquivo
-   inteiro, de 1025643 linhas, e reproduzivel com:
+   A ROM NAO esta no repositorio: e imagem de terceiros (16 MB), e o arquivo
+   inteiro e' reproduzivel com:
 
-     python -m gbadecomp.cli analisar ROM.gba --censo functions.csv \
+     python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
             --json evidencias/rom_bpre_analise.json -o levantado_rom.c
 
-   Estado medido (todos os numeros em evidencias/rom_bpre_analise.json):
-     descoberta .........: 7998 funcoes,
-                          442971 instrucoes listadas,
-                          20393 arestas de chamada
+   Estado medido (tudo em evidencias/rom_bpre_analise.json, gerado por esse
+   comando nesta rodada):
+     descoberta .........: 8151 funcoes,
+                          439869 instrucoes listadas,
+                          20379 arestas de chamada,
+                          170 enderecos descartados
      censo coberto ......: 5981/5981 (100%)
-     fora do censo ......: 2017 funcoes que o censo nao tinha
-     com C para ler .....: 7838 completas + 160 parciais (100.0%)
-     tabelas de casos ...: 377 reconhecidas, 5789 casos viraram `switch`
-     conferencia bytes ..: 442742/442971 (99.948%) remontam identicas
-     compilacao .........: OK, 0 erros (objeto ARM de 2121016 bytes)
+     fora do censo ......: 2170 funcoes que o censo nao tinha
+     tabelas de casos ...: 375 reconhecidas,
+                          5767 casos lidos da ROM
+     saltos para tras ...: 245 saidas de funcao;
+                          154 trechos orfaos
+                          recuperados como janela propria
+     com C para ler .....: 8005 completas + 146 parciais (100.0%)
+     C ..................: 1020566 linhas / 38375181 bytes
+     conferencia bytes ..: 439640/439869 (99.948%) remontam
+                          identicas ao binario; 225 divergencias
+                          ({'cmp': 219, 'bx': 6}) e 4
+                          instrucoes que o remontador nao aceita na sintaxe
+     compilacao .........: OK, 0 erros
+                          (objeto ARM de 2124636 bytes, sha256
+                          17192ca3644ad20d...)
 
    O que isto NAO prova: semantica. Sem verdade-terreno nesta ROM, o que se prova
    e que cada instrucao remonta byte a byte e que o C compila -- comportamento so
-   esta provado no corpus sintetico (59/59 por emulacao, no binario e no C
-   levantado e recompilado). As lacunas que restam (100 desvios
-   indiretos, 42 desvios para endereco nao desmontado...) aparecem MARCADAS
-   dentro do proprio C, com endereco e motivo.
+   esta provado no corpus sintetico (59/59, emulando o binario E o C levantado e
+   recompilado). As 146 funcoes com lacuna trazem a lacuna MARCADA
+   dentro do proprio C, com endereco e motivo; nada e silenciado.
+
+   Cada funcao abaixo e' recortada do arquivo inteiro, sem edicao, e mostra um
+   caso que esta rodada passou a distinguir:
+     - tabela de casos lida da ROM virou `switch`: FUN_080011e4
+     - desvio para tras: a leitura continua em outra rotina: fn_08014040
+     - `bx rN` recusado, com o motivo dito por inteiro (thunk de 4 bytes): fn_081DC45A
    ============================================================================ */
 
+/* ---------------- FUN_080011e4 -- tabela de casos lida da ROM virou `switch` ---------------- */
 
-/* ---------------- FUN_08000a04 ---------------- */
 
-__attribute__((noinline, used)) u32 FUN_08000a04(u32 r0, u32 r1, u32 r2, u32 r3) {
+/* chamada por 14: FUN_080014f0, FUN_080017d0, FUN_08001aa8, FUN_08001b90, FUN_08001ccc, FUN_08001d08, ... (+8) */
+/* origem: 0x080011E4 (thumb), semente: informada, pilha: balanceada */
+__attribute__((noinline, used)) u32 FUN_080011e4(u32 r0, u32 r1, u32 r2, u32 r3) {
     u32 r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, lr = 0;
     u32 pc = 0;  /* escrever em pc = retorno/desvio: tratado explicitamente, ver comentarios */
     u32 z = 0, n = 0, c = 0, v = 0;
     u32 sp = PILHA_TOPO, sp0 = sp;
+    u32 idx_08001218 = 0;  /* indice da tabela de casos em 0x08001224 */
     (void)r1; (void)r2; (void)r3;
     sp -= 12;
     guarda32(sp + 0, r4);
     guarda32(sp + 4, r5);
     guarda32(sp + 8, lr);
-    r0 = 0x030000C0u;  /* pool 0x08000A30 */
-    r0 = carrega8(r0);
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x18, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x18, &c_);
+      c = c_; r4 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 c_ = c; u32 r_ = sh_lsl(r1, 0x18, &c_);
+      c = c_; r1 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 c_ = c; u32 r_ = sh_lsr(r1, 0x18, &c_);
+      c = c_; r5 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
+      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31);
+      r0 = r_; }
+    /* bl 0x080014DC (no modulo) */
+    r0 = FUN_080014dc(r0, r1, r2, r3);
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x18, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
     { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
       c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 != 0x0) goto L_08000A28;
-    r5 = 0x0u;
-    z = (r5 == 0); n = (r5 >> 31);
-    L_08000A10: ;
-    r0 = 0x03000060u;  /* pool 0x08000A34 */
-    { u32 a_ = r5, b_ = r0 + 0; u32 r_ = a_ + b_;
+    if (r0 != 0x0) goto L_08001290;
+    r1 = 0x030008D0u;  /* pool 0x0800121C */
+    { u32 c_ = c; u32 r_ = sh_lsl(r4, 0x2, &c_);
+      c = c_; r2 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 a_ = r2, b_ = r1 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
-      r4 = r_; }
-    r0 = carrega8(r4);
-    { u32 a_ = r0, b_ = 0xff; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 == 0xff) goto L_08000A28;
-    /* bl 0x080009C0 (no modulo) */
-    r0 = gpu_commit_idx_like(r0, r1, r2, r3);
-    r0 = 0xFFu;
-    z = (r0 == 0); n = (r0 >> 31);
-    guarda8(r4, (u8)r0);
-    { u32 a_ = r5, b_ = 0x1 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r5 = r_; }
-    { u32 a_ = r5, b_ = 0x5f; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31); }
-    if ((s32)r5 <= (s32)0x5f) goto L_08000A10;
-    L_08000A28: ;
-    r4 = carrega32(sp + 0);
-    r5 = carrega32(sp + 4);
-    sp += 8;
-    r0 = carrega32(sp + 0);
-    sp += 4;
-    return r0;
-    if (sp != sp0) { g_erro |= 1; }
-    return r0;
-}
-
-
-
-/* ---------------- DISPATCHER_34c_tbl0803FC08 (Dispatcher do censo: tabela @0x0803FC08) ---------------- */
-__attribute__((noinline, used)) u32 DISPATCHER_34c_tbl0803FC08(u32 r0, u32 r1, u32 r2, u32 r3) {
-    u32 r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, lr = 0;
-    u32 pc = 0;  /* escrever em pc = retorno/desvio: tratado explicitamente, ver comentarios */
-    u32 z = 0, n = 0, c = 0, v = 0;
-    u32 sp = PILHA_TOPO, sp0 = sp;
-    u32 idx_0803FC00 = 0;  /* indice da tabela de casos em 0x0803FC08 */
-    (void)r1; (void)r2; (void)r3;
-    sp -= 8;
-    guarda32(sp + 0, r4);
-    guarda32(sp + 4, lr);
-    { u32 a_ = r0, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r4 = r_; }
+      r0 = r_; }
+    r0 = carrega8(r0);
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x1f, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
     { u32 a_ = r1, b_ = 0x0 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r3 = r_; }
-    { u32 a_ = r3, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x37; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x21; u32 r_ = a_ - b_;
+    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
       c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 <= 0x21) goto L_0803FBF8;
-    goto L_0803FD36;
-    L_0803FBF8: ;
+    if (r0 == 0x0) goto L_08001290;
+    { u32 a_ = r5, b_ = 0x1; u32 r_ = a_ - b_;
+      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31);
+      r0 = r_; }
+    { u32 a_ = r0, b_ = 0x7; u32 r_ = a_ - b_;
+      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31); }
+    if (r0 > 0x7) goto L_08001290;
     { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x2, &c_);
       c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    r1 = 0x0803FC08u;  /* pool 0x0803FC04 */
-    idx_0803FC00 = r0;
+    r1 = 0x08001224u;  /* pool 0x08001220 */
+    idx_08001218 = r0;
     { u32 a_ = r0, b_ = r1 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
     r0 = carrega32(r0);
-    /* tabela de casos em 0x0803FC08: 34 casos lidos da ROM (indice x4) */
-    switch (idx_0803FC00 >> 2) {
-        case 0: goto L_0803FC90;
-        case 1: goto L_0803FC94;
-        case 2: goto L_0803FC9C;
-        case 3: goto L_0803FCA4;
-        case 4: goto L_0803FCAC;
-        case 5: goto L_0803FCBE;
-        case 6: goto L_0803FCD0;
-        case 7: goto L_0803FCE2;
-        case 8: goto L_0803FCF4;
-        case 9: goto L_0803FD2E;
-        case 10: goto L_0803FD36;
-        case 11: goto L_0803FD36;
-        case 12: goto L_0803FD36;
-        case 13: goto L_0803FD36;
-        case 14: goto L_0803FD36;
-        case 15: goto L_0803FD36;
-        case 16: goto L_0803FD36;
-        case 17: goto L_0803FD36;
-        case 18: goto L_0803FD36;
-        case 19: goto L_0803FD36;
-        case 20: goto L_0803FD36;
-        case 21: goto L_0803FD36;
-        case 22: goto L_0803FD36;
-        case 23: goto L_0803FD36;
-        case 24: goto L_0803FD36;
-        case 25: goto L_0803FD36;
-        case 26: goto L_0803FD36;
-        case 27: goto L_0803FD36;
-        case 28: goto L_0803FD36;
-        case 29: goto L_0803FD06;
-        case 30: goto L_0803FD0E;
-        case 31: goto L_0803FD16;
-        case 32: goto L_0803FD1E;
-        case 33: goto L_0803FD26;
+    /* tabela de casos em 0x08001224: 8 casos lidos da ROM (indice x4) */
+    switch (idx_08001218 >> 2) {
+        case 0: goto L_08001244;
+        case 1: goto L_0800124E;
+        case 2: goto L_08001258;
+        case 3: goto L_08001262;
+        case 4: goto L_0800126C;
+        case 5: goto L_08001274;
+        case 6: goto L_0800127E;
+        case 7: goto L_08001288;
         default: g_erro |= 2; break;   /* fora da tabela */
     }
     return r0;   /* inalcancavel: todo caso salta */
-    L_0803FC90: ;
-    r0 = carrega32(r4 + 0x50);
-    goto L_0803FD3E;
-    L_0803FC94: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x54 + 0; u32 r_ = a_ + b_;
+    L_08001244: ;
+    { u32 a_ = r2, b_ = r3 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
     r0 = carrega8(r0);
-    goto L_0803FD3E;
-    L_0803FC9C: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x1f, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x1f, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    goto L_08001292;
+    L_0800124E: ;
+    { u32 a_ = r2, b_ = r3 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
-    { u32 a_ = r0, b_ = 0x56 + 0; u32 r_ = a_ + b_;
+    r0 = carrega8(r0 + 0x1);
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x1e, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x1e, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    goto L_08001292;
+    L_08001258: ;
+    { u32 a_ = r2, b_ = r3 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FCA4: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
+    r0 = carrega8(r0 + 0x1);
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x19, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x1b, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    goto L_08001292;
+    L_08001262: ;
+    { u32 a_ = r2, b_ = r3 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x58 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FCAC: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r1 = 0x1u;
+    /* ... 61 linhas omitidas AQUI para a amostra caber; a funcao inteira esta no levantado_rom.c, que este comando gera */
+/* ---------------- fn_08014040 -- desvio para tras: a leitura continua em outra rotina ---------------- */
+
+
+/* PARCIAL (0x08014040): o corpo abaixo tem lacunas marcadas -- em execucao, marca g_erro:
+     0x0801415C b #0x8013a18: desvio para tras, para fora da funcao (0x08013A18 < entrada 0x08014040): a leitura continua em bloco comum de outra rotina
+   */
+/* origem: 0x08014040 (thumb), semente: ponteiro de pool em 0x08013CCC, pilha: balanceada, fim: salto para fora (para tras): 0x08013A18 */
+__attribute__((noinline, used)) u32 fn_08014040(u32 r0, u32 r1, u32 r2, u32 r3) {
+    u32 r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, lr = 0;
+    u32 pc = 0;  /* escrever em pc = retorno/desvio: tratado explicitamente, ver comentarios */
+    u32 z = 0, n = 0, c = 0, v = 0;
+    u32 sp = PILHA_TOPO, sp0 = sp;
+    u32 idx_08014088 = 0;  /* indice da tabela de casos em 0x0801409C */
+    u32 idx_08014230 = 0;  /* indice da tabela de casos em 0x0801424C */
+    u32 idx_080147A6 = 0;  /* indice da tabela de casos em 0x080147BC */
+    (void)r1; (void)r2; (void)r3;
+    sp -= 20;
+    guarda32(sp + 0, r4);
+    guarda32(sp + 4, r5);
+    guarda32(sp + 8, r6);
+    guarda32(sp + 12, r7);
+    guarda32(sp + 16, lr);
+    r7 = r10;
+    r6 = r9;
+    r5 = r8;
+    sp -= 12;
+    guarda32(sp + 0, r5);
+    guarda32(sp + 4, r6);
+    guarda32(sp + 8, r7);
+    sp -= 28;  /* ajuste de pilha */
+    r0 = 0x02023E82u;  /* pool 0x0801408C */
+    r1 = 0x0u;
     z = (r1 == 0); n = (r1 >> 31);
-    /* bl 0x08044674 (no modulo) */
-    r0 = FUN_08044674(r0, r1, r2, r3);
-    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
+    guarda8(r0 + 0x4, (u8)r1);
+    r0 = 0x02023BC4u;  /* pool 0x08014090 */
+    guarda8(r0, (u8)r1);
+    r0 = 0x02023BCCu;  /* pool 0x08014094 */
+    { u32 a_ = r0, b_ = 0x0 + 0; u32 r_ = a_ + b_;
+      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31);
+      r2 = r_; }
+    r0 = carrega8(r2);
+    { u32 a_ = r1, b_ = r0; u32 r_ = a_ - b_;
       c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 != 0x0) goto L_0803FD3E;
-    goto L_0803FD06;
-    L_0803FCBE: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r1 = 0x2u;
-    z = (r1 == 0); n = (r1 >> 31);
-    /* bl 0x08044674 (no modulo) */
-    r0 = FUN_08044674(r0, r1, r2, r3);
-    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x10, &c_);
+    if (r1 < r0) goto L_08014064;
+    /* bl 0x08014C68 (no modulo) */
+    r0 = fn_08014C68(r0, r1, r2, r3);
+    L_08014064: ;
+    r4 = 0x02023BC4u;  /* pool 0x08014090 */
+    r0 = carrega8(r4);
+    /* bl 0x080751D8 (no modulo) */
+    r0 = fn_080751D8(r0, r1, r2, r3);
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x18, &c_);
       c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 != 0x0) goto L_0803FD3E;
-    goto L_0803FD0E;
-    L_0803FCD0: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r1 = 0x3u;
-    z = (r1 == 0); n = (r1 >> 31);
-    /* bl 0x08044674 (no modulo) */
-    r0 = FUN_08044674(r0, r1, r2, r3);
-    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 != 0x0) goto L_0803FD3E;
-    goto L_0803FD16;
-    L_0803FCE2: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r1 = 0x4u;
-    z = (r1 == 0); n = (r1 >> 31);
-    /* bl 0x08044674 (no modulo) */
-    r0 = FUN_08044674(r0, r1, r2, r3);
-    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 != 0x0) goto L_0803FD3E;
-    goto L_0803FD1E;
-    L_0803FCF4: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r1 = 0x5u;
-    z = (r1 == 0); n = (r1 >> 31);
-    /* bl 0x08044674 (no modulo) */
-    r0 = FUN_08044674(r0, r1, r2, r3);
-    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x10, &c_);
-      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
-    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
-      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31); }
-    if (r0 != 0x0) goto L_0803FD3E;
-    goto L_0803FD26;
-    L_0803FD06: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x5a + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FD0E: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x5c + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FD16: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x5e + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FD1E: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x60 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FD26: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x62 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    r0 = carrega16(r0);
-    goto L_0803FD3E;
-    L_0803FD2E: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
-      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
-      z = (r_ == 0); n = (r_ >> 31);
-      r0 = r_; }
-    { u32 a_ = r0, b_ = 0x55 + 0; u32 r_ = a_ + b_;
+    { u32 c_ = c; u32 r_ = sh_lsr(r0, 0x18, &c_);
+      c = c_; r5 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    r1 = 0x02023E82u;  /* pool 0x0801408C */
+    r0 = carrega8(r4);
+    { u32 a_ = r0, b_ = r1 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
     r0 = carrega8(r0);
-    goto L_0803FD3E;
-    L_0803FD36: ;
-    { u32 a_ = r4, b_ = 0x0 + 0; u32 r_ = a_ + b_;
+    { u32 a_ = r0, b_ = 0x6; u32 r_ = a_ - b_;
+      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31); }
+    if (r0 <= 0x6) goto L_08014080;
+    /* bl 0x08014C4E (no modulo) */
+    r0 = fn_08014C4E(r0, r1, r2, r3);
+    L_08014080: ;
+    { u32 c_ = c; u32 r_ = sh_lsl(r0, 0x2, &c_);
+      c = c_; r0 = r_; z = (r_ == 0); n = (r_ >> 31); }
+    r1 = 0x0801409Cu;  /* pool 0x08014098 */
+    idx_08014088 = r0;
+    { u32 a_ = r0, b_ = r1 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
-    { u32 a_ = r3, b_ = 0x0 + 0; u32 r_ = a_ + b_;
+    r0 = carrega32(r0);
+    /* tabela de casos em 0x0801409C: 7 casos lidos da ROM (indice x4) */
+    switch (idx_08014088 >> 2) {
+        case 0: goto L_080140B8;
+        case 1: goto L_080141DC;
+        case 2: goto L_08014764;
+        case 3: goto L_08014AA0;
+        case 4: goto L_08014B44;
+        case 5: goto L_08014B88;
+        case 6: goto L_08014C20;
+        default: g_erro |= 2; break;   /* fora da tabela */
+    }
+    return r0;   /* inalcancavel: todo caso salta */
+    L_080140B8: ;
+    r0 = 0x02023BC4u;  /* pool 0x08014150 */
+    r1 = carrega8(r0);
+    r4 = 0x02023FE8u;  /* pool 0x08014154 */
+    r0 = carrega32(r4);
+    { u32 a_ = r1, b_ = r0 + 0; u32 r_ = a_ + b_;
       c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
       z = (r_ == 0); n = (r_ >> 31);
       r1 = r_; }
-    /* bl 0x0803FD44 (no modulo) */
-    r0 = FUN_0803fd44(r0, r1, r2, r3);
-    L_0803FD3E: ;
-    r4 = carrega32(sp + 0);
-    sp += 4;
-    r1 = carrega32(sp + 0);
-    sp += 4;
-    return r0;
+    { u32 a_ = r1, b_ = 0x5c + 0; u32 r_ = a_ + b_;
+      c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31);
+      r1 = r_; }
+    r0 = 0x6u;
+    z = (r0 == 0); n = (r0 >> 31);
+    guarda8(r1, (u8)r0);
+    r0 = 0x02022B4Cu;  /* pool 0x08014158 */
+    r0 = carrega32(r0);
+    r1 = 0x40u;
+    z = (r1 == 0); n = (r1 >> 31);
+    r0 = r0 & r1;
+    z = (r0 == 0); n = (r0 >> 31);
+    { u32 a_ = r0, b_ = 0x0; u32 r_ = a_ - b_;
+      c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;
+      z = (r_ == 0); n = (r_ >> 31); }
+    if (r0 != 0x0) goto L_08014114;
+    r1 = 0x2u;
+    z = (r1 == 0); n = (r1 >> 31);
+    r0 = 0x2u;
+    /* ... 2406 linhas omitidas AQUI para a amostra caber; a funcao inteira esta no levantado_rom.c, que este comando gera */
+/* ---------------- fn_081DC45A -- `bx rN` recusado, com o motivo dito por inteiro (thunk de 4 bytes) ---------------- */
+
+
+/* PARCIAL (0x081DC45A): o corpo abaixo tem lacunas marcadas -- em execucao, marca g_erro:
+     0x081DC45A bx r3: thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o destino vem NO REGISTRADOR, de quem chamou -- traduzir exigiria inventar a assinatura
+   */
+/* chamada por 1: fn_081DC020 */
+/* origem: 0x081DC45A (thumb), semente: chamada (bl) em 0x081DC064, pilha: balanceada */
+__attribute__((noinline, used)) u32 fn_081DC45A(u32 r0, u32 r1, u32 r2, u32 r3) {
+    u32 r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, lr = 0;
+    u32 pc = 0;  /* escrever em pc = retorno/desvio: tratado explicitamente, ver comentarios */
+    u32 z = 0, n = 0, c = 0, v = 0;
+    u32 sp = PILHA_TOPO, sp0 = sp;
+    (void)r1; (void)r2; (void)r3;
+    /* NAO LEVANTADO: bx r3 */
     if (sp != sp0) { g_erro |= 1; }
     return r0;
 }
