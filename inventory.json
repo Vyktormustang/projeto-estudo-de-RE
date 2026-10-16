@@ -1,11 +1,11 @@
 {
   "projeto": "gba-re",
   "versao_inventario": 1,
-  "atualizado_utc": "2026-10-14T16:42:50+00:00",
+  "atualizado_utc": "2026-10-16T10:58:37.083913+00:00",
   "rom": {
-    "status": "COPIA_REGISTRADA",
-    "observacao": "Nenhuma ROM fornecida ate o momento. O original do usuario permanece com o usuario; so serao usadas copias de trabalho. A ROM nunca entra em repositorios publicos.",
-    "caminho_copia_trabalho": "/home/user/gba-re/rom/pokemon_firered_bpre_trabalho.gba",
+    "status": "COPIA_VERIFICADA",
+    "observacao": "ROM fornecida pelo usuario via Google Drive ('Pokemon - Fire Red (BR).gba', id 14JCEJp6LFgdkzKMOtI5-l3XvowJ1SxnC); sha256 verificado. Copia de trabalho em rom/ (gitignored). Nunca entra em repositorios publicos.",
+    "caminho_copia_trabalho": "rom/pokemon_firered_bpre_trabalho.gba",
     "nome_original_informado": null,
     "sha256": "6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae",
     "tamanho_bytes": 16777216,

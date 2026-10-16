@@ -610,3 +610,23 @@ Progresso estimado do projeto: **~62%**.
   (candidatas: per-frame vblank / ReadKeys).
 * Nota de ambiente: save-states `emu/*.bin` também estavam gitignored — serão
   refeitos via agenda de input (ciclo 28) ou fornecidos pelo usuário.
+
+### Ciclo 35 (continuação) — 2026-10-16: causa-raiz do v3 + combo provado
+
+* **ROM** obtida do Google Drive e verificada (sha256 = inventory.json). Sem git.
+* **Bug 1 (FATO)**: veneer `01 4b` lia literal em 0x08000A40 (código original, `0x2C5F0C09`)
+  em vez de 0x08000A3C → `bx` para lixo no 1º SetGpuReg → tela branca. Corrigido para `00 4b`
+  (`ldr r3,[pc,#0]`; regra Align(PC,4)+imm·4 confirmada no próprio código do jogo).
+* **Bug 2 (FATO)**: retorno do tramp 0x08000A43 pulava `lsrs r1,r1,#0x10`@0xA40. Correto = 0x08000A41.
+* **Bug 3 (FATO)**: máscara do tramp_regkey virava 0xFF00 (não 0x3FF) → `== 0x308` nunca verdadeiro.
+  Tramp remontado (88 B, bne→pop validado, capstone).
+* **Isolador always** (`rom_mod/BAG_MOD_dbg_always.gba`, sha256 b59de9ec…): 600 frames → PNG
+  IDÊNTICO byte a byte ao original (`reports/c35_lit600.png` = `c35_orig600.png`); bolsa slot0 = `0xAAAA` → trap roda.
+* **Prova semântica** do tramp_regkey (mini-emulador Thumb): 5/5 (combo exato escreve; sem teclas,
+  L+R sem START, L+R+START+A e START sozinho NÃO escrevem; pilha/r5/lr/prólogo/retorno OK).
+* **Combo no mGBA**: `--input 150:L:200 --input 150:R:200 --input 150:START:200` → bolsa `aa aa 00 00`
+  (`reports/c35_key_combo.png`); controle sem combo → `00 00 00 00` (`BAG_MOD_dbg_regkey.gba`).
+* Sintaxe de input do emulador: `FRAME:BOTAO[:SEGURAR]`, um item por botão.
+* Commit `05b1bc4` + merge com remoto (`d1b9d14`). PR #2 (revert do workflow JDK, obsoleto frente ao PR #3) FECHADO.
+* PENDENTE: aceitação visual completa (overworld/quarto, menu START com bolsa cheia, 60 s estável) e
+  mod de preenchimento real (`apply_mod_v3`-equivalente com payload de itens) — o regkey atual só grava 0xAAAA.

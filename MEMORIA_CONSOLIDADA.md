@@ -39,9 +39,9 @@ Nota de colisão: L+R abre a ajuda nativa do jogo — combo escolhido L+R+START 
   Causa-raiz: site 0x08000B08→tramp 0x08EB0C00 = ~15,4MB → FORA do alcance BL ±4MB.
   O "back-bl certo" de c33 não existia de fato — contas validaram campo, não alcance.
 - **`rom_mod/BAG_MOD_v3.gba` (design veneer)**: site em **0x08000A38** (prologo SetGpuReg):
-  `01 4b 18 47 01 0c eb 08` = ldr r3,[pc,#4]; bx r3; .word 0x08EB0C01.
+  `00 4b 18 47 01 0c eb 08` = ldr r3,[pc,#0]; bx r3; .word 0x08EB0C01 (corrigido c35: `01 4b` lia literal em 0xA40 = código).
   Tramp @ 0x08EB0C00 (158 B): push{r0-r3} + payload(130 B) + pop + replay 4 instr +
-  retorno bx-stay-Thumb → 0x08000A42 (bit0=1). Header: `reports/site_v3.hex`,
+  retorno bx-stay-Thumb → **0x08000A41** (corrigido c35; o valor 0x08000A42/A43 original estava ERRADO e pulava `lsrs r1,r1,#0x10`@0xA40). Header: `reports/site_v3.hex`,
   `reports/tramp_v3.hex`. **STATUS: boot OK BRANCO (?! frames iguais 480/2900 AMBOS
   de tela branca — provável pré-GBI 'fade to white' do boot? Deletado: precisa validar
   o conteúdo das imagens, pois 4-byte-white pode ser boot legítimo)**. Testes no
@@ -67,8 +67,8 @@ Nota de colisão: L+R abre a ajuda nativa do jogo — combo escolhido L+R+START 
 ## 5. FÓRMULAS & BYTES DURAIS
 - **Thumb BL (certo)**: enc: S=1 se off<0; raw23=off&0x7FFFFF; w0=F000|(S<<10)|H; w1=F800|L
   (H=(raw23>>12)&3FF, L=(raw23>>1)&7FF). dec espelha. Off>±0x400000 → FORA DE ALCANCE.
-- Site v3: bytes `01 4b 18 47 01 0c eb 08` @0x08000A38. Tramp jump-back: bx sobre
-  0x08000A43 (0xA42|1 = thumb-bit).
+- Site v3: bytes `00 4b 18 47 01 0c eb 08` @0x08000A38 (c35). Tramp jump-back: bx sobre
+  **0x08000A41** (0xA40|1 = thumb-bit). Literal do veneer em 0x08000A3C = 0x08EB0C01.
 - Push/pop const-range certos: `0xB40F` push{r0-r3} / `0xBC0F` pop{r0-r3} (AUDITADOS c34 —
   anteriores 0xB0/0xB8-famílias misturadas no c33 histórico; versão c34 no tramp_v3 e
   dump capstone 1:1).
