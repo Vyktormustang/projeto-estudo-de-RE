@@ -188,6 +188,11 @@ class FuncaoDesmontada:
     terminacao: str = "indefinida"
     semente: str = "?"               # de onde veio esta funcao
     tabelas: list[TabelaCasos] = field(default_factory=list)
+    # `mov pc, rX` em que o idioma de tabela de casos NAO foi reconhecido, com o
+    # motivo MEDIDO (`_tabela_de_casos_ou_motivo`). Sem isto o relatorio so'
+    # podia dizer "salto calculado nao reconhecido": as quatro recusas da ROM de
+    # estudo parecem a mesma coisa de longe e nao sao.
+    tabelas_recusadas: list[tuple[int, str]] = field(default_factory=list)
     # Saltos para endereco ABAIXO da entrada: a leitura saiu desta funcao (bloco
     # comum de outra rotina). Ver a regra no ponto 4 de _seguir_funcao.
     saidas: list[tuple[int, int]] = field(default_factory=list)
@@ -226,11 +231,18 @@ class TabelaCasos:
     indice_endereco: int   # onde esta o `adds rI, rI, rB`
     indice_reg: int = -1   # registrador do indice (id do capstone)
     deslocamento: int | None = None
+    # De onde saiu o numero de casos. O guarda do `switch` do compilador NAO e'
+    # sempre `cmp rX, #k`: em duas tabelas da ROM de estudo (0x0805234C e
+    # 0x08050F5C, 268 casos cada) o limite vem de um `ldr rY, [pc, #N]` e o
+    # `cmp` compara com registrador -- o numero continua medivel (esta' na ROM),
+    # mas so' se a sonda disser de onde ele veio.
+    guarda: int | None = None
+    guarda_fonte: str = ""
 
     def texto(self) -> str:
         escala = f", indice x{1 << self.deslocamento}" if self.deslocamento is not None else ""
         return (f"tabela de casos em 0x{self.tabela:08X}: {len(self.alvos)} casos{escala}; "
-                f"salto em 0x{self.endereco:08X}")
+                f"salto em 0x{self.endereco:08X}; {self.guarda_fonte}")
 
 
 @dataclass
@@ -289,6 +301,12 @@ class Desmontagem:
     def texto(self) -> str:
         linhas = [f"desmontagem: {len(self.funcoes)} funcoes, "
                   f"{self.total_instrucoes} instrucoes, {len(self.arestas())} arestas"]
+        recusadas = [item for f in self.funcoes.values() for item in f.tabelas_recusadas]
+        if recusadas:
+            tabelas = [t for f in self.funcoes.values() for t in f.tabelas]
+            linhas.append(f"  tabelas de casos: {len(tabelas)} reconhecidas "
+                          f"({sum(len(t.alvos) for t in tabelas)} casos lidos da ROM); "
+                          f"{len(recusadas)} `mov pc, rX` recusados (motivo completo no JSON)")
         if self.descartes:
             linhas.append(f"  {len(self.descartes)} enderecos tentados como funcao e "
                           f"descartados: nenhuma instrucao valida do ARM7TDMI no inicio "
@@ -527,7 +545,10 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                     anteriores = sorted(
                         (i for i in funcao.instrucoes if i.endereco < ins.address),
                         key=lambda i: i.endereco)
-                    tabela = _tabela_de_casos(imagem, base, anteriores, ins, cs)
+                    tabela, por_que = _tabela_de_casos_ou_motivo(
+                        imagem, base, anteriores, ins, cs)
+                    if tabela is None:
+                        funcao.tabelas_recusadas.append((ins.address, por_que))
                     if tabela is not None:
                         funcao.tabelas.append(tabela)
                         # Mesma regra do ponto 4: alvo de tabela abaixo da
@@ -659,6 +680,37 @@ def _operandos_de(imagem: bytes, base: int, instrucao, cs):
     return lista[0] if lista else None
 
 
+def _literal_do_pool(imagem: bytes, base: int, anteriores: list, registrador: int, cs):
+    """Valor de um literal do pool carregado em `registrador` -- `(valor, pool)`.
+
+    Existe porque o guarda do `switch` nao e' sempre `cmp rX, #k`. Medido na ROM
+    de estudo (0x0805233C e 0x08050F4E):
+
+        0x08052338  ldr r1, [pc, #0x18]   ; r1 = 0x0000010B, o LIMITE
+        0x0805233C  cmp r5, r1
+        0x0805233E  bls 0x08052344        ; dentro da faixa
+        0x08052340  bl  0x08053774        ; fora da faixa: chama o tratamento
+
+    O numero de casos continua vindo da ROM (nao de suposicao); o que muda e' o
+    caminho ate ele. Devolve None quando o registrador nao foi carregado de um
+    `ldr rY, [pc, #N]`.
+    """
+    for item in reversed(anteriores[-8:]):
+        lida = _operandos_de(imagem, base, item, cs)
+        if (lida is not None and lida.mnemonic.startswith("ldr")
+                and len(lida.operands) == 2
+                and lida.operands[0].type == capstone.arm.ARM_OP_REG
+                and lida.operands[0].reg == registrador
+                and lida.operands[1].type == capstone.arm.ARM_OP_MEM
+                and lida.operands[1].mem.base == capstone.arm.ARM_REG_PC):
+            pool = ((lida.address + 4) & ~3) + lida.operands[1].mem.disp
+            valor = _ler32(imagem, base, pool)
+            if valor is None:
+                return None
+            return valor, pool
+    return None
+
+
 def _tabela_de_casos(imagem: bytes, base: int, anteriores: list, ins, cs):
     """Reconhece o idioma de tabela de casos e devolve o que leu da ROM.
 
@@ -682,18 +734,34 @@ def _tabela_de_casos(imagem: bytes, base: int, anteriores: list, ins, cs):
          filtro de dado-lido-como-codigo).
 
     Devolve None se QUALQUER criterio falhar: ai a funcao continua marcada como
-    parcial, em vez de o desmontador inventar codigo.
+    parcial, em vez de o desmontador inventar codigo. O motivo MEDIDO de cada
+    recusa sai por `_tabela_de_casos_ou_motivo` -- "nao reconheci" sem dizer o
+    que foi medido ja' custou uma rodada neste projeto (o relatorio de desvio
+    dizia "rotulo inexistente" para endereco desmontado).
+    """
+    return _tabela_de_casos_ou_motivo(imagem, base, anteriores, ins, cs)[0]
+
+
+def _tabela_de_casos_ou_motivo(imagem: bytes, base: int, anteriores: list, ins, cs):
+    """A mesma funcao, devolvendo `(tabela, motivo)` -- motivo vazio se aceitou.
+
+    Existe para a sonda (`ferramentas/diagnosticar_tabela.py`) e para o relatorio:
+    dizer "nao reconheci a tabela" nao distingue nada, e as quatro recusas da ROM
+    de estudo parecem todas a mesma coisa de longe.
     """
     # ATENCAO: `anteriores` vem em ordem de ENDERECO, nao em ordem de travessia
     # -- a travessia segue desvios e volta, entao a lista da funcao nao esta
     # ordenada quando esta funcao e chamada (bug real: olhar para o fim da lista
     # nao reconheceu nenhuma das 309 tabelas).
     if len(anteriores) < 3:
-        return None
+        return None, (f"so' {len(anteriores)} instrucoes antes do "
+                      f"`{ins.mnemonic} {ins.op_str}` nesta janela")
     anterior = _operandos_de(imagem, base, anteriores[-1], cs)
     antes = _operandos_de(imagem, base, anteriores[-2], cs)
     if anterior is None or antes is None:
-        return None
+        return None, (f"nao consegui reler as instrucoes anteriores "
+                      f"(0x{anteriores[-2].endereco:08X}, "
+                      f"0x{anteriores[-1].endereco:08X})")
     # `ldr rI, [rI]` (offset zero) e `adds rI, rI, rB`
     if not (anterior.mnemonic == "ldr" and len(anterior.operands) == 2
             and all(o.type == capstone.arm.ARM_OP_REG or o.type == capstone.arm.ARM_OP_MEM
@@ -702,12 +770,16 @@ def _tabela_de_casos(imagem: bytes, base: int, anteriores: list, ins, cs):
             and anterior.operands[1].type == capstone.arm.ARM_OP_MEM
             and anterior.operands[1].mem.base == anterior.operands[0].reg
             and anterior.operands[1].mem.disp == 0):
-        return None
+        return None, (f"a instrucao anterior a 0x{ins.address:08X} nao e' "
+                      f"`ldr rI, [rI]` (medido: `{anterior.mnemonic} "
+                      f"{anterior.op_str}` em 0x{anterior.address:08X})")
     if not (antes.mnemonic.startswith("add") and len(antes.operands) == 3
             and all(o.type == capstone.arm.ARM_OP_REG for o in antes.operands)
             and antes.operands[0].reg == antes.operands[1].reg
             and antes.operands[0].reg == anterior.operands[0].reg):
-        return None
+        return None, (f"a instrucao antes dela nao e' `adds rI, rI, rB` "
+                      f"(medido: `{antes.mnemonic} {antes.op_str}` em "
+                      f"0x{antes.address:08X})")
     registrador_base = antes.operands[2].reg
     registrador_indice = antes.operands[0].reg
 
@@ -739,37 +811,75 @@ def _tabela_de_casos(imagem: bytes, base: int, anteriores: list, ins, cs):
                 tabela = valor
             break
     if tabela is None:
-        return None
+        return None, ("nenhum `ldr rB, [pc, #N]` nas 40 instrucoes anteriores "
+                      "carrega a base da tabela dentro da imagem")
 
-    # guarda `cmp rX, #k` -- diz quantos casos existem, sem depender da tabela
+    # guarda `cmp rX, #k` (imediato) ou `cmp rX, rY` com rY carregado de um
+    # literal do pool -- diz quantos casos existem, sem depender da tabela
     guarda = None
-    for atras in reversed(anteriores[-18:]):
+    guarda_fonte = ""
+    for posicao in range(len(anteriores) - 1, max(len(anteriores) - 18, 0) - 1, -1):
+        atras = anteriores[posicao]
         candidata = _operandos_de(imagem, base, atras, cs)
-        if (candidata is not None and candidata.mnemonic.startswith("cmp")
-                and len(candidata.operands) == 2
-                and candidata.operands[1].type == capstone.arm.ARM_OP_IMM):
-            guarda = candidata.operands[1].imm
+        if (candidata is None or not candidata.mnemonic.startswith("cmp")
+                or len(candidata.operands) != 2):
+            continue
+        segundo = candidata.operands[1]
+        if segundo.type == capstone.arm.ARM_OP_IMM:
+            guarda = segundo.imm
+            guarda_fonte = f"guarda imediato em 0x{candidata.address:08X}"
             break
+        if segundo.type != capstone.arm.ARM_OP_REG:
+            continue
+        # forma por registrador: so' vale se o proximo passo for um desvio
+        # condicional (e' ele que usa o resultado do `cmp`) e se o limite vier de
+        # um literal do pool, lido da ROM
+        if posicao + 1 >= len(anteriores):
+            continue
+        seguinte = _operandos_de(imagem, base, anteriores[posicao + 1], cs)
+        if (seguinte is None or not seguinte.group(capstone.CS_GRP_JUMP)
+                or seguinte.mnemonic in ("b", "bl", "bx")):
+            continue
+        fonte = _literal_do_pool(imagem, base, anteriores[:posicao], segundo.reg, cs)
+        if fonte is None:
+            continue
+        valor, pool = fonte
+        if not 0 <= valor <= 0x10000:
+            continue
+        guarda = valor
+        guarda_fonte = (f"guarda por registrador em 0x{candidata.address:08X}, "
+                        f"limite 0x{valor:X} lido do pool em 0x{pool:08X}")
+        break
     if guarda is None:
-        return None
+        return None, ("nao existe `cmp rX, #k` nem `cmp rX, rY` com rY vindo de "
+                      "literal do pool nas 18 instrucoes anteriores: sem o guarda "
+                      "nao ha como saber quantos casos a tabela tem")
 
     alvos = []
     for indice in range(guarda + 1):
         valor = _ler32(imagem, base, tabela + 4 * indice)
         if valor is None or not (base <= (valor & ~1) < base + len(imagem)):
-            return None
+            return None, (f"a entrada {indice} da tabela (0x{tabela:08X}, guarda "
+                          f"`cmp rX, #0x{guarda:X}`) nao e' endereco de codigo "
+                          f"dentro da imagem")
         alvos.append(valor & ~1)
 
     # cada alvo tem de comecar com instrucao que EXISTE no ARM7TDMI
-    for alvo in alvos:
+    for indice, alvo in enumerate(alvos):
         inicio = alvo - base
         lidas = list(cs.disasm(imagem[inicio:inicio + 4], alvo, count=1))
-        if not lidas or impossivel_no_arm7tdmi(lidas[0], "thumb") is not None:
-            return None
+        if not lidas:
+            return None, (f"o alvo {indice} (0x{alvo:08X}) nao decodifica como "
+                          f"instrucao")
+        motivo = impossivel_no_arm7tdmi(lidas[0], "thumb")
+        if motivo is not None:
+            return None, (f"o alvo {indice} (0x{alvo:08X}) comeca em "
+                          f"`{lidas[0].mnemonic} {lidas[0].op_str}`: {motivo}")
 
     return TabelaCasos(endereco=ins.address, tabela=tabela, alvos=alvos,
                        indice_endereco=antes.address, indice_reg=registrador_indice,
-                       deslocamento=deslocamento)
+                       deslocamento=deslocamento, guarda=guarda,
+                       guarda_fonte=guarda_fonte), ""
 
 
 def _termina_fluxo(ins) -> bool:

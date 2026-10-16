@@ -1118,3 +1118,194 @@ def test_evidencia_do_corpus_e_a_rodada_de_agora(rodada):
     # comparar bytes (licao de uma rodada anterior), entao compara-se o texto.
     levantado = (RAIZ / "evidencias" / "levantado_corpus.c").read_text(encoding="utf-8")
     assert levantado == rodada.codigo.texto()
+
+
+def _imagem_com_tabela_guarda_no_pool(limite: int) -> bytes:
+    """Idioma de tabela de casos em que o guarda NAO e' `cmp rX, #k`.
+
+    Medido na ROM de estudo (0x0805234C e 0x08050F5C, 268 casos cada):
+
+        0x08052338  ldr r1, [pc, #0x18]   ; limite = 0x0000010B, lido do pool
+        0x0805233C  cmp r5, r1
+        0x0805233E  bls 0x08052344
+        0x08052340  bl  0x08053774        ; fora da faixa
+
+    Aqui o mesmo formato, com a tabela no fim:
+
+        0x40  ldr r2, [pc, #0x10]   ; pool em 0x54 -> r2 = limite
+        0x42  cmp r0, r2
+        0x44  bhi 0x08000070        ; padrao
+        0x46  lsls r0, r0, #2
+        0x48  ldr r1, [pc, #0x10]   ; pool em 0x5C -> 0x08000080 (a tabela)
+        0x4A  adds r0, r0, r1
+        0x4C  ldr r0, [r0]
+        0x4E  mov pc, r0
+        0x80  tabela: 3 enderecos PARES
+    """
+    base = rom.ROM_BASE
+    casos = [0x08000090, 0x08000094, 0x08000098]
+    padrao = 0x08000070
+    tabela = 0x08000080
+    imagem = bytearray(0x100)
+
+    def meia(endereco: int, valor: int) -> None:
+        imagem[endereco - base:endereco - base + 2] = valor.to_bytes(2, "little")
+
+    meia(0x08000040, (0x4800 | (2 << 8) | (0x10 // 4)))       # ldr r2, [pc, #0x10]
+    meia(0x08000042, 0x4280 | (2 << 3))                       # cmp r0, r2
+    meia(0x08000044, 0xD800 | ((padrao - 0x08000048) // 2))   # bhi padrao
+    meia(0x08000046, 0x0080)                                  # lsls r0, r0, #2
+    meia(0x08000048, (0x4800 | (1 << 8) | (0x10 // 4)))       # ldr r1, [pc, #0x10]
+    meia(0x0800004A, 0x1840)                                  # adds r0, r0, r1
+    meia(0x0800004C, 0x6800)                                  # ldr r0, [r0]
+    meia(0x0800004E, 0x4687)                                  # mov pc, r0
+    imagem[0x08000054 - base:0x08000058 - base] = limite.to_bytes(4, "little")
+    imagem[0x0800005C - base:0x08000060 - base] = tabela.to_bytes(4, "little")
+    meia(padrao, 0x20FF)                                      # movs r0, #0xFF
+    meia(padrao + 2, 0x4770)                                  # bx lr
+    for numero, endereco in enumerate(casos):
+        meia(endereco, 0x2000 | ((numero + 1) * 0x10))        # movs r0, #N
+        meia(endereco + 2, 0x4770)                            # bx lr
+        inicio = tabela + 4 * numero
+        imagem[inicio - base:inicio - base + 4] = endereco.to_bytes(4, "little")
+    return bytes(imagem)
+
+
+def test_guarda_do_switch_pode_estar_em_registrador_carregado_do_pool():
+    """O limite do `switch` tambem vem por registrador -- e continua medivel.
+
+    Criterio 4 sem esta forma recusava 2 tabelas de 268 casos cada na ROM de
+    estudo, dizendo "nao existe `cmp rX, #k`": verdade incompleta. O limite
+    estava na ROM (literal do pool), nao no campo imediato do `cmp`.
+    """
+    imagem = _imagem_com_tabela_guarda_no_pool(limite=2)      # 3 casos
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    (funcao,) = desmontagem.funcoes.values()
+    lidas = [f"{i.mnemonic} {i.operadores}".strip() for i in funcao.instrucoes[:5]]
+    assert "cmp r0, r2" in lidas, lidas
+    (tabela,) = funcao.tabelas
+    assert len(tabela.alvos) == 3, tabela.alvos
+    assert tabela.guarda == 2, tabela.guarda
+    assert "pool em" in tabela.guarda_fonte, tabela.guarda_fonte
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert "switch" in levantada.corpo
+    assert "limite 0x2 lido do pool" in levantada.corpo
+
+
+def test_guarda_no_pool_que_nao_bate_tambem_recusa():
+    """Se o limite do pool nao fechar com as entradas lidas, nao ha' tabela.
+
+    Sem isto a forma nova viraria um "sim" geral para qualquer `cmp rX, rY`
+    seguido de `mov pc, rZ` -- o que seria adivinhacao com cara de medicao.
+    """
+    imagem = _imagem_com_tabela_guarda_no_pool(limite=5)      # diz 6, tabela tem 3
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    (funcao,) = desmontagem.funcoes.values()
+    assert funcao.tabelas == [], "nao pode reconhecer tabela que nao fecha com o limite"
+    (site, motivo), = funcao.tabelas_recusadas
+    assert "nao e' endereco de codigo dentro da imagem" in motivo, motivo
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert "switch" not in levantada.corpo
+    assert not levantada.completa
+
+
+def test_sonda_de_tabela_roda_e_diz_o_motivo(tmp_path):
+    """A sonda que explica a recusa e' conferida RODANDO, no caso recusado.
+
+    Ela existe para responder "por que nao virou switch?" -- e ja' falhou do jeito
+    mais bobo possivel: recebendo o objeto errado (`Instrucao` do desmontador em
+    vez da instrucao do capstone) e estourando `AttributeError` justamente quando
+    havia uma recusa para explicar. Ferramenta de diagnostico que nao roda no caso
+    de diagnostico nao serve para nada.
+    """
+    caminho = tmp_path / "sintetica.gba"
+    caminho.write_bytes(_imagem_com_tabela_guarda_no_pool(5))     # limite que nao fecha
+    processo = subprocess.run(
+        [sys.executable, str(RAIZ / "ferramentas" / "diagnosticar_tabela.py"),
+         str(caminho), "--entrada", "0x08000041"],
+        capture_output=True, text=True)
+    assert processo.returncode == 0, processo.stderr[-2000:]
+    assert "`mov pc, rX` recusados ...: 1" in processo.stdout, processo.stdout
+    assert "nao e' endereco de codigo dentro da imagem" in processo.stdout, processo.stdout
+    # e no caso em que a tabela fecha, a sonda diz RECONHECIDA
+    caminho.write_bytes(_imagem_com_tabela_guarda_no_pool(2))
+    processo = subprocess.run(
+        [sys.executable, str(RAIZ / "ferramentas" / "diagnosticar_tabela.py"),
+         str(caminho), "--entrada", "0x08000041", "--site", "0x0800004E"],
+        capture_output=True, text=True)
+    assert processo.returncode == 0, processo.stderr[-2000:]
+    assert "veredito: RECONHECIDA" in processo.stdout, processo.stdout
+
+
+def _carregar_sonda_de_lacunas():
+    """`ferramentas/onde_estao_as_lacunas.py` e' script, nao modulo do pacote."""
+    import importlib.util
+    caminho = RAIZ / "ferramentas" / "onde_estao_as_lacunas.py"
+    especificacao = importlib.util.spec_from_file_location("onde_estao_as_lacunas", caminho)
+    modulo = importlib.util.module_from_spec(especificacao)
+    especificacao.loader.exec_module(modulo)
+    return modulo
+
+
+def test_alvo_de_desvio_que_ninguem_cobriu_e_medido_nos_bytes():
+    """Alvo de desvio fora de toda janela: e' codigo que ficou de fora ou dado?
+
+    Esta e' a pergunta que decide se vale "preencher buraco" com semente, e a
+    sonda responde lendo os BYTES REAIS -- nao chutando pela aparencia. Caso 1,
+    montado no desmontador de verdade: um desvio cujo alvo ninguem tentou ler
+    (a leitura chegou la' e parou), um alvo coberto e um ja' tentado como
+    semente e descartado. Se a leitura do alvo nao fosse medida, os tres casos
+    sairiam como a mesma linha ("buraco") -- foi assim que "102 recusas por
+    buraco" passou rodadas parecendo codigo faltando, quando 108 dos 110 alvos
+    param na PRIMEIRA instrucao.
+
+    Caso 2: o veredito pergunta pelos DOIS motivos que o levantador usa (o de
+    mnemonic e o de FORMA por tamanho de codificacao). Sem o segundo, dado do
+    Thumb-2 que o capstone MOSTRA como `adc r4, r4, #0xd000` passaria por
+    "codigo que segue" e o buraco voltaria a parecer codigo faltando.
+    """
+    base = rom.ROM_BASE
+    imagem = bytearray(0x40)
+
+    def meia(endereco: int, valor: int) -> None:
+        imagem[endereco - base:endereco - base + 2] = valor.to_bytes(2, "little")
+
+    def salto(endereco: int, destino: int) -> None:
+        deslocamento = (destino - (endereco + 4)) // 2
+        meia(endereco, 0xE000 | (deslocamento & 0x7FF))
+
+    salto(0x08000000, 0x08000008)                  # alvo NUNCA tentado
+    imagem[0x08000008 - base:0x0800000A - base] = bytes.fromhex("08bf")   # `it eq`
+    salto(0x0800000C, 0x08000000)                  # alvo coberto
+    imagem[0x08000014 - base:0x08000016 - base] = bytes.fromhex("08bf")
+    salto(0x08000020, 0x08000014)                  # alvo ja' descartado
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(imagem), sementes={0x08000000: "thumb", 0x0800000C: "thumb",
+                                 0x08000014: "thumb", 0x08000020: "thumb"})
+    assert 0x08000014 in desmontagem.descartes, sorted(desmontagem.descartes)
+    sonda = _carregar_sonda_de_lacunas()
+    medido = sonda.alvos_nao_cobertos({"desmontagem": desmontagem,
+                                       "imagem": bytes(imagem)})
+    assert medido["alvos"] == {"coberto (instrucao de alguma janela)": 1,
+                              "nunca tentado": 1,
+                              "ja' tentado como semente (descartado: dado)": 1}, medido
+    assert medido["veredito_dos_nao_tentados"] == {"para na primeira": 1}, medido
+    exemplo = medido["exemplos"]["para na primeira: IT block (it): nao existe "
+                                  "no ARMv4T"][0]
+    assert "0x08000008" in exemplo and "0x08000000" in exemplo, exemplo
+
+    # caso 2: os dois motivos do levantador, e nao so' o de mnemonic
+    so_uma_funcao = disasm.Desmontagem(base=base)
+    so_uma_funcao.funcoes[0x08000000] = disasm.FuncaoDesmontada(
+        entrada=0x08000000, modo="thumb", semente="informada",
+        instrucoes=[disasm.Instrucao(0x08000000, bytes.fromhex("02e0"), "b",
+                                     "#0x8000008", "thumb", alvo=0x08000008)])
+    com_dado32 = bytearray(0x40)
+    com_dado32[0x08:0x0C] = bytes.fromhex("44f55044")
+    medido = sonda.alvos_nao_cobertos({"desmontagem": so_uma_funcao,
+                                       "imagem": bytes(com_dado32)})
+    assert medido["alvos"] == {"nunca tentado": 1}, medido
+    chave = next(iter(medido["exemplos"]))
+    assert chave.startswith("para na primeira: codificacao de 32 bits"), chave

@@ -33,6 +33,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
+import capstone                                            # noqa: E402
 from gbadecomp import analise as analise_mod              # noqa: E402
 from gbadecomp import decompile as decompile_mod          # noqa: E402
 from gbadecomp import disasm as disasm_mod                # noqa: E402
@@ -117,7 +118,7 @@ def coletar(rom_caminho: str, censo: str | None) -> dict:
                 "texto": item,
             })
     return {"desmontagem": desmontagem, "codigo": codigo, "lacunas": lacunas,
-            "nomes": nomes, "do_censo": do_censo}
+            "nomes": nomes, "do_censo": do_censo, "imagem": rom.data}
 
 
 def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> dict:
@@ -206,6 +207,10 @@ def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> 
                      "funcoes": len(funcoes_por_pagina[p])}
                     for p, n in lacunas_por_pagina.most_common(12)],
         "destinos_de_desvio": destinos,
+        # (5) E O QUE TEM NOS ALVOS QUE NINGUEM COBRIU? A tabela acima diz quantos
+        # desvios foram recusados por classe; esta diz o que HA' em cada classe de
+        # alvo (instrucao, descarte ja' medido, ou bytes lidos na hora).
+        "alvos_nao_cobertos": alvos_nao_cobertos(dados),
         "origens_bx": dict(origens_bx.most_common()),
         "exemplos_bx": {k: v for k, v in list(exemplos_bx.items())[:12]},
         "contexto": contexto,
@@ -237,6 +242,16 @@ def relatar(medido: dict, exemplos: int) -> str:
         if d["paginas_dos_destinos"]:
             saida.append("    destinos por pagina: " + ", ".join(
                 f"{p['pagina']}={p['n']}" for p in d["paginas_dos_destinos"][:6]))
+    alvos = medido.get("alvos_nao_cobertos") or {}
+    if alvos.get("alvos"):
+        saida += ["", "alvos de desvio imediato (todos os `b`/`bl` da desmontagem):"]
+        for classe, n in alvos["alvos"].items():
+            saida.append(f"  {n:5d}  {classe}")
+        for porque, n in alvos["veredito_dos_nao_tentados"].items():
+            saida.append(f"  {n:5d}  veredito dos nunca tentados: {porque}")
+        for chave, lista in alvos["exemplos"].items():
+            for exemplo in lista[:2]:
+                saida.append(f"        {exemplo}")
     if medido["origens_bx"]:
         saida += ["", "de onde vem o registrador do `bx rN` (heuristica: ultima "
                       "escrita antes do bx, lida do desmonte):"]
@@ -320,6 +335,91 @@ def _para_onde_vai_o_desvio(desmontagem, lacunas: list, nomes: dict) -> dict:
         "paginas_dos_destinos": [{"pagina": p, "n": n}
                                  for p, n in por_faixa.most_common(8)],
         "exemplos": {k: v for k, v in exemplos.items()},
+    }
+
+
+def alvos_nao_cobertos(dados: dict, limite: int = 40) -> dict:
+    """Cada alvo de desvio imediato que NAO e' instrucao de janela nenhuma.
+
+    A pergunta que decide se vale "preencher buraco" com semente: os alvos que
+    nunca foram tentados (nem desmontados, nem descartados como semente) sao
+    codigo perdido ou dado? A resposta sai dos BYTES REAIS, no modo da janela
+    dona, lidos ate' um retorno ou ate' a primeira instrucao que nao existe no
+    ARM7TDMI. Se a leitura morre na primeira, ali e' dado -- e semear seria ler
+    dado como codigo, o defeito que a rodada r13 desfez.
+
+    A conta fecha com a tabela de destinos: um alvo recusado ou ja' e'
+    instrucao (outra janela), ou ja' foi tentado e descartado, ou esta' neste
+    balde. Sem os tres numeros juntos, "102 recusas por buraco" parece codigo
+    faltando; com eles, ve-se quanto e' dado medido.
+    """
+    desmontagem = dados["desmontagem"]
+    imagem = dados.get("imagem") or b""
+    base = desmontagem.base
+    cs_de = {modo: disasm_mod._capstone(modo) for modo in ("thumb", "arm")}
+    cobertos = {i.endereco for f in desmontagem.funcoes.values() for i in f.instrucoes}
+    tentados = set(desmontagem.descartes)
+
+    contagem: collections.Counter = collections.Counter()
+    veredito: collections.Counter = collections.Counter()
+    exemplos: dict[str, list[str]] = collections.defaultdict(list)
+    for f in desmontagem.funcoes.values():
+        cs = cs_de[f.modo]
+        for instrucao in f.instrucoes:
+            if not instrucao.mnemonic.startswith("b"):
+                continue          # so' `b`, `b<cond>` e `bl` tem alvo imediato
+            uma = list(cs.disasm(instrucao.bytes_, instrucao.endereco, count=1))
+            if not uma or not uma[0].group(capstone.CS_GRP_JUMP):
+                continue          # `bx`/`blx` nao tem imediato; `bl` e' chamada
+            operandos = uma[0].operands
+            if not operandos or operandos[0].type != capstone.arm.ARM_OP_IMM:
+                continue
+            alvo = operandos[0].imm & 0xFFFFFFFF
+            if not (base <= alvo < base + len(imagem)):
+                contagem["fora da imagem"] += 1
+                continue
+            if alvo in cobertos:
+                contagem["coberto (instrucao de alguma janela)"] += 1
+                continue
+            if alvo in tentados:
+                contagem["ja' tentado como semente (descartado: dado)"] += 1
+                continue
+            contagem["nunca tentado"] += 1
+            lidas, porque = [], "limite de instrucoes sem retorno"
+            atual = alvo
+            for _ in range(limite):
+                uma = list(cs.disasm(imagem[atual - base:atual - base + 4], atual, count=1))
+                if not uma:
+                    porque = "para na primeira: codigo invalido"
+                    break
+                ins = uma[0]
+                # OS DOIS motivos que o levantador usa para dizer "isto nao
+                # existe no alvo": o de mnemonic (que tambem PARA a leitura no
+                # desmontador) e o de FORMA por tamanho de codificacao (que so'
+                # o levantador pergunta, de proposito -- ver o comentario de
+                # `disasm.forma_impossivel_no_thumb1`). Perguntar so' pelo
+                # primeiro deixaria passar dado do Thumb-2 que decodifica com
+                # cara de instrucao -- `adc r4, r4, #0xd000` e' o exemplo medido.
+                motivo = (disasm_mod.impossivel_no_arm7tdmi(ins, f.modo)
+                          or disasm_mod.forma_impossivel_no_thumb1(ins, f.modo))
+                if motivo is not None:
+                    porque = f"para na primeira: {motivo}"
+                    break
+                lidas.append(f"{ins.mnemonic} {ins.op_str}")
+                if disasm_mod._eh_retorno(ins):
+                    porque = "a leitura fecha (chega a um retorno)"
+                    break
+                atual += len(ins.bytes)
+            veredito[porque.split(":")[0]] += 1
+            if len(exemplos[porque]) < 3:
+                exemplos[porque].append(
+                    f"0x{alvo:08X} <- desvio em 0x{instrucao.endereco:08X} de "
+                    f"0x{f.entrada:08X} ({f.semente}) | {porque} | "
+                    f"{' | '.join(lidas[:4]) or '(nada)'}")
+    return {
+        "alvos": dict(contagem.most_common()),
+        "veredito_dos_nao_tentados": dict(veredito.most_common()),
+        "exemplos": {k: v for k, v in list(exemplos.items())[:6]},
     }
 
 

@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `45 passed` |
+| testes automatizados | `50 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -48,16 +48,16 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 
 | medida | valor |
 |---|---|
-| descoberta partindo **so do vetor de reset** | 3 544 funcoes · 2 590 das 5 981 do censo (43,3%) |
-| descoberta usando o **censo como sementes** | **8 153 funcoes**, 456 822 instrucoes listadas, 20 380 arestas |
-| cobertura do censo | 5 981/5 981 (100%) · **2 172 funcoes que o censo nao tinha** |
-| enderecos descartados | 162 (nenhuma instrucao valida do ARM7TDMI no inicio) |
+| descoberta partindo **so do vetor de reset** | 3 586 funcoes · 2 599 das 5 981 do censo (43,4%) |
+| descoberta usando o **censo como sementes** | **8 172 funcoes**, 460 868 instrucoes listadas, 20 492 arestas |
+| cobertura do censo | 5 981/5 981 (100%) · **2 191 funcoes que o censo nao tinha** |
+| enderecos descartados | 164 (nenhuma instrucao valida do ARM7TDMI no inicio) |
 | saltos que saem da funcao para tras | 241 · 148 trechos orfaos voltaram como janela propria |
-| tabelas de casos | **375 reconhecidas**, 5 767 casos lidos da ROM → `switch` no C |
-| funcoes com C para ler | **8 007 completas + 146 parciais = 100%** |
-| C levantado | 1 046 852 linhas / 39,6 MB |
+| tabelas de casos | **377 reconhecidas**, 6 303 casos lidos da ROM → `switch` no C |
+| funcoes com C para ler | **8 027 completas + 145 parciais = 100%** |
+| C levantado | 1 056 640 linhas / 39,9 MB |
 | conferencia byte a byte | **99,950%** das instrucoes remontam identicas ao binario |
-| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 144 280 bytes) |
+| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 164 980 bytes) |
 | determinismo | C, JSON e objeto compilado **identicos** em duas rodadas (`ferramentas/checar_determinismo.py`) |
 
 ### Achados que valem mais que os números
@@ -202,12 +202,61 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    isso a verdade-terreno existe só no corpus, onde a emulação decide (teste
    `test_forma_inexistente_no_thumb1_e_julgado_pelo_tamanho_da_codificacao`).
 
+13. **O guarda do `switch` nem sempre e' `cmp rX, #k` — e a recusa dizia so' a
+   metade.** Duas tabelas da ROM (`0x0805234C` e `0x08050F5C`, **268 casos
+   cada**) eram recusadas com "nao existe `cmp rX, #k` nas 18 instrucoes
+   anteriores". Verdade incompleta: o limite estava na ROM. O codigo e'
+
+   ```
+   0x08052338  ldr r1, [pc, #0x18]   ; r1 = 0x0000010B -- o LIMITE, vindo do pool
+   0x0805233C  cmp r5, r1            ; compara com REGISTRADOR, nao com imediato
+   0x0805233E  bls 0x08052344        ; dentro da faixa
+   0x08052340  bl  0x08053774        ; fora da faixa: tratamento
+   ```
+
+   O numero de casos continua saindo de medicao (e nao de suposicao): o limite
+   lido do pool **tem de fechar** com as entradas lidas da tabela. Medido nos
+   dois sitios: **268 entradas, todas enderecos de codigo do alvo**, e o word
+   seguinte (`0x68384B1A`) **nao** e' endereco de codigo — a tabela acaba
+   exatamente onde o guarda diz, confirmacao dupla. Antes disto a sonda
+   (`ferramentas/diagnosticar_tabela.py`) tambem nao existia: as quatro recusas
+   pareciam a mesma coisa de longe e nao sao (**2** sao este idioma, **2** nao
+   sao — em `0x083F62EC` e `0x081DBEBA` a instrucao anterior e' um `cmp`/`bhs`,
+   e o motivo agora diz isso com a instrucao medida). Efeito: **375 → 377
+   tabelas, 5 767 → 6 303 casos**, 8 153 → **8 172 funcoes** (os corpos dos casos
+   passaram a entrar na desmontagem), 456 822 → **460 868 instrucoes**. As
+   recusas cairam de 193 para **192** — e o motivo das duas que sairam, o das
+   que ficaram e o das que apareceram (uma janela nova que termina em desvio para
+   trecho nao desmontado) esta' no JSON, item a item.
+
+14. **"Buraco" nao era codigo faltando — era dado, e agora esta' medido.** As
+   **99** recusas de desvio cujo motivo era "trecho nao desmontado" (47 buraco de
+   outra janela, 29 buraco dentro da propria faixa, 23 endereco que leitura
+   nenhuma alcancou) pareciam a maior lacuna do levantamento, e a correcao
+   parecia obvia: semear esses enderecos "para recuperar o trecho". Antes de
+   escrever isso, o que HA' em cada alvo foi lido da ROM: dos **65 911** alvos de
+   desvio imediato da desmontagem, **65 801** sao instrucao de alguma janela
+   (99,83 %); dos **110** restantes, **2** caem fora da imagem, **53** ja' tinham
+   sido tentados como semente e descartados (nao decodificam) e **55** nunca
+   foram tentados — e os **55 param na PRIMEIRA instrucao**: nenhum chega a um
+   retorno. Nao ha' codigo perdido em nenhum deles; semear ali seria ler dado
+   como codigo, exatamente o defeito que a rodada r13 desfez (item 12). O
+   veredito pergunta pelos **dois** motivos que o levantador usa — o mnemonico
+   (`mrc2`, `ldrd`, `udf`: instrucoes que nao existem no ARM7TDMI) e a **forma
+   por tamanho de codificacao** (`44 f5 50 44` = `adc r4, r4, #0xd000`, que o
+   capstone mostra com cara de instrucao valida e nao existe no Thumb-1) — e sem
+   o segundo o buraco voltaria a parecer codigo faltando. Medido pela secao
+   "alvos de desvio imediato" de `ferramentas/onde_estao_as_lacunas.py`; o
+   teste `test_alvo_de_desvio_que_ninguem_cobriu_e_medido_nos_bytes` monta os
+   tres casos (coberto, nunca tentado, ja' descartado) num binario sintetico e
+   cai se a leitura dos bytes deixar de ser feita.
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
 (99,950% remontam byte a byte; as 226 divergencias sao `cmp`/`bx` escritos com a
 outra codificacao valida da mesma instrucao), e o C gerado e **C valido para o
-alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 046 852
+alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 056 640
 linhas). Nao prova **semantica** -- foi exatamente esse tipo de defeito (item 12)
 que a conferencia de bytes deixou passar por uma rodada inteira.
 
@@ -222,13 +271,14 @@ levantado e recompilado.
 | lacuna | ocorrencias |
 |---|---|
 | `bx rN` com origem nao rastreada | 39 (11 sao `bx rN`+nop *thunk*, 1 e' chamada indireta ARM→Thumb, 27 sao salto calculado) |
-| desvio que sai da funcao (bloco comum de outra rotina) | 97 — destino **medido**: 31 instrucao de outra janela, 29 buraco de outra janela, 14 fora de qualquer janela, 10 buraco da propria faixa, 7 buraco nesta janela, 6 fora de qualquer janela (salto) |
+| desvio que sai da funcao (bloco comum de outra rotina) | 98 |
 | desvio condicional para endereco sem rotulo nesta janela | 32 — mesmas 4 classes de destino |
 | instrucao que **nao existe** no ARM7TDMI (dado lido como codigo) | 17 (codificacao de 32 bits do Thumb-2; ARMv5+/coprocessador nem chega aqui: **para** a leitura e vira `descarte`, 162 deles) |
 | instrucao que EXISTE no ARMv4T e o lifter ainda nao traduz | 4 (`mrs`, `msr`, `stmdb` no ARM) |
-| salto calculado por tabela que nao passou nos criterios | 4 |
-| **total** | **193** (14 em funcao do censo, 179 fora dele) |
-| destino de cada desvio recusado (relatorio separado) | 129: 47 buraco de outra janela, 31 instrucao de outra janela, 28 buraco da propria faixa, 23 ninguem desmontou |
+| salto calculado por tabela que nao passou nos criterios | 2 |
+| **total** | **192** (13 em funcao do censo, 179 fora dele) |
+| destino de cada desvio recusado (relatorio separado) | 130: 47 buraco de outra janela, 31 instrucao de outra janela, 29 buraco da propria faixa, 23 ninguem desmontou |
+| o que HA' nos alvos que nenhuma janela cobriu | 110 de 65 911: 53 ja' tentados como semente e descartados, 55 nunca tentados (**os 55 param na primeira instrucao**), 2 fora da imagem — **0 sao codigo** |
 
 Cada uma aparece no ponto exato do C como `/* NAO LEVANTADO: ... */`, com o
 endereco e o motivo. A funcao continua legivel ate ali — e o que faltou esta
@@ -251,6 +301,7 @@ python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
 python -m gbadecomp.conferir_bytes ROM.gba --censo censo/functions.csv
 python ferramentas/estudo_switch.py ROM.gba --censo censo/functions.csv
 python ferramentas/onde_estao_as_lacunas.py ROM.gba --censo censo/functions.csv
+python ferramentas/diagnosticar_tabela.py ROM.gba --censo censo/functions.csv
 python ferramentas/checar_determinismo.py ROM.gba --censo censo/functions.csv
 
 # a amostra versionada (evidencias/rom_bpre_amostra_levantada.c) sai daqui: o
@@ -272,12 +323,23 @@ README citar numero de outra rodada, tambem. Conferido quebrando de proposito:
 trocar `"funcoes": 25` por `24` no JSON, ou um unico caractere no `.c` versionado,
 faz o teste falhar.
 
+`diagnosticar_tabela.py` responde "por que este `mov pc, rX` nao virou
+`switch`?" — e ele existe porque a resposta antiga ("salto calculado nao
+reconhecido", 4 ocorrencias) juntava quatro situacoes diferentes: **2** sao o
+idioma com o limite vindo do pool e **2** nao sao o idioma (a instrucao anterior
+e' um `cmp`/`bhs`). A classificacao vem da MESMA funcao que o desmontador usa
+(`disasm._tabela_de_casos_ou_motivo`) — sonda que reimplementa a regra mede a
+regra da sonda, nao a do programa — e o veredito sai com os numeros medidos: o
+guarda, o pool, cada entrada lida e qual delas nao existe no alvo.
+(`--site 0x...` detalha um sitio; `--censo`/`--entrada` dao as sementes.)
+
 `onde_estao_as_lacunas.py` responde o que o resumo nao responde: onde as lacunas
 se concentram (por pagina de 4 KB), se cairam em funcao do censo ou fora dele,
 **de onde vem o registrador de cada `bx rN`** e **para onde vai cada desvio
 recusado** (buraco de outra janela, instrucao de outra janela, buraco na propria
 faixa ou endereco que leitura nenhuma alcancou) — foi ele que separou "falta
-implementar" de "a leitura saiu desta janela". Com `--regiao 0x...-0x...` ele
+implementar" de "a leitura saiu desta janela" — e **o que existe em cada alvo que
+nenhuma janela cobriu**, lendo os bytes dos 110 alvos: nenhum tem codigo (item 14). Com `--regiao 0x...-0x...` ele
 lista o desmonte de uma faixa mostrando **todas** as funcoes donas de cada
 endereco (o caso que mais confunde).
 

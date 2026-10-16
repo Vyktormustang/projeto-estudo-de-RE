@@ -177,6 +177,8 @@ class Medicao:
     recusas_total: int = 0
     recusas_mnemonico: dict = field(default_factory=dict)
     recusas_motivo: dict = field(default_factory=dict)
+    tabelas_recusadas_total: int = 0
+    tabelas_recusadas_motivo: dict = field(default_factory=dict)
     descartes_por_semente: dict = field(default_factory=dict)
     descartes: list = field(default_factory=list)
     linhas_c: int = 0
@@ -255,6 +257,8 @@ class Medicao:
             linhas.append("por motivo (enderecos trocados por 0x..., a soma e' o total):")
             for motivo, n in list(self.recusas_motivo.items())[:8]:
                 linhas.append(f"  {n:5d}  {motivo}")
+            for motivo, n in list(self.tabelas_recusadas_motivo.items())[:6]:
+                linhas.append(f"     {n:5d}  {motivo[:140]}")
             if len(self.recusas_motivo) > 8:
                 linhas.append(f"  ... (+{len(self.recusas_motivo) - 8} motivos; "
                               f"o JSON tem todos)")
@@ -289,6 +293,22 @@ def _contar_tabelas(desmontagem) -> tuple[int, int]:
     """
     tabelas = [t for f in desmontagem.funcoes.values() for t in f.tabelas]
     return len(tabelas), sum(len(t.alvos) for t in tabelas)
+
+
+def _tabelas_recusadas(desmontagem) -> tuple[dict, int]:
+    """Histograma dos `mov pc, rX` em que o idioma de tabela NAO foi reconhecido.
+
+    Existe pelo mesmo motivo que `recusas_motivo`: o numero sozinho ("4 salto
+    calculado") nao diz se falta implementar ou se a leitura saiu da janela.
+    Os motivos passam por `motivo_canonico` (cada um carrega endereco).
+    """
+    por_motivo: collections.Counter = collections.Counter()
+    total = 0
+    for f in desmontagem.funcoes.values():
+        for _, motivo in f.tabelas_recusadas:
+            total += 1
+            por_motivo[motivo_canonico(motivo)] += 1
+    return dict(por_motivo.most_common()), total
 
 
 def _descoberta(rom: rom_mod.GbaRom, sementes: dict[int, str],
@@ -346,6 +366,8 @@ def medir(caminho_rom: str | Path, censo: str | Path | None = None,
     medicao.levantamento = _classificar(codigo)
     (medicao.recusas_mnemonico, medicao.recusas_motivo,
      medicao.recusas_total) = _recusas(codigo)
+    (medicao.tabelas_recusadas_motivo,
+     medicao.tabelas_recusadas_total) = _tabelas_recusadas(desmontagem)
 
     # Descartes: quantos vieram de ponteiro de pool, de chamada ou de semente.
     contagem: collections.Counter = collections.Counter()

@@ -5,41 +5,41 @@
   "censo": "/home/user/gba-re/censo/functions.csv",
   "censo_funcoes": 5981,
   "boot": {
-    "tabelas_de_casos": 164,
-    "casos_de_tabela": 2530,
-    "funcoes": 3550,
-    "instrucoes": 203510,
-    "arestas": 8433,
-    "descartes": 43,
+    "tabelas_de_casos": 166,
+    "casos_de_tabela": 3066,
+    "funcoes": 3586,
+    "instrucoes": 208454,
+    "arestas": 8588,
+    "descartes": 45,
     "saidas_para_tras": 52,
     "saidas_recuperadas": 25,
-    "no_censo": 2590,
-    "fora_do_censo": 960
+    "no_censo": 2599,
+    "fora_do_censo": 987
   },
   "completo": {
-    "tabelas_de_casos": 375,
-    "casos_de_tabela": 5767,
-    "funcoes": 8153,
-    "instrucoes": 456822,
-    "arestas": 20380,
-    "descartes": 162,
+    "tabelas_de_casos": 377,
+    "casos_de_tabela": 6303,
+    "funcoes": 8172,
+    "instrucoes": 460868,
+    "arestas": 20492,
+    "descartes": 164,
     "saidas_para_tras": 241,
     "saidas_recuperadas": 148,
     "no_censo": 5981,
-    "fora_do_censo": 2172
+    "fora_do_censo": 2191
   },
   "levantamento": {
-    "funcoes": 8153,
-    "com_c_para_ler": 8153,
-    "completas": 8007,
-    "parciais": 146,
+    "funcoes": 8172,
+    "com_c_para_ler": 8172,
+    "completas": 8027,
+    "parciais": 145,
     "sem_corpo": 0,
     "percentual_com_c": 100.0,
-    "funcoes_com_lacuna": 146
+    "funcoes_com_lacuna": 145
   },
-  "recusas_total": 193,
+  "recusas_total": 192,
   "recusas_mnemonico": {
-    "b": 55,
+    "b": 56,
     "bx": 39,
     "bls": 18,
     "bpl": 17,
@@ -48,13 +48,13 @@
     "bhi": 6,
     "ble": 5,
     "bgt": 5,
-    "mov": 4,
     "adc": 4,
     "blt": 3,
     "bge": 3,
     "bvs": 3,
     "bne": 3,
     "mrs": 2,
+    "mov": 2,
     "eor": 2,
     "rsb": 2,
     "msr": 1,
@@ -75,16 +75,21 @@
     "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 14,
     "thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o destino vem NO REGISTRADOR, de quem chamou -- traduzir exigiria inventar a assinatura": 11,
     "salto para fora da funcao (0x...): dentro da faixa da janela 0x..., em trecho nao desmontado (buraco: la a leitura parou em dado)": 10,
+    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 8,
     "desvio para 0x..., sem rotulo nesta janela: dentro da faixa da janela 0x..., em trecho nao desmontado (buraco: la a leitura parou em dado)": 8,
-    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 7,
     "salto para fora da funcao (0x...): fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 6,
     "mnemonico nao implementado (a instrucao existe no ARMv4T; falta traduzir)": 4,
-    "salto calculado (tabela de casos) nao modelado": 4,
     "desvio para 0x..., sem rotulo nesta janela: fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 3,
+    "salto calculado (tabela de casos) nao modelado": 2,
     "chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN`): o alvo veio de dado lido na ROM, sem assinatura declarada": 1
   },
+  "tabelas_recusadas_total": 2,
+  "tabelas_recusadas_motivo": {
+    "a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `cmp r1, #0x...` em 0x...)": 1,
+    "a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `bhs #0x...` em 0x...)": 1
+  },
   "descartes_por_semente": {
-    "ponteiro de pool": 116,
+    "ponteiro de pool": 118,
     "salto": 37,
     "chamada (bl)": 9
   },
@@ -1014,6 +1019,20 @@
       "bytes": "ff bf e7 e8 d5 00 e8 e6"
     },
     {
+      "entrada": "0x0841E1E8",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08052862",
+      "motivo": "parou em 0x0841E1E8: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff fd 03 00 e7 d9 e6 17"
+    },
+    {
+      "entrada": "0x0841E20C",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08053590",
+      "motivo": "parou em 0x0841E20C: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff fd 02 00 e6 d9 d7 d9"
+    },
+    {
       "entrada": "0x0841E324",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080CF9B4",
@@ -1224,13 +1243,13 @@
       "bytes": "ff ff ff ff ff ff ff ff"
     }
   ],
-  "linhas_c": 1046852,
-  "desvios_com_comparacao": 7045,
-  "desvios_por_flag": 15991,
-  "bytes_c": 39567201,
+  "linhas_c": 1056640,
+  "desvios_com_comparacao": 7077,
+  "desvios_por_flag": 16073,
+  "bytes_c": 39943782,
   "conferencia": {
-    "total": 456822,
-    "identicas": 456593,
+    "total": 460868,
+    "identicas": 460639,
     "taxa": 99.95,
     "divergentes": 226,
     "divergentes_por_mnemonico": {
@@ -1276,10 +1295,10 @@
     "codigo_de_saida": 0,
     "n_erros": 0,
     "primeiros_erros": [],
-    "bytes_objeto": 2144280,
-    "sha256_objeto": "55324204f674f2d79967d95495319ed3618a2a8d42d1a0825acc120fe48594e8",
+    "bytes_objeto": 2164980,
+    "sha256_objeto": "66c42fd35764ad229a7eaecab6d981f812f642d108c1818a3d7de1e4bce1faa6",
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/levantado_r13.c"
+  "caminho_c": "/home/user/gba-re/saida/levantado_r14.c"
 }

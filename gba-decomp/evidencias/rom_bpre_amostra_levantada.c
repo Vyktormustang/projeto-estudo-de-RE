@@ -9,31 +9,31 @@
 
      python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
             --json evidencias/rom_bpre_analise.json -o levantado_rom.c
-     sha256 do .c levantado: f0f23bd0f0f4f1e851579a4401169f28...
+     sha256 do .c levantado: 03b351749139bbf9fc77fc7c5ed365af...
      sha256 da ROM ........: 6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae
 
    Estado medido (tudo em evidencias/rom_bpre_analise.json, gerado por
    esse comando nesta rodada):
-     descoberta .........: 8153 funcoes,
-                          456822 instrucoes listadas,
-                          20380 arestas de chamada,
-                          162 enderecos descartados
+     descoberta .........: 8172 funcoes,
+                          460868 instrucoes listadas,
+                          20492 arestas de chamada,
+                          164 enderecos descartados
      censo do projeto ...: 5981/5981 (100.0% das funcoes do censo)
-     fora do censo ......: 2172 funcoes que o censo nao tinha
-     tabelas de casos ...: 375 reconhecidas,
-                          5767 casos lidos da ROM
+     fora do censo ......: 2191 funcoes que o censo nao tinha
+     tabelas de casos ...: 377 reconhecidas,
+                          6303 casos lidos da ROM
      saltos para tras ...: 241 saidas de funcao;
                           148 trechos orfaos
                           recuperados como janela propria
-     com C para ler .....: 8007 completas + 146 parciais
+     com C para ler .....: 8027 completas + 145 parciais
                           (100.0% com C)
-     C ..................: 1046852 linhas / 39567201 bytes
-     conferencia bytes ..: 456593/456822 (99.95%) remontam identicas ao
+     C ..................: 1056640 linhas / 39943782 bytes
+     conferencia bytes ..: 460639/460868 (99.95%) remontam identicas ao
                           binario; 226 divergencias, 3 fora da sintaxe
      compilacao .........: OK, 0 erros
-                          (objeto ARM de 2144280 bytes, sha256
-                          55324204f674f2d7...)
-     boot so' (ARM/Thumb): 3550 funcoes alcancadas pelo vetor
+                          (objeto ARM de 2164980 bytes, sha256
+                          66c42fd35764ad22...)
+     boot so' (ARM/Thumb): 3586 funcoes alcancadas pelo vetor
                           de reset (o resto vem do censo)
 
    O que isto NAO prova: semantica. Sem verdade-terreno nesta ROM, o que
@@ -47,7 +47,7 @@
      - tabela de casos lida da ROM virou switch: FUN_080011e4
      - desvio para tras: a leitura continua em OUTRA janela: fn_08014040
      - bx rN recusado, com o motivo dito por inteiro: fn_081DC45A
-   (o .c inteiro tem 1046852 linhas; os cortes estao marcados no lugar)
+   (o .c inteiro tem 1056640 linhas; os cortes estao marcados no lugar)
    ============================================================================ */
 
 /* ---------------- FUN_080011e4 -- tabela de casos lida da ROM virou switch ---------------- */
@@ -120,7 +120,7 @@ __attribute__((noinline, used)) u32 FUN_080011e4(u32 r0, u32 r1, u32 r2, u32 r3)
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
     r0 = carrega32(r0);
-    /* tabela de casos em 0x08001224: 8 casos lidos da ROM (indice x4) */
+    /* tabela de casos em 0x08001224: 8 casos lidos da ROM (indice x4); guarda imediato em 0x0800120C */
     switch (idx_08001218 >> 2) {
         case 0: goto L_08001244;
         case 1: goto L_0800124E;
@@ -282,7 +282,7 @@ __attribute__((noinline, used)) u32 fn_08014040(u32 r0, u32 r1, u32 r2, u32 r3) 
       z = (r_ == 0); n = (r_ >> 31);
       r0 = r_; }
     r0 = carrega32(r0);
-    /* tabela de casos em 0x0801409C: 7 casos lidos da ROM (indice x4) */
+    /* tabela de casos em 0x0801409C: 7 casos lidos da ROM (indice x4); guarda imediato em 0x08014078 */
     switch (idx_08014088 >> 2) {
         case 0: goto L_080140B8;
         case 1: goto L_080141DC;

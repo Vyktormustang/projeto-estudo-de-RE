@@ -437,10 +437,19 @@ class _Emissor:
                 # como atribuicao seria mentira silenciosa: fica marcado e a
                 # funcao sai PARCIAL.
                 tabela = self.tabelas_emitidas.get(ins.address)
+                if tabela is not None and tabela.deslocamento is None:
+                    # A tabela foi reconhecida mas o `lsls rI, rI, #N` que escala o
+                    # indice nao ficou medido: sem ele a escala do `switch` seria
+                    # suposicao. (Antes disto, `1 << None` estourava TypeError -- o
+                    # caminho so' nao apareceu porque nenhuma das 375 tabelas da ROM
+                    # de estudo chega aqui sem deslocamento medido.)
+                    raise _NaoLevantado("tabela de casos reconhecida sem o `lsls` "
+                                        "do indice: escala nao medida")
                 if tabela is not None:
                     self._emitir(f"/* tabela de casos em 0x{tabela.tabela:08X}: "
                                  f"{len(tabela.alvos)} casos lidos da ROM "
-                                 f"(indice x{1 << tabela.deslocamento}) */")
+                                 f"(indice x{1 << tabela.deslocamento}); "
+                                 f"{_comentario(tabela.guarda_fonte)} */")
                     self._emitir(f"switch (idx_{tabela.endereco:08X} >> "
                                  f"{tabela.deslocamento}) {{")
                     for numero, destino in enumerate(tabela.alvos):
@@ -999,6 +1008,15 @@ def _monta_retorno_a_mao(instrucao) -> bool:
     """`add lr, pc, #0` -- o retorno do interworking montado instrucao a instrucao."""
     return (instrucao.mnemonic in ("add", "adds")
             and instrucao.operadores.replace(" ", "").startswith("lr,pc,"))
+
+
+def _comentario(texto: str) -> str:
+    """Texto seguro para ir dentro de `/* ... */` num comentario do C gerado.
+
+    `*/` fecha o comentario antes da hora e o C deixa de compilar -- e o texto vem
+    de dado da ROM (nome de registrador, valor lido), entao nao se confia nele.
+    """
+    return texto.replace("*/", "* /") if texto else "(guarda nao registrado)"
 
 
 def _carrega_da_pilha(instrucao, registrador: str) -> bool:
