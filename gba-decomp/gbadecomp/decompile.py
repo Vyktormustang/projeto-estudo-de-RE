@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 import capstone
 from capstone import Cs, CS_ARCH_ARM, CS_MODE_ARM, CS_MODE_THUMB, CS_OPT_DETAIL
 
+from . import disasm as disasm_mod
 from . import rom as rom_mod
 
 TIPOS_C = """typedef unsigned char u8;
@@ -262,11 +263,13 @@ class CodigoC:
 class _Emissor:
     """Traduz as instrucoes de UMA funcao para linhas de C."""
 
-    def __init__(self, funcao, imagem: bytes, base: int, nomes: dict[int, str]):
+    def __init__(self, funcao, imagem: bytes, base: int, nomes: dict[int, str],
+                 indice: "IndiceDeJanelas | None" = None):
         self.f = funcao
         self.imagem = imagem
         self.base = base
         self.nomes = nomes
+        self.indice = indice
         self.linhas: list[str] = []
         self.nao_levantadas: list[str] = []
         self.rotulos: dict[int, str] = {}
@@ -392,6 +395,19 @@ class _Emissor:
     def _traduzir_base(self, ins, m: str) -> None:
         op = ins.operands
 
+        # Antes de QUALQUER despacho por mnemonico: a FORMA da instrucao existe
+        # no alvo? O `adc` existe no ARMv4T (o mnemonic cai num tratador mais
+        # abaixo) e mesmo assim `adc r4, r4, #0xd000` e' do Thumb-2 -- se a
+        # checagem ficasse so no fim da cadeia, o tratador responderia "forma
+        # aritmetica nao implementada" e a resposta seria falsa (sugere falta de
+        # trabalho no levantador, quando o que houve foi leitura passando por
+        # dado). Medido: 0x0845A3B6 e 0x0845A3BA na ROM de estudo.
+        forma_impossivel = disasm_mod.forma_impossivel_no_thumb1(ins, self.f.modo)
+        if forma_impossivel is not None:
+            raise _NaoLevantado(
+                f"instrucao que nao existe no ARM7TDMI ({forma_impossivel}): "
+                f"aqui a leitura passou por dado, nao por codigo")
+
         if m in ("push", "pop"):
             return self._pilha(ins, m)
         if m in ("b", "bl", "blx") or m in [f"b{c}" for c in CONDICOES]:
@@ -480,10 +496,41 @@ class _Emissor:
             return
         if m in ("ror", "rors", "rorn"):
             return self._deslocamento(ins, "asrs" if False else m)
+        if m == "adr":
+            return self._adr(ins)
         if m == "nop":
             self._emitir(";")
             return
-        raise _NaoLevantado("mnemonico nao implementado")
+        # Nao e' tudo "nao implementado": instrucao que NAO EXISTE no ARM7TDMI e'
+        # outra coisa -- e' dado lido como codigo, e dizer "falta implementar"
+        # manda quem le procurar defeito no lifter (mesmo defeito de relato do
+        # desvio para fora: 20 das 189 lacunas diziam isso).
+        impossivel = disasm_mod.impossivel_no_arm7tdmi(ins, self.f.modo)
+        if impossivel is not None:
+            raise _NaoLevantado(
+                f"instrucao que nao existe no ARM7TDMI ({impossivel}): aqui a "
+                f"leitura passou por dado, nao por codigo")
+        raise _NaoLevantado("mnemonico nao implementado (a instrucao existe no "
+                            "ARMv4T; falta traduzir)")
+
+    def _adr(self, ins) -> None:
+        """`adr rD, #imm` -- o endereco e' calculado a partir do PC desta instrucao.
+
+        No Thumb-1 `adr` e' `add rD, pc, #imm*4` e o PC vale (endereco + 4) com o
+        bit 1 zerado; no ARM, endereco + 8. O valor e' uma CONSTANTE conhecida em
+        tempo de traducao (nao ha carga nenhuma), por isso sai como literal -- do
+        mesmo jeito que o literal lido do pool, para o C ficar legivel.
+        Medido na ROM de estudo: 168 ocorrencias, todas em janelas Thumb, e todas
+        recusadas antes disto.
+        """
+        op = ins.operands
+        if (not op or op[0].type != capstone.arm.ARM_OP_REG
+                or len(op) < 2 or op[1].type != capstone.arm.ARM_OP_IMM):
+            raise _NaoLevantado("adr sem registrador e imediato")
+        pc = (ins.address + 4) & ~3 if self.f.modo == "thumb" else ins.address + 8
+        valor = pc + op[1].imm
+        self._emitir(f"{self._reg(op[0])} = 0x{valor:08X}u;  "
+                     f"/* adr: pc 0x{pc:08X} + 0x{op[1].imm:X} */")
 
     def _flags_logicas(self, resultado: str) -> None:
         self._emitir(f"z = ({resultado} == 0); n = ({resultado} >> 31);")
@@ -585,6 +632,28 @@ class _Emissor:
                     "sem assinatura declarada")
         return "desvio indireto por registrador sem origem conhecida"
 
+    def _motivo_saida(self, alvo: int, verbo: str) -> str:
+        """Uma frase que diz o que foi MEDIDO sobre o destino, nao o que se supoe.
+
+        Antes: "desvio para 0x..., que nao foi desmontado (rotulo inexistente)".
+        Medido na ROM: 29 dos 130 desvios recusados apontavam para endereco
+        DESMONTADO (em outra janela) -- a frase era falsa justamente sobre o
+        proprio levantamento. Agora: onde o endereco esta', verificado no indice.
+        """
+        para_tras = _saida_para_tras(alvo, self.f.entrada)
+        if para_tras:
+            return f"{para_tras} -- {self._onde_esta(alvo)}"
+        if verbo == "salto":
+            return f"salto para fora da funcao (0x{alvo:08X}): {self._onde_esta(alvo)}"
+        return (f"desvio para 0x{alvo:08X}, sem rotulo nesta janela: "
+                f"{self._onde_esta(alvo)}")
+
+    def _onde_esta(self, alvo: int) -> str:
+        """Onde o destino do desvio esta desmontado -- ou se nao esta em lugar nenhum."""
+        if self.indice is None:
+            return "destino nao desmontado"
+        return self.indice.descrever(alvo, self.f.entrada, self.f.fim)
+
     def _anterior(self):
         """Instrucao imediatamente anterior NA ORDEM EMITIDA (nao por endereco)."""
         indice = self._indice_instrucao - 1
@@ -607,8 +676,7 @@ class _Emissor:
                 self._emitir(f"r0 = {self.nomes[alvo]}(r0, r1, r2, r3);")
                 self._emitir("return r0;")
             else:
-                raise _NaoLevantado(_saida_para_tras(alvo, self.f.entrada)
-                                    or f"salto para fora da funcao (0x{alvo:08X})")
+                raise _NaoLevantado(self._motivo_saida(alvo, "salto"))
             return
         if ins.mnemonic in ("bl", "blx"):
             if (alvo & ~1) not in self.nomes:
@@ -642,9 +710,7 @@ class _Emissor:
                 self._emitir(f"if ({cond}) {{ r0 = {self.nomes[alvo]}(r0, r1, r2, r3); "
                              f"return r0; }}  /* chamada de cauda condicional */")
                 return
-            raise _NaoLevantado(
-                _saida_para_tras(alvo, self.f.entrada)
-                or f"desvio para 0x{alvo:08X}, que nao foi desmontado (rotulo inexistente)")
+            raise _NaoLevantado(self._motivo_saida(alvo, "desvio condicional"))
         self._emitir(f"if ({cond}) goto {self._rotulo(alvo)};")
 
     def _aritmetica(self, ins, m: str) -> None:
@@ -972,7 +1038,7 @@ def _saida_para_tras(alvo: int, entrada: int) -> str | None:
     """
     if alvo < entrada:
         return (f"desvio para tras, para fora da funcao (0x{alvo:08X} < entrada "
-                f"0x{entrada:08X}): a leitura continua em bloco comum de outra rotina")
+                f"0x{entrada:08X})")
     return None
 
 
@@ -986,6 +1052,51 @@ def identificador_c(nome: str) -> str:
     if not limpo or limpo[0].isdigit():
         limpo = "_" + limpo
     return limpo
+
+
+class IndiceDeJanelas:
+    """Onde cada endereco desmontado mora -- para as mensagens nao mentirem.
+
+    Existe por um defeito de RELATO medido na ROM: 29 dos desvios recusados
+    diziam "desvio para 0x..., que nao foi desmontado (rotulo inexistente)"
+    quando o endereco ESTAVA desmontado -- em outra janela. Dizer que o endereco
+    nao existe desmontado e' uma afirmacao falsa sobre o proprio levantamento, e
+    ela manda quem le procurar defeito onde nao tem: o que falta ali nao e'
+    implementar instrucao, e' a leitura poder continuar em outra rotina.
+    """
+
+    def __init__(self, desmontagem) -> None:
+        self.endereco_dono: dict[int, int] = {}
+        self.faixas: list[tuple[int, int, int]] = []
+        for funcao in desmontagem.funcoes.values():
+            for instrucao in funcao.instrucoes:
+                self.endereco_dono.setdefault(instrucao.endereco, funcao.entrada)
+            if funcao.instrucoes:
+                self.faixas.append((funcao.entrada, funcao.fim, funcao.entrada))
+        self.faixas.sort()
+
+    def faixa_que_contem(self, endereco: int) -> int | None:
+        for entrada, fim, _ in self.faixas:
+            if entrada <= endereco < fim:
+                return entrada
+            if entrada > endereco:
+                break        # faixas ordenadas: nao ha como achar mais adiante
+        return None
+
+    def descrever(self, alvo: int, propria: int, fim_propria: int) -> str:
+        """Em uma frase: onde este endereco esta (ou nao esta) desmontado."""
+        if propria <= alvo < fim_propria:
+            return ("dentro desta janela, em trecho nao desmontado (a leitura "
+                    "parou antes de alcancar)")
+        dono = self.endereco_dono.get(alvo)
+        if dono is not None:
+            return f"a leitura continua em INSTRUCAO da janela 0x{dono:08X}"
+        dono = self.faixa_que_contem(alvo)
+        if dono is not None:
+            return (f"dentro da faixa da janela 0x{dono:08X}, em trecho nao "
+                    f"desmontado (buraco: la a leitura parou em dado)")
+        return ("fora de qualquer janela desmontada: nenhuma leitura passou por "
+                "esse endereco")
 
 
 def chamadores_de(desmontagem, nomes: dict[int, str]) -> dict[str, list[str]]:
@@ -1020,9 +1131,10 @@ def decompilar(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE,
     for endereco in desmontagem.funcoes:
         nomes.setdefault(endereco, f"fn_{endereco:08X}")
     saida = CodigoC(chamadores=chamadores_de(desmontagem, nomes))
+    indice = IndiceDeJanelas(desmontagem)
     for endereco in sorted(desmontagem.funcoes):
         funcao = desmontagem.funcoes[endereco]
-        emissor = _Emissor(funcao, imagem, base, nomes)
+        emissor = _Emissor(funcao, imagem, base, nomes, indice)
         levantada = emissor.levantar()
         saida.funcoes.append(levantada)
         if not levantada.completa:

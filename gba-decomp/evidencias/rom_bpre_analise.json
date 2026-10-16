@@ -7,81 +7,86 @@
   "boot": {
     "tabelas_de_casos": 164,
     "casos_de_tabela": 2530,
-    "funcoes": 3544,
-    "instrucoes": 201036,
-    "arestas": 8432,
-    "descartes": 47,
-    "saidas_para_tras": 49,
-    "saidas_recuperadas": 23,
+    "funcoes": 3550,
+    "instrucoes": 203510,
+    "arestas": 8433,
+    "descartes": 43,
+    "saidas_para_tras": 52,
+    "saidas_recuperadas": 25,
     "no_censo": 2590,
-    "fora_do_censo": 954
+    "fora_do_censo": 960
   },
   "completo": {
     "tabelas_de_casos": 375,
     "casos_de_tabela": 5767,
-    "funcoes": 8151,
-    "instrucoes": 439869,
-    "arestas": 20379,
-    "descartes": 170,
-    "saidas_para_tras": 245,
-    "saidas_recuperadas": 154,
+    "funcoes": 8153,
+    "instrucoes": 456822,
+    "arestas": 20380,
+    "descartes": 162,
+    "saidas_para_tras": 241,
+    "saidas_recuperadas": 148,
     "no_censo": 5981,
-    "fora_do_censo": 2170
+    "fora_do_censo": 2172
   },
   "levantamento": {
-    "funcoes": 8151,
-    "com_c_para_ler": 8151,
-    "completas": 8005,
+    "funcoes": 8153,
+    "com_c_para_ler": 8153,
+    "completas": 8007,
     "parciais": 146,
     "sem_corpo": 0,
     "percentual_com_c": 100.0,
     "funcoes_com_lacuna": 146
   },
+  "recusas_total": 193,
   "recusas_mnemonico": {
-    "b": 60,
-    "bx": 35,
-    "bls": 17,
+    "b": 55,
+    "bx": 39,
+    "bls": 18,
     "bpl": 17,
-    "stmdb": 7,
-    "bvc": 7,
+    "bvc": 8,
+    "and": 6,
+    "bhi": 6,
     "ble": 5,
-    "bhi": 5,
+    "bgt": 5,
     "mov": 4,
-    "bgt": 4,
+    "adc": 4,
     "blt": 3,
     "bge": 3,
     "bvs": 3,
-    "ldcl": 3,
     "bne": 3,
-    "stcl": 3,
     "mrs": 2,
+    "eor": 2,
+    "rsb": 2,
     "msr": 1,
-    "orn": 1,
+    "stmdb": 1,
+    "orr": 1,
     "bmi": 1,
-    "smlawt": 1,
+    "adcs": 1,
     "beq": 1,
     "blo": 1,
-    "orns": 1,
-    "hint": 1
+    "rsbs": 1
   },
   "recusas_motivo": {
-    "desvio indireto por registrador sem origem conhecida": 23,
-    "mnemonico nao implementado": 20,
-    "thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o de": 11,
+    "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- a leitura continua em INSTRUCAO da janela 0x...": 31,
+    "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- dentro da faixa da janela 0x..., em trecho nao desmontado (buraco: la a leitura parou em dado)": 29,
+    "desvio indireto por registrador sem origem conhecida": 27,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 21,
+    "instrucao que nao existe no ARM7TDMI (codificacao de 32 bits do Thumb-2: o ARM7TDMI executa so' as formas Thumb de 16 bits (e o `bl` de 32 bits, que o capstone escreve sem sufixo)): aqui a leitura passou por dado, nao por codigo": 17,
+    "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 14,
+    "thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o destino vem NO REGISTRADOR, de quem chamou -- traduzir exigiria inventar a assinatura": 11,
+    "salto para fora da funcao (0x...): dentro da faixa da janela 0x..., em trecho nao desmontado (buraco: la a leitura parou em dado)": 10,
+    "desvio para 0x..., sem rotulo nesta janela: dentro da faixa da janela 0x..., em trecho nao desmontado (buraco: la a leitura parou em dado)": 8,
+    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 7,
+    "salto para fora da funcao (0x...): fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 6,
+    "mnemonico nao implementado (a instrucao existe no ARMv4T; falta traduzir)": 4,
     "salto calculado (tabela de casos) nao modelado": 4,
-    "salto para fora da funcao (0x0841F276)": 2,
-    "chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN`)": 1,
-    "desvio para tras, para fora da funcao (0x08013A18 < entrada 0x08014040): a leitura continu": 1,
-    "desvio para tras, para fora da funcao (0x08013A18 < entrada 0x08014064): a leitura continu": 1,
-    "desvio para tras, para fora da funcao (0x08017B9C < entrada 0x08018258): a leitura continu": 1,
-    "desvio para tras, para fora da funcao (0x08017B9C < entrada 0x0801829C): a leitura continu": 1,
-    "salto para fora da funcao (0x081A7320)": 1,
-    "desvio para 0x081A6F46, que nao foi desmontado (rotulo inexistente)": 1
+    "desvio para 0x..., sem rotulo nesta janela: fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 3,
+    "chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN`): o alvo veio de dado lido na ROM, sem assinatura declarada": 1
   },
   "descartes_por_semente": {
-    "ponteiro de pool": 123,
+    "ponteiro de pool": 116,
     "salto": 37,
-    "chamada (bl)": 10
+    "chamada (bl)": 9
   },
   "descartes": [
     {
@@ -90,13 +95,6 @@
       "semente": "chamada (bl) em 0x0841924A",
       "motivo": "parou em 0x08033014: cdp2: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
       "bytes": "c1 fe 22 78 0e 48 00 68"
-    },
-    {
-      "entrada": "0x081A64A8",
-      "modo": "thumb",
-      "semente": "salto para tras em 0x081A6CA4",
-      "motivo": "parou em 0x081A64A8: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "29 a3 00 29 a4 00 29 62"
     },
     {
       "entrada": "0x081A6CB2",
@@ -132,6 +130,13 @@
       "semente": "salto para tras em 0x081A6DE0",
       "motivo": "parou em 0x081A6DB6: IT block (itee): nao existe no ARMv4T (provavel dado lido como codigo)",
       "bytes": "ce bf 00 e3 00 c2 c7 fe"
+    },
+    {
+      "entrada": "0x081A6ECE",
+      "modo": "thumb",
+      "semente": "salto para tras em 0x081A6EFC",
+      "motivo": "parou em 0x081A6ECE: stmdb: no Thumb-1 os blocos so' existem como `push`/`pop`/`stmia`/`ldmia` -- isto e' a forma do Thumb-2 (provavel dado lido como codigo)",
+      "bytes": "00 e9 e1 00 d8 d9 00 e1"
     },
     {
       "entrada": "0x081A6F0A",
@@ -225,13 +230,6 @@
       "bytes": "3c be 3c 10 9d 00 12 40"
     },
     {
-      "entrada": "0x081DC010",
-      "modo": "thumb",
-      "semente": "chamada (bl) em 0x081DCFE2",
-      "motivo": "parou em 0x081DC010: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "00 a2 10 47 90 21 83 e0"
-    },
-    {
       "entrada": "0x08231C84",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080073FC",
@@ -274,20 +272,6 @@
       "bytes": "ff fe ff ba ff 00 b9 e0"
     },
     {
-      "entrada": "0x083A650E",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x08063FE4",
-      "motivo": "parou em 0x083A650E: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "20 a0 a0 a1 a2 a3 31 31"
-    },
-    {
-      "entrada": "0x083A654A",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x080641F4",
-      "motivo": "parou em 0x083A654A: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "49 a6 a6 a7 a8 a9 21 21"
-    },
-    {
       "entrada": "0x083FBBE8",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08042E54",
@@ -309,11 +293,11 @@
       "bytes": "00 ff c0 e3 e6 00 fd 13"
     },
     {
-      "entrada": "0x083FC71A",
+      "entrada": "0x083FC944",
       "modo": "thumb",
-      "semente": "salto para tras em 0x083FC91A",
-      "motivo": "parou em 0x083FC71A: stc2: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
-      "bytes": "00 fd 13 00 fe da d9 ee"
+      "semente": "salto para tras em 0x083FCF78",
+      "motivo": "parou em 0x083FC944: stmdb: no Thumb-1 os blocos so' existem como `push`/`pop`/`stmia`/`ldmia` -- isto e' a forma do Thumb-2 (provavel dado lido como codigo)",
+      "bytes": "00 e9 e4 00 d5 00 e7 d5"
     },
     {
       "entrada": "0x083FCCD0",
@@ -356,6 +340,13 @@
       "semente": "salto para tras em 0x083FD182",
       "motivo": "parou em 0x083FD134: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
       "bytes": "ff fd 0f 00 dd e7 fe e0"
+    },
+    {
+      "entrada": "0x083FD192",
+      "modo": "thumb",
+      "semente": "salto para tras em 0x083FD1C8",
+      "motivo": "parou em 0x083FD192: stmdb: no Thumb-1 os blocos so' existem como `push`/`pop`/`stmia`/`ldmia` -- isto e' a forma do Thumb-2 (provavel dado lido como codigo)",
+      "bytes": "00 e9 e1 00 fd 01 ad fb"
     },
     {
       "entrada": "0x083FD296",
@@ -883,20 +874,6 @@
       "bytes": "ff fc 06 00 ae fc 06 02"
     },
     {
-      "entrada": "0x0841B2EC",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x0811D418",
-      "motivo": "parou em 0x0841B2EC: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "ff a2 b8 00 ff a3 b8 00"
-    },
-    {
-      "entrada": "0x0841B2F0",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x0811D404",
-      "motivo": "parou em 0x0841B2F0: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "ff a3 b8 00 d9 00 b0 00"
-    },
-    {
       "entrada": "0x0841B314",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0811D47E",
@@ -1149,27 +1126,6 @@
       "bytes": "03 ff 87 00 8f 00 90 00"
     },
     {
-      "entrada": "0x0845718C",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x0811B7BC",
-      "motivo": "parou em 0x0845718C: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "00 a4 fe a5 fe 00 00 00"
-    },
-    {
-      "entrada": "0x0845718E",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x0811B888",
-      "motivo": "parou em 0x0845718E: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "fe a5 fe 00 00 00 fc 01"
-    },
-    {
-      "entrada": "0x0845A2E2",
-      "modo": "thumb",
-      "semente": "ponteiro de pool em 0x08121538",
-      "motivo": "parou em 0x0845A2E2: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "68 a1 a7 a8 00 00 df 71"
-    },
-    {
       "entrada": "0x08463FC0",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x081397D8",
@@ -1182,13 +1138,6 @@
       "semente": "ponteiro de pool em 0x0813981C",
       "motivo": "codigo invalido em 0x08463FCC",
       "bytes": "03 fb fd ff 00 01 03 05"
-    },
-    {
-      "entrada": "0x0846D948",
-      "modo": "thumb",
-      "semente": "salto para tras em 0x0846D9D4",
-      "motivo": "parou em 0x0846D948: adr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
-      "bytes": "09 a3 14 08 c3 bf cd ff"
     },
     {
       "entrada": "0x0846E370",
@@ -1275,21 +1224,27 @@
       "bytes": "ff ff ff ff ff ff ff ff"
     }
   ],
-  "linhas_c": 1020566,
-  "desvios_com_comparacao": 7043,
-  "desvios_por_flag": 15990,
-  "bytes_c": 38375181,
+  "linhas_c": 1046852,
+  "desvios_com_comparacao": 7045,
+  "desvios_por_flag": 15991,
+  "bytes_c": 39567201,
   "conferencia": {
-    "total": 439869,
-    "identicas": 439640,
-    "taxa": 99.948,
-    "divergentes": 225,
+    "total": 456822,
+    "identicas": 456593,
+    "taxa": 99.95,
+    "divergentes": 226,
     "divergentes_por_mnemonico": {
-      "cmp": 219,
-      "bx": 6
+      "bx": 7,
+      "cmp": 219
     },
-    "nao_remontadas": 4,
+    "nao_remontadas": 3,
     "divergentes_exemplos": [
+      {
+        "endereco": "0x085D241A",
+        "asm": "bx r4",
+        "binario": "2247",
+        "remontado": "2047"
+      },
       {
         "endereco": "0x081D97C4",
         "asm": "cmp r3, r0",
@@ -1313,12 +1268,6 @@
         "asm": "cmp r6, r7",
         "binario": "3e45",
         "remontado": "be42"
-      },
-      {
-        "endereco": "0x081D957E",
-        "asm": "cmp r6, r7",
-        "binario": "3e45",
-        "remontado": "be42"
       }
     ]
   },
@@ -1327,10 +1276,10 @@
     "codigo_de_saida": 0,
     "n_erros": 0,
     "primeiros_erros": [],
-    "bytes_objeto": 2124636,
-    "sha256_objeto": "17192ca3644ad20dce8ead48cd651eb93e9039a3404f6cda826fd3542f9a4322",
+    "bytes_objeto": 2144280,
+    "sha256_objeto": "55324204f674f2d79967d95495319ed3618a2a8d42d1a0825acc120fe48594e8",
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/levantado_r3.c"
+  "caminho_c": "/home/user/gba-re/saida/levantado_r13.c"
 }

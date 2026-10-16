@@ -60,16 +60,16 @@ def test_corpus_e_gba_valido(corpus_pronto):
     assert relatorio.logo_area_preenchida is False
 
 
-def test_corpus_lista_24_funcoes_com_verdade_terreno(corpus_pronto):
+def test_corpus_lista_25_funcoes_com_verdade_terreno(corpus_pronto):
     nomes = {f.nome for f in corpus_pronto.funcoes}
-    assert len(nomes) == 24
+    assert len(nomes) == 25
     assert {"soma", "fat", "divide", "loop_decrescente", "main_teste"} <= nomes
     assert len(corpus_pronto.sha256) == 64
 
 
 def test_verdade_terreno_passa_no_corpus(corpus_pronto):
     rel = verificador.verificar_verdade_terreno(corpus_pronto)
-    assert rel.total == 59
+    assert rel.total == 60
     assert rel.reprovados == [], rel.texto()
 
 
@@ -80,7 +80,7 @@ def test_tabela_de_verdade_nao_foi_copiada_do_resultado(corpus_pronto):
     assert '"esperado": 42' in fonte          # soma(7, 35)
     assert '"esperado": 120' in fonte         # fat(5)
     assert '"esperado": 0xFFFE0001' in fonte  # mul32(0xFFFF, 0xFFFF)
-    assert fonte.count('"funcao":') == 59
+    assert fonte.count('"funcao":') == 60
 
 
 def test_descoberta_recursiva_acha_todas_as_funcoes(corpus_pronto):
@@ -88,8 +88,8 @@ def test_descoberta_recursiva_acha_todas_as_funcoes(corpus_pronto):
     desmontagem = disasm.desmontar_por_sementes(imagem)   # so o vetor de boot
     esperadas = {f.addr for f in corpus_pronto.funcoes}
     assert set(desmontagem.funcoes) == esperadas
-    assert desmontagem.total_instrucoes == 370
-    assert len(desmontagem.arestas()) == 26
+    assert desmontagem.total_instrucoes == 379
+    assert len(desmontagem.arestas()) == 27
 
 
 def test_grafo_de_chamadas_bate_com_a_verdade(corpus_pronto):
@@ -101,7 +101,7 @@ def test_grafo_de_chamadas_bate_com_a_verdade(corpus_pronto):
     assert ("chama_soma", "soma") in arestas
     assert ("loop_decrescente", "__aeabi_lmul") in arestas
     assert ("__aeabi_lmul", "mul32") in arestas
-    assert len([a for a, _ in arestas if a == "main_teste"]) == 22
+    assert len([a for a, _ in arestas if a == "main_teste"]) == 23
 
 
 def test_modo_herdado_da_chamada_nao_vem_da_paridade(corpus_pronto):
@@ -127,7 +127,7 @@ def test_pop_le_do_endereco_mais_baixo(corpus_pronto):
 
 def test_lift_compila_e_reproduz_a_verdade_terreno(rodada):
     assert rodada.erros == []
-    assert rodada.relatorio_original.aprovados == 59
+    assert rodada.relatorio_original.aprovados == 60
     assert rodada.relatorio_levantado is not None
     assert rodada.relatorio_levantado.reprovados == [], rodada.relatorio_levantado.texto()
     # o codigo C compilado nao pode ser maior que o original de forma absurda
@@ -245,7 +245,7 @@ def test_medicao_do_corpus_fecha_as_contas(corpus_pronto):
     """As categorias da medicao sao exaustivas e batem com a verdade-terreno."""
     medicao = analise_mod.medir(corpus_pronto.rom_path, conferir=False)
     lev = medicao.levantamento
-    assert lev["funcoes"] == 24
+    assert lev["funcoes"] == 25
     assert lev["com_c_para_ler"] + lev["sem_corpo"] == lev["funcoes"]
     assert lev["completas"] + lev["parciais"] == lev["com_c_para_ler"]
     assert lev["com_c_para_ler"] == lev["funcoes"], "no corpus tudo tem C para ler"
@@ -615,3 +615,506 @@ def test_chamada_indireta_interworking_tem_motivo_proprio():
     levantada = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
     assert any("chamada indireta ARM->Thumb montada a mao" in item
                for item in levantada.nao_levantadas), levantada.nao_levantadas
+
+
+def test_desvio_recusado_diz_onde_o_destino_foi_desmontado():
+    """Se o alvo ESTA desmontado (em outra janela), a mensagem nao pode dizer
+    "nao foi desmontado": isso e' afirmacao falsa sobre o proprio levantamento.
+
+    Medido na ROM: 29 dos 130 desvios recusados caiam exatamente nisso -- o
+    endereco estava desmontado como instrucao de OUTRA janela (bloco comum). A
+    mensagem antiga ("rotulo inexistente") mandava procurar defeito onde nao
+    tinha: nao falta implementar instrucao, falta a leitura poder continuar em
+    outra rotina.
+    """
+    imagem = _imagem_com_salto_para_tras()      # B salta para 0x08000012, instrucao de A
+    desmontagem = disasm.desmontar_por_sementes(
+        imagem, sementes={0x08000010: "thumb", 0x08000014: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    b = next(f for f in codigo.funcoes if f.endereco == 0x08000014)
+    item = next(i for i in b.nao_levantadas if i.startswith("0x08000016"))
+    assert "INSTRUCAO da janela 0x08000010" in item, item
+    assert "nao foi desmontado" not in item
+
+
+def test_desvio_para_endereco_que_ninguem_desmontou_diz_isso():
+    """E se ninguem passou pelo endereco, a mensagem tambem diz -- sem supor."""
+    base = rom.ROM_BASE
+    imagem = bytearray(0x40)
+    imagem[0x10:0x14] = b"\xff\xff\xff\xff"           # nada decodificavel aqui
+    imagem[0x20:0x22] = (0x2001).to_bytes(2, "little")   # movs r0, #1
+    offset = (0x08000010 - (0x08000022 + 4)) // 2
+    imagem[0x22:0x24] = (0xE000 | (offset & 0x7FF)).to_bytes(2, "little")   # b 0x08000010
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    funcao = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
+    item = next(i for i in funcao.nao_levantadas if "0x08000010" in i)
+    assert "fora de qualquer janela desmontada" in item, item
+
+
+def _carregar_recortador():
+    """`ferramentas/recortar_amostra.py` e' script, nao modulo do pacote."""
+    import importlib.util
+    caminho = RAIZ / "ferramentas" / "recortar_amostra.py"
+    especificacao = importlib.util.spec_from_file_location("recortar_amostra", caminho)
+    modulo = importlib.util.module_from_spec(especificacao)
+    especificacao.loader.exec_module(modulo)
+    return modulo
+
+
+_C_FALSO = """/* cabecalho do arquivo inteiro, nao faz parte de nenhuma funcao */
+void outra(void) {
+    /* este corpo NAO pode entrar no recorte de 0x08000020 */
+}
+
+/* chamada por 2: a, b */
+/* PARCIAL (0x08000020): o corpo abaixo tem lacunas marcadas -- em execucao, marca g_erro:
+     0x08000022 b #0x8000010: desvio para tras, para fora da funcao
+   */
+/* origem: 0x08000020 (thumb), semente: informada, pilha: balanceada */
+__attribute__((noinline, used)) u32 fn_08000020(u32 r0, u32 r1, u32 r2, u32 r3) {
+    u32 r4 = 0;
+    r4 = r0;
+    return r4;
+}
+"""
+
+
+def test_recorte_da_amostra_leva_o_cabecalho_e_o_motivo_da_lacuna():
+    """O bloco de uma funcao comeca no cabecalho dela -- inclusive no `PARCIAL`.
+
+    Defeito real: a primeira versao do recortador subia so' por linhas que
+    comecavam com `/*`. O bloco `/* PARCIAL ... */` tem linhas de motivo no MEIO
+    (a linha do desvio recusado nao comeca com `/*`), entao o recorte perdia
+    justamente o motivo da lacuna -- a amostra mostraria a lacuna sem dizer por
+    que. E o corpo da funcao ANTERIOR nao pode entrar: o corte e' a linha em
+    branco que separa as funcoes.
+    """
+    recortador = _carregar_recortador()
+    linhas = _C_FALSO.splitlines()
+    inicio, fim, nome = recortador.achar_bloco(linhas, 0x08000020)
+    bloco = linhas[inicio:fim]
+    assert nome == "fn_08000020"
+    assert bloco[0] == "/* chamada por 2: a, b */", bloco[0]
+    assert any("0x08000022 b" in linha for linha in bloco)   # o motivo veio junto
+    assert any("PARCIAL (0x08000020)" in linha for linha in bloco)
+    assert bloco[-1] == "}" and "return r4;" in bloco[-2]
+    assert not any("outra(void)" in linha or "NAO pode entrar" in linha
+                   for linha in bloco), "recorte engoliu a funcao anterior"
+
+
+def test_recorte_declara_o_tamanho_do_que_tirou_e_nao_quebra_comentario():
+    """Cortar o meio e' permitido; esconder que cortou nao e'.
+
+    O marcador tem de dizer QUANTAS linhas sairam (a conta tem de fechar com o
+    bloco original) e tem de caber em UMA linha: um marcador com quebra de linha
+    dentro empurra o `*/` para depois e ja' saiu daqui torto.
+    """
+    recortador = _carregar_recortador()
+    linhas = _C_FALSO.splitlines()
+    inicio, fim, _ = recortador.achar_bloco(linhas, 0x08000020)
+    total = fim - inicio                       # o bloco de _C_FALSO tem 10 linhas
+    recortada = recortador.recortar(linhas, inicio, fim, 8)   # cabecalho = 5 linhas
+    assert len(recortada) == 8, recortada
+    marcador = next(linha for linha in recortada if "linhas omitidas" in linha)
+    tiradas = int(marcador.split("... ")[1].split(" ")[0])
+    assert tiradas == (fim - inicio) - (len(recortada) - 1)
+    recortador.comentarios_balanceados("\n".join(recortada) + "\n")
+    # o corte nunca cai no meio do cabecalho de comentarios (comentario aberto):
+    # o `*/` do bloco PARCIAL fica sempre do lado de dentro do recorte
+    assert any("*/" in linha and "PARCIAL" not in linha for linha in recortada[:6])
+    assert recortada[4] == "/* origem: 0x08000020 (thumb), semente: informada, pilha: balanceada */"
+    with pytest.raises(SystemExit):
+        recortador.recortar(linhas, inicio, fim, 3)   # orcamento menor que o cabecalho
+    # fora do orcamento, o bloco sai inteiro -- sem marcador nenhum
+    inteiro = recortador.recortar(linhas, inicio, fim, 100)
+    assert inteiro == linhas[inicio:fim]
+
+
+def test_amostra_do_repositorio_conta_a_rodada_do_json_ao_lado():
+    """O cabecalho da amostra e' o retrato do JSON que esta' no mesmo diretorio.
+
+    Antes esses numeros eram digitados a mao: bastava uma rodada nova para o
+    cabecalho ficar contando uma medicao que nao era a do arquivo ao lado. Agora
+    a amostra e' gerada de `evidencias/rom_bpre_analise.json`; este teste e' o que
+    impede a digitacao de voltar.
+    """
+    amostra = (RAIZ / "evidencias" / "rom_bpre_amostra_levantada.c").read_text(encoding="utf-8")
+    analise = json.loads((RAIZ / "evidencias" / "rom_bpre_analise.json").read_text(encoding="utf-8"))
+    levantamento, descoberta = analise["levantamento"], analise["completo"]
+    for numero in (descoberta["funcoes"], descoberta["instrucoes"], descoberta["arestas"],
+                   descoberta["descartes"], descoberta["tabelas_de_casos"],
+                   descoberta["casos_de_tabela"], levantamento["completas"],
+                   levantamento["parciais"], analise["linhas_c"], analise["bytes_c"],
+                   analise["conferencia"]["identicas"], analise["linhas_c"]):
+        assert str(numero) in amostra, f"{numero} nao aparece no cabecalho da amostra"
+    assert analise["sha256"] in amostra                     # a ROM e' a mesma
+    assert f"sha256 do .c levantado" in amostra             # e o .c diz de onde veio
+    for caso in ("FUN_080011e4", "fn_08014040", "fn_081DC45A"):
+        assert amostra.count(f"-- {caso} --") == 1, caso      # um caso, uma vez
+
+
+def test_histograma_de_recusas_fecha_com_o_total_e_agrupa_endereco():
+    """A soma dos motivos tem de dar o TOTAL de recusas -- senao o numero mente.
+
+    Defeito real: `_recusas` devolvia o histograma de motivos cortado em 12 grupos
+    e truncado em 90 caracteres, e a soma dele (67) nao tinha relacao com o numero
+    de recusas (189). Quem citasse o JSON podia escrever "67 recusas" -- um numero
+    que existe no arquivo, com o nome errado. Agora o total vai separado e a soma
+    dos motivos tem de fechar com ele.
+
+    O segundo defeito era o agrupamento: quase todo motivo carrega o endereco do
+    desvio dentro do texto, entao sem canonizar (`_canonico`) cada motivo virava
+    um grupo de 1.
+    """
+    class Falsa:
+        def __init__(self, itens):
+            self.nao_levantadas = itens
+
+    codigo = type("C", (), {"funcoes": [
+        Falsa([
+            "0x08001234 mov pc, r0: desvio indireto por registrador sem origem conhecida",
+            "0x08001235 bx r1: desvio para 0x08001000, sem rotulo nesta janela: "
+            "fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco",
+            "0x08001236 bx r2: desvio para 0x08002000, sem rotulo nesta janela: "
+            "fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco",
+        ]),
+        Falsa(["0x08001237 stmdb sp!, {r0}: mnemonico nao implementado"]),
+    ]})()
+    por_mnemonico, por_motivo, total = analise_mod._recusas(codigo)
+    assert total == 4
+    assert sum(por_mnemonico.values()) == total
+    assert sum(por_motivo.values()) == total, por_motivo
+    assert por_mnemonico == {"bx": 2, "mov": 1, "stmdb": 1}
+    # dois enderecos diferentes com a mesma frase = UM grupo de 2
+    agrupado = next(k for k, v in por_motivo.items() if v == 2)
+    assert "fora de qualquer janela desmontada" in agrupado
+    assert "0x08001000" not in agrupado and "0x..." in agrupado
+
+
+def _decodifica(bytes_, endereco, modo):
+    """Desmonta bytes de verdade -- antes de julgar o filtro, veja o que ESTA la."""
+    import capstone
+    cs = capstone.Cs(capstone.CS_ARCH_ARM,
+                     capstone.CS_MODE_THUMB if modo == "thumb" else capstone.CS_MODE_ARM)
+    cs.detail = True
+    lidas = list(cs.disasm(bytes_, endereco, count=1))
+    assert lidas, f"{bytes_.hex(' ')} nao decodifica em {modo}"
+    return lidas[0]
+
+
+def test_instrucao_que_nao_existe_no_thumb1_e_marcada_como_tal():
+    """Formas com letra colada no nome passavam pelo filtro (`ldcl`, `stcl`).
+
+    Bytes reais da ROM de estudo (imagem do usuario, modo Thumb), todos com
+    `impossivel_no_arm7tdmi` devolvendo None antes desta correcao -- ou seja,
+    chegavam ao lifter como "mnemonico nao implementado", que e' afirmacao falsa:
+    `orn`/`orns` sao ARMv6, `smlawt` e' ARMv5TE, `hint` e' Thumb-2, `ldcl`/`stcl`
+    sao coprocessador (nao existe no Thumb-1) e `stmdb r0, {...}` so' existe no
+    ARM. Nada disso executa num ARM7TDMI: ali a leitura passou por DADO.
+    """
+    casos = [
+        ("67 f0 52 1a", 0x081A6798, "thumb", "orn"),
+        ("00 e9 e1 00", 0x081A6ECE, "thumb", "stmdb"),
+        ("d9 ed ab ff", 0x083FD156, "thumb", "ldcl"),
+        ("3a fb 1c 08", 0x081C6CDC, "thumb", "smlawt"),
+        ("b0 bf", 0x086C9E72, "thumb", "hint"),
+        ("74 ea a5 65", 0x0862B40C, "thumb", "orns"),
+    ]
+    for hexa, endereco, modo, mnemonic in casos:
+        ins = _decodifica(bytes.fromhex(hexa), endereco, modo)
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)   # o que esta' la
+        motivo = disasm.impossivel_no_arm7tdmi(ins, modo)
+        assert motivo is not None, f"{mnemonic} deveria ser impossivel em {modo}"
+    # o MESMO `stmdb sp!, {lr}` e' legal no ARM do ARMv4T -- nao pode ser filtrado
+    ins = _decodifica(bytes.fromhex("00 40 2d e9"), 0x08000368, "arm")
+    assert ins.mnemonic == "stmdb" and disasm.impossivel_no_arm7tdmi(ins, "arm") is None
+    # `mrs` existe no ARM (e' o que carrega spsr/cpsr); so' o Thumb-1 nao tem
+    ins = _decodifica(bytes.fromhex("00 00 4f e1"), 0x08000258, "arm")
+    assert ins.mnemonic == "mrs" and disasm.impossivel_no_arm7tdmi(ins, "arm") is None
+    # os MESMOS bytes lidos em Thumb nao sao `mrs` -- sao outra instrucao valida;
+    # o filtro so' julga o que o desmontador leu no modo certo
+    ins = _decodifica(bytes.fromhex("00 00 4f e1"), 0x08000258, "thumb")
+    assert ins.mnemonic == "movs" and disasm.impossivel_no_arm7tdmi(ins, "thumb") is None
+    # e o filtro nao pode ser um "nao" geral: o que existe no alvo passa
+    for hexa, endereco, mnemonic in [("10 b5", 0x08000000, "push"),
+                                     ("01 c8", 0x08000000, "ldm"),
+                                     ("08 68", 0x08000000, "ldr"),
+                                     ("01 30", 0x08000000, "adds"),
+                                     ("70 47", 0x08000000, "bx")]:
+        ins = _decodifica(bytes.fromhex(hexa), endereco, "thumb")
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)
+        assert disasm.impossivel_no_arm7tdmi(ins, "thumb") is None
+
+
+def test_lifter_distingue_instrucao_que_nao_existe_de_falta_implementar():
+    """Se uma impossivel chegar ao lifter, o motivo tem de dizer ISSO.
+
+    Defesa em profundidade: depois do filtro do desmontador isso nao deveria
+    acontecer, mas se acontecer (furo no filtro) o texto nao pode mandar quem le
+    procurar defeito onde nao tem -- foi o que aconteceu com 20 das 189 lacunas da
+    ROM. Instrucao impossivel = dado lido como codigo; instrucao que existe no
+    ARMv4T e' que e' "falta implementar", e ai' o texto tem de dizer os dois casos
+    de forma diferente.
+    """
+    class DesmontagemFalsa:
+        dados_lidos: dict = {}
+
+        def __init__(self, funcoes):
+            self.funcoes = {f.entrada: f for f in funcoes}
+
+        def arestas(self):
+            return []
+
+    def monta(hexa, endereco, modo):
+        """Imagem com os bytes REAIS no lugar, e a instrucao lida dela (nao "de memoria")."""
+        imagem = bytearray(0x100)
+        deslocamento = endereco - rom.ROM_BASE
+        imagem[deslocamento:deslocamento + 4] = bytes.fromhex(hexa)
+        ins = _decodifica(bytes.fromhex(hexa), endereco, modo)
+        funcao = disasm.FuncaoDesmontada(entrada=endereco, modo=modo, semente="teste")
+        funcao.instrucoes.append(disasm.Instrucao(endereco, ins.bytes, ins.mnemonic,
+                                                  ins.op_str, modo))
+        return bytes(imagem), DesmontagemFalsa([funcao])
+
+    imagem, desmontagem = monta("67 f0 52 1a", 0x08000020, "thumb")   # `orn` (dado)
+    codigo = decompile.decompilar(desmontagem, imagem, nomes={})
+    levantada = codigo.funcoes[0]
+    motivo = next(i for i in levantada.nao_levantadas if "orn" in i)
+    assert "nao existe no ARM7TDMI" in motivo, motivo
+    assert "passou por dado" in motivo, motivo
+    assert "mnemonico nao implementado" not in motivo, motivo
+
+    # `mrs` no ARM EXISTE no ARMv4T (carrega spsr/cpsr): ai' "falta implementar"
+    # e' a verdade, e o texto tem de dizer isso -- sem sugerir que o alvo nao tem
+    # a instrucao.
+    imagem, desmontagem = monta("00 00 4f e1", 0x08000020, "arm")
+    codigo = decompile.decompilar(desmontagem, imagem, nomes={})
+    motivo = next(i for i in codigo.funcoes[0].nao_levantadas if "mrs" in i)
+    assert "existe no ARMv4T" in motivo and "falta traduzir" in motivo, motivo
+    assert "nao existe no ARM7TDMI" not in motivo, motivo
+
+
+def test_filtro_nao_rejeita_o_que_existe_no_thumb1():
+    """A lista de "impossivel no Thumb-1" tinha `adr` e `mul` -- os dois existem.
+
+    O custo disso apareceu na medicao: **56 funcoes terminavam em `adr`**, porque
+    a leitura parava ali achando que tinha encontrado dado. No Thumb-1 `adr` e'
+    `add r0, pc, #8` (bytes `02 a0`) e `muls` e' `muls r0, r1, r0` (bytes
+    `48 43`) -- os dois do ARMv4T. Este teste trava a lista pelos DOIS lados: o que
+    existe passa e o que nao existe e' recusado.
+    """
+    for hexa, mnemonic in [("02 a0", "adr"), ("48 43", "muls"), ("80 b0", "sub"),
+                           ("10 b5", "push"), ("70 47", "bx")]:
+        ins = _decodifica(bytes.fromhex(hexa), 0x08000000, "thumb")
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)
+        assert disasm.impossivel_no_arm7tdmi(ins, "thumb") is None, mnemonic
+    # do outro lado: o que o Thumb-1 NAO tem continua recusado
+    for hexa, mnemonic in [("00 ba", "rev"), ("b0 bf", "hint"), ("00 00", None)]:
+        ins = _decodifica(bytes.fromhex(hexa), 0x08000000, "thumb")
+        if mnemonic is None:
+            continue
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)
+        assert disasm.impossivel_no_arm7tdmi(ins, "thumb") is not None, mnemonic
+
+
+def test_adr_do_levantador_bate_com_o_emulador(corpus_pronto):
+    """O valor ABSOLUTO do `adr` no C tem de ser o que a CPU produz.
+
+    O caso `distancia_adr` da tabela de verdade prova a aritmetica do `adr` (a
+    diferenca entre dois deles), de proposito: e' o que vale nos DOIS binarios
+    (original e C levantado recompilado, com layouts diferentes). O valor absoluto
+    nao caberia ali, entao e' conferido aqui contra o emulador: cada `adr` do
+    corpus e' executado SOZINHO pelo unicorn (`limite=1` instrucao) e o r0 que sai
+    tem de ser o numero que o levantador escreveu no C. A regra do PC no Thumb e'
+    `(endereco + 4) & ~3` -- com `endereco + 4` o valor sai 2 a mais quando a
+    instrucao esta em endereco 2 mod 4, e o corpus tem um `adr` exatamente assim.
+    """
+    from gbadecomp import verificador as ver_mod
+
+    imagem = Path(corpus_pronto.rom_path).read_bytes()
+    desmontagem = disasm.desmontar_por_sementes(imagem)
+    alvo = next(f for f in corpus_pronto.funcoes if f.nome == "distancia_adr")
+    adrs = [i for i in desmontagem.funcoes[alvo.addr].instrucoes
+            if i.mnemonic == "adr"]
+    assert len(adrs) == 2, [i.mnemonic for i in adrs]
+    assert any(i.endereco % 4 == 2 for i in adrs), \
+        "sem um `adr` em endereco 2 mod 4 o teste nao exercita o alinhamento do PC"
+    codigo = decompile.decompilar(desmontagem, imagem, nomes={})
+    levantada = next(f for f in codigo.funcoes if f.endereco == alvo.addr)
+    linhas = [l for l in levantada.corpo.splitlines() if "/* adr:" in l]
+    assert len(linhas) == len(adrs), linhas
+    from unicorn.arm_const import UC_ARM_REG_R0
+
+    emu = ver_mod.Emulador(imagem)
+    for instrucao, linha in zip(adrs, linhas):
+        no_c = int(linha.split("=", 1)[1].split("u;")[0].strip(), 16)
+        # ATENCAO (2 armadilhas medidas aqui): `chamar` devolve r0 e o segundo
+        # `adr` escreve em r1 -- ler r0 nos dois faz o teste passar dizendo o
+        # contrario (o r0 ficava com o valor do primeiro `adr`); e o numero de
+        # registrador do capstone NAO e' o do unicorn (`operands[0].reg` = 132
+        # aqui, e o unicorn reclamou de id invalido), entao o nome sai do capstone
+        # e o numero, do nome.
+        lida = _decodifica(instrucao.bytes_, instrucao.endereco, instrucao.modo)
+        nome = lida.reg_name(lida.operands[0].reg)
+        assert nome.startswith("r") and nome[1:].isdigit(), nome
+        emu.chamar(instrucao.endereco, limite=1)      # executa SO' esta instrucao
+        na_cpu = emu.mu.reg_read(UC_ARM_REG_R0 + int(nome[1:]))
+        assert no_c == na_cpu, (hex(instrucao.endereco), hex(no_c), hex(na_cpu))
+
+
+def test_forma_inexistente_no_thumb1_e_julgada_pelo_tamanho_da_codificacao():
+    """Quem decide se a forma existe e' a CODIFICACAO, nao o texto do capstone.
+
+    Bytes reais da ROM de estudo:
+        0x08000BD6  48 42        rsbs r0, r1, #0     (2 B -- o `neg` do Thumb-1)
+        0x0845A3B6  44 f5 50 44  adc  r4, r4, #0xd000 (4 B -- Thumb-2)
+        0x0845A3BA  44 f5 70 66  adc  r6, r4, #0xf00  (4 B -- Thumb-2)
+        0x081C69C0  08 f3 1c 08  ssat r8, #0x1d, r8  (4 B -- ARMv6)
+    Duas regras anteriores perguntaram por NOME + OPERANDOS impressos e as duas
+    estavam erradas: `lsls`/`lsrs`/`asrs` com imediato existem no Thumb-1, e o
+    `#0` que o capstone mostra em `rsbs r0, r1, #0` nao esta codificado (a regra
+    marcou 1 750 instrucoes validas como inexistentes e o C nao compilou).
+    """
+    casos = [("48 42", 0x08000BD6, "rsbs", False),
+             ("44 f5 50 44", 0x0845A3B6, "adc", True),
+             ("44 f5 70 66", 0x0845A3BA, "adc", True),
+             ("08 f3 1c 08", 0x081C69C0, "ssat", True),
+             ("41 41", 0x08000000, "adcs", False)]
+    for hexa, endereco, mnemonic, eh_forma_inexistente in casos:
+        ins = _decodifica(bytes.fromhex(hexa), endereco, "thumb")
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)
+        forma = disasm.forma_impossivel_no_thumb1(ins, "thumb")
+        assert (forma is not None) == eh_forma_inexistente, (hexa, mnemonic, forma)
+        if eh_forma_inexistente:
+            assert len(ins.bytes) == 4, hexa
+    # `ssat` esta na lista por nome (o filtro PARA a leitura ali); o `adc` NAO
+    # esta: ele existe no ARMv4T, o que nao existe e' a forma de 32 bits.
+    assert disasm.impossivel_no_arm7tdmi(_decodifica(bytes.fromhex("08 f3 1c 08"),
+                                                     0x081C69C0, "thumb"), "thumb") is not None
+    assert disasm.impossivel_no_arm7tdmi(_decodifica(bytes.fromhex("44 f5 50 44"),
+                                                     0x0845A3B6, "thumb"), "thumb") is None
+    assert disasm.impossivel_no_arm7tdmi(_decodifica(bytes.fromhex("48 42"),
+                                                     0x08000BD6, "thumb"), "thumb") is None
+    # a regra so' vale no Thumb: no ARM toda instrucao tem 4 bytes
+    ins = _decodifica(bytes.fromhex("04 40 a0 e2"), 0x08000000, "arm")
+    assert ins.mnemonic.startswith("adc"), ins.mnemonic
+    assert disasm.forma_impossivel_no_thumb1(ins, "arm") is None
+
+
+def _milhar(numero: int) -> str:
+    """Como o README escreve: 1 046 836 (espaco no lugar da virgula)."""
+    return f"{numero:,}".replace(",", " ")
+
+
+def test_readme_conta_a_mesma_rodada_da_evidencia():
+    """Os numeros das tabelas do README tem de sair da evidencia versionada.
+
+    Este defeito reapareceu tres vezes no projeto, sempre do mesmo jeito: um
+    numero digitado a mao sobrevive a uma rodada nova (o cabecalho da amostra
+    contava uma rodada que nao era a do arquivo ao lado; o relatorio de conferencia
+    dizia "25 divergencias" para 225; o JSON tinha um "67" que ninguem sabia
+    definir). Agora a tabela da ROM e' conferida contra
+    `evidencias/rom_bpre_analise.json`: se a medicao mudar e o README nao, cai.
+    """
+    readme = (RAIZ / "README.md").read_text(encoding="utf-8")
+    analise = json.loads((RAIZ / "evidencias" / "rom_bpre_analise.json").read_text(encoding="utf-8"))
+    descoberta, lev = analise["completo"], analise["levantamento"]
+    exigidos = {
+        "funcoes": _milhar(descoberta["funcoes"]),
+        "instrucoes": _milhar(descoberta["instrucoes"]),
+        "arestas": _milhar(descoberta["arestas"]),
+        "descartes": _milhar(descoberta["descartes"]),
+        "fora do censo": _milhar(descoberta["fora_do_censo"]),
+        "saidas para tras": _milhar(descoberta["saidas_para_tras"]),
+        "orfaos recuperados": _milhar(descoberta["saidas_recuperadas"]),
+        "tabelas": _milhar(descoberta["tabelas_de_casos"]),
+        "casos de tabela": _milhar(descoberta["casos_de_tabela"]),
+        "completas": _milhar(lev["completas"]),
+        "parciais": _milhar(lev["parciais"]),
+        "linhas de C": _milhar(analise["linhas_c"]),
+        "objeto": _milhar(analise["compilacao"]["bytes_objeto"]),
+        "recusas": _milhar(analise["recusas_total"]),
+    }
+    ausentes = {rotulo: valor for rotulo, valor in exigidos.items() if valor not in readme}
+    assert not ausentes, f"o README nao conta a rodada da evidencia: {ausentes}"
+    # a taxa de remontagem e' publicada com virgula decimal
+    taxa = f"{analise['conferencia']['taxa']:.3f}".replace(".", ",")
+    assert taxa in readme, taxa
+
+    # A TABELA DAS LACUNAS tambem tem de sair da evidencia: cada linha e' um
+    # numero publicado, e numero publicado a mao ja' sobreviveu a tres rodadas
+    # neste projeto. As linhas somam o total (senao a tabela mente por omissao).
+    def soma(predicado) -> int:
+        return sum(v for k, v in analise["recusas_motivo"].items() if predicado(k))
+
+    linhas = {
+        "bx rN": (analise["recusas_mnemonico"]["bx"],
+                  "| `bx rN` com origem nao rastreada | {} "),
+        "desvio que sai da funcao": (soma(lambda k: "desvio para tras" in k
+                                          or "salto para fora da funcao" in k),
+                                     "| desvio que sai da funcao (bloco comum de outra "
+                                     "rotina) | {} "),
+        "desvio sem rotulo": (soma(lambda k: "sem rotulo nesta janela" in k),
+                              "| desvio condicional para endereco sem rotulo nesta "
+                              "janela | {} "),
+        "instrucao inexistente": (soma(lambda k: "codificacao de 32 bits" in k),
+                                  "| instrucao que **nao existe** no ARM7TDMI (dado "
+                                  "lido como codigo) | {} "),
+        "falta traduzir": (soma(lambda k: "falta traduzir" in k),
+                           "| instrucao que EXISTE no ARMv4T e o lifter ainda nao "
+                           "traduz | {} "),
+        "salto por tabela": (soma(lambda k: "salto calculado" in k),
+                             "| salto calculado por tabela que nao passou nos "
+                             "criterios | {} |"),
+    }
+    assert sum(valor for valor, _ in linhas.values()) == analise["recusas_total"]
+    fora = {rotulo: formato.format(valor) for rotulo, (valor, formato) in linhas.items()
+            if formato.format(valor) not in readme}
+    assert not fora, f"a tabela das lacunas no README nao conta a evidencia: {fora}"
+    assert f"| **total** | **{analise['recusas_total']}** (" in readme
+
+
+def test_forma_que_nao_existe_e_checada_antes_do_despacho_por_mnemonico():
+    """`adc` existe no ARMv4T -- mas `adc` COM IMEDIATO no Thumb-1 nao existe.
+
+    A checagem de forma tem de vir ANTES do despacho por mnemonico: no fim da
+    cadeia, o tratador de `adc` respondia por ela e a mensagem saia "forma
+    aritmetica nao implementada" -- falsa (manda procurar defeito no levantador
+    quando o que houve foi leitura passando por dado). Bytes reais da ROM:
+    `44 f5 50 44` = adc r4, r4, #0xd000.
+    """
+    imagem = bytearray(0x40)
+    imagem[0x20:0x24] = bytes.fromhex("44f55044")      # adc r4, r4, #0xd000 (Thumb-2)
+    imagem[0x24:0x26] = bytes.fromhex("00bf")          # nop
+    imagem[0x26:0x28] = bytes.fromhex("7047")          # bx lr
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    lidas = [(i.mnemonic, i.operadores) for i in desmontagem.funcoes[0x08000020].instrucoes]
+    assert ("adc", "r4, r4, #0xd000") in lidas, lidas
+    codigo = decompile.decompilar(desmontagem, imagem)
+    levantada = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
+    motivos = " | ".join(levantada.nao_levantadas)
+    assert "nao existe no ARM7TDMI" in motivos, motivos
+    assert "codificacao de 32 bits" in motivos, motivos
+    assert "forma aritmetica nao implementada" not in motivos, motivos
+
+
+def test_evidencia_do_corpus_e_a_rodada_de_agora(rodada):
+    """A evidencia versionada tem de ser a rodada de AGORA, campo a campo.
+
+    Mesma classe de defeito do numero digitado a mao: um arquivo de evidencia que
+    ficou para tras descreve um programa que nao existe mais. Aconteceu aqui --
+    `evidencias/levantado_corpus.c` era de uma rodada de 24 funcoes e convivia com
+    um corpus de 25, sem nada que reclamasse. O JSON e' gerado
+    (`reconstruir.ResultadoRodada.para_json`, exposto como `cli rodada --json`),
+    entao a comparacao nao tem campo escrito a mao de nenhum dos dois lados.
+    """
+    evidencia = json.loads((RAIZ / "evidencias" / "rodada_corpus.json")
+                           .read_text(encoding="utf-8"))
+    agora = json.loads(rodada.para_json())
+    assert evidencia == agora
+
+    # e o .c versionado tem de ser o .c desta rodada: comparar TAMANHO nao e'
+    # comparar bytes (licao de uma rodada anterior), entao compara-se o texto.
+    levantado = (RAIZ / "evidencias" / "levantado_corpus.c").read_text(encoding="utf-8")
+    assert levantado == rodada.codigo.texto()

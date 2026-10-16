@@ -17,6 +17,7 @@ Num binario de terceiros sem verdade-terreno, o melhor que se pode afirmar e
 
 from __future__ import annotations
 
+import json
 import subprocess
 import tempfile
 from dataclasses import dataclass, field
@@ -41,8 +42,42 @@ class ResultadoRodada:
     relatorio_levantado: verificador_mod.RelatorioEmulacao | None = None
     caminho_c: str | None = None
     caminho_rom_levantado: str | None = None
+    caminho_rom: str | None = None          # a ROM de entrada (no corpus: gerada)
     tamanho_levantado: int | None = None
     erros: list[str] = field(default_factory=list)
+
+    def para_json(self, indent: int = 2) -> str:
+        """A rodada do corpus em JSON -- e' o que vira evidencia versionada.
+
+        Regra: campo calculado, nunca digitado. O que muda entre duas rodadas
+        legitimas (caminho do .c, diretorio de build) NAO entra aqui, senao a
+        evidencia deixa de poder ser comparada com a rodada de agora -- e o
+        teste `test_evidencia_do_corpus_e_a_rodada_de_agora` compara.
+        """
+        resumo: dict = {"corpus": {}, "levantamento": {}, "verificacao": {}}
+        if self.caminho_rom:
+            rom = Path(self.caminho_rom)
+            if rom.exists():
+                resumo["corpus"]["arquivo"] = f"{rom.name} (gerado pelo proprio pipeline)"
+                resumo["corpus"]["bytes"] = rom.stat().st_size
+        resumo["corpus"]["funcoes"] = len(self.desmontagem.funcoes)
+        resumo["corpus"]["instrucoes"] = self.desmontagem.total_instrucoes
+        resumo["corpus"]["arestas_de_chamada"] = len(self.desmontagem.arestas())
+        resumo["levantamento"]["funcoes_completas"] = len(self.codigo.completas)
+        resumo["levantamento"]["funcoes_incompletas"] = len(self.codigo.incompletas)
+        resumo["levantamento"]["codigo_c_compilado_bytes"] = self.tamanho_levantado
+        for chave, relatorio in (("no_binario_original", self.relatorio_original),
+                                 ("no_c_levantado", self.relatorio_levantado)):
+            if relatorio is None:
+                resumo["verificacao"][chave] = None
+                continue
+            resumo["verificacao"][chave] = {
+                "aprovados": relatorio.aprovados,
+                "total": relatorio.total,
+                "falhas": [f"{c.nome}{c.argumentos}" for c in relatorio.reprovados],
+            }
+        resumo["erros"] = list(self.erros)
+        return json.dumps(resumo, indent=indent, ensure_ascii=False)
 
     def resumo(self) -> str:
         linhas = ["=== rodada de engenharia reversa ==="]
@@ -86,6 +121,7 @@ def rodada_corpus(caminho_rom: str | Path | None = None,
     resultado.relatorio_original = verificador_mod.verificar_verdade_terreno(corpus)
     resultado.caminho_rom_levantado = _verificar_levantado(
         resultado, tmp, corpus, zig=zig)
+    resultado.caminho_rom = str(caminho_rom)
     return resultado
 
 

@@ -96,6 +96,7 @@ u32 divide(u32 a, u32 b);
 int ternario(int a, int b);
 u32 poe_bit(u32 v, int bit);
 int troca(int a, int b);
+u32 distancia_adr(int ignora);
 
 static volatile u32 area_teste[64];
 
@@ -124,6 +125,7 @@ int main_teste(void) {
     s += (u32)ternario(9, 4);
     s += poe_bit(0u, 7);
     s += (u32)troca(3, 9);
+    s += distancia_adr(0);
     s += (u32)(mul32(1000u, 1000u) & 0xFFFFu);
     s += (u32)(__aeabi_lmul(1000ull, 1000ull) & 0xFFFFu);
     return (int)s;
@@ -228,6 +230,41 @@ __attribute__((noinline, used)) u32 poe_bit(u32 v, int bit) {
 __attribute__((noinline, used)) int troca(int a, int b) {
     int t = a; a = b; b = t;
     return a - b;
+}
+
+/* `adr` -- endereco calculado a partir do PC. O compilador moderno NAO emite
+   esta instrucao (prefere `ldr rX, [pc, #N]`: verificado, as duas formas usuais
+   de escrever isso em C viram carga do pool), mas a ROM de estudo foi compilada
+   com o agbcc da epoca e tem 168 delas, todas em janelas Thumb. Entra por asm de
+   proposito.
+
+   A funcao devolve a DIFERENCA entre dois `adr`: e' o unico jeito de o caso
+   valer nos dois binarios (o original e o C levantado e recompilado, que tem
+   outro layout -- um endereco absoluto lido daqui apontaria para outra coisa la).
+   A diferenca e' fixa (os dois rotulos distam 4 bytes) e NAO e' trivial de
+   acertar: `.balign 4` no comeco garante que o primeiro `adr` fique em endereco
+   ≡ 2 (mod 4), e e' exatamente ai que a regra do ARM ARM importa -- o PC do
+   `adr` e' `(endereco + 4) & ~3`, nao `endereco + 4`. Com a regra errada, o
+   resultado sai 2 em vez de 4 (o emulador confirma o valor absoluto no teste
+   `test_adr_do_levantador_bate_com_o_emulador`).
+
+   O `.word` tem bytes `b0 bf` (que no Thumb-1 nao existem) para a leitura parar
+   nele em vez de desmontar o dado como codigo. */
+__attribute__((noinline, used)) u32 distancia_adr(int ignora) {
+    u32 um, outro;
+    (void)ignora;
+    __asm__ volatile(
+        ".balign 4\n\t"
+        ".short 0x46c0\n\t"      /* `mov r8, r8`: 2 bytes, poe o `adr` em 2 mod 4 */
+        "adr %0, 1f\n\t"
+        "adr %1, 2f\n\t"
+        "b 3f\n\t"
+        ".balign 4\n"
+        "1:\n\t.word 0xB0BFBFB0\n\t"
+        "2:\n"
+        "3:\n"
+        : "=r"(um), "=r"(outro));
+    return outro - um;
 }
 """
 
@@ -537,6 +574,8 @@ VERDADE_TERRENO: list[dict] = [
     {"funcao": "ternario", "args": (9, 4), "esperado": 5},
     {"funcao": "ternario", "args": (4, 9), "esperado": 5},
     {"funcao": "troca", "args": (3, 9), "esperado": 6},
+    # -- endereco calculado por `adr` (ver o comentario no CORPUS_C) ---------
+    {"funcao": "distancia_adr", "args": (0,), "esperado": 4},
     {"funcao": "troca", "args": (9, 3), "esperado": -6, "sinal": "com"},
     # -- laco / desvio ------------------------------------------------------
     {"funcao": "conta_bits", "args": (0xFF,), "esperado": 8},

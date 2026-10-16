@@ -1,21 +1,27 @@
 {
   "corpus": {
-    "arquivo": "corpus.gba (gerado pelo proprio pipeline, nao versionado)",
+    "arquivo": "corpus.gba (gerado pelo proprio pipeline)",
     "bytes": 262144,
-    "funcoes": 24,
-    "instrucoes": 370,
-    "arestas_de_chamada": 26
+    "funcoes": 25,
+    "instrucoes": 379,
+    "arestas_de_chamada": 27
   },
   "levantamento": {
-    "funcoes_completas": 24,
+    "funcoes_completas": 25,
     "funcoes_incompletas": 0,
-    "codigo_c_compilado_bytes": 1148
+    "codigo_c_compilado_bytes": 1096
   },
   "verificacao": {
-    "no_binario_original": "59/59",
-    "no_c_levantado": "59/59"
+    "no_binario_original": {
+      "aprovados": 60,
+      "total": 60,
+      "falhas": []
+    },
+    "no_c_levantado": {
+      "aprovados": 60,
+      "total": 60,
+      "falhas": []
+    }
   },
-  "rom_de_terceiros_sem_verdade_terreno": [
-    "ROM de terceiros: nao existe verdade-terreno conhecida, entao NAO foi possivel afirmar se o C levantado esta correto -- so foi possivel compila-lo e registrar o que ele executa"
-  ]
+  "erros": []
 }

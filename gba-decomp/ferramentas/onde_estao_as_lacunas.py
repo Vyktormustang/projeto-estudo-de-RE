@@ -33,6 +33,7 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
+from gbadecomp import analise as analise_mod              # noqa: E402
 from gbadecomp import decompile as decompile_mod          # noqa: E402
 from gbadecomp import disasm as disasm_mod                # noqa: E402
 from gbadecomp import rom as rom_mod                      # noqa: E402
@@ -115,7 +116,8 @@ def coletar(rom_caminho: str, censo: str | None) -> dict:
                 "motivo": _motivo(item),
                 "texto": item,
             })
-    return {"desmontagem": desmontagem, "codigo": codigo, "lacunas": lacunas}
+    return {"desmontagem": desmontagem, "codigo": codigo, "lacunas": lacunas,
+            "nomes": nomes, "do_censo": do_censo}
 
 
 def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> dict:
@@ -124,7 +126,11 @@ def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> 
                if not so_motivo or so_motivo in l["motivo"]]
     balanceamento = {f.endereco: f.balanceamento for f in dados["codigo"].funcoes}
 
-    por_motivo = collections.Counter(l["motivo"] for l in lacunas)
+    # canoniza antes de contar: quase todo motivo carrega o endereco dentro do
+    # texto, entao sem isto cada motivo vira um grupo de 1 e o histograma nao
+    # agrupa nada (a soma do relatorio nao fecha com o total de lacunas).
+    por_motivo = collections.Counter(
+        analise_mod.motivo_canonico(l["motivo"]) for l in lacunas)
     por_mnemonico = collections.Counter(
         (l["texto"].split(" ", 2)[1].split(",")[0].split(" ")[0]
          if " " in l["texto"] else "?") for l in lacunas)
@@ -168,6 +174,13 @@ def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> 
                 f"0x{l['instrucao']:08X} em {l['nome']} "
                 f"(pilha: {balanceamento.get(l['funcao'], '?')}) -- antes: {anteriores}")
 
+    # (4) O DESVIO RECUSADO VAI PARA ONDE? "para endereco que nao foi desmontado"
+    # e' uma frase que nao ajuda quem le. O que ajuda (e o que decide o proximo
+    # conserto) e' saber se o destino e' instrucao de outra janela ja desmontada,
+    # buraco dentro da propria faixa, ou endereco que NINGUEM desmontou -- as tres
+    # coisas pedem acoes diferentes.
+    destinos = _para_onde_vai_o_desvio(desmontagem, lacunas, dados.get("nomes") or {})
+
     # contexto impresso para cada motivo (o que o lifter viu antes de recusar)
     contexto = []
     for l in lacunas[:exemplos * 4]:
@@ -192,6 +205,7 @@ def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> 
         "paginas": [{"pagina": f"0x{p:08X}", "lacunas": n,
                      "funcoes": len(funcoes_por_pagina[p])}
                     for p, n in lacunas_por_pagina.most_common(12)],
+        "destinos_de_desvio": destinos,
         "origens_bx": dict(origens_bx.most_common()),
         "exemplos_bx": {k: v for k, v in list(exemplos_bx.items())[:12]},
         "contexto": contexto,
@@ -211,6 +225,18 @@ def relatar(medido: dict, exemplos: int) -> str:
     for pagina in medido["paginas"]:
         saida.append(f"  {pagina['pagina']}: {pagina['lacunas']:4d} lacunas "
                      f"em {pagina['funcoes']} funcoes")
+    if medido.get("destinos_de_desvio", {}).get("por_classe"):
+        d = medido["destinos_de_desvio"]
+        saida += ["", "para onde vai o desvio recusado:"]
+        for classe, n in d["por_classe"].items():
+            saida.append(f"  {n:5d}  {classe}")
+        for exemplo in d["exemplos"].get("instrucao de outra janela", [])[:3]:
+            saida.append(f"        {exemplo}")
+        for exemplo in d["exemplos"].get("ninguem desmontou", [])[:3]:
+            saida.append(f"        SEM DONO: {exemplo}")
+        if d["paginas_dos_destinos"]:
+            saida.append("    destinos por pagina: " + ", ".join(
+                f"{p['pagina']}={p['n']}" for p in d["paginas_dos_destinos"][:6]))
     if medido["origens_bx"]:
         saida += ["", "de onde vem o registrador do `bx rN` (heuristica: ultima "
                       "escrita antes do bx, lida do desmonte):"]
@@ -227,6 +253,74 @@ def relatar(medido: dict, exemplos: int) -> str:
             for linha in bloco["antes"]:
                 saida.append(f"      {linha}")
     return "\n".join(saida)
+
+
+def _para_onde_vai_o_desvio(desmontagem, lacunas: list, nomes: dict) -> dict:
+    """Classifica cada desvio recusado pelo destino que ele aponta.
+
+    Classes (mutuamente exclusivas, na ordem em que sao testadas):
+      instrucao de outra janela .... o destino E uma instrucao desmontada, de
+                                    outra funcao: a leitura continua la (bloco
+                                    comum). Nada a implementar; o que faltava era
+                                    dizer PARA ONDE vai.
+      buraco dentro da propria faixa  o destino esta entre a entrada e o fim
+                                    desta funcao, mas nao foi desmontado
+      buraco de outra janela ....... o destino cai no intervalo de outra funcao
+                                    sem ser instrucao dela
+      ninguem desmontou ............ nenhuma funcao passou por esse endereco:
+                                    e' o caso que merece investigacao (dado?)
+    """
+    import re as _re
+    donos: dict[int, list[int]] = collections.defaultdict(list)
+    faixas: list[tuple[int, int, int]] = []
+    for f in desmontagem.funcoes.values():
+        for instrucao in f.instrucoes:
+            donos[instrucao.endereco].append(f.entrada)
+        faixas.append((f.entrada, f.fim, f.entrada))
+    faixas.sort()
+
+    def janela_que_contem(endereco: int) -> int | None:
+        for entrada, fim, _ in faixas:
+            if entrada <= endereco < fim:
+                return entrada
+        return None
+
+    contagem: collections.Counter = collections.Counter()
+    exemplos: dict[str, list[str]] = collections.defaultdict(list)
+    por_faixa: collections.Counter = collections.Counter()
+    for l in lacunas:
+        motivo = l["motivo"]
+        if not (motivo.startswith("salto para fora") or motivo.startswith("desvio para")):
+            continue
+        achado = _re.search(r"0x([0-9A-Fa-f]{8})", motivo)
+        if not achado:
+            continue
+        alvo = int(achado.group(1), 16)
+        funcao = desmontagem.funcoes.get(l["funcao"])
+        fim = funcao.fim if funcao else l["funcao"]
+        if alvo in donos and l["funcao"] not in donos[alvo]:
+            classe = "instrucao de outra janela"
+        elif funcao is not None and l["funcao"] <= alvo < fim:
+            classe = "buraco dentro da propria faixa"
+        elif janela_que_contem(alvo) is not None:
+            classe = "buraco de outra janela"
+        else:
+            classe = "ninguem desmontou"
+        contagem[classe] += 1
+        por_faixa[f"0x{alvo & ~0xFFF:08X}"] += 1
+        if len(exemplos[classe]) < 4:
+            dono = donos.get(alvo, [])
+            rotulo = ", ".join(f"0x{d:08X}" for d in dono) or "-"
+            exemplos[classe].append(
+                f"0x{alvo:08X} (janela dona: {rotulo}) <- desvio em "
+                f"0x{l['instrucao']:08X} de 0x{l['funcao']:08X} "
+                f"({nomes.get(l['funcao'], '(sem nome no censo)')})")
+    return {
+        "por_classe": dict(contagem.most_common()),
+        "paginas_dos_destinos": [{"pagina": p, "n": n}
+                                 for p, n in por_faixa.most_common(8)],
+        "exemplos": {k: v for k, v in exemplos.items()},
+    }
 
 
 def listar_regiao(dados: dict, inicio: int, fim: int) -> str:

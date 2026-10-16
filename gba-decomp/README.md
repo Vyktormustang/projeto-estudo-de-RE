@@ -22,16 +22,16 @@ binário  --disasm-->  funções + grafo de chamadas
 
 | medida | valor |
 |---|---|
-| ROM sintética | 262 144 B, sha256 `5dfd55fb1c6d8ad93dd55aa4730908d0711427fa8395154c65c9382eeff7459a` |
-| funções no binário | 24 (todas com resultado conhecido) |
-| funções redescobertas **só a partir do vetor de boot** | 24/24, zero funções inventadas |
-| instruções desmontadas | 370 |
-| arestas de chamada | 26 (todas conferidas contra a verdade) |
-| tabela de verdade no binário original | **59/59** |
-| C levantado | 24/24 funções traduzidas, 0 não levantadas |
-| tabela de verdade **no C levantado, recompilado e emulado** | **59/59** |
-| C compilado (tamanho do modulo) | 1 092 bytes |
-| testes automatizados | `32 passed` |
+| ROM sintética | 262 144 B, sha256 `5f9fe092e32780a1e7475c821e611a026ff6526523846ec1045f2208b3997135` |
+| funções no binário | 25 (24 com caso de verdade-terreno; a 25ª é o próprio `main_teste`) |
+| funções redescobertas **só a partir do vetor de boot** | 25/25, zero funções inventadas |
+| instruções desmontadas | 379 |
+| arestas de chamada | 27 (todas conferidas contra a verdade) |
+| tabela de verdade no binário original | **60/60** |
+| C levantado | 25/25 funções traduzidas, 0 não levantadas |
+| tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
+| C compilado (tamanho do modulo) | 1 096 bytes |
+| testes automatizados | `45 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -49,15 +49,15 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 | medida | valor |
 |---|---|
 | descoberta partindo **so do vetor de reset** | 3 544 funcoes · 2 590 das 5 981 do censo (43,3%) |
-| descoberta usando o **censo como sementes** | **8 151 funcoes**, 439 869 instrucoes listadas, 20 379 arestas |
-| cobertura do censo | 5 981/5 981 (100%) · **2 170 funcoes que o censo nao tinha** |
-| enderecos descartados | 170 (nenhuma instrucao valida do ARM7TDMI no inicio) |
-| saltos que saem da funcao para tras | 245 · 154 trechos orfaos voltaram como janela propria |
+| descoberta usando o **censo como sementes** | **8 153 funcoes**, 456 822 instrucoes listadas, 20 380 arestas |
+| cobertura do censo | 5 981/5 981 (100%) · **2 172 funcoes que o censo nao tinha** |
+| enderecos descartados | 162 (nenhuma instrucao valida do ARM7TDMI no inicio) |
+| saltos que saem da funcao para tras | 241 · 148 trechos orfaos voltaram como janela propria |
 | tabelas de casos | **375 reconhecidas**, 5 767 casos lidos da ROM → `switch` no C |
-| funcoes com C para ler | **8 005 completas + 146 parciais = 100%** |
-| C levantado | 1 020 566 linhas / 38,4 MB |
-| conferencia byte a byte | **99,948%** das instrucoes remontam identicas ao binario |
-| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 124 636 bytes) |
+| funcoes com C para ler | **8 007 completas + 146 parciais = 100%** |
+| C levantado | 1 046 852 linhas / 39,6 MB |
+| conferencia byte a byte | **99,950%** das instrucoes remontam identicas ao binario |
+| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 144 280 bytes) |
 | determinismo | C, JSON e objeto compilado **identicos** em duas rodadas (`ferramentas/checar_determinismo.py`) |
 
 ### Achados que valem mais que os números
@@ -131,52 +131,155 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    tabela reconhecida de `switch` emitido. Agora `analise._contar_tabelas` conta o
    que foi **lido da ROM** pela propria descoberta: **375 tabelas, 5 767 casos**.
    O numero mudou porque a fonte do numero mudou — o antigo nao era reproduzivel.
+8. **A mensagem da lacuna mandava procurar defeito onde nao tinha.** Nos 146
+   parciais, desvio recusado saia como "desvio para 0x…, que nao foi desmontado
+   (rotulo inexistente)". `ferramentas/onde_estao_as_lacunas.py` passou a
+   classificar o **destino** de cada desvio recusado lendo a propria descoberta —
+   e o que se mediu foi: dos **130**, **48** caem em buraco de OUTRA janela,
+   **29** caem em **instrucao** de outra janela (o endereco esta desmontado, so
+   nao esta nesta rotina), **29** em buraco dentro da propria faixa e **24** em
+   endereco que leitura nenhuma alcancou. Em 77 dos 130 a frase antiga era
+   **falsa sobre o proprio levantamento**. O lifter agora tem um indice de janelas
+   (`decompile.IndiceDeJanelas`) e escreve onde o alvo esta — "a leitura continua
+   em INSTRUCAO da janela 0x…", "dentro da faixa da janela 0x…, em trecho nao
+   desmontado (buraco: la a leitura parou em dado)" ou "fora de qualquer janela
+   desmontada". Nenhuma dessas classes e' instrucao faltando implementar: sao
+   todas "a leitura sai desta janela" (o bloco comum pertence a outra rotina).
+   Testes `test_desvio_recusado_diz_onde_o_destino_foi_desmontado` e
+   `test_desvio_para_endereco_que_ninguem_desmontou_diz_isso`. O objeto compilado
+   **nao mudou um byte** (o motivo vive em comentario): sha256 do objeto identico
+   antes e depois da correcao — a prosa mudou, o codigo gerado nao.
+9. **"Mnemônico nao implementado" tambem mandava procurar defeito onde nao tem.**
+   Das lacunas, 20 diziam isso. Medindo uma por uma: 16 nao sao instrucao que
+   falte implementar — **nao existem no ARM7TDMI**. `orn`/`orns` sao ARMv6,
+   `smlawt` e' ARMv5TE, `hint` e' Thumb-2, `ldcl`/`stcl` sao coprocessador (o
+   Thumb-1 nao tem nenhum) e `stmdb r0, {...}` so' existe no ARM -- todas lidas
+   em janelas **Thumb**, ou seja, ali a leitura passou por **dado**. O filtro
+   `disasm.impossivel_no_arm7tdmi` existia, mas nao pegava as formas com letra
+   colada (`ldcl` nao e' `ldc` na comparacao por igualdade) nem essa familia;
+   agora pega, e o desmontador **para** no ponto (registrando a terminacao) em vez
+   de continuar lendo dado como codigo. **189 → 173 lacunas, 146 → 134 parciais**,
+   336 instrucoes a menos (eram bytes de dado escritos como instrucao). Testes
+   `test_instrucao_que_nao_existe_no_thumb1_e_marcada_como_tal` e
+   `test_lifter_distingue_instrucao_que_nao_existe_de_falta_implementar` — os
+   bytes vem da ROM (com o que capstone le neles assertado antes do veredito), e
+   o mesmo `stmdb sp!, {lr}` do ARM continua passando pelo filtro.
+10. **Um numero do JSON que dava para citar errado.** `recusas_motivo` era o
+   histograma de motivos cortado em 12 grupos e truncado em 90 caracteres: a soma
+   dele dava **67** para **189** lacunas. Nao era erro de calculo, era um numero
+   sem definicao publicada — quem citasse o JSON escreveria "67 recusas". Agora o
+   JSON traz `recusas_total` (o total, com o nome dizendo o que e'), o histograma
+   por motivo **completo** e com os enderecos trocados por `0x...` (senao cada
+   motivo com endereco vira um grupo de 1) e o relatorio diz na tela que a soma
+   dos motivos e' o total. Teste
+   `test_histograma_de_recusas_fecha_com_o_total_e_agrupa_endereco`.
+11. **Uma regra escrita pelo TEXTO que o capstone imprime errou duas vezes — e a
+   segunda vez quebrou o C.** A pergunta era boa (o `adc` existe no ARMv4T, mas
+   `adc r4, r4, #0xd000` não existe no Thumb-1), a resposta não: a regra olhava o
+   nome e os operandos *impressos*. Primeiro `lsls`/`lsrs`/`asrs` com imediato,
+   que **existem** no Thumb-1 (formatos 1 e 3): 11 testes caíram. Depois
+   `rsbs r0, r1, #0` — que é o `neg` do Thumb-1 escrito em **dois bytes**
+   (`48 42`); o `#0` que o capstone **mostra** ali não está codificado em lugar
+   nenhum. A regra marcou **1 750 instruções válidas** como inexistentes e o C
+   levantado **não compilou** (rodada r12 — o defeito era do filtro, não da ROM;
+   a rodada inteira foi descartada, nada dela foi publicado). A versão que ficou
+   pergunta pela **codificação**: instrução Thumb do ARM7TDMI tem 16 bits, e a
+   codificação de 32 bits começa com prefixos que no Thumb-1 são indefinidos —
+   se a leitura chegou num deles, ela passou por dado. A exceção é medida e
+   estreita: o **`bl` do Thumb-1 também tem 32 bits** (é assim que o Thumb chama
+   sub-rotina) e continua válido — o corpus tem 29 dessas chamadas e sem a
+   exceção o levantado parava de reproduzir a verdade-terreno.
+12. **O que essa regra consertou era C silenciosamente errado.** Nos 17 sítios de
+   codificação de 32 bits que sobraram, o lifter **traduzia dado como código** e
+   acertava a conta errada: `orr r2, r0, #0x810000` saía como `r2 = r2 | 0x810000;`
+   (o `r0` sumia) e `and sl, r1, #0x690069` como `r10 = r10 & 0x690069;` — o
+   registrador de origem era o **destino**, e do imediato ninguém via nada de
+   errado. **8 funções** estavam nesse estado e viraram parciais: hoje o sítio sai
+   como `/* NAO LEVANTADO: orr r2, r0, #0x810000 */`, com o motivo verdadeiro.
+   Detalhe que vale registrar: a conferência byte a byte **não pega** isso — ela
+   confere o texto contra os bytes, e o texto remonta certo (keystone monta a
+   forma de 32 bits). Conferência de bytes não é conferência de semântica; por
+   isso a verdade-terreno existe só no corpus, onde a emulação decide (teste
+   `test_forma_inexistente_no_thumb1_e_julgado_pelo_tamanho_da_codificacao`).
 
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
-(99,948% remontam byte a byte; as 225 divergencias sao `cmp`/`bx` escritos com a
+(99,950% remontam byte a byte; as 226 divergencias sao `cmp`/`bx` escritos com a
 outra codificacao valida da mesma instrucao), e o C gerado e **C valido para o
-alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 020 566
-linhas).
+alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 046 852
+linhas). Nao prova **semantica** -- foi exatamente esse tipo de defeito (item 12)
+que a conferencia de bytes deixou passar por uma rodada inteira.
 
 Nao prova: **semantica**. Nesta ROM nao existe verdade-terreno, entao nao se pode
 afirmar que uma funcao levantada faz o que a original faz. O unico lugar onde
-comportamento esta provado e o corpus sintetico — 59 casos, por emulacao, no
-binario e no C levantado e recompilado.
+comportamento esta provado e o corpus sintetico — 60 casos (em 24 das 25
+funcoes; a 25ª e' o proprio `main_teste`), por emulacao, no binario e no C
+levantado e recompilado.
 
 ### As lacunas que ficam (todas marcadas dentro do C)
 
 | lacuna | ocorrencias |
 |---|---|
-| `bx rN` com origem nao rastreada | 35 (20 sao `bx rN`+nop *thunk*; o resto, salto calculado) |
-| desvio que sai da funcao (bloco comum de outra rotina) | 130 · 71 para tras, 28 para fora, 31 para endereco nao desmontado |
-| instrucao de ARM v4T ainda nao implementada (`mrs`, `stmdb`, `ldcl`...) | 20 |
+| `bx rN` com origem nao rastreada | 39 (11 sao `bx rN`+nop *thunk*, 1 e' chamada indireta ARM→Thumb, 27 sao salto calculado) |
+| desvio que sai da funcao (bloco comum de outra rotina) | 97 — destino **medido**: 31 instrucao de outra janela, 29 buraco de outra janela, 14 fora de qualquer janela, 10 buraco da propria faixa, 7 buraco nesta janela, 6 fora de qualquer janela (salto) |
+| desvio condicional para endereco sem rotulo nesta janela | 32 — mesmas 4 classes de destino |
+| instrucao que **nao existe** no ARM7TDMI (dado lido como codigo) | 17 (codificacao de 32 bits do Thumb-2; ARMv5+/coprocessador nem chega aqui: **para** a leitura e vira `descarte`, 162 deles) |
+| instrucao que EXISTE no ARMv4T e o lifter ainda nao traduz | 4 (`mrs`, `msr`, `stmdb` no ARM) |
 | salto calculado por tabela que nao passou nos criterios | 4 |
-| **total** | **189** (14 em funcao do censo, 175 fora dele) |
+| **total** | **193** (14 em funcao do censo, 179 fora dele) |
+| destino de cada desvio recusado (relatorio separado) | 129: 47 buraco de outra janela, 31 instrucao de outra janela, 28 buraco da propria faixa, 23 ninguem desmontou |
 
 Cada uma aparece no ponto exato do C como `/* NAO LEVANTADO: ... */`, com o
 endereco e o motivo. A funcao continua legivel ate ali — e o que faltou esta
 declarado, nao escondido.
 
 Comando que produz a evidencia (duas execucoes seguidas dao JSON identico e o
-mesmo `.c` byte a byte):
+mesmo `.c` byte a byte), com os arquivos que ficam versionados em `evidencias/`:
 
 ```bash
+# corpus sintetico: rodada, desmontagem e o C levantado (tudo gerado)
+python -m gbadecomp.cli rodada --saida /tmp/corpus --json evidencias/rodada_corpus.json
+python -m gbadecomp.cli disasm /tmp/corpus/corpus.gba \
+        --json evidencias/desmontagem_corpus.json \
+        --listagem evidencias/desmontagem_corpus.txt
+cp /tmp/corpus/levantado.c evidencias/levantado_corpus.c
+
+# ROM de terceiros: sem verdade-terreno, so' o que foi medido
 python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
         --json evidencias/rom_bpre_analise.json -o levantado_rom.c
 python -m gbadecomp.conferir_bytes ROM.gba --censo censo/functions.csv
 python ferramentas/estudo_switch.py ROM.gba --censo censo/functions.csv
 python ferramentas/onde_estao_as_lacunas.py ROM.gba --censo censo/functions.csv
 python ferramentas/checar_determinismo.py ROM.gba --censo censo/functions.csv
+
+# a amostra versionada (evidencias/rom_bpre_amostra_levantada.c) sai daqui: o
+# cabecalho vem do JSON acima e os trechos, do .c da mesma rodada
+python ferramentas/recortar_amostra.py levantado_rom.c \
+        --analise evidencias/rom_bpre_analise.json \
+        --caso 0x080011E4 "tabela de casos lida da ROM virou switch" \
+        --caso 0x08014040 "desvio para tras: a leitura continua em OUTRA janela" \
+        --caso 0x081DC45A "bx rN recusado, com o motivo dito por inteiro" \
+        --orcamento 150 --saida evidencias/rom_bpre_amostra_levantada.c
 ```
 
+Os arquivos de `evidencias/` **nao sao retratos antigos**: dois testes comparam
+cada um com o que o pipeline produz agora — `test_readme_conta_a_mesma_rodada_
+da_evidencia` (tabelas do README contra `rom_bpre_analise.json`) e
+`test_evidencia_do_corpus_e_a_rodada_de_agora` (rodada do corpus, campo a campo,
+e o `.c` byte a byte). Se a medicao mudar e a evidencia nao, os testes caem; se o
+README citar numero de outra rodada, tambem. Conferido quebrando de proposito:
+trocar `"funcoes": 25` por `24` no JSON, ou um unico caractere no `.c` versionado,
+faz o teste falhar.
+
 `onde_estao_as_lacunas.py` responde o que o resumo nao responde: onde as lacunas
-se concentram (por pagina de 4 KB), se cairam em funcao do censo ou fora dele, e
-**de onde vem o registrador de cada `bx rN`** — foi ele que separou "falta
-implementar" de "a leitura estava engolindo a funcao anterior". Com
-`--regiao 0x...-0x...` ele lista o desmonte de uma faixa mostrando **todas** as
-funcoes donas de cada endereco (o caso que mais confunde).
+se concentram (por pagina de 4 KB), se cairam em funcao do censo ou fora dele,
+**de onde vem o registrador de cada `bx rN`** e **para onde vai cada desvio
+recusado** (buraco de outra janela, instrucao de outra janela, buraco na propria
+faixa ou endereco que leitura nenhuma alcancou) — foi ele que separou "falta
+implementar" de "a leitura saiu desta janela". Com `--regiao 0x...-0x...` ele
+lista o desmonte de uma faixa mostrando **todas** as funcoes donas de cada
+endereco (o caso que mais confunde).
 
 ## Como usar
 
@@ -211,7 +314,7 @@ Testes: `python -m pytest tests/ -q`
 | arquivo | o que faz |
 |---|---|
 | `rom.py` | acesso à ROM por endereço do espaço GBA, cabeçalho, espaço livre, leitura do `functions.csv` |
-| `corpus.py` | compila e empacota a ROM sintética (zig cc → Thumb), com a tabela de verdade de 59 casos |
+| `corpus.py` | compila e empacota a ROM sintética (zig cc → Thumb), com a tabela de verdade de 60 casos |
 | `disasm.py` | descoberta recursiva (bl, desvios, pools de literais) com modo herdado da chamada |
 | `decompile.py` | tradução instrução-a-instrução para C, com pilha em memória real e conferência de balanceamento |
 | `verificador.py` | emulador unicorn + comparação com a verdade-terreno, caso a caso, sem maquiagem |

@@ -128,20 +128,38 @@ def _classificar(codigo: decompile_mod.CodigoC) -> dict:
     }
 
 
-def _recusas(codigo: decompile_mod.CodigoC) -> tuple[dict, dict]:
-    """Histograma do que ficou de fora, por mnemonico e por motivo."""
+def _recusas(codigo: decompile_mod.CodigoC) -> tuple[dict, dict, int]:
+    """O que ficou de fora: por mnemonico, por motivo e o TOTAL.
+
+    O total vem separado de proposito. A versao anterior devolvia so' os dois
+    histogramas, e o de motivos era cortado em 12 grupos e truncado em 90
+    caracteres para caber no relatorio -- o que fazia a soma dele (67) nao ter
+    nada a ver com o numero de recusas (189). Numero cuja soma nao fecha vira
+    citacao errada: "67 recusas" e' uma frase que o JSON deixava escrever.
+
+    Os motivos passam por `motivo_canonico` antes de contar: quase todo motivo carrega
+    o endereco do desvio dentro do texto, entao sem canonizar cada um vira um
+    grupo de 1 e o histograma nao agrupa nada.
+    """
     por_mnemonico: collections.Counter = collections.Counter()
     por_motivo: collections.Counter = collections.Counter()
+    total = 0
     for f in codigo.funcoes:
         for item in f.nao_levantadas:
+            total += 1
             # formato: "0x08001234 mov pc, r0: <motivo>"
             corpo, _, motivo = item.partition(": ")
             partes = corpo.split(" ", 1)
             if len(partes) == 2:
                 por_mnemonico[partes[1].split(",")[0].split(" ")[0]] += 1
-            por_motivo[motivo[:90]] += 1
+            por_motivo[motivo_canonico(motivo)] += 1
     return (dict(por_mnemonico.most_common()),
-            {k: v for k, v in por_motivo.most_common(12)})
+            dict(por_motivo.most_common()), total)
+
+
+def motivo_canonico(motivo: str) -> str:
+    """Troca os enderecos de um motivo por `0x...` -- para os motivos agruparem."""
+    return re.sub(r"0x[0-9A-Fa-f]+", "0x...", motivo)
 
 
 @dataclass
@@ -156,6 +174,7 @@ class Medicao:
     boot: dict = field(default_factory=dict)
     completo: dict = field(default_factory=dict)
     levantamento: dict = field(default_factory=dict)
+    recusas_total: int = 0
     recusas_mnemonico: dict = field(default_factory=dict)
     recusas_motivo: dict = field(default_factory=dict)
     descartes_por_semente: dict = field(default_factory=dict)
@@ -226,9 +245,19 @@ class Medicao:
                                      key=lambda x: -x[1]):
                 linhas.append(f"  {n:5d}  vindos de {semente}")
         if self.recusas_mnemonico:
-            linhas += ["", "instrucoes recusadas (o lifter nao inventa traducao):"]
+            quantos = len(self.recusas_mnemonico)
+            linhas += ["", f"instrucoes recusadas: {self.recusas_total} no total "
+                           f"(o lifter nao inventa traducao) -- {quantos} mnemonicos:"]
             for mnemonico, n in list(self.recusas_mnemonico.items())[:12]:
                 linhas.append(f"  {n:5d}  {mnemonico}")
+            if quantos > 12:
+                linhas.append(f"  ... (+{quantos - 12} mnemonicos; o JSON tem todos)")
+            linhas.append("por motivo (enderecos trocados por 0x..., a soma e' o total):")
+            for motivo, n in list(self.recusas_motivo.items())[:8]:
+                linhas.append(f"  {n:5d}  {motivo}")
+            if len(self.recusas_motivo) > 8:
+                linhas.append(f"  ... (+{len(self.recusas_motivo) - 8} motivos; "
+                              f"o JSON tem todos)")
         if self.conferencia:
             c = self.conferencia
             linhas += ["", f"conferencia byte a byte: {c.get('identicas')}/{c.get('total')} "
@@ -315,7 +344,8 @@ def medir(caminho_rom: str | Path, censo: str | Path | None = None,
 
     codigo = decompile_mod.decompilar(desmontagem, dados, nomes=nomes or None)
     medicao.levantamento = _classificar(codigo)
-    medicao.recusas_mnemonico, medicao.recusas_motivo = _recusas(codigo)
+    (medicao.recusas_mnemonico, medicao.recusas_motivo,
+     medicao.recusas_total) = _recusas(codigo)
 
     # Descartes: quantos vieram de ponteiro de pool, de chamada ou de semente.
     contagem: collections.Counter = collections.Counter()

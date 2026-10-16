@@ -33,6 +33,9 @@ def _cmd_rodada(args) -> int:
         print()
         print(resultado.relatorio_levantado.texto() if resultado.relatorio_levantado
               else "sem verificacao do C levantado")
+    if args.json:
+        Path(args.json).write_text(resultado.para_json(), encoding="utf-8")
+        print(f"JSON da rodada gravado em {args.json}")
     falhas = 0
     for rel in (resultado.relatorio_original, resultado.relatorio_levantado):
         falhas += len(rel.reprovados) if rel else 1
@@ -156,6 +159,7 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("rodada", help="roda o pipeline completo no corpus sintetico")
     p.add_argument("--saida", help="diretorio de trabalho (padrao: temporario)")
+    p.add_argument("--json", help="gravar o resultado da rodada em JSON (evidencia)")
     p.set_defaults(func=_cmd_rodada)
 
     p = sub.add_parser("disasm", help="descoberta recursiva de funcoes")

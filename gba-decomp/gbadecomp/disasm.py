@@ -40,15 +40,94 @@ GRUPO_RETORNO = (capstone.CS_GRP_RET,)
 # sufixos `.w` vindos de dados, com aparencia perfeitamente plausivel.
 # ---------------------------------------------------------------------------
 FORA_DO_ARM7TDMI = {
+    # ARMv6 (saturacao e paralelismo de 16 bits): `ssat r4, #8, r0` foi lido numa
+    # janela da ROM e o filtro dizia que a instrucao EXISTIA -- nao existe.
+    "ssat", "usat", "ssat16", "usat16", "sel",
+    "sadd8", "sadd16", "ssub8", "ssub16", "uadd8", "uadd16", "usub8", "usub16",
+    "shadd8", "shadd16", "shsub8", "shsub16", "uhadd8", "uhadd16", "uhsub8",
+    "uhsub16", "qadd8", "qadd16", "qsub8", "qsub16", "uadd8", "sxtb16", "uxtb16",
     "cdp2", "mcr2", "mrc2", "udf", "bkpt", "cbz", "cbnz", "ldrd", "strd",
     "sdiv", "udiv", "dmb", "dsb", "isb", "wfi", "wfe", "sev", "pld", "pli",
     "ldrex", "strex", "clz", "bfc", "bfi", "rev16", "revsh", "sxtb", "sxth",
     "uxtb", "uxth", "smlabb", "smlabt", "smlaltb", "smlaltt", "smulbb",
     "qadd", "qsub", "qdadd", "qdsub", "bxj", "eret", "rfe", "srs", "blx",
 }
+# ARMv5TE para cima, NOS DOIS MODOS -- familia DSP de multiplicacao (SMLAxy,
+# SMULxy, SMULWy), `pkhtb`/`pkhbt` e `hint`. Medido na ROM: `orn sl, r7,
+# #0x520052` (em 0x081A6798) e `smlawt r8, sl, ip, r0` (0x081C6CDC) chegavam ao
+# lifter como "mnemonico nao implementado" -- como se fosse codigo do alvo que o
+# lifter ainda nao cobre. Nao e': essas instrucoes nao EXISTEM no ARM7TDMI, entao
+# ali a leitura passou por dado.
+FORA_DO_ARMV4T_SEMPRE = {
+    "orn", "orns", "hint", "pkhbt", "pkhtb",
+    "smlabb", "smlabt", "smlatb", "smlatt", "smlalbb", "smlalbt", "smlaltb",
+    "smlaltt", "smlawb", "smlawt", "smulbb", "smulbt", "smultb", "smultt",
+    "smulwb", "smulwt", "smulwy", "smlalwy",
+}
+# Formas de coprocessador com letra colada no nome: `ldcl`, `stcl`, `ldc2`,
+# `stc2`, `cdp2`, `mcr2`, `mrc2` (o `l`/`2` faz parte da mesma instrucao). A
+# lista abaixo so' pega a forma exata, e foi por isso que `ldcl` (3 vezes) e
+# `stcl` (3 vezes) passaram pelo filtro no modo Thumb.
+FORMAS_DE_COPROCESSADOR = ("ldc", "stc", "cdp", "mcr", "mrc")
+TAMANHO_THUMB1 = 2      # toda instrucao Thumb que o ARM7TDMI executa
+TAMANHO_THUMB2 = 4      # codificacao de 32 bits: prefixos 11101/11110/11111
+
+
+def forma_impossivel_no_thumb1(ins, modo: str) -> str | None:
+    """Motivo para uma FORMA que nao existe no Thumb-1 -- sem mexer na leitura.
+
+    Existe porque a mesma regra foi testada em dois papeis, e eles nao sao o
+    mesmo:
+
+      * como filtro do desmontador (que PARA a leitura no ponto), ela derruba a
+        cobertura de forma medida: -46 475 instrucoes e -26 tabelas de casos na
+        ROM de estudo, porque bloco de dado tem byte com cara de Thumb-2 e a
+        leitura que parava no primeiro deles nao chegava mais ao codigo depois;
+      * como motivo do lifter, ela so' troca um texto FALSO ("forma aritmetica nao
+        implementada", como se faltasse implementar) por um verdadeiro (a
+        instrucao nao existe no alvo: aqui a leitura passou por dado).
+
+    Entao ela vive aqui: quem levanta o C pergunta, o desmontador nao. Medido na
+    ROM: `adc r4, r4, #0xd000` (0x0845A3B6) e `adc r6, r4, #0xf00` (0x0845A3BA),
+    em janelas Thumb, num trecho que termina em "codigo invalido". As duas tem
+    QUATRO bytes; `44 f5 50 44` e' uma codificacao de 32 bits.
+    """
+    if modo != "thumb":
+        return None
+    # A pergunta certa e' sobre a CODIFICACAO, nao sobre o texto que o capstone
+    # MOSTRA. Duas tentativas anteriores perguntaram pelo nome + pelos operandos
+    # impressos, e as duas erraram feio (esta escrito aqui porque a terceira vez
+    # seria a mesma coisa):
+    #   * `lsls`/`lsrs`/`asrs` + imediato EXISTEM no Thumb-1 (formatos 1 e 3 do
+    #     mapa de opcodes): a lista errada derrubou 11 testes e quebrou o
+    #     reconhecimento das tabelas de casos (`lsls rI, rI, #2`);
+    #   * `rsbs r0, r1, #0` e' o `neg` do Thumb-1, escrito em DOIS bytes (`48 42`):
+    #     o `#0` que o capstone mostra nao esta codificado em lugar nenhum. A
+    #     regra por operando marcou 1 750 instrucoes validas como inexistentes e
+    #     o C levantado NAO COMPILOU (rodada r12 -- o erro era do filtro, nao da
+    #     ROM).
+    # O que separa os dois casos e' o tamanho: Thumb do ARM7TDMI e' 16 bits, e a
+    # codificacao de 32 bits comeca com prefixos que no Thumb-1 sao indefinidos --
+    # se a leitura chegou num deles, ela passou por dado.
+    # EXCECAO MEDIDA: o `bl` do Thumb-1 TAMBEM e' uma codificacao de 32 bits
+    # (prefixo 11110), e o ARM7TDMI executa -- e' assim que o Thumb chama
+    # sub-rotina. Sem esta excecao a regra recusava 23 chamadas do corpus e o
+    # levantado parava de reproduzir a verdade-terreno.
+    if len(ins.bytes) >= TAMANHO_THUMB2 and ins.mnemonic.lower().split(".")[0] != "bl":
+        return ("codificacao de 32 bits do Thumb-2: o ARM7TDMI executa so' as "
+                "formas Thumb de 16 bits (e o `bl` de 32 bits, que o capstone "
+                "escreve sem sufixo)")
+    return None
+# ATENCAO ao editar esta lista: agora que ela PARA a leitura (fim da funcao),
+# uma entrada errada custa instrucoes de verdade. A versao anterior tinha "adr" e
+# "mul", que EXISTEM no Thumb-1 -- e o estrago apareceu na medicao: **56 funcoes
+# terminavam em `adr`** por causa disso. `02 a0` e' `adr r0, #8`, que no Thumb-1 e'
+# `add r0, pc, #8`; `48 43` e' `muls r0, r1, r0`, do Thumb-1 tambem. O que NAO
+# existe no Thumb-1 (e fica): `rev`/`swp`/`mrs`/`msr`/`umull`/`smull` (ARMv5), as
+# de coprocessador, `ldmib`/`stmib` e `blx` (ARMv5T).
 FORA_DO_V4T_SO_NO_THUMB = {
-    "adr", "rev", "mrs", "msr", "umull", "umlal", "smull", "smlal", "swp",
-    "swpb", "ldc", "stc", "mcr", "mrc", "cdp", "ldmib", "stmib", "mul",
+    "rev", "mrs", "msr", "umull", "umlal", "smull", "smlal", "swp",
+    "swpb", "ldc", "stc", "mcr", "mrc", "cdp", "ldmib", "stmib",
 }
 SUFIXOS_THUMB2 = (".w", ".n")
 
@@ -62,7 +141,7 @@ def impossivel_no_arm7tdmi(ins, modo: str) -> str | None:
     base = mnemonic.split(".")[0]
     if base.startswith("it"):
         return f"IT block ({base}): nao existe no ARMv4T"
-    if base in FORA_DO_ARM7TDMI:
+    if base in FORA_DO_ARM7TDMI or base in FORA_DO_ARMV4T_SEMPRE:
         return f"{base}: instrucao inexistente no ARM7TDMI"
     # NEON/VFP: o ARM7TDMI do GBA nao tem FPU nem vetoriais. Qualquer mnemonic
     # comecando com "v" aqui e dado lido como codigo (visto: vhadd.u8, vrev64.8).
@@ -72,8 +151,14 @@ def impossivel_no_arm7tdmi(ins, modo: str) -> str | None:
                     "ldc2", "stc2", "cdp2", "mcr2", "mrc2", "blx", "bxns", "vc"):
         if base.startswith(prefixo):
             return f"{base}: coprocessador 2 nao existe no ARM7TDMI"
-    if modo == "thumb" and base in FORA_DO_V4T_SO_NO_THUMB:
-        return f"{base}: existe no ARM do ARMv4T, mas nao no Thumb-1"
+    if modo == "thumb":
+        if base in FORA_DO_V4T_SO_NO_THUMB:
+            return f"{base}: existe no ARM do ARMv4T, mas nao no Thumb-1"
+        if base.startswith(FORMAS_DE_COPROCESSADOR):
+            return f"{base}: coprocessador nao existe no Thumb-1"
+        if base in ("stmdb", "ldmdb", "stmib", "ldmib"):
+            return (f"{base}: no Thumb-1 os blocos so' existem como `push`/`pop`/"
+                    f"`stmia`/`ldmia` -- isto e' a forma do Thumb-2")
     return None
 
 @dataclass
