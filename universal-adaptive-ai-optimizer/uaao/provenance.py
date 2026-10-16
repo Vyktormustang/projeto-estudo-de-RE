@@ -9,7 +9,9 @@ politica de seguranca que proibe executar processos.
 from __future__ import annotations
 
 import hashlib
+import os
 import platform
+import sqlite3
 import sys
 from pathlib import Path
 from typing import Any
@@ -40,8 +42,6 @@ def git_commit(start: Path | None = None) -> str:
             ref = content.split("ref:", 1)[1].strip()
             ref_file = parent / ".git" / ref
             sha = _read_text_safe(ref_file)
-            if shas := ref_file.parent.glob(f"{ref_file.name}*"):
-                pass
             if sha:
                 return sha.splitlines()[0]
             # ref pode estar empacotada em packed-refs
@@ -62,8 +62,8 @@ def environment_fingerprint() -> dict[str, Any]:
         "implementation": platform.python_implementation(),
         "platform": platform.platform(),
         "machine": platform.machine(),
-        "cpu_count": __import__("os").cpu_count(),
-        "sqlite": __import__("sqlite3").sqlite_version,
+        "cpu_count": os.cpu_count(),
+        "sqlite": sqlite3.sqlite_version,
         "gpu": "nenhuma detectada (projeto nao usa GPU)",
     }
 

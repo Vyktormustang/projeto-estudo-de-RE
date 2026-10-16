@@ -172,7 +172,6 @@ def test_target_policy_scores_perfect_on_every_builtin_suite(registered_suites, 
     """
     from uaao.graders import run_grader
 
-    target = __import__("uaao.promptspec", fromlist=["x"])
     from uaao.types import PromptArtifact
 
     prompt = PromptArtifact(text=render(["Siga a politica."], dict(PREFERRED_VALUES), header="alvo"))

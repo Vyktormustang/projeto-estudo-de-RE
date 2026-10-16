@@ -1,6 +1,6 @@
 {
   "report_version": 1,
-  "experiment_id": "exp-b5b7de1cf251",
+  "experiment_id": "exp-c42e0c017b56",
   "name": "opt-merged",
   "suite": {
     "suite_id": "merged",
@@ -22,7 +22,7 @@
     }
   },
   "run": {
-    "experiment_id": "exp-b5b7de1cf251",
+    "experiment_id": "exp-c42e0c017b56",
     "name": "opt-merged",
     "seed_sha": "938ef38acc6b",
     "final_sha": "bff3d9c20461",
@@ -1464,7 +1464,7 @@
       "max_retries": 3,
       "cost_units": 0.0,
       "max_cost_units": 100.0,
-      "elapsed_s": 0.196,
+      "elapsed_s": 0.215,
       "max_wall_seconds": 900.0
     },
     "determinism_ok": true,
@@ -1480,9 +1480,9 @@
       "set_directive"
     ],
     "context": {
-      "timestamp_utc": "2026-10-16T15:54:59+00:00",
+      "timestamp_utc": "2026-10-16T16:02:45+00:00",
       "code_version": "0.1.0",
-      "git_commit": "eabe82b31af26f6ff4f8a415cf8af74b08d5b4fd",
+      "git_commit": "fe919b1d5708a992f9b497cb626fa1654bf00978",
       "executor": "policy_reference_v1",
       "seed": 1729,
       "environment": {
@@ -1520,9 +1520,9 @@
           "min_improved_fraction": 0.0,
           "use_holdout_for_selection": false
         },
-        "db_path": "/tmp/runA/uaao_memory.sqlite3",
-        "reports_dir": "/tmp/runA/reports",
-        "audit_path": "/tmp/runA/audit/audit.jsonl",
+        "db_path": "/tmp/run_final/uaao_memory.sqlite3",
+        "reports_dir": "/tmp/run_final/reports",
+        "audit_path": "/tmp/run_final/audit/audit.jsonl",
         "default_executor": "policy_reference_v1",
         "random_seed": 1729,
         "enabled_executors": [
@@ -1530,7 +1530,7 @@
         ],
         "safety_policy_fingerprint": "5d43bbf70b9278c4"
       },
-      "context_digest": "45681626a58e97a9"
+      "context_digest": "e870d0da83f4c81a"
     }
   },
   "criteria": [
@@ -1545,10 +1545,10 @@
   ],
   "versions": {
     "experiment": {
-      "id": "exp-b5b7de1cf251",
+      "id": "exp-c42e0c017b56",
       "name": "opt-merged",
       "status": "finished",
-      "created_at": "2026-10-16T15:54:59+00:00",
+      "created_at": "2026-10-16T16:02:45+00:00",
       "suite_id": "merged",
       "suite_sha": "b576e604933c",
       "executor": "policy_reference_v1",
@@ -1787,13 +1787,13 @@
     "max_retries": 3,
     "cost_units": 0.0,
     "max_cost_units": 100.0,
-    "elapsed_s": 0.196,
+    "elapsed_s": 0.215,
     "max_wall_seconds": 900.0
   },
   "context": {
-    "timestamp_utc": "2026-10-16T15:54:59+00:00",
+    "timestamp_utc": "2026-10-16T16:02:45+00:00",
     "code_version": "0.1.0",
-    "git_commit": "eabe82b31af26f6ff4f8a415cf8af74b08d5b4fd",
+    "git_commit": "fe919b1d5708a992f9b497cb626fa1654bf00978",
     "executor": "policy_reference_v1",
     "seed": 1729,
     "environment": {
@@ -1831,9 +1831,9 @@
         "min_improved_fraction": 0.0,
         "use_holdout_for_selection": false
       },
-      "db_path": "/tmp/runA/uaao_memory.sqlite3",
-      "reports_dir": "/tmp/runA/reports",
-      "audit_path": "/tmp/runA/audit/audit.jsonl",
+      "db_path": "/tmp/run_final/uaao_memory.sqlite3",
+      "reports_dir": "/tmp/run_final/reports",
+      "audit_path": "/tmp/run_final/audit/audit.jsonl",
       "default_executor": "policy_reference_v1",
       "random_seed": 1729,
       "enabled_executors": [
@@ -1841,7 +1841,7 @@
       ],
       "safety_policy_fingerprint": "5d43bbf70b9278c4"
     },
-    "context_digest": "45681626a58e97a9"
+    "context_digest": "e870d0da83f4c81a"
   },
   "config": {
     "limits": {
@@ -1868,9 +1868,9 @@
       "min_improved_fraction": 0.0,
       "use_holdout_for_selection": false
     },
-    "db_path": "/tmp/runA/uaao_memory.sqlite3",
-    "reports_dir": "/tmp/runA/reports",
-    "audit_path": "/tmp/runA/audit/audit.jsonl",
+    "db_path": "/tmp/run_final/uaao_memory.sqlite3",
+    "reports_dir": "/tmp/run_final/reports",
+    "audit_path": "/tmp/run_final/audit/audit.jsonl",
     "default_executor": "policy_reference_v1",
     "random_seed": 1729,
     "enabled_executors": [

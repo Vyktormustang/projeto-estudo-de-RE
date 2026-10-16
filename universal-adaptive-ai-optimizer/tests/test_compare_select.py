@@ -5,6 +5,8 @@ Cobre o requisito: "Regressoes entre versoes".
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
 from uaao.compare import bootstrap_ci, compare, is_improvement_significant, sign_test_p_value
@@ -39,7 +41,7 @@ def mk_eval(artifact: str, scores: dict[str, float], critical: set[str] | None =
     (1, 2, 1.0),
     (2, 6, 2 * (1 + 6 + 15) / 64),
     (0, 0, 1.0),
-    (4, 20, 2 * sum(__import__("math").comb(20, i) for i in range(0, 5)) / 2 ** 20),
+    (4, 20, 2 * sum(math.comb(20, i) for i in range(0, 5)) / 2 ** 20),
 ])
 def test_sign_test_exact_values(k, n, expected):
     assert sign_test_p_value(k, n) == pytest.approx(min(1.0, expected))
