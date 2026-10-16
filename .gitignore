@@ -4,3 +4,5 @@ emu/*.bin
 deliver/
 *.pyc
 __pycache__/
+emu/states_usuario/
+*.st0
