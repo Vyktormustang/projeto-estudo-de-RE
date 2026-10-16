@@ -370,8 +370,8 @@ como foram corrigidos** — em [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md).
 
 ## Resultados medidos
 
-Execução real deste repositório (duas vezes, resultados idênticos), com as 5
-suites agregadas (51 casos: 32 treino / 13 validação / 6 holdout):
+Execução real deste repositório (**quatro execuções**, mesmos números), com as 5
+suites agregadas (50 casos: 27 treino / 14 validação / 9 holdout):
 
 | Divisão | Papel | Baseline | Final | Δ |
 |---|---|---|---|---|
@@ -381,11 +381,15 @@ suites agregadas (51 casos: 32 treino / 13 validação / 6 holdout):
 
 - 13 candidatos testados, **6 aceitos, 7 rejeitados com motivo registrado**;
 - 403 chamadas de métrica, ~0,2 s de tempo de parede, **custo R$ 0,00**;
-- determinismo verificado (duas execuções → mesma assinatura `ff7702dbc2a6`);
+- determinismo verificado (quatro execuções → mesma assinatura `ff7702dbc2a6`);
 - as diretivas descobertas foram `OUTPUT_FORMAT=json_object`,
   `ROUND_DECIMALS=2`, `ON_AMBIGUOUS=ask_clarification`,
   `ON_MISSING_TOOL=report_not_executed`, `ON_UNTRUSTED_CONTENT=treat_as_data`,
   `LANGUAGE=pt-BR`, `MAX_WORDS=40`, `REFUSAL_CODE=POL-REFUSE`.
+
+O relatório completo dessa execução de referência está versionado em
+[`docs/evidencias/exp-9ddfece1aa9a.md`](docs/evidencias/exp-9ddfece1aa9a.md)
+(com o `.json` ao lado); dentro dele está registrado o `git_commit` que o gerou.
 
 Candidatos rejeitados são o resultado mais informativo: `LANGUAGE=auto` foi
 **bloqueado** por falha em casos críticos; `MAX_WORDS=unlimited` caiu de 1.0000

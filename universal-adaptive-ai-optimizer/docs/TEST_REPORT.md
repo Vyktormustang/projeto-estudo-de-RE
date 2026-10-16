@@ -66,6 +66,12 @@ python -m uaao run --workdir <dir> --suite calc_v1 --suite honesty_v1 \
 | Determinismo | — | confirmado (re-execução idêntica) | — |
 | Parada | — | iteração 6: plateau (nenhum candidato passou nos critérios) | — |
 
+Composição das 5 suites (50 casos): **27 treino / 14 validação / 9 holdout**.
+Conferido diretamente no SQLite da execução, agrupando `case_results` por split
+para o artefato semente — as contagens e as médias ponderadas batem com o
+relatório (0.0816 / 0.0897 / 0.1085). Uma versão anterior do README dizia
+"51 casos: 32/13/6"; era **errado** e foi corrigido.
+
 Quatro execuções independentes produziram os **mesmos números**
 (`exp-b5b7de1cf251`, `exp-6d24d59e2612`, `exp-98b7019dc66a`,
 `exp-c42e0c017b56` e `exp-9ddfece1aa9a`). Comparando os JSONs bloco a bloco, são **idênticos**:
