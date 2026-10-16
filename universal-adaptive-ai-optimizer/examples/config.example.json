@@ -1,0 +1,34 @@
+{
+  "db_path": ".uaao/uaao_memory.sqlite3",
+  "reports_dir": ".uaao/reports",
+  "audit_path": ".uaao/audit/audit.jsonl",
+  "default_executor": "policy_reference_v1",
+  "random_seed": 1729,
+
+  "limits": {
+    "max_iterations": 12,
+    "max_candidates_per_iteration": 6,
+    "max_metric_calls": 5000,
+    "max_retries": 3,
+    "max_wall_seconds": 900.0,
+    "max_case_output_chars": 4000
+  },
+
+  "costs": {
+    "max_cost_units": 100.0,
+    "cost_per_metric_call": 0.0,
+    "reference_usd_per_1k_calls": 0.0
+  },
+
+  "selection": {
+    "min_improvement": 0.02,
+    "per_case_regression_tolerance": 0.0,
+    "block_on_critical_regression": true,
+    "require_significance": true,
+    "significance_alpha": 0.05,
+    "min_decided_pairs": 8,
+    "max_metric_regression": 0.0,
+    "min_improved_fraction": 0.0,
+    "use_holdout_for_selection": false
+  }
+}

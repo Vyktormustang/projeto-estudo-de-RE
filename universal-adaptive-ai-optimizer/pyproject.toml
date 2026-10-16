@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "universal-adaptive-ai-optimizer"
+version = "0.1.0"
+description = "Camada externa de otimizacao de prompts/instrucoes por experimentacao, avaliacao objetiva e memoria persistente."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Vyktormustang" }]
+keywords = ["prompt-optimization", "evaluation", "experiment-tracking", "deterministic-metrics"]
+
+# DECISAO DE ARQUITETURA: zero dependencias de runtime.
+# Todo o nucleo usa apenas a biblioteca padrao do Python (sqlite3, json, hashlib,
+# statistics, argparse). Isso mantem o custo em R$ 0, elimina risco de
+# supply-chain e permite rodar em qualquer maquina sem pip install.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+uaao = "uaao.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["uaao*"]
+
+[tool.setuptools.package-data]
+uaao = ["suites/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,38 @@
+# Artefatos transitorios do uaao (memoria, relatorios, auditoria)
+.uaao/
+*.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.db-wal
+*.db-shm
+reports/
+audit/
+
+# Segredos: NUNCA versionar
+.env
+.env.*
+*.pem
+*.key
+.envrc
+
+# Ambientes virtuais e caches de ferramentas
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Editores / SO
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

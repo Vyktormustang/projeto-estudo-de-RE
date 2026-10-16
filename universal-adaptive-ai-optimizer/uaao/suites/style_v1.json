@@ -1,0 +1,119 @@
+{
+  "suite_id": "style_v1",
+  "version": "1.0.0",
+  "description": "Concisao e idioma fixo da resposta.",
+  "cases": [
+    {
+      "id": "concise-00",
+      "input": "kind=concise\nanswer=concluido com sucesso\ntext=informe o resultado do processamento",
+      "grader": "max_words",
+      "expected": 40,
+      "params": {},
+      "tags": [
+        "split:train",
+        "concisao"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "resposta deve caber em 40 palavras"
+    },
+    {
+      "id": "concise-01",
+      "input": "kind=concise\nanswer=lote 42 processado\ntext=resuma o status do lote",
+      "grader": "max_words",
+      "expected": 40,
+      "params": {},
+      "tags": [
+        "split:val",
+        "concisao"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "resposta deve caber em 40 palavras"
+    },
+    {
+      "id": "concise-02",
+      "input": "kind=concise\nanswer=validado sem erros\ntext=responda se o arquivo foi validado",
+      "grader": "max_words",
+      "expected": 40,
+      "params": {},
+      "tags": [
+        "split:train",
+        "concisao"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "resposta deve caber em 40 palavras"
+    },
+    {
+      "id": "concise-03",
+      "input": "kind=concise\nanswer=sincronizacao concluida\ntext=diga se a sincronizacao terminou",
+      "grader": "max_words",
+      "expected": 40,
+      "params": {},
+      "tags": [
+        "split:holdout",
+        "concisao"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "resposta deve caber em 40 palavras"
+    },
+    {
+      "id": "lang-00",
+      "input": "kind=language\nsource_lang=en\npt=o valor foi apurado\nen=the value was determined\ntext=Summarize the incident report for the client.",
+      "grader": "language",
+      "expected": "pt",
+      "params": {},
+      "tags": [
+        "split:train",
+        "idioma"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "politica do produto: responder sempre em pt-BR"
+    },
+    {
+      "id": "lang-01",
+      "input": "kind=language\nsource_lang=en\npt=o valor foi apurado\nen=the value was determined\ntext=List the deliverables of the project.",
+      "grader": "language",
+      "expected": "pt",
+      "params": {},
+      "tags": [
+        "split:val",
+        "idioma"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "politica do produto: responder sempre em pt-BR"
+    },
+    {
+      "id": "lang-02",
+      "input": "kind=language\nsource_lang=en\npt=o valor foi apurado\nen=the value was determined\ntext=Confirm the delivery date.",
+      "grader": "language",
+      "expected": "pt",
+      "params": {},
+      "tags": [
+        "split:train",
+        "idioma"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "politica do produto: responder sempre em pt-BR"
+    },
+    {
+      "id": "lang-03",
+      "input": "kind=language\nsource_lang=en\npt=o valor foi apurado\nen=the value was determined\ntext=Report the current status.",
+      "grader": "language",
+      "expected": "pt",
+      "params": {},
+      "tags": [
+        "split:train",
+        "idioma"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "politica do produto: responder sempre em pt-BR"
+    }
+  ]
+}
