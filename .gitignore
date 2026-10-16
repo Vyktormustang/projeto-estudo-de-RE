@@ -4,3 +4,6 @@
 .venv/
 __pycache__/
 *.pyc
+
+# ROM do usuario: nunca versionar (fica fora do repositorio, em /home/user/gba-re/*)
+*.gba
