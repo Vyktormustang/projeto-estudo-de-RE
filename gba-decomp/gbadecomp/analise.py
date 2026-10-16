@@ -26,6 +26,7 @@ from __future__ import annotations
 import collections
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -146,6 +147,8 @@ class Medicao:
     descartes_por_semente: dict = field(default_factory=dict)
     descartes: list = field(default_factory=list)
     linhas_c: int = 0
+    desvios_com_comparacao: int = 0
+    desvios_por_flag: int = 0
     bytes_c: int = 0
     conferencia: dict = field(default_factory=dict)
     compilacao: dict | None = None
@@ -186,6 +189,9 @@ class Medicao:
                 f"     parciais ....: {lev.get('parciais')} (lacuna marcada dentro do C)",
                 f"  sem corpo ......: {lev.get('sem_corpo')}",
                 f"  C ..............: {self.linhas_c} linhas / {self.bytes_c} bytes",
+                f"  desvios lidos do `cmp` como comparacao direta: "
+                f"{self.desvios_com_comparacao} (os outros "
+                f"{self.desvios_por_flag} saem por flag)",
             ]
         if self.descartes_por_semente:
             linhas += ["", f"descartes ({len(self.descartes)} enderecos tentados como "
@@ -283,6 +289,24 @@ def medir(caminho_rom: str | Path, censo: str | Path | None = None,
         for d in sorted(desmontagem.descartes.values(), key=lambda x: x.entrada)]
 
     texto_c = codigo.texto()
+    # REGRA (explicita de proposito -- numero sem definicao escrita nao e medicao):
+    # conta os `if (...) goto` cuja condicao virou COMPARACAO DIRETA entre
+    # registradores/constantes (`if ((s32)r1 >= (s32)0x0)`), que e o caso em que o
+    # `cmp` foi fundido no desvio. O resto sai testando flag (`if ((z))`,
+    # `if ((n == v))`), que e fiel mas nao ajuda quem le.
+    comparacao = re.compile(r"^\s*if \(.*\) goto .*;\s*$")
+    # Comparacao DIRETA e a condicao que usa >=, <=, > ou < (com ou sem `(s32)`).
+    # Teste de flag nunca usa esses operadores: sai como `if ((z))`, `if ((n == v))`,
+    # `if ((!c))`, `if ((c && !z))` -- fiel ao hardware, mas nao ajuda quem le.
+    direta = re.compile(r"(>=|<=|>|<)")
+    for linha in texto_c.splitlines():
+        if "goto" not in linha or not linha.lstrip().startswith("if ("):
+            continue
+        if comparacao.match(linha):
+            if direta.search(linha):
+                medicao.desvios_com_comparacao += 1
+            else:
+                medicao.desvios_por_flag += 1
     medicao.linhas_c = len(texto_c.splitlines())
     medicao.bytes_c = len(texto_c.encode("utf-8"))
     if caminho_c:

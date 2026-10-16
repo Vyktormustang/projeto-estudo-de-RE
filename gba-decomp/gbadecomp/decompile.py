@@ -121,6 +121,7 @@ class FuncaoDec:
     externos: list[str] = field(default_factory=list)   # alvos de chamada sem corpo
     balanceamento: str = "desconhecido"
     terminacao: str = "indefinida"                      # como o fluxo terminou
+    declaracoes: list[str] = field(default_factory=list)  # temporarios do switch
 
     @property
     def completa(self) -> bool:
@@ -242,6 +243,8 @@ class CodigoC:
                           "tratado explicitamente, ver comentarios */")
             linhas.append("    u32 z = 0, n = 0, c = 0, v = 0;")
             linhas.append("    u32 sp = PILHA_TOPO, sp0 = sp;")
+            for declaracao in f.declaracoes:
+                linhas.append(f"    {declaracao}")
             linhas.append("    (void)r1; (void)r2; (void)r3;")
             for linha in f.corpo.splitlines():
                 linhas.append(f"    {linha}")
@@ -281,6 +284,22 @@ class _Emissor:
         for ins in funcao.instrucoes:
             if ins.alvo is not None and ins.alvo in desmontados:
                 self.rotulos.setdefault(ins.alvo, f"L_{ins.alvo:08X}")
+        # Tabelas de casos: cada alvo lido da tabela E um destino de salto, logo
+        # precisa de rotulo (as instrucoes desses alvos foram desmontadas dentro
+        # desta funcao -- o desmontador segue a tabela, ver disasm._tabela_de_casos).
+        self.tabelas = {t.endereco: t for t in funcao.tabelas}
+        # So emite `switch` quando da para fazer isso sem inventar: todos os
+        # alvos precisam existir como endereco desmontado DESTA funcao (senao o
+        # `goto` apontaria para rotulo inexistente e o C nao compilaria) e a
+        # escala do indice precisa ter sido vista (o `lsls` antes da soma).
+        self.tabelas_emitidas = {}
+        for t in funcao.tabelas:
+            if t.deslocamento is None or not all(a in desmontados for a in t.alvos):
+                continue
+            for alvo in t.alvos:
+                self.rotulos.setdefault(alvo, f"L_{alvo:08X}")
+            self.tabelas_emitidas[t.endereco] = t
+        self.capturas = {t.indice_endereco: t for t in self.tabelas_emitidas.values()}
 
     # -- utilitarios ------------------------------------------------------
     def _rotulo(self, endereco: int) -> str:
@@ -308,6 +327,12 @@ class _Emissor:
             self._indice_instrucao = indice
             if ins.endereco in self.rotulos:
                 self._emitir(f"{self._rotulo(ins.endereco)}: ;")
+            if ins.endereco in self.capturas:
+                tabela = self.capturas[ins.endereco]
+                # Guardar o indice ANTES do `adds` (que soma a base da tabela):
+                # depois do `ldr rI, [rI]` o registrador ja nao tem mais o indice.
+                self._emitir(f"idx_{tabela.endereco:08X} = "
+                             f"{self._nome(tabela.indice_reg)};")
             try:
                 decodificada = list(self.cs.disasm(ins.bytes_, ins.endereco, count=1))[0]
                 self._traduzir(decodificada)
@@ -325,6 +350,10 @@ class _Emissor:
             balanceamento=("balanceada" if self.sp_modelo == 0
                            else f"desequilibrada ({self.sp_modelo} slots)"),
             terminacao=self.f.terminacao,
+            declaracoes=[f"u32 idx_{t.endereco:08X} = 0;  /* indice da tabela de "
+                         f"casos em 0x{t.tabela:08X} */"
+                         for t in sorted(self.tabelas_emitidas.values(),
+                                         key=lambda x: x.endereco)],
         )
 
     # -- traducao ---------------------------------------------------------
@@ -380,11 +409,27 @@ class _Emissor:
                 if origem == "lr":
                     self._emitir("return r0;  /* mov pc, lr */")
                     return
-                # `mov pc, rN` = salto CALCULADO (tabela de casos). Traduzir como
-                # atribuicao a uma variavel seria mentira silenciosa: fica marcado
-                # e a funcao passa a ser PARCIAL, com o aviso na saida.
+                # `mov pc, rN` = salto CALCULADO (tabela de casos). Quando a
+                # tabela foi RECONHECIDA e lida da ROM (criterios em
+                # disasm._tabela_de_casos), o C sai com `switch` de verdade e os
+                # destinos que o proprio binario declara. Quando nao, traduzir
+                # como atribuicao seria mentira silenciosa: fica marcado e a
+                # funcao sai PARCIAL.
+                tabela = self.tabelas_emitidas.get(ins.address)
+                if tabela is not None:
+                    self._emitir(f"/* tabela de casos em 0x{tabela.tabela:08X}: "
+                                 f"{len(tabela.alvos)} casos lidos da ROM "
+                                 f"(indice x{1 << tabela.deslocamento}) */")
+                    self._emitir(f"switch (idx_{tabela.endereco:08X} >> "
+                                 f"{tabela.deslocamento}) {{")
+                    for numero, destino in enumerate(tabela.alvos):
+                        self._emitir(f"    case {numero}: goto {self._rotulo(destino)};")
+                    self._emitir("    default: g_erro |= 2; break;   /* fora da tabela */")
+                    self._emitir("}")
+                    self._emitir("return r0;   /* inalcancavel: todo caso salta */")
+                    return
                 self._emitir(f"/* PC calculado em {origem}: tabela de casos nao "
-                             f"modelada */")
+                             f"reconhecida */")
                 self._emitir("g_erro |= 2;")
                 self._emitir("return r0;")
                 self.nao_levantadas.append(

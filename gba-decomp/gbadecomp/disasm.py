@@ -102,6 +102,7 @@ class FuncaoDesmontada:
     chamadas: list[tuple[int, int]] = field(default_factory=list)   # (end. bl, destino)
     terminacao: str = "indefinida"
     semente: str = "?"               # de onde veio esta funcao
+    tabelas: list[TabelaCasos] = field(default_factory=list)
 
     @property
     def fim(self) -> int:
@@ -117,7 +118,29 @@ class FuncaoDesmontada:
     def texto(self) -> list[str]:
         cab = (f"func {self.entrada:08X} ({self.modo}, {self.tamanho} B, "
                f"semente: {self.semente}, fim: {self.terminacao})")
-        return [cab] + [f"    {i}" for i in self.instrucoes]
+        tabelas = [f"    {t.texto()}" for t in self.tabelas]
+        return [cab] + tabelas + [f"    {i}" for i in self.instrucoes]
+
+
+@dataclass
+class TabelaCasos:
+    """Tabela de saltos lida da ROM (o `switch` que o compilador gerou).
+
+    `alvos` sao os enderecos dos corpos dos casos, lidos da propria tabela -- nao
+    deduzidos: se a tabela tem 6 entradas, foram lidos 6 enderecos da ROM.
+    """
+
+    endereco: int          # onde esta o `mov pc, rX`
+    tabela: int            # endereco da tabela na imagem
+    alvos: list[int]
+    indice_endereco: int   # onde esta o `adds rI, rI, rB`
+    indice_reg: int = -1   # registrador do indice (id do capstone)
+    deslocamento: int | None = None
+
+    def texto(self) -> str:
+        escala = f", indice x{1 << self.deslocamento}" if self.deslocamento is not None else ""
+        return (f"tabela de casos em 0x{self.tabela:08X}: {len(self.alvos)} casos{escala}; "
+                f"salto em 0x{self.endereco:08X}")
 
 
 @dataclass
@@ -192,6 +215,11 @@ class Desmontagem:
                         "semente": f.semente,
                         "terminacao": f.terminacao,
                         "chamadas": [f"0x{d:08X}" for _, d in f.chamadas],
+                        "tabelas": [
+                            {"salto": f"0x{t.endereco:08X}", "tabela": f"0x{t.tabela:08X}",
+                             "casos": len(t.alvos), "deslocamento": t.deslocamento,
+                             "alvos": [f"0x{a:08X}" for a in t.alvos]}
+                            for t in f.tabelas],
                         "instrucoes": [
                             {"endereco": f"0x{i.endereco:08X}", "bytes": i.bytes_.hex(),
                              "asm": f"{i.mnemonic} {i.operadores}".strip()}
@@ -358,6 +386,19 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
 
             # 3) retornos: fim da funcao
             if _eh_retorno(ins):
+                if _eh_salto_calculado(ins):
+                    # `mov pc, rX`: salto calculado. Se for tabela de casos
+                    # RECONHECIDA (criterios em _tabela_de_casos), os corpos dos
+                    # casos sao parte DESTA funcao -- entram na fila, como os
+                    # alvos de um desvio condicional. Sem isso eles ficam fora
+                    # da desmontagem e a funcao nao tem como virar `switch`.
+                    anteriores = sorted(
+                        (i for i in funcao.instrucoes if i.endereco < ins.address),
+                        key=lambda i: i.endereco)
+                    tabela = _tabela_de_casos(imagem, base, anteriores, ins, cs)
+                    if tabela is not None:
+                        funcao.tabelas.append(tabela)
+                        pendente.extend(tabela.alvos)
                 funcao.terminacao = f"{ins.mnemonic} {ins.op_str}".strip()
                 break
 
@@ -446,6 +487,133 @@ def _eh_retorno(ins) -> bool:
     if ins.mnemonic == "ldr" and ins.op_str.startswith("pc,"):
         return True
     return False
+
+
+def _eh_salto_calculado(ins) -> bool:
+    """`mov pc, rX` / `add pc, rX` -- tabela de casos, nao retorno."""
+    return (ins.mnemonic in ("mov", "add") and ins.op_str.startswith("pc,")
+            and "lr" not in ins.op_str and "sp" not in ins.op_str)
+
+
+def _operandos_de(imagem: bytes, base: int, instrucao, cs):
+    """Re-desmonta UMA instrucao ja lida, so para ter os operandos do capstone."""
+    off = instrucao.endereco - base
+    lista = list(cs.disasm(imagem[off:off + len(instrucao.bytes_)],
+                           instrucao.endereco, count=1))
+    return lista[0] if lista else None
+
+
+def _tabela_de_casos(imagem: bytes, base: int, anteriores: list, ins, cs):
+    """Reconhece o idioma de tabela de casos e devolve o que leu da ROM.
+
+    Idioma (304 dos 306 sitios da ROM de estudo, ver ferramentas/estudo_switch.py):
+
+        lsls rI, rI, #2          ; indice * 4
+        ldr  rB, [pc, #N]        ; rB = base da tabela, vinda do pool
+        adds rI, rI, rB          ; rI = indice*4 + base
+        ldr  rI, [rI]            ; rI = tabela[indice]  <- endereco do caso
+        mov  pc, rI              ; salto
+
+    Criterios de aceitacao (sem eles isto seria adivinhacao):
+      1. as tres instrucoes anteriores batem com o idioma, na ordem;
+      2. a base da tabela vem de um `ldr rB, [pc, #N]` e o valor E um endereco
+         dentro da imagem;
+      3. TODAS as entradas lidas sao enderecos de codigo alinhados na imagem;
+      4. existe um guarda `cmp rX, #k` antes, e k+1 E IGUAL ao numero de
+         entradas lidas -- confirmacao independente: o guarda diz quantos casos
+         existem, a tabela tem de ter exatamente essa quantidade;
+      5. a primeira instrucao de cada alvo existe no ARM7TDMI (nao para no
+         filtro de dado-lido-como-codigo).
+
+    Devolve None se QUALQUER criterio falhar: ai a funcao continua marcada como
+    parcial, em vez de o desmontador inventar codigo.
+    """
+    # ATENCAO: `anteriores` vem em ordem de ENDERECO, nao em ordem de travessia
+    # -- a travessia segue desvios e volta, entao a lista da funcao nao esta
+    # ordenada quando esta funcao e chamada (bug real: olhar para o fim da lista
+    # nao reconheceu nenhuma das 309 tabelas).
+    if len(anteriores) < 3:
+        return None
+    anterior = _operandos_de(imagem, base, anteriores[-1], cs)
+    antes = _operandos_de(imagem, base, anteriores[-2], cs)
+    if anterior is None or antes is None:
+        return None
+    # `ldr rI, [rI]` (offset zero) e `adds rI, rI, rB`
+    if not (anterior.mnemonic == "ldr" and len(anterior.operands) == 2
+            and all(o.type == capstone.arm.ARM_OP_REG or o.type == capstone.arm.ARM_OP_MEM
+                    for o in anterior.operands)
+            and anterior.operands[0].type == capstone.arm.ARM_OP_REG
+            and anterior.operands[1].type == capstone.arm.ARM_OP_MEM
+            and anterior.operands[1].mem.base == anterior.operands[0].reg
+            and anterior.operands[1].mem.disp == 0):
+        return None
+    if not (antes.mnemonic.startswith("add") and len(antes.operands) == 3
+            and all(o.type == capstone.arm.ARM_OP_REG for o in antes.operands)
+            and antes.operands[0].reg == antes.operands[1].reg
+            and antes.operands[0].reg == anterior.operands[0].reg):
+        return None
+    registrador_base = antes.operands[2].reg
+    registrador_indice = antes.operands[0].reg
+
+    # onde o indice foi multiplicado (so para o comentario do C)
+    deslocamento = None
+    for atras in anteriores[-6:-2]:
+        candidata = _operandos_de(imagem, base, atras, cs)
+        if (candidata is not None and candidata.mnemonic.startswith("lsl")
+                and len(candidata.operands) == 3
+                and candidata.operands[0].type == capstone.arm.ARM_OP_REG
+                and candidata.operands[0].reg == registrador_indice
+                and candidata.operands[2].type == capstone.arm.ARM_OP_IMM):
+            deslocamento = candidata.operands[2].imm
+            break
+
+    # a base da tabela vem de um `ldr rB, [pc, #N]` (dentro desta funcao)
+    tabela = None
+    for atras in reversed(anteriores[-40:]):
+        candidata = _operandos_de(imagem, base, atras, cs)
+        if (candidata is not None and candidata.mnemonic == "ldr"
+                and len(candidata.operands) == 2
+                and candidata.operands[0].type == capstone.arm.ARM_OP_REG
+                and candidata.operands[0].reg == registrador_base
+                and candidata.operands[1].type == capstone.arm.ARM_OP_MEM
+                and candidata.operands[1].mem.base == capstone.arm.ARM_REG_PC):
+            pool = ((candidata.address + 4) & ~3) + candidata.operands[1].mem.disp
+            valor = _ler32(imagem, base, pool)
+            if valor is not None and base <= valor < base + len(imagem):
+                tabela = valor
+            break
+    if tabela is None:
+        return None
+
+    # guarda `cmp rX, #k` -- diz quantos casos existem, sem depender da tabela
+    guarda = None
+    for atras in reversed(anteriores[-18:]):
+        candidata = _operandos_de(imagem, base, atras, cs)
+        if (candidata is not None and candidata.mnemonic.startswith("cmp")
+                and len(candidata.operands) == 2
+                and candidata.operands[1].type == capstone.arm.ARM_OP_IMM):
+            guarda = candidata.operands[1].imm
+            break
+    if guarda is None:
+        return None
+
+    alvos = []
+    for indice in range(guarda + 1):
+        valor = _ler32(imagem, base, tabela + 4 * indice)
+        if valor is None or not (base <= (valor & ~1) < base + len(imagem)):
+            return None
+        alvos.append(valor & ~1)
+
+    # cada alvo tem de comecar com instrucao que EXISTE no ARM7TDMI
+    for alvo in alvos:
+        inicio = alvo - base
+        lidas = list(cs.disasm(imagem[inicio:inicio + 4], alvo, count=1))
+        if not lidas or impossivel_no_arm7tdmi(lidas[0], "thumb") is not None:
+            return None
+
+    return TabelaCasos(endereco=ins.address, tabela=tabela, alvos=alvos,
+                       indice_endereco=antes.address, indice_reg=registrador_indice,
+                       deslocamento=deslocamento)
 
 
 def _termina_fluxo(ins) -> bool:

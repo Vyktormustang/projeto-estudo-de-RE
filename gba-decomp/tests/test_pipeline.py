@@ -266,3 +266,122 @@ def test_verificador_reporta_divergencia_sem_maquiar(tmp_path):
         corpus.Corpus(rom_path=str(destino), sha256="", total_funcoes=c.total_funcoes,
                       funcoes=c.funcoes, comando_compilacao="", compilador="", c_fonte=""))
     assert rel.reprovados, "um binario alterado nao pode passar como correto"
+
+def _imagem_com_tabela_de_casos(guarda: int = 2) -> bytes:
+    """Monta uma imagem minima com o idioma REAL de tabela de casos (Thumb).
+
+    Bytes escritos a mao porque o codificador escolhe codificacoes mais largas
+    quando voce escreve o mnemonico (deslocando o layout) -- e aqui o layout e o
+    que esta sendo testado. Os bytes sao conferidos pelo proprio desmontador no
+    inicio do teste, entao um erro de codificacao falha em vez de passar.
+
+        0x40  cmp r0, #guarda      ; o guarda diz quantos casos existem
+        0x42  bhi 0x0800006C       ; fora da faixa
+        0x44  lsls r0, r0, #2      ; indice * 4
+        0x46  ldr r1, [pc, #0xC]   ; pool em 0x08000054 -> endereco da tabela
+        0x48  adds r0, r0, r1
+        0x4A  ldr r0, [r0]         ; endereco do caso, lido da tabela
+        0x4C  mov pc, r0
+        0x54  .word 0x08000080     ; a tabela
+        0x58/0x5C/0x60  corpos dos casos 0, 1, 2
+        0x6C  corpo do padrao (para onde o `bhi` manda)
+        0x80  tabela: 3 enderecos PARES (no Thumb `mov pc, rN` alinha em
+              meia-palavra: o bit0 nao carrega modo)
+    """
+    base = rom.ROM_BASE
+    casos = [0x08000058, 0x0800005C, 0x08000060]
+    padrao = 0x0800006C
+    tabela = 0x08000080
+    imagem = bytearray(0x100)
+
+    def meia(endereco: int, valor: int) -> None:
+        imagem[endereco - base:endereco - base + 2] = valor.to_bytes(2, "little")
+
+    meia(0x08000040, 0x2800 | guarda)          # cmp r0, #guarda
+    meia(0x08000042, 0xD800 | ((padrao - 0x08000046) // 2))   # bhi padrao
+    meia(0x08000044, 0x0080)                   # lsls r0, r0, #2
+    meia(0x08000046, 0x4903)                   # ldr r1, [pc, #0xC]
+    meia(0x08000048, 0x1840)                   # adds r0, r0, r1
+    meia(0x0800004A, 0x6800)                   # ldr r0, [r0]
+    meia(0x0800004C, 0x4687)                   # mov pc, r0 (D=1 e Rd=r7 -> r15)
+    for endereco in (0x0800004E, 0x08000050, 0x08000052):
+        meia(endereco, 0x0000)                 # preenchimento ate o pool
+    # ATENCAO: `0x54 - base` seria NEGATIVO (indice do fim em Python) e o slice
+    # inseriria bytes no comeco, deslocando o layout inteiro -- bug real que o
+    # teste de autoconferencia pegou.
+    imagem[0x08000054 - base:0x08000058 - base] = tabela.to_bytes(4, "little")
+    for numero, endereco in enumerate(casos):
+        meia(endereco, 0x2000 | ((numero + 1) * 0x10))   # movs r0, #N
+        meia(endereco + 2, 0x4770)                       # bx lr
+    meia(padrao, 0x20FF)                       # movs r0, #0xFF
+    meia(padrao + 2, 0x4770)                   # bx lr
+    for numero, endereco in enumerate(casos):
+        inicio = tabela + 4 * numero
+        imagem[inicio - base:inicio - base + 4] = endereco.to_bytes(4, "little")
+    return bytes(imagem)
+
+
+def test_imagem_de_teste_decodifica_o_que_ela_promete():
+    """Autoconferencia da imagem usada nos testes de tabela: os bytes a mao
+    precisam desmontar exatamente no idioma esperado."""
+    imagem = _imagem_com_tabela_de_casos()
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    (funcao,) = desmontagem.funcoes.values()
+    lidas = [(i.endereco, i.mnemonic, i.operadores) for i in funcao.instrucoes]
+    assert (0x08000040, "cmp", "r0, #2") in lidas
+    assert (0x08000044, "lsls", "r0, r0, #2") in lidas
+    assert (0x08000046, "ldr", "r1, [pc, #0xc]") in lidas
+    assert (0x08000048, "adds", "r0, r0, r1") in lidas
+    assert (0x0800004A, "ldr", "r0, [r0]") in lidas
+    assert (0x0800004C, "mov", "pc, r0") in lidas
+    assert (0x08000058, "movs", "r0, #0x10") in lidas
+
+
+def test_desmontador_segue_a_tabela_de_casos(tmp_path):
+    """`mov pc, rX` com tabela reconhecida: os corpos dos casos sao desmontados.
+
+    Sem isso os alvos ficam fora da funcao e um `switch` no C apontaria para
+    rotulo inexistente (nao compila) -- foi o que a sonda mediu na ROM real
+    (19 de 34 alvos desmontados antes de seguir a tabela).
+    """
+    imagem = _imagem_com_tabela_de_casos()
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    (funcao,) = desmontagem.funcoes.values()
+    (tabela,) = funcao.tabelas
+    assert tabela.tabela == 0x08000080
+    assert tabela.alvos == [0x08000058, 0x0800005C, 0x08000060]
+    assert tabela.deslocamento == 2
+    desmontados = {i.endereco for i in funcao.instrucoes}
+    assert set(tabela.alvos) <= desmontados, "a tabela tem de ser seguida"
+
+
+def test_lift_emite_switch_a_partir_da_tabela_lida_da_rom(tmp_path):
+    """O C do salto calculado sai com `switch` real, e compila."""
+    imagem = _imagem_com_tabela_de_casos()
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert levantada.completa, levantada.nao_levantadas
+    assert "switch (idx_0800004C >> 2)" in levantada.corpo
+    assert "case 0: goto L_08000058;" in levantada.corpo
+    assert "case 2: goto L_08000060;" in levantada.corpo
+    assert "default: g_erro |= 2;" in levantada.corpo
+    # `goto` para rotulo que nao existe e erro de compilacao -- e o teste que
+    # garante que o switch emitido e C valido
+    corpus.compilar_thumb(codigo.texto(), tmp_path / "switch.o")
+    assert (tmp_path / "switch.o").exists()
+
+
+def test_tabela_sem_guarda_que_bata_nao_vira_switch():
+    """Criterio de recusa: se o `cmp rX, #k` nao bater com o numero de entradas
+    lidas da tabela, NAO se reconhece tabela nenhuma -- a funcao continua
+    PARCIAL, em vez de o lifter publicar um `switch` inventado."""
+    imagem = _imagem_com_tabela_de_casos(guarda=5)      # guarda diz 6, tabela tem 3
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000040: "thumb"})
+    (funcao,) = desmontagem.funcoes.values()
+    assert funcao.tabelas == [], "nao pode reconhecer tabela que nao fecha com o guarda"
+    codigo = decompile.decompilar(desmontagem, imagem)
+    (levantada,) = codigo.funcoes
+    assert not levantada.completa
+    assert "nao reconhecida" in levantada.corpo
+    assert "switch" not in levantada.corpo
