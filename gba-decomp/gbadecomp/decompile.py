@@ -408,6 +408,14 @@ class _Emissor:
                 f"instrucao que nao existe no ARM7TDMI ({forma_impossivel}): "
                 f"aqui a leitura passou por dado, nao por codigo")
 
+        # `pc` LIDO como operando: o valor e' constante conhecida em tempo de
+        # traducao, mas o C levantado NAO guarda o endereco da instrucao em `pc`
+        # (o `pc` do C existe so' para RECEBER desvio) -- entao traduzir pelo
+        # caminho comum emite a expressao errada (medido: `add lr, pc, #0` saia
+        # como `lr = pc + 0`, com pc = 0). Aqui a constante e' dobrada, a mesma
+        # conta que o `adr` ja' fazia.
+        if self._le_pc_como_fonte(ins):
+            return self._pc_como_fonte(ins, m)
         if m in ("push", "pop"):
             return self._pilha(ins, m)
         if m in ("b", "bl", "blx") or m in [f"b{c}" for c in CONDICOES]:
@@ -496,8 +504,25 @@ class _Emissor:
                 # Nao inventamos valor para eles: so N e Z sao atualizados.
                 self._emitir(f"z = ({destino} == 0); n = ({destino} >> 31);")
             return
-        if m in ("stm", "stmia", "ldm", "ldmia"):
+        if m in ("stmdb", "ldmia"):
+            # No ARM, PUSH E' `stmdb sp!` e POP E' `ldmia sp!` -- as MESMAS
+            # instrucoes, com o sp escrito por extenso. Elas vao para o caminho da
+            # PILHA (que mantem o modelo de pilha usado para reconhecer o epilogo
+            # `pop {rN}; bx rN`), com a lista SEM o registrador base. Medido na
+            # ROM de estudo: em ARM existe UM bloco assim (`stmdb sp!, {lr}` em
+            # 0x08000368, no IRQ_HANDLER); os outros 1 155 sao Thumb (`stm`/`ldm`).
+            operands = ins.operands
+            base = self._reg(operands[0]) if operands else ""
+            if base == "sp" and "!" in ins.op_str:
+                lista = [self._reg(o) for o in operands[1:]
+                         if o.type == capstone.arm.ARM_OP_REG]
+                return self._pilha(ins, "push" if m == "stmdb" else "pop", lista)
+        if m in ("stm", "stmia", "ldm", "ldmia", "stmdb", "ldmdb", "stmib", "ldmib"):
+            # `_multipla` trata os quatro modos de enderecamento (ia/ib/da/db, com
+            # o writeback de cada um) -- e' o caminho dos blocos que NAO sao pilha.
             return self._multipla(ins, m)
+        if m in ("mrs", "msr"):
+            return self._psr(ins, m)
         if m in ("svc", "swi"):
             numero = (op[0].imm if op and op[0].type == capstone.arm.ARM_OP_IMM else 0)
             self._emitir(f"r0 = bios_svc(0x{numero:X}u, r0, r1, r2, r3);  "
@@ -522,6 +547,139 @@ class _Emissor:
         raise _NaoLevantado("mnemonico nao implementado (a instrucao existe no "
                             "ARMv4T; falta traduzir)")
 
+    def _pc_da_instrucao(self, ins) -> int:
+        """O valor que a instrucao LE quando le `pc`.
+
+        Thumb: (endereco + 4) alinhado a 4 bytes; ARM: endereco + 8. E' a mesma
+        conta do `adr` e do pool de literais -- errar isso desloca tudo em 4
+        bytes. Fica numa funcao so' porque agora ha' TRES lugares que precisam
+        dela (adr, pool de literais e as instrucoes que LEEM pc).
+        """
+        if self.f.modo == "thumb":
+            return (ins.address + 4) & ~3
+        return ins.address + 8
+
+    def _le_pc_como_fonte(self, ins) -> bool:
+        """A instrucao LE `pc` como operando -- fora as formas ja' tratadas?
+
+        Ficam de fora, de proposito:
+          * `ldr rX, [pc, #N]` -- o pool de literais, tratado em `_memoria`;
+          * `mov pc, rX` / `ldr pc, ...` -- `pc` como DESTINO (retorno/tabela);
+          * `push`/`pop`/`stm*`/`ldm*` -- a lista do bloco nao e' operando de
+            leitura (o `pop {r4, pc}` e' retorno, tratado antes).
+        """
+        if ins.mnemonic.lower().split(".")[0] in (
+                "push", "pop", "stm", "stmia", "stmdb", "stmib", "ldm", "ldmia",
+                "ldmdb", "ldmib"):
+            return False
+        for indice, operando in enumerate(ins.operands):
+            if (operando.type == capstone.arm.ARM_OP_REG
+                    and operando.reg == capstone.arm.ARM_REG_PC):
+                if indice > 0:
+                    return True
+            elif (operando.type == capstone.arm.ARM_OP_MEM
+                    and operando.mem.base == capstone.arm.ARM_REG_PC
+                    and not ins.mnemonic.startswith("ldr")):
+                return True
+        return False
+
+    def _pc_como_fonte(self, ins, m: str) -> None:
+        """Traduz o que tem valor EXATO; recusa o resto com o motivo dito.
+
+        Medido na ROM de estudo (3 sitios em 460 868 instrucoes): `add lr, pc, #0`
+        (0x0800036C, a chamada ARM->Thumb montada a mao), `add r8, pc` (0x0839FEB8)
+        e `mov r2, pc` (0x0800C280). As tres formas sao dobradas para a constante;
+        o que nao estiver aqui (forma com `s` mexendo nas flags, `cmp` contra pc,
+        escrita em `[pc, ...]`) e' RECUSADO: o modelo nao tem o endereco da
+        instrucao para calcular, e emitir a expressao com a variavel `pc` daria C
+        que compila e conta errado -- era o que acontecia com `add lr, pc, #0`,
+        que saia como `lr = pc + 0` com `pc` valendo 0.
+        """
+        op = ins.operands
+        valor = self._pc_da_instrucao(ins)
+        origem = f"pc desta instrucao (0x{ins.address:08X})"
+        if m in ("mov", "movs") and len(op) == 2 and self._reg(op[1]) == "pc":
+            self._emitir(f"{self._reg(op[0])} = 0x{valor:08X}u;  /* {origem} */")
+            return
+        if m in ("add", "sub"):
+            destino = self._reg(op[0]) if op else "?"
+            sinal = "+" if m == "add" else "-"
+            if (len(op) == 3 and self._reg(op[1]) == "pc"
+                    and op[2].type == capstone.arm.ARM_OP_IMM):
+                imediato = op[2].imm & 0xFFFFFFFF
+                # imediato 0 sai como a constante sozinha: `0x...u + 0x0u` e' a
+                # mesma conta, mas polui o C (medido: `add lr, pc, #0`).
+                conta = (f"0x{valor:08X}u" if imediato == 0
+                         else f"0x{valor:08X}u {sinal} 0x{imediato:X}u")
+                self._emitir(f"{destino} = {conta};  /* {origem} */")
+                return
+            if len(op) == 2 and self._reg(op[1]) == "pc":
+                # Thumb-1 formato 5: `add rD, pc` = rD = rD + pc (nao mexe em flags)
+                self._emitir(f"{destino} = {destino} + 0x{valor:08X}u;  "
+                             f"/* + {origem} */")
+                return
+        raise _NaoLevantado(
+            f"leitura de pc como operando ({ins.mnemonic} {ins.op_str}): o C "
+            f"levantado nao guarda o endereco da instrucao -- `pc` no C existe so' "
+            f"para receber desvio; so' `mov rD, pc` e `add/sub rD, pc, #imm` tem o "
+            f"valor dobrado em tempo de traducao")
+
+    def _psr(self, ins, m: str) -> None:
+        """PSR: LER o PSR e' recusa declarada; escrever SO' o campo de flags traduz.
+
+        O modelo do C levantado tem o PSR como quatro variaveis 0/1 (`z`, `n`,
+        `c`, `v`): nao existe CPSR, nao existe SPSR, nao existe modo do
+        processador, nao existe mascara de IRQ.
+
+          * escrever o campo de FLAGS (`apsr_f`/`cpsr_f`) -- exato, os quatro
+            bits sao os quatro que o modelo tem;
+          * LER `cpsr`/`spsr`/`apsr` -- recusa: no ARMv4T o valor lido carrega
+            tambem modo e mascara de IRQ, que o modelo nao tem -- qualquer valor
+            emitido seria inventado. (O capstone 5 chama de `apsr` a leitura de
+            CPSR: e' o MESMO encoding, com o nome do ARMv6+; no ARM7TDMI o
+            encoding 0xE10F0000 e' `mrs rX, cpsr`.)
+          * escrever o campo de CONTROLE (`cpsr_fc`, `cpsr_c`) -- recusa, mesmo
+            motivo.
+
+        Medido na ROM de estudo (IRQ_HANDLER_arm_boot, 0x08000248): `mrs r0, spsr`
+        (0x08000258), `mrs r3, apsr` (0x0800034C) e `msr cpsr_fc, r3` (0x08000358,
+        o que escreve a mascara de interrupcao) ficam recusados -- com o motivo
+        dizendo que e' LIMITE DO MODELO, e nao trabalho que falta no levantador.
+        """
+        op = ins.operands
+        if m == "mrs":
+            destino = self._reg(op[0]) if op else "?"
+            fonte = ins.op_str.split(",")[-1].strip().lower()
+            if len(op) > 1 and op[1].type == capstone.arm.ARM_OP_REG:
+                nome = ins.reg_name(op[1].reg)
+                if nome:
+                    fonte = nome.lower()
+            raise _NaoLevantado(
+                f"leitura do PSR (`{fonte}`) nao tem traducao: o C levantado tem o "
+                f"PSR como quatro variaveis 0/1 (z, n, c, v) -- o valor lido no "
+                f"ARMv4T carrega tambem o modo do processador e a mascara de IRQ, e "
+                f"traduzir seria inventar o valor")
+        # `msr`: o nome do campo vem do TEXTO -- o capstone marca o operando como
+        # ARM_OP_SYSREG mas nao da' nome a ele (reg_name devolve None), e o texto
+        # e' o que o desmonte mostra para quem for conferir.
+        campo = ins.op_str.split(",")[0].strip().lower()
+        origem = (self._reg(op[1]) if len(op) > 1
+                  and op[1].type == capstone.arm.ARM_OP_REG else "?")
+        if campo not in ("apsr_f", "cpsr_f"):
+            # `apsr_nzcvq` e' como o capstone 5 NOMEIA o encoding do campo de flags
+            # (`msr cpsr_f, r3` = e1 28 f0 03) -- e o nome inclui o bit Q, que e'
+            # saturacao e NAO existe no modelo. Por isso `apsr_nzcvq` tambem e'
+            # recusado: traduzir seria escrever um bit que o C nao tem. Nao ha
+            # nenhum `msr` deste tipo na ROM de estudo (o unico e' o `cpsr_fc`).
+            raise _NaoLevantado(
+                f"escrita no PSR (`{campo}`) no campo de CONTROLE: o C levantado "
+                f"nao tem modo do processador nem mascara de IRQ -- so' as flags "
+                f"z/n/c/v, que sao o campo `f`; o bit Q tambem nao existe no modelo")
+        self._emitir(f"n = ({origem} >> 31) & 1; z = ({origem} >> 30) & 1; "
+                     f"c = ({origem} >> 29) & 1; v = ({origem} >> 28) & 1;  "
+                     f"/* msr {campo}: so' as flags */")
+        self._limpar_flags()
+
     def _adr(self, ins) -> None:
         """`adr rD, #imm` -- o endereco e' calculado a partir do PC desta instrucao.
 
@@ -536,7 +694,7 @@ class _Emissor:
         if (not op or op[0].type != capstone.arm.ARM_OP_REG
                 or len(op) < 2 or op[1].type != capstone.arm.ARM_OP_IMM):
             raise _NaoLevantado("adr sem registrador e imediato")
-        pc = (ins.address + 4) & ~3 if self.f.modo == "thumb" else ins.address + 8
+        pc = self._pc_da_instrucao(ins)
         valor = pc + op[1].imm
         self._emitir(f"{self._reg(op[0])} = 0x{valor:08X}u;  "
                      f"/* adr: pc 0x{pc:08X} + 0x{op[1].imm:X} */")
@@ -557,7 +715,7 @@ class _Emissor:
         self._emitir("if (sp != sp0) { g_erro |= 1; }")
         self._emitir("return r0;")
 
-    def _pilha(self, ins, m) -> None:
+    def _pilha(self, ins, m, registradores: list[str] | None = None) -> None:
         """PUSH/POP com a semantica exata do ARM7TDMI.
 
         Detalhe que ja causou erro aqui: o PUSH **desce** o sp e grava em
@@ -566,7 +724,8 @@ class _Emissor:
         mais baixo) e o `pop {r1}` seguinte devolve o lr. Tratar a pilha como
         "LIFO classico" inverte tudo.
         """
-        regs = [self._reg(o) for o in ins.operands if o.type == capstone.arm.ARM_OP_REG]
+        regs = registradores if registradores is not None else [
+            self._reg(o) for o in ins.operands if o.type == capstone.arm.ARM_OP_REG]
         n = len(regs)
         if m == "push":
             self._emitir(f"sp -= {4 * n};")

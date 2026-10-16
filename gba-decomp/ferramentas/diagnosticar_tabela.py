@@ -49,7 +49,11 @@ def _detalhe(imagem: bytes, base: int, cs, funcao, site: int) -> dict:
             {"endereco": f"0x{item.endereco:08X}",
              "bytes": item.bytes_.hex(" "),
              "asm": f"{item.mnemonic} {item.operadores}".strip()})
-    # leitura bruta (sem os criterios): pool da base, guarda e as entradas
+    # leitura bruta (sem os criterios): pool da base, guarda e as entradas.
+    # O endereco da tabela fica em `tabela` (NUMERO): o texto de exibicao ja'
+    # carregou a explicacao "fora da imagem" e nao serve para calcular entrada --
+    # converter texto de volta para numero foi o segundo defeito desta sonda.
+    tabela = None
     for item in reversed(anteriores[-40:]):
         lida = disasm_mod._operandos_de(imagem, base, item, cs)
         if lida is None or lida.mnemonic != "ldr" or len(lida.operands) != 2:
@@ -63,7 +67,20 @@ def _detalhe(imagem: bytes, base: int, cs, funcao, site: int) -> dict:
             valor = disasm_mod._ler32(imagem, base, pool)
             if valor is not None:
                 detalhe["leitura_bruta"]["valor do pool"] = f"0x{valor:08X}"
-                detalhe["leitura_bruta"]["tabela"] = f"0x{valor:08X}"
+                if base <= valor < base + len(imagem):
+                    detalhe["leitura_bruta"]["tabela"] = f"0x{valor:08X}"
+                    tabela = valor
+                else:
+                    # Nao e' tabela: e' valor que so' existe fora da imagem (na
+                    # ROM de estudo, 0x04000120 = registrador de I/O do GBA). Sem
+                    # esta linha a sonda tentava ler as entradas num endereco que
+                    # nao existe e depois estourava ao imprimir (KeyError:
+                    # 'primeira') -- ferramenta de diagnostico que quebra no caso
+                    # que ela existe para diagnosticar nao serve para nada.
+                    detalhe["leitura_bruta"]["tabela"] = (
+                        f"0x{valor:08X} FORA da imagem "
+                        f"(0x{base:08X}-0x{base + len(imagem) - 1:08X})")
+                    detalhe["tabela_fora_da_imagem"] = True
             break
     guarda = None
     for item in reversed(anteriores[-18:]):
@@ -76,14 +93,14 @@ def _detalhe(imagem: bytes, base: int, cs, funcao, site: int) -> dict:
                                                   f"{lida.op_str}` em "
                                                   f"0x{lida.address:08X}")
             break
-    tabela_txt = detalhe["leitura_bruta"].get("tabela")
-    if guarda is not None and tabela_txt:
-        tabela = int(tabela_txt, 16)
+    if guarda is not None and tabela is not None:
         entradas = []
         for indice in range(guarda + 1):
             valor = disasm_mod._ler32(imagem, base, tabela + 4 * indice)
             if valor is None:
-                entradas.append({"indice": indice, "valor": "(fora da imagem)"})
+                entradas.append({"indice": indice, "valor": "(fora da imagem)",
+                                 "primeira": "(fora da imagem)",
+                                 "existe_no_alvo": False})
                 continue
             alvo = valor & ~1
             lidas = list(cs.disasm(imagem[alvo - base:alvo - base + 4], alvo, count=1))
@@ -211,6 +228,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"=== 0x{site:08X} na janela 0x{funcao.entrada:08X} "
                   f"(semente: {funcao.semente}) ===")
             print(f"veredito: {detalhe['veredito']} -- {detalhe['motivo']}")
+            if detalhe.get("tabela_fora_da_imgem") or detalhe.get("tabela_fora_da_imagem"):
+                print("ATENCAO: o valor lido do pool NAO esta' na imagem -- mesmo "
+                      "que o idioma fechasse, nao ha' tabela de codigo ali")
             print("instrucoes anteriores:")
             for item in detalhe["anteriores"]:
                 print(f"   {item['endereco']}  {item['bytes']:<12} {item['asm']}")

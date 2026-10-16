@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `50 passed` |
+| testes automatizados | `55 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -55,9 +55,9 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 | saltos que saem da funcao para tras | 241 · 148 trechos orfaos voltaram como janela propria |
 | tabelas de casos | **377 reconhecidas**, 6 303 casos lidos da ROM → `switch` no C |
 | funcoes com C para ler | **8 027 completas + 145 parciais = 100%** |
-| C levantado | 1 056 640 linhas / 39,9 MB |
+| C levantado | 1 056 638 linhas / 39,9 MB |
 | conferencia byte a byte | **99,950%** das instrucoes remontam identicas ao binario |
-| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 164 980 bytes) |
+| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 164 988 bytes) |
 | determinismo | C, JSON e objeto compilado **identicos** em duas rodadas (`ferramentas/checar_determinismo.py`) |
 
 ### Achados que valem mais que os números
@@ -225,7 +225,8 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    e o motivo agora diz isso com a instrucao medida). Efeito: **375 → 377
    tabelas, 5 767 → 6 303 casos**, 8 153 → **8 172 funcoes** (os corpos dos casos
    passaram a entrar na desmontagem), 456 822 → **460 868 instrucoes**. As
-   recusas cairam de 193 para **192** — e o motivo das duas que sairam, o das
+   recusas cairam de 193 para **192** naquela rodada (191 hoje, item 15) — e o
+   motivo das duas que sairam, o das
    que ficaram e o das que apareceram (uma janela nova que termina em desvio para
    trecho nao desmontado) esta' no JSON, item a item.
 
@@ -251,12 +252,45 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    tres casos (coberto, nunca tentado, ja' descartado) num binario sintetico e
    cai se a leitura dos bytes deixar de ser feita.
 
+15. **O C levantado nao guarda o endereco da instrucao — e tres instrucoes liam
+   `pc`.** O modelo tem `pc` como variavel que so' serve para RECEBER desvio (vale
+   0), entao `add lr, pc, #0` saia como `lr = pc + 0`: C que compila e conta
+   errado, sem marca de lacuna nenhuma — o pior tipo de defeito deste projeto
+   (item 12). Medido o universo inteiro: **392 instrucoes** citam `pc` na ROM, das
+   quais 388 sao `mov pc, rX` (retorno/tabela, ja' tratados) e **3 LEEM `pc`** —
+   `add lr, pc, #0` em 0x0800036C (a chamada ARM→Thumb montada a mao), `add r8, pc`
+   em 0x0839FEB8 e `mov r2, pc` em 0x0800C280. As tres formas viraram **constante
+   dobrada em tempo de traducao**, com a conta no comentario
+   (`lr = 0x08000374u;  /* pc desta instrucao (0x0800036C) */`), pela mesma regra
+   que o `adr` ja' usava (endereco + 8 no ARM; endereco + 4 alinhado no Thumb — o
+   `mov r2, pc` de 0x0800C280 e o `add r8, pc` de 0x0839FEB8 leem o MESMO valor,
+   0x08000024 no caso do teste, porque o segundo cai em endereco nao alinhado). As
+   formas sem valor constante (`cmp rD, pc`, `add rD, rM, pc`, `str` em `[pc, ...]`)
+   sao **recusadas**, com o motivo dizendo exatamente isso. Na mesma passada, duas
+   fronteiras do modelo ficaram ditas com o motivo certo: no ARM, PUSH e POP **sao**
+   `stmdb sp!` / `ldmia sp!` — a unica ocorrencia da ROM (0x08000368, no
+   IRQ_HANDLER) era recusada e agora entra pelo caminho da pilha (o mesmo do `push`
+   do Thumb, que mantem o modelo usado para reconhecer o epilogo `pop {rN}; bx rN`);
+   e o PSR **nao existe** no modelo, entao ler `mrs r0, spsr` / `mrs r3, apsr` e
+   escrever o campo de CONTROLE (`msr cpsr_fc, r3`, o que mexe na mascara de IRQ)
+   ficam recusados — mas o texto agora diz **limite do modelo**, no lugar do
+   "mnemonico nao implementado / falta traduzir" que mandava procurar trabalho
+   inexistente. Efeito medido: **192 → 191 recusas**, 1 056 640 → 1 056 638 linhas
+   de C, objeto 2 164 980 → 2 164 988 B (`sha256` 82b93d74…); **todo o resto
+   identico** (8 172 funcoes, 460 868 instrucoes, 20 492 arestas, 377 tabelas /
+   6 303 casos, 8 027 + 145 completas/parciais, 460 639 identicas em 460 868).
+   Testes: `test_pc_lido_como_operando_vira_constante_e_nao_a_variavel_pc`,
+   `test_mov_e_add_com_pc_no_thumb1_usam_o_pc_alinhado`,
+   `test_leitura_de_pc_em_forma_sem_valor_constante_e_recusada` e
+   `test_stmdb_sp_do_arm_e_o_push_da_pilha_do_modelo` (bytes montados com keystone,
+   conferidos pelo capstone e conferidos contra os bytes da ROM).
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
 (99,950% remontam byte a byte; as 226 divergencias sao `cmp`/`bx` escritos com a
 outra codificacao valida da mesma instrucao), e o C gerado e **C valido para o
-alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 056 640
+alvo** (nenhum rotulo inexistente, nenhuma chamada sem declaracao, em 1 056 638
 linhas). Nao prova **semantica** -- foi exatamente esse tipo de defeito (item 12)
 que a conferencia de bytes deixou passar por uma rodada inteira.
 
@@ -274,9 +308,9 @@ levantado e recompilado.
 | desvio que sai da funcao (bloco comum de outra rotina) | 98 |
 | desvio condicional para endereco sem rotulo nesta janela | 32 — mesmas 4 classes de destino |
 | instrucao que **nao existe** no ARM7TDMI (dado lido como codigo) | 17 (codificacao de 32 bits do Thumb-2; ARMv5+/coprocessador nem chega aqui: **para** a leitura e vira `descarte`, 162 deles) |
-| instrucao que EXISTE no ARMv4T e o lifter ainda nao traduz | 4 (`mrs`, `msr`, `stmdb` no ARM) |
+| o PSR nao existe no MODELO (`mrs` lendo, `msr` escrevendo o campo de controle) | 3 — o valor lido no ARMv4T carrega modo e mascara de IRQ, que o C levantado nao tem (so' z/n/c/v) |
 | salto calculado por tabela que nao passou nos criterios | 2 |
-| **total** | **192** (13 em funcao do censo, 179 fora dele) |
+| **total** | **191** (13 em funcao do censo, 178 fora dele) |
 | destino de cada desvio recusado (relatorio separado) | 130: 47 buraco de outra janela, 31 instrucao de outra janela, 29 buraco da propria faixa, 23 ninguem desmontou |
 | o que HA' nos alvos que nenhuma janela cobriu | 110 de 65 911: 53 ja' tentados como semente e descartados, 55 nunca tentados (**os 55 param na primeira instrucao**), 2 fora da imagem — **0 sao codigo** |
 

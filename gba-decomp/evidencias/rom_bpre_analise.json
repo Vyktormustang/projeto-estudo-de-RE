@@ -37,7 +37,7 @@
     "percentual_com_c": 100.0,
     "funcoes_com_lacuna": 145
   },
-  "recusas_total": 192,
+  "recusas_total": 191,
   "recusas_mnemonico": {
     "b": 56,
     "bx": 39,
@@ -58,7 +58,6 @@
     "eor": 2,
     "rsb": 2,
     "msr": 1,
-    "stmdb": 1,
     "orr": 1,
     "bmi": 1,
     "adcs": 1,
@@ -78,9 +77,11 @@
     "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 8,
     "desvio para 0x..., sem rotulo nesta janela: dentro da faixa da janela 0x..., em trecho nao desmontado (buraco: la a leitura parou em dado)": 8,
     "salto para fora da funcao (0x...): fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 6,
-    "mnemonico nao implementado (a instrucao existe no ARMv4T; falta traduzir)": 4,
     "desvio para 0x..., sem rotulo nesta janela: fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 3,
     "salto calculado (tabela de casos) nao modelado": 2,
+    "leitura do PSR (`spsr`) nao tem traducao: o C levantado tem o PSR como quatro variaveis 0/1 (z, n, c, v) -- o valor lido no ARMv4T carrega tambem o modo do processador e a mascara de IRQ, e traduzir seria inventar o valor": 1,
+    "leitura do PSR (`apsr`) nao tem traducao: o C levantado tem o PSR como quatro variaveis 0/1 (z, n, c, v) -- o valor lido no ARMv4T carrega tambem o modo do processador e a mascara de IRQ, e traduzir seria inventar o valor": 1,
+    "escrita no PSR (`cpsr_fc`) no campo de CONTROLE: o C levantado nao tem modo do processador nem mascara de IRQ -- so' as flags z/n/c/v, que sao o campo `f`; o bit Q tambem nao existe no modelo": 1,
     "chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN`): o alvo veio de dado lido na ROM, sem assinatura declarada": 1
   },
   "tabelas_recusadas_total": 2,
@@ -1243,10 +1244,10 @@
       "bytes": "ff ff ff ff ff ff ff ff"
     }
   ],
-  "linhas_c": 1056640,
+  "linhas_c": 1056638,
   "desvios_com_comparacao": 7077,
   "desvios_por_flag": 16073,
-  "bytes_c": 39943782,
+  "bytes_c": 39944129,
   "conferencia": {
     "total": 460868,
     "identicas": 460639,
@@ -1295,10 +1296,10 @@
     "codigo_de_saida": 0,
     "n_erros": 0,
     "primeiros_erros": [],
-    "bytes_objeto": 2164980,
-    "sha256_objeto": "66c42fd35764ad229a7eaecab6d981f812f642d108c1818a3d7de1e4bce1faa6",
+    "bytes_objeto": 2164988,
+    "sha256_objeto": "82b93d7462678b53d9c094a83f451793d712c8d65220bc83e80389fe4fb0fe9a",
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/levantado_r14.c"
+  "caminho_c": "/home/user/gba-re/saida/levantado_r16.c"
 }

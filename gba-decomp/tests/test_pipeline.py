@@ -164,7 +164,12 @@ def test_levantador_avisa_o_que_nao_traduz():
     assert next(iter(desmontagem.funcoes.values())).modo == "arm"
     codigo = decompile.decompilar(desmontagem, imagem)
     assert codigo.incompletas, "MRS deveria constar como nao levantada"
-    assert "mnemonico nao implementado" in codigo.incompletas[0].nao_levantadas[0]
+    # O texto diz o LIMITE DO MODELO, e nao "falta implementar": no ARMv4T o valor
+    # lido do PSR carrega modo e mascara de IRQ, que o C levantado nao tem (e o
+    # capstone 5 nomeia esse encoding de `apsr`, nome do ARMv6+).
+    motivo = codigo.incompletas[0].nao_levantadas[0]
+    assert "PSR" in motivo and "mrs r0" in motivo, motivo
+    assert "mnemonico nao implementado" not in motivo, motivo
 
 
 def test_funcao_parcial_sai_marcada_e_detectavel(corpus_pronto):
@@ -885,14 +890,20 @@ def test_lifter_distingue_instrucao_que_nao_existe_de_falta_implementar():
     assert "passou por dado" in motivo, motivo
     assert "mnemonico nao implementado" not in motivo, motivo
 
-    # `mrs` no ARM EXISTE no ARMv4T (carrega spsr/cpsr): ai' "falta implementar"
-    # e' a verdade, e o texto tem de dizer isso -- sem sugerir que o alvo nao tem
-    # a instrucao.
-    imagem, desmontagem = monta("00 00 4f e1", 0x08000020, "arm")
+    # `mrs` no ARM EXISTE no ARMv4T (le' spsr/cpsr) -- mas o valor LIDO carrega
+    # modo e mascara de IRQ, que o modelo do C levantado nao tem (so' z/n/c/v). O
+    # texto tem de dizer isso: limite do MODELO, nao trabalho que falta.
+    imagem, desmontagem = monta("00 00 4f e1", 0x08000020, "arm")      # mrs r0, spsr
     codigo = decompile.decompilar(desmontagem, imagem, nomes={})
     motivo = next(i for i in codigo.funcoes[0].nao_levantadas if "mrs" in i)
-    assert "existe no ARMv4T" in motivo and "falta traduzir" in motivo, motivo
+    assert "nao tem traducao" in motivo and "PSR" in motivo, motivo
+    assert "falta traduzir" not in motivo, motivo
     assert "nao existe no ARM7TDMI" not in motivo, motivo
+    # e o `msr cpsr_fc, r3` (o que ESCREVE a mascara de IRQ) diz o limite tambem
+    imagem, desmontagem = monta("03 f0 29 e1", 0x08000020, "arm")      # msr cpsr_fc, r3
+    codigo = decompile.decompilar(desmontagem, imagem, nomes={})
+    motivo = next(i for i in codigo.funcoes[0].nao_levantadas if "msr" in i)
+    assert "CONTROLE" in motivo and "mascara de IRQ" in motivo, motivo
 
 
 def test_filtro_nao_rejeita_o_que_existe_no_thumb1():
@@ -1061,9 +1072,14 @@ def test_readme_conta_a_mesma_rodada_da_evidencia():
         "instrucao inexistente": (soma(lambda k: "codificacao de 32 bits" in k),
                                   "| instrucao que **nao existe** no ARM7TDMI (dado "
                                   "lido como codigo) | {} "),
-        "falta traduzir": (soma(lambda k: "falta traduzir" in k),
-                           "| instrucao que EXISTE no ARMv4T e o lifter ainda nao "
-                           "traduz | {} "),
+        # A categoria "falta traduzir" acabou: o que sobra de instrucao que EXISTE
+        # no ARMv4T nao e' trabalho pendente, e' LIMITE DO MODELO -- o C levantado
+        # nao tem PSR (so' as flags z/n/c/v). O texto publicado tem de ser o mesmo
+        # que o JSON mede (era o defeito dos "67" do item 10).
+        "PSR": (soma(lambda k: "PSR" in k),
+                "| o PSR nao existe no MODELO (`mrs` lendo, `msr` escrevendo o campo "
+                "de controle) | {} — o valor lido no ARMv4T carrega modo e mascara "
+                "de IRQ, que o C levantado nao tem (so' z/n/c/v) |"),
         "salto por tabela": (soma(lambda k: "salto calculado" in k),
                              "| salto calculado por tabela que nao passou nos "
                              "criterios | {} |"),
@@ -1239,6 +1255,29 @@ def test_sonda_de_tabela_roda_e_diz_o_motivo(tmp_path):
     assert "veredito: RECONHECIDA" in processo.stdout, processo.stdout
 
 
+def test_sonda_de_tabela_diz_quando_o_pool_aponta_para_fora_da_imagem(tmp_path):
+    """O valor lido do pool pode NAO ser endereco nenhum da imagem.
+
+    Medido na ROM de estudo (0x081DBEBA, um dos 2 `mov pc, rX` que ficam
+    recusados): o pool carrega **0x04000120** — registrador de I/O do GBA, nao
+    tabela de codigo. A sonda tentava ler as entradas num endereco que nao existe
+    e estourava (`KeyError: 'primeira'`, e depois `ValueError` ao converter de
+    volta o texto de exibicao) justamente no caso que ela existe para explicar.
+    """
+    imagem = bytearray(_imagem_com_tabela_guarda_no_pool(2))
+    imagem[0x5C:0x60] = (0x04000120).to_bytes(4, "little")   # pool -> fora da imagem
+    caminho = tmp_path / "sintetica.gba"
+    caminho.write_bytes(bytes(imagem))
+    processo = subprocess.run(
+        [sys.executable, str(RAIZ / "ferramentas" / "diagnosticar_tabela.py"),
+         str(caminho), "--entrada", "0x08000041", "--site", "0x0800004E"],
+        capture_output=True, text=True)
+    assert processo.returncode == 0, processo.stderr[-2000:]
+    assert "FORA da imagem" in processo.stdout, processo.stdout
+    assert "veredito: recusada" in processo.stdout, processo.stdout
+    assert "nao ha' tabela de codigo ali" in processo.stdout, processo.stdout
+
+
 def _carregar_sonda_de_lacunas():
     """`ferramentas/onde_estao_as_lacunas.py` e' script, nao modulo do pacote."""
     import importlib.util
@@ -1309,3 +1348,78 @@ def test_alvo_de_desvio_que_ninguem_cobriu_e_medido_nos_bytes():
     assert medido["alvos"] == {"nunca tentado": 1}, medido
     chave = next(iter(medido["exemplos"]))
     assert chave.startswith("para na primeira: codificacao de 32 bits"), chave
+
+
+def _imagem_de_teste(*instrucoes: tuple[int, str], tamanho: int = 0x600) -> bytes:
+    """Imagem com bytes hexa nos enderecos dados (o resto e' zero)."""
+    imagem = bytearray(tamanho)
+    for endereco, hexa in instrucoes:
+        dados = bytes.fromhex(hexa)
+        inicio = endereco - rom.ROM_BASE
+        imagem[inicio:inicio + len(dados)] = dados
+    return bytes(imagem)
+
+
+def test_pc_lido_como_operando_vira_constante_e_nao_a_variavel_pc():
+    """`add lr, pc, #0` (bytes REAIS da ROM: 00 e0 8f e2) tem valor constante.
+
+    O C levantado nao guarda o endereco da instrucao em `pc` -- a variavel existe
+    para RECEBER desvio e vale 0 --, entao traduzir `pc` lido como operando pelo
+    caminho comum emitia a conta errada: medido na ROM de estudo, `add lr, pc, #0`
+    (0x0800036C, a chamada ARM->Thumb montada a mao do IRQ_HANDLER) saia como
+    `lr = pc + 0`. Aqui a constante e' dobrada: no ARM o pc vale endereco + 8.
+    """
+    imagem = _imagem_de_teste((0x08000020, "00 e0 8f e2"),    # add lr, pc, #0
+                              (0x08000024, "1e ff 2f e1"))    # bx lr
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "arm"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    corpo = codigo.funcoes[0].corpo
+    assert "lr = 0x08000028u" in corpo, corpo                 # 0x08000020 + 8
+    assert "pc + 0" not in corpo, corpo
+    assert codigo.incompletas == [], [f.nao_levantadas for f in codigo.incompletas]
+
+
+def test_mov_e_add_com_pc_no_thumb1_usam_o_pc_alinhado():
+    """`mov r2, pc` e `add r8, pc`: o valor e' (endereco + 4) alinhado a 4 bytes.
+
+    Mesma regra do `adr` e do pool de literais -- e o teste vale por mostrar a
+    conta com o alinhamento: as DUAS instrucoes (0x08000020 e 0x08000022) leem o
+    MESMO 0x08000024, porque (0x08000022 + 4) = 0x08000026 desce para 0x08000024.
+    """
+    imagem = _imagem_de_teste((0x08000020, "7a 46"),         # mov r2, pc
+                              (0x08000022, "f8 44"),         # add r8, pc
+                              (0x08000024, "70 47"))         # bx lr
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    corpo = codigo.funcoes[0].corpo
+    assert "r2 = 0x08000024u" in corpo, corpo
+    assert "r8 = r8 + 0x08000024u" in corpo, corpo
+    assert codigo.incompletas == [], [f.nao_levantadas for f in codigo.incompletas]
+
+
+def test_leitura_de_pc_em_forma_sem_valor_constante_e_recusada():
+    """`cmp r1, pc` (0f 00 51 e1) nao tem traducao: fica declarado, nao inventado."""
+    imagem = _imagem_de_teste((0x08000020, "0f 00 51 e1"),    # cmp r1, pc
+                              (0x08000024, "1e ff 2f e1"))    # bx lr
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "arm"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    motivo = codigo.incompletas[0].nao_levantadas[0]
+    assert "leitura de pc como operando" in motivo, motivo
+    assert "cmp r1, pc" in motivo, motivo
+
+
+def test_stmdb_sp_do_arm_e_o_push_da_pilha_do_modelo():
+    """`stmdb sp!, {lr}` (00 40 2d e9) e' o `push` do ARM: mesma semantica de pilha.
+
+    Antes disto a instrucao era recusada (e a conferencia de balanceamento acusava
+    desequilibrio na funcao, porque o push nao existia no C). `_multipla` ja'
+    tratava os quatro modos de bloco -- faltava o `db` chegar nela.
+    """
+    imagem = _imagem_de_teste((0x08000020, "00 40 2d e9"),    # stmdb sp!, {lr}
+                              (0x08000024, "1e ff 2f e1"))    # bx lr
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "arm"})
+    codigo = decompile.decompilar(desmontagem, imagem)
+    corpo = codigo.funcoes[0].corpo
+    assert "sp -= 4" in corpo, corpo
+    assert "guarda32(sp + 0, lr)" in corpo, corpo
+    assert codigo.incompletas == [], [f.nao_levantadas for f in codigo.incompletas]

@@ -9,7 +9,7 @@
 
      python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
             --json evidencias/rom_bpre_analise.json -o levantado_rom.c
-     sha256 do .c levantado: 03b351749139bbf9fc77fc7c5ed365af...
+     sha256 do .c levantado: fcc41d716540ac26d1a4104ca648dec2...
      sha256 da ROM ........: 6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae
 
    Estado medido (tudo em evidencias/rom_bpre_analise.json, gerado por
@@ -27,12 +27,12 @@
                           recuperados como janela propria
      com C para ler .....: 8027 completas + 145 parciais
                           (100.0% com C)
-     C ..................: 1056640 linhas / 39943782 bytes
+     C ..................: 1056638 linhas / 39944129 bytes
      conferencia bytes ..: 460639/460868 (99.95%) remontam identicas ao
                           binario; 226 divergencias, 3 fora da sintaxe
      compilacao .........: OK, 0 erros
-                          (objeto ARM de 2164980 bytes, sha256
-                          66c42fd35764ad22...)
+                          (objeto ARM de 2164988 bytes, sha256
+                          82b93d7462678b53...)
      boot so' (ARM/Thumb): 3586 funcoes alcancadas pelo vetor
                           de reset (o resto vem do censo)
 
@@ -47,7 +47,7 @@
      - tabela de casos lida da ROM virou switch: FUN_080011e4
      - desvio para tras: a leitura continua em OUTRA janela: fn_08014040
      - bx rN recusado, com o motivo dito por inteiro: fn_081DC45A
-   (o .c inteiro tem 1056640 linhas; os cortes estao marcados no lugar)
+   (o .c inteiro tem 1056638 linhas; os cortes estao marcados no lugar)
    ============================================================================ */
 
 /* ---------------- FUN_080011e4 -- tabela de casos lida da ROM virou switch ---------------- */
