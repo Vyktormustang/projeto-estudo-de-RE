@@ -9,7 +9,13 @@ executado nesta máquina e os comandos estão reproduzíveis.
 cd universal-adaptive-ai-optimizer
 python3 -m venv .venv && .venv/bin/pip install pytest   # única dependência (dev)
 .venv/bin/python -m pytest tests/ -q                    # suíte completa
+.venv/bin/python tools/check_docs.py                    # auditoria da documentação
 ```
+
+O último comando confere as afirmações numéricas deste relatório e do README
+contra o código, as suites, o banco de evidência e a coleta do `pytest`. Ele roda
+também dentro da suíte (`tests/test_docs_consistency.py`), e existe porque um erro
+real já passou por aqui: o README dizia "51 casos" quando havia 50 (ver §4.1).
 
 Ambiente da execução registrada: **Python 3.11.2**, **pytest 9.1.1**, Linux,
 2 vCPU / 3.8 GiB RAM, sem GPU, sem rede utilizada pelos testes.
@@ -17,8 +23,11 @@ Ambiente da execução registrada: **Python 3.11.2**, **pytest 9.1.1**, Linux,
 ## 2. Resultado da suíte
 
 ```
-297 passed in 5.80s     (exit code 0)
+300 passed in 7.37s     (exit code 0)
 ```
+
+O tempo varia entre execuções nesta máquina (5,8 s a 7,4 s); as contagens, não.
+Os tempos citados são sempre de uma execução real — nenhum é estimado.
 
 | Arquivo | Testes | Foco |
 |---|---:|---|
@@ -34,7 +43,8 @@ Ambiente da execução registrada: **Python 3.11.2**, **pytest 9.1.1**, Linux,
 | `test_optimizer_cycle.py` | 21 | ciclo completo, holdout, retomada, orçamento, isolamento das divisões |
 | `test_cli.py` | 15 | fluxo do usuário ponta a ponta (doctor → run → versions → rollback → verify-audit → export) |
 | `test_acceptance.py` | 15 | um teste por requisito da especificação |
-| **Total** | **297** | |
+| `test_docs_consistency.py` | 3 | documentação × código (afirmações numéricas) |
+| **Total** | **300** | |
 
 ### 2.1 Requisitos de aceitação → testes
 
@@ -135,6 +145,36 @@ localizados, mas esses quatro eram (9) uma falha de segurança silenciosa,
 já sabia resolver, e (19) uma incompatibilidade entre a interface e o próprio
 armazenamento.
 
+### 4.1 Um 20º defeito, este de documentação — e a auditoria que o encontrou
+
+Diferente dos 19 acima, este **não** foi encontrado por teste nem por execução: foi
+encontrado por revisão manual dos números, e é o que motivou automatizar a
+conferência.
+
+| # | Sintoma | Causa raiz | Correção | Encontrado por |
+|---|---|---|---|---|
+| 20 | O README afirmava **"51 casos: 32 treino / 13 validação / 6 holdout"**; o correto é **50 casos: 27 / 14 / 9** | O número foi escrito de memória em uma das primeiras versões do README e nunca conferido | README corrigido; contagens conferidas agrupando `case_results` por split no SQLite da execução real | revisão manual |
+
+Três das execuções registradas (`exp-9ddfece1aa9a` entre elas) provam a contagem:
+agrupando `case_results` por split do artefato semente, sai 27 treino (0.0816),
+14 validação (0.0897) e 9 holdout (0.1085) — exatamente o que o relatório publica.
+
+**Correção de fundo:** `tools/check_docs.py` passou a **ler os números escritos na
+documentação** e conferir cada um contra a fonte de verdade (código, suites, banco
+de evidência e a coleta do `pytest`). Ele está ligado à suíte por
+`tests/test_docs_consistency.py`, e um dos testes é *negativo*: monta um README
+falso com "51 casos" e exige que o auditor **reprove** — um verificador que só sabe
+aprovar não verificaria nada.
+
+Cobertura da auditoria: composição das suites, os três números da tabela de
+resultados (baseline, final e delta) contra o `docs/evidencias/*.json`, contagem de
+candidatos, chamadas de métrica, tabelas do SQLite, graders, padrões de injeção e
+de segredo, limites de truncagem e de `output_head`, payloads maliciosos do teste
+de aritmética, dependências de runtime, links locais e as contagens de teste por
+arquivo. Total: **24 afirmações** — e a própria auditoria já provou seu valor:
+ao adicionar os 3 testes deste arquivo, ela falhou imediatamente apontando que a
+documentação ainda dizia 297 testes em vez de 300.
+
 ## 5. Correções do lado dos testes (não eram bugs do produto)
 
 Registradas para que ninguém "corrija" o produto por causa delas:
@@ -189,7 +229,9 @@ Registradas para que ninguém "corrija" o produto por causa delas:
 
 ## 8. Estado final
 
-- Suíte: **297/297 passando**, exit code 0.
-- Ciclo real: **1.0000 na validação e no holdout**, reprodutível em 3 execuções.
+- Suíte: **300/300 passando**, exit code 0.
+- Ciclo real: **1.0000 na validação e no holdout**, reprodutível em 7 execuções
+  independentes — inclusive a partir de um *clone limpo* do repositório com
+  `pip install -e ".[dev]"` (ver §4.1).
 - Defeitos abertos conhecidos: **nenhum** bloqueante; as limitações da §7 são de
   projeto e estão declaradas no código e na documentação.

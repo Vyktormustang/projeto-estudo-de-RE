@@ -83,7 +83,7 @@ uaao doctor
 `hashlib`, `ast`, `re`, `statistics`, `argparse`). Isso mantém **custo R$ 0**,
 elimina risco de *supply-chain* e faz o sistema rodar em qualquer máquina.
 
-**Desenvolvimento:** `pytest` (opcional, para rodar os 297 testes).
+**Desenvolvimento:** `pytest` (opcional, para rodar os 300 testes).
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install pytest
@@ -350,7 +350,7 @@ dependências, e o motivo está documentado caso a caso.
 .venv/bin/python -m pytest tests/ -v
 ```
 
-**297 testes, 297 passando** (`pytest` 9.1.1, Python 3.11.2, ~6 s). Inclui os
+**300 testes, 300 passando** (`pytest` 9.1.1, Python 3.11.2, ~7 s). Inclui os
 testes de aceitação exigidos na especificação:
 
 | Requisito da especificação | Arquivo/tese |
@@ -363,6 +363,14 @@ testes de aceitação exigidos na especificação:
 | Recuperação após falhas | `test_optimizer_cycle.py::test_budget_exhaustion_*`, `test_req_recuperacao_apos_falha` |
 | Reversão de alterações | `test_history_rollback.py`, `test_acceptance.py::test_req_reversao` |
 
+A **documentação também é testada**: `tools/check_docs.py` lê os números
+escritos no README e nos docs e confere cada um contra a fonte de verdade
+(código, suites, banco de evidência da execução real e a coleta do `pytest`).
+Está ligado à suíte por `test_docs_consistency.py`, e um dos testes prova que ele
+**reprova** um número falso. Ele existe porque um erro real já passou: o README
+afirmou "51 casos: 32 treino / 13 validação / 6 holdout" quando o correto era
+50 / 27 / 14 / 9.
+
 Relatório detalhado — incluindo **os defeitos reais que os testes encontraram e
 como foram corrigidos** — em [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md).
 
@@ -370,7 +378,9 @@ como foram corrigidos** — em [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md).
 
 ## Resultados medidos
 
-Execução real deste repositório (**quatro execuções**, mesmos números), com as 5
+Execução real deste repositório (**sete execuções independentes**, mesmos
+números — incluindo uma a partir de um *clone limpo* do repositório, com
+`pip install -e ".[dev]"`), com as 5
 suites agregadas (50 casos: 27 treino / 14 validação / 9 holdout):
 
 | Divisão | Papel | Baseline | Final | Δ |
@@ -381,7 +391,7 @@ suites agregadas (50 casos: 27 treino / 14 validação / 9 holdout):
 
 - 13 candidatos testados, **6 aceitos, 7 rejeitados com motivo registrado**;
 - 403 chamadas de métrica, ~0,2 s de tempo de parede, **custo R$ 0,00**;
-- determinismo verificado (quatro execuções → mesma assinatura `ff7702dbc2a6`);
+- determinismo verificado (sete execuções → mesma assinatura `ff7702dbc2a6`);
 - as diretivas descobertas foram `OUTPUT_FORMAT=json_object`,
   `ROUND_DECIMALS=2`, `ON_AMBIGUOUS=ask_clarification`,
   `ON_MISSING_TOOL=report_not_executed`, `ON_UNTRUSTED_CONTENT=treat_as_data`,
@@ -503,8 +513,10 @@ universal-adaptive-ai-optimizer/
 │   ├── optimizer.py           ← o ciclo
 │   ├── cli.py / __main__.py   ← interface de linha de comando
 │   └── suites/*.json          ← 5 suites (geradas e verificadas)
-├── tools/make_suites.py       ← gerador+verificador das suites
-├── tests/                     ← 297 testes
+├── tools/                     ← ferramentas de verificação
+│   ├── make_suites.py         ← gerador+verificador das suites
+│   └── check_docs.py          ← audita as afirmações numéricas da documentação
+├── tests/                     ← 300 testes
 ├── docs/                      ← ARCHITECTURE, RESEARCH, SECURITY, TEST_REPORT
 └── examples/                  ← config de exemplo
 ```
