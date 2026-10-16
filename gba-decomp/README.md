@@ -353,6 +353,7 @@ python ferramentas/recortar_amostra.py levantado_rom.c \
         --caso 0x080011E4 "tabela de casos lida da ROM virou switch" \
         --caso 0x08014040 "desvio para tras: a leitura continua em OUTRA janela" \
         --caso 0x081DC45A "bx rN recusado, com o motivo dito por inteiro" \
+        --caso 0x08000248 "no ARM, stmdb sp! E' o push da pilha, e add lr, pc virou constante" \
         --orcamento 150 --saida evidencias/rom_bpre_amostra_levantada.c
 ```
 
@@ -390,7 +391,16 @@ o MESMO C compilado noutro diretorio nao da objeto byte a byte igual -- e' por
 isso que o objeto de 2 164 988 B da rodada publicada nao bate com um build local
 em outro caminho, e nao por causa de codigo.
 
-`onde_estao_as_lacunas.py` responde o que o resumo nao responde: onde as lacunas
+A amostra versionada (`evidencias/rom_bpre_amostra_levantada.c`) existe para o
+item 15 poder ser **lido**, e nao acreditado: o ultimo caso e' o
+`IRQ_HANDLER_arm_boot` inteiro (0x08000248), onde dao para ver as duas coisas que
+mudaram -- `sp -= 4; guarda32(sp + 0, lr);` no lugar do `/* NAO LEVANTADO: stmdb
+sp!, {lr} */` (que era a unica ocorrencia de push em ARM da ROM) e
+`lr = 0x08000374u;  /* pc desta instrucao (0x0800036C) */` no lugar de um
+`lr = pc + 0` que compilava e devolvia 0. Na r14, as duas linhas estavam ali do
+lado: `{ u32 a_ = pc, b_ = 0x0 + 0; ... }`.
+
+ onde as lacunas
 se concentram (por pagina de 4 KB), se cairam em funcao do censo ou fora dele,
 **de onde vem o registrador de cada `bx rN`** e **para onde vai cada desvio
 recusado** (buraco de outra janela, instrucao de outra janela, buraco na propria

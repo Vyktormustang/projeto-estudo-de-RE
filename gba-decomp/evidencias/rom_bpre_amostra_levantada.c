@@ -47,6 +47,7 @@
      - tabela de casos lida da ROM virou switch: FUN_080011e4
      - desvio para tras: a leitura continua em OUTRA janela: fn_08014040
      - bx rN recusado, com o motivo dito por inteiro: fn_081DC45A
+     - no ARM, stmdb sp! E' o push da pilha, e add lr, pc virou constante: IRQ_HANDLER_arm_boot
    (o .c inteiro tem 1056638 linhas; os cortes estao marcados no lugar)
    ============================================================================ */
 
@@ -370,6 +371,140 @@ __attribute__((noinline, used)) u32 fn_081DC45A(u32 r0, u32 r1, u32 r2, u32 r3) 
     u32 sp = PILHA_TOPO, sp0 = sp;
     (void)r1; (void)r2; (void)r3;
     /* NAO LEVANTADO: bx r3 */
+    if (sp != sp0) { g_erro |= 1; }
+    return r0;
+}
+
+/* ---------------- IRQ_HANDLER_arm_boot -- no ARM, stmdb sp! E' o push da pilha, e add lr, pc virou constante ---------------- */
+
+/* PARCIAL (0x08000248): o corpo abaixo tem lacunas marcadas -- em execucao, marca g_erro:
+     0x08000258 mrs r0, spsr: leitura do PSR (`spsr`) nao tem traducao: o C levantado tem o PSR como quatro variaveis 0/1 (z, n, c, v) -- o valor lido no ARMv4T carrega tambem o modo do processador e a mascara de IRQ, e traduzir seria inventar o valor
+     0x0800034C mrs r3, apsr: leitura do PSR (`apsr`) nao tem traducao: o C levantado tem o PSR como quatro variaveis 0/1 (z, n, c, v) -- o valor lido no ARMv4T carrega tambem o modo do processador e a mascara de IRQ, e traduzir seria inventar o valor
+     0x08000358 msr cpsr_fc, r3: escrita no PSR (`cpsr_fc`) no campo de CONTROLE: o C levantado nao tem modo do processador nem mascara de IRQ -- so' as flags z/n/c/v, que sao o campo `f`; o bit Q tambem nao existe no modelo
+     0x08000370 bx r0: chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN`): o alvo veio de dado lido na ROM, sem assinatura declarada
+   */
+/* origem: 0x08000248 (arm), semente: informada, pilha: desequilibrada (-6 slots) */
+__attribute__((noinline, used)) u32 IRQ_HANDLER_arm_boot(u32 r0, u32 r1, u32 r2, u32 r3) {
+    u32 r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, r10 = 0, r11 = 0, r12 = 0, lr = 0;
+    u32 pc = 0;  /* escrever em pc = retorno/desvio: tratado explicitamente, ver comentarios */
+    u32 z = 0, n = 0, c = 0, v = 0;
+    u32 sp = PILHA_TOPO, sp0 = sp;
+    (void)r1; (void)r2; (void)r3;
+    r3 = 0x4000000u;
+    { u32 a_ = r3, b_ = 0x200 + 0; u32 r_ = a_ + b_;
+      r3 = r_; }
+    r2 = carrega32(r3);
+    r1 = carrega16(r3 + 0x8);
+    /* NAO LEVANTADO: mrs r0, spsr */
+    sp -= 20;
+    guarda32(sp + 0, r0);
+    guarda32(sp + 4, r1);
+    guarda32(sp + 8, r2);
+    guarda32(sp + 12, r3);
+    guarda32(sp + 16, lr);
+    r0 = 0x0u;
+    guarda16(r3 + 0x8, (u16)r0);
+    r1 = r1 & r2;
+    r12 = 0x0u;
+    r0 = r0 & 0x4;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = 0x1u;
+    guarda16(r3 + 0x8, (u16)r0);
+    r0 = r0 & 0x80;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x40;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x2;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x1;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x8;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x10;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x20;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x100;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x200;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x400;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x800;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x1000;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (r0 != 0) goto L_08000320;
+    { u32 a_ = r12, b_ = 0x4 + 0; u32 r_ = a_ + b_;
+      r12 = r_; }
+    r0 = r0 & 0x2000;
+    z = (r0 == 0); n = (r0 >> 31);
+    if (!z) {
+        guarda8(r3 + -0x17c, (u8)r0);
+    }
+    L_0800031C: ;
+    if (!z) goto L_0800031C;
+    L_08000320: ;
+    guarda16(r3 + 0x2, (u16)r0);
+    r2 = r2 & ~ r0;
+    r0 = 0x03007438u;  /* pool 0x0800039C */
+    r0 = carrega32(r0);
+    r0 = carrega8(r0 + 0xa);
+    r1 = 0x8u;
+    { u32 c_ = c; u32 r_ = sh_lsl(r1, (r0 & 0xFFu), &c_);
+      r0 = r_; }    /* sem s: C preservado */
+    r0 = r0 | 0x2000;
+    r1 = r1 | 0xc6;
+    r1 = r1 & r2;
+    guarda16(r3, (u16)r1);
+    /* NAO LEVANTADO: mrs r3, apsr */
+    r3 = r3 & ~ 0xdf;
+    r3 = r3 | 0x1f;
+    /* NAO LEVANTADO: msr cpsr_fc, r3 */
+    r1 = 0x03003540u;  /* pool 0x080003A0 */
+    { u32 a_ = r1, b_ = r12 + 0; u32 r_ = a_ + b_;
+      r1 = r_; }
+    r0 = carrega32(r1);
+    sp -= 4;
+    guarda32(sp + 0, lr);
+    lr = 0x08000374u;  /* pc desta instrucao (0x0800036C) */
+    /* NAO LEVANTADO: bx r0 */
     if (sp != sp0) { g_erro |= 1; }
     return r0;
 }
