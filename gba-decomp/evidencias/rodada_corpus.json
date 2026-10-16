@@ -1,0 +1,21 @@
+{
+  "corpus": {
+    "arquivo": "corpus.gba (gerado pelo proprio pipeline, nao versionado)",
+    "bytes": 262144,
+    "funcoes": 24,
+    "instrucoes": 370,
+    "arestas_de_chamada": 26
+  },
+  "levantamento": {
+    "funcoes_completas": 24,
+    "funcoes_incompletas": 0,
+    "codigo_c_compilado_bytes": 1148
+  },
+  "verificacao": {
+    "no_binario_original": "59/59",
+    "no_c_levantado": "59/59"
+  },
+  "rom_de_terceiros_sem_verdade_terreno": [
+    "ROM de terceiros: nao existe verdade-terreno conhecida, entao NAO foi possivel afirmar se o C levantado esta correto -- so foi possivel compila-lo e registrar o que ele executa"
+  ]
+}

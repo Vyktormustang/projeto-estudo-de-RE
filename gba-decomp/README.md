@@ -1,0 +1,114 @@
+# gbadecomp — pipeline de engenharia reversa de ROM de GBA
+
+Objetivo: sair do binário (ARM7TDMI, ARM/Thumb) e chegar a **código-fonte C
+verificado**, não a um "achismo que parece código".
+
+A regra que governa este diretório: **nada é afirmado sem execução**. Um
+disassembler que produz uma listagem bonita e um decompilador que gera C que
+compila não provam nada. O que prova é compilar o C gerado, empacotá-lo de volta
+numa imagem de GBA e rodar a **mesma bateria de testes** contra as duas coisas:
+
+```
+binário  --disasm-->  funções + grafo de chamadas
+         --decompile-->  C (uma instrução por linha, sem nomes inventados)
+         --zig cc-->  objeto -> ELF linkado (endereços absolutos) -> blob
+         --empacota-->  imagem de GBA
+         --unicorn-->  mesma tabela de verdade contra o binário E contra o C
+```
+
+## Resultado medido (não estimado)
+
+Última rodada, reproduzível com `python -m gbadecomp.cli rodada`:
+
+| medida | valor |
+|---|---|
+| ROM sintética | 262 144 B, sha256 `5dfd55fb1c6d8ad93dd55aa4730908d0711427fa8395154c65c9382eeff7459a` |
+| funções no binário | 24 (todas com resultado conhecido) |
+| funções redescobertas **só a partir do vetor de boot** | 24/24, zero funções inventadas |
+| instruções desmontadas | 370 |
+| arestas de chamada | 26 (todas conferidas contra a verdade) |
+| tabela de verdade no binário original | **59/59** |
+| C levantado | 24/24 funções traduzidas, 0 não levantadas |
+| tabela de verdade **no C levantado, recompilado e emulado** | **59/59** |
+| testes automatizados | `14 passed` |
+
+A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
+decrescente, classificação por faixas, leitura/escrita de memória, chamadas
+internas). Ela serve para provar o *ferramental* em ARM/Thumb de verdade — não
+diz nada sobre qualquer ROM de terceiros.
+
+## O que está provado e o que não está
+
+**Provado:** o ciclo completo funciona em código Thumb real, incluindo as
+armadilhas que quebraram o pipeline durante o desenvolvimento (veja
+`../gba-re/RELATORIO_gbadecomp.md`): modo de execução herdado da chamada,
+semântica de PUSH/POP, deslocamento por registrador, `mvns` com fonte no
+segundo operando, writeback do `stm`, e o offset `PC+4` do pool de literais.
+
+**NÃO provado (e não será sem a ROM):** nada sobre o FireRed/BPRE do projeto
+`../gba-re`. Sem o arquivo da ROM no disco, o melhor que este pipeline pode
+fazer com ele é: nada. Não existe verdade-terreno, não existe byte para ler.
+
+Para ROM de terceiros sem verdade-terreno, o caminho `rodada_binario` /
+`cli levantar` grava explicitamente no relatório:
+
+> ROM de terceiros: não existe verdade-terreno conhecida, então NÃO foi possível
+> afirmar se o C levantado está correto — só foi possível compilá-lo e registrar
+> o que ele executa.
+
+## Como usar
+
+```bash
+# prova o pipeline inteiro no corpus sintético (não precisa de ROM nenhuma)
+python -m gbadecomp.cli rodada
+
+# descoberta recursiva a partir do vetor de boot, com listagem e JSON
+python -m gbadecomp.cli disasm ROM.gba --listagem lista.txt --json dados.json
+
+# levantar o binário para C
+python -m gbadecomp.cli decompilar ROM.gba -o levantado.c
+
+# cabeçalho, espaço livre e cruzamento com o censo de funções
+python -m gbadecomp.cli relatorio ROM.gba --censo functions.csv
+
+# ROM de verdade, usando o censo como sementes (endereços + nomes)
+python -m gbadecomp.cli levantar ROM.gba --censo functions.csv -o levantado_rom.c
+```
+
+Testes: `python -m pytest tests/ -q`
+
+## Módulos
+
+| arquivo | o que faz |
+|---|---|
+| `rom.py` | acesso à ROM por endereço do espaço GBA, cabeçalho, espaço livre, leitura do `functions.csv` |
+| `corpus.py` | compila e empacota a ROM sintética (zig cc → Thumb), com a tabela de verdade de 59 casos |
+| `disasm.py` | descoberta recursiva (bl, desvios, pools de literais) com modo herdado da chamada |
+| `decompile.py` | tradução instrução-a-instrução para C, com pilha em memória real e conferência de balanceamento |
+| `verificador.py` | emulador unicorn + comparação com a verdade-terreno, caso a caso, sem maquiagem |
+| `reconstruir.py` | junta tudo: disasm → C → compilação → imagem → verificação |
+| `cli.py` | linha de comando |
+
+## Limites técnicos declarados
+
+- **Subconjunto de instruções.** O levantador cobre o que aparece no corpus
+  (Thumb-1: aritmética, deslocamentos, comparações, memória, `push`/`pop`,
+  `bl`/`bx`, desvios condicionais, `stm`). Instrução não coberta **aparece na
+  lista de não levantadas** — nunca é ignorada em silêncio.
+- **ARM**: o desmontador entende ARM e começa por ele (o vetor de boot de um GBA
+  executa em ARM), mas o levantamento para C foi exercitado apenas em Thumb.
+- **Desvio indireto por registrador** sem origem conhecida (`bx rN` que não veio
+  de um `pop`) interrompe o levantamento daquela função, com o motivo registrado.
+- **Flags imprevisíveis**: onde o ARM não define o resultado (ex.: flag C após
+  `MUL`), o C gerado não inventa valor — o comportamento fica anotado.
+- **Sem nomes, sem estruturas.** O C gerado tem `fn_08000258` e `goto`; a
+  reescrita para `if`/`while`/nomes significativos é trabalho humano posterior.
+- **Não é um emulador de GBA completo.** O verificador mapeia ROM, EWRAM e
+  IWRAM; não há PPU, DMA, timers nem interrupções. Código que dependa disso
+  (a maior parte de um jogo) exige um emulador completo, não este verificador.
+
+## Requisitos
+
+`python3` e, no `.venv` do repositório: `capstone`, `unicorn`, `pyelftools`,
+`ziglang` (traz o `zig cc`, que faz o papel de `arm-none-eabi-gcc` — este último
+não pôde ser instalado neste ambiente). Nada além disso é necessário.

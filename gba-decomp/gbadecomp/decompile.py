@@ -1,0 +1,497 @@
+"""Levantamento Thumb/ARM -> C, verificavel por execucao.
+
+Criterio de honestidade deste modulo: ele NAO tenta adivinhar estruturas de alto
+nivel (`if`, `while`, nomes de variaveis). Ele traduz instrucao por instrucao
+para C equivalente -- registradores como variaveis, memoria endereçada de
+verdade, desvios como `goto` -- e marca explicitamente tudo o que nao souber
+traduzir. O que prova que a traducao esta certa nao e a leitura do C gerado: e
+compilar esse C e rodar a MESMA tabela de verdade contra ele (`--verificar`).
+
+Limite declarado: as flags sao recalculadas como variaveis (`z`, `n`, `c`, `v`)
+na hora em que a instrucao as define, o que reproduz o comportamento observavel
+naquele ponto; onde o ARM deixa a flag como imprevisivel, o comportamento e
+anotado no comentario em vez de inventado.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass, field
+
+import capstone
+from capstone import Cs, CS_ARCH_ARM, CS_MODE_ARM, CS_MODE_THUMB, CS_OPT_DETAIL
+
+from . import rom as rom_mod
+
+TIPOS_C = """typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef signed int s32;
+
+static inline u32 carrega32(u32 end) { return *(volatile u32 *)end; }
+static inline u16 carrega16(u32 end) { return *(volatile u16 *)end; }
+static inline u8 carrega8(u32 end) { return *(volatile u8 *)end; }
+static inline s32 carrega16s(u32 end) { return (s32)(*(volatile short *)end); }
+static inline s32 carrega8s(u32 end) { return (s32)(*(volatile signed char *)end); }
+static inline void guarda32(u32 end, u32 v) { *(volatile u32 *)end = v; }
+static inline void guarda16(u32 end, u16 v) { *(volatile u16 *)end = v; }
+static inline void guarda8(u32 end, u8 v) { *(volatile u8 *)end = v; }
+
+/* Deslocamentos com o comportamento exato do ARM7TDMI (inclusive os casos que
+   costumam ser esquecidos: n = 0 nao mexe em C; n = 32 e n > 32 tem regra
+   propria; ASR satura no sinal). */
+static inline u32 sh_lsl(u32 v, u32 n, u32 *pc) {
+    if (n == 0) { return v; }
+    if (n < 32) { *pc = (v >> (32 - n)) & 1; return v << n; }
+    if (n == 32) { *pc = v & 1; return 0; }
+    *pc = 0; return 0;
+}
+static inline u32 sh_lsr(u32 v, u32 n, u32 *pc) {
+    if (n == 0) { return v; }
+    if (n < 32) { *pc = (v >> (n - 1)) & 1; return v >> n; }
+    if (n == 32) { *pc = (v >> 31) & 1; return 0; }
+    *pc = 0; return 0;
+}
+static inline u32 sh_asr(u32 v, u32 n, u32 *pc) {
+    s32 s = (s32)v;
+    if (n == 0) { return v; }
+    if (n < 32) { *pc = ((u32)s >> (n - 1)) & 1; return (u32)(s >> n); }
+    *pc = (v >> 31) & 1; return (u32)(s >> 31);
+}
+
+/* Pilha de trabalho EM MEMORIA DE VERDADE, dentro da IWRAM do GBA e longe da
+   pilha do proprio harness (0x03007F00). Assim `str r0,[sp,#12]` funciona sem
+   traducao especial, o transbordo de registrador para a pilha sai igual ao do
+   hardware e a recursao funciona. g_erro acusa desbalanceamento na saida. */
+#define PILHA_BASE 0x03005000u
+#define PILHA_TOPO (PILHA_BASE + 0x800u)
+static int g_erro;
+"""
+
+CONDICOES = {
+    "eq": "z", "ne": "!z", "cs": "c", "hs": "c", "cc": "!c", "lo": "!c",
+    "mi": "n", "pl": "!n", "vs": "v", "vc": "!v",
+    "hi": "(c && !z)", "ls": "(!c || z)",
+    "ge": "(n == v)", "lt": "(n != v)", "gt": "(!z && (n == v))", "le": "(z || (n != v))",
+}
+
+
+@dataclass
+class FuncaoDec:
+    """Uma funcao levantada para C."""
+
+    endereco: int
+    nome: str
+    modo: str
+    corpo: str
+    nao_levantadas: list[str] = field(default_factory=list)
+    balanceamento: str = "desconhecido"
+
+    @property
+    def completa(self) -> bool:
+        return not self.nao_levantadas
+
+    def assinatura(self) -> str:
+        return f"u32 {self.nome}(u32 r0, u32 r1, u32 r2, u32 r3)"
+
+
+@dataclass
+class CodigoC:
+    """Resultado do levantamento de uma imagem inteira."""
+
+    funcoes: list[FuncaoDec] = field(default_factory=list)
+    avisos: list[str] = field(default_factory=list)
+
+    @property
+    def completas(self) -> list[FuncaoDec]:
+        return [f for f in self.funcoes if f.completa]
+
+    @property
+    def incompletas(self) -> list[FuncaoDec]:
+        return [f for f in self.funcoes if not f.completa]
+
+    def texto(self, nome_arquivo: str = "gbadecomp_lift.c") -> str:
+        linhas = [
+            "/* C levantado mecanicamente do binario pelo modulo decompile.py.",
+            "   Sem nomes inventados e sem estruturas de alto nivel: uma instrucao",
+            "   por linha, desvios como `goto`, flags explicitas. O nome de cada",
+            "   funcao guarda o endereco de origem no binario (fn_08000258). */",
+            "",
+            TIPOS_C,
+        ]
+        completas = [f for f in sorted(self.funcoes, key=lambda x: x.endereco) if f.completa]
+        for f in completas:
+            # noinline+used: sem isso o compilador embute as funcoes nas chamadas
+            # e elimina os simbolos, e a verificacao por endereco deixa de existir.
+            linhas.append(f"__attribute__((noinline, used)) "
+                          f"u32 {f.nome}(u32 r0, u32 r1, u32 r2, u32 r3);")
+        for f in sorted(self.funcoes, key=lambda x: x.endereco):
+            if not f.completa:
+                linhas.append(f"/* 0x{f.endereco:08X}: NAO levantada -- "
+                              f"{'; '.join(f.nao_levantadas)} */")
+                continue
+            linhas.append("")
+            linhas.append(f"/* origem: 0x{f.endereco:08X} ({f.modo}), pilha: {f.balanceamento} */")
+            linhas.append(f"__attribute__((noinline, used)) "
+                          f"u32 {f.nome}(u32 r0, u32 r1, u32 r2, u32 r3) {{")
+            # Todos os registradores do ARM7TDMI viram variaveis C com o MESMO
+            # nome que o desmontador usa (r0..r12, ip, lr, sp, pc). `lr` so
+            # carrega o endereco de retorno salvo na pilha; o codigo levantado
+            # nunca o desreferencia (o retorno real e `return r0;`).
+            linhas.append("    u32 r4 = 0, r5 = 0, r6 = 0, r7 = 0, r8 = 0, r9 = 0, "
+                          "r10 = 0, r11 = 0, ip = 0, lr = 0;")
+            linhas.append("    u32 z = 0, n = 0, c = 0, v = 0;")
+            linhas.append("    u32 sp = PILHA_TOPO, sp0 = sp;")
+            linhas.append("    (void)r1; (void)r2; (void)r3;")
+            for linha in f.corpo.splitlines():
+                linhas.append(f"    {linha}")
+            linhas.append("    if (sp != sp0) { g_erro |= 1; }")
+            linhas.append("    return r0;")
+            linhas.append("}")
+        linhas.append("")
+        return "\n".join(linhas)
+
+
+class _Emissor:
+    """Traduz as instrucoes de UMA funcao para linhas de C."""
+
+    def __init__(self, funcao, imagem: bytes, base: int, nomes: dict[int, str]):
+        self.f = funcao
+        self.imagem = imagem
+        self.base = base
+        self.nomes = nomes
+        self.linhas: list[str] = []
+        self.nao_levantadas: list[str] = []
+        self.rotulos: dict[int, str] = {}
+        self.lr_regs: set[str] = set()      # registradores que carregam o retorno
+        # Modelo de pilha por endereco (mesma semantica do hardware): guarda, para
+        # cada slot, se ali foi salvo o endereco de retorno.
+        self.pilha: dict[int, str] = {}     # slot -> o que esta guardado ali
+        self.sp_modelo = 0                  # espelho em Python do g_sp do C
+        self.cs = Cs(CS_ARCH_ARM, CS_MODE_THUMB if funcao.modo == "thumb" else CS_MODE_ARM)
+        self.cs.detail = True
+        for ins in funcao.instrucoes:
+            if ins.alvo is not None and funcao.entrada <= ins.alvo < funcao.fim:
+                self.rotulos.setdefault(ins.alvo, f"L_{ins.alvo:08X}")
+
+    # -- utilitarios ------------------------------------------------------
+    def _rotulo(self, endereco: int) -> str:
+        return self.rotulos.setdefault(endereco, f"L_{endereco:08X}")
+
+    def _reg(self, operando) -> str:
+        return self.cs.reg_name(operando.reg)
+
+    def _emitir(self, texto: str) -> None:
+        self.linhas.append(texto)
+
+    def levantar(self) -> FuncaoDec:
+        for ins in self.f.instrucoes:
+            if ins.endereco in self.rotulos:
+                self._emitir(f"{self._rotulo(ins.endereco)}: ;")
+            try:
+                decodificada = list(self.cs.disasm(ins.bytes_, ins.endereco, count=1))[0]
+                self._traduzir(decodificada)
+            except _NaoLevantado as exc:
+                self.nao_levantadas.append(f"0x{ins.endereco:08X} {ins.mnemonic} "
+                                           f"{ins.operadores}: {exc}")
+                self._emitir(f"/* NAO LEVANTADO: {ins.mnemonic} {ins.operadores} */")
+        return FuncaoDec(
+            endereco=self.f.entrada,
+            nome=self.nomes.get(self.f.entrada, f"fn_{self.f.entrada:08X}"),
+            modo=self.f.modo,
+            corpo="\n".join(l for l in self.linhas if l),
+            nao_levantadas=self.nao_levantadas,
+            balanceamento=("balanceada" if self.sp_modelo == 0
+                           else f"desequilibrada ({self.sp_modelo} slots)"),
+        )
+
+    # -- traducao ---------------------------------------------------------
+    def _traduzir(self, ins) -> None:
+        m = ins.mnemonic
+        op = ins.operands
+
+        if m in ("push", "pop"):
+            return self._pilha(ins, m)
+        if m in ("b", "bl", "blx") or m in [f"b{c}" for c in CONDICOES]:
+            return self._desvio(ins)
+        if m.startswith("ldr") or m.startswith("str"):
+            return self._memoria(ins)
+        if m == "bx":
+            return self._bx(ins)
+        if m in ("movs", "mov"):
+            destino, fonte = self._reg(op[0]), op[1]
+            if fonte.type == capstone.arm.ARM_OP_IMM:
+                self._emitir(f"{destino} = 0x{fonte.imm & 0xFFFFFFFF:X}u;")
+                if m == "movs":
+                    self._flags_logicas(destino)
+            else:
+                self._emitir(f"{destino} = {self._reg(fonte)};")
+                if m == "movs":
+                    self._flags_logicas(destino)
+            return
+        if m in ("adds", "subs", "cmp", "add", "sub", "adcs", "sbcs", "rsbs"):
+            return self._aritmetica(ins)
+        if m in ("ands", "orrs", "eors", "bics", "mvns", "tst"):
+            return self._logica(ins)
+        if m in ("lsls", "lsrs", "asrs", "lsl", "lsr", "asr"):
+            return self._deslocamento(ins)
+        if m in ("muls", "mul"):
+            destino = self._reg(op[0])
+            self._emitir(f"{destino} = {self._reg(op[0])} * {self._reg(op[1])};")
+            # No ARM7TDMI o MUL define N e Z; C e V ficam IMPREVISIVEIS.
+            # Nao inventamos valor para eles: so N e Z sao atualizados.
+            self._emitir(f"z = ({destino} == 0); n = ({destino} >> 31);")
+            return
+        if m in ("stm", "stmia", "ldm", "ldmia"):
+            return self._multipla(ins)
+        if m in ("nop",):
+            self._emitir(";")
+            return
+        raise _NaoLevantado("mnemonico nao implementado")
+
+    def _flags_logicas(self, resultado: str) -> None:
+        self._emitir(f"z = ({resultado} == 0); n = ({resultado} >> 31);")
+
+    def _retornar(self) -> None:
+        """Saida da funcao com conferencia de balanceamento da pilha."""
+        self._emitir("if (sp != sp0) { g_erro |= 1; }")
+        self._emitir("return r0;")
+
+    def _pilha(self, ins, m) -> None:
+        """PUSH/POP com a semantica exata do ARM7TDMI.
+
+        Detalhe que ja causou erro aqui: o PUSH **desce** o sp e grava em
+        enderecos crescentes (sp -= 4n; mem[sp] = 1o da lista; mem[sp+4] = 2o...).
+        Por isso `push {r7,lr}` seguido de `pop {r7}` devolve o r7 (o endereco
+        mais baixo) e o `pop {r1}` seguinte devolve o lr. Tratar a pilha como
+        "LIFO classico" inverte tudo.
+        """
+        regs = [self._reg(o) for o in ins.operands if o.type == capstone.arm.ARM_OP_REG]
+        n = len(regs)
+        if m == "push":
+            self._emitir(f"sp -= {4 * n};")
+            for indice, r in enumerate(regs):
+                self._emitir(f"guarda32(sp + {4 * indice}, {r});")
+                self.pilha[self.sp_modelo - n + indice] = "retorno" if r == "lr" else r
+            self.sp_modelo -= n
+            return
+        for indice, r in enumerate(regs):
+            marcador = self.pilha.get(self.sp_modelo + indice)
+            if r == "pc":
+                self._emitir(f"sp += {4 * n};")
+                self.sp_modelo += n
+                self._retornar()
+                return
+            if r == "lr":
+                self._emitir(f"(void)carrega32(sp + {4 * indice});")
+                continue
+            self._emitir(f"{r} = carrega32(sp + {4 * indice});")
+            if marcador == "retorno":
+                # `pop {r1}; bx r1` e como o codigo compilado volta: o
+                # registrador recem-carregado carrega o endereco de retorno.
+                self.lr_regs.add(r)
+        self._emitir(f"sp += {4 * n};")
+        self.sp_modelo += n
+
+    def _bx(self, ins) -> None:
+        r = self._reg(ins.operands[0])
+        if r == "lr" or r in self.lr_regs:
+            self._emitir("return r0;")
+            return
+        raise _NaoLevantado("desvio indireto por registrador sem origem conhecida")
+
+    def _desvio(self, ins) -> None:
+        alvo = ins.operands[0].imm & 0xFFFFFFFF
+        if ins.mnemonic == "b":
+            if self.f.entrada <= alvo < self.f.fim:
+                self._emitir(f"goto {self._rotulo(alvo)};")
+            else:
+                raise _NaoLevantado(f"salto para fora da funcao (0x{alvo:08X})")
+            return
+        if ins.mnemonic in ("bl", "blx"):
+            destino = self.nomes.get(alvo & ~1, f"fn_{alvo & ~1:08X}")
+            fora = "externo" if alvo & ~1 not in self.nomes else "no modulo"
+            self._emitir(f"/* bl 0x{alvo:08X} ({fora}) */")
+            self._emitir(f"r0 = {destino}(r0, r1, r2, r3);")
+            return
+        cond = CONDICOES.get(ins.mnemonic[1:])
+        if cond is None:
+            raise _NaoLevantado("condicao desconhecida")
+        if not (self.f.entrada <= alvo < self.f.fim):
+            raise _NaoLevantado(f"desvio condicional para fora (0x{alvo:08X})")
+        self._emitir(f"if ({cond}) goto {self._rotulo(alvo)};")
+
+    def _aritmetica(self, ins) -> None:
+        m, op = ins.mnemonic, ins.operands
+        if m in ("adds", "subs", "add", "sub", "adcs", "sbcs", "cmp"):
+            if len(op) == 2 and m in ("add", "sub") and self._reg(op[0]) == "sp":
+                imediato = op[1].imm & 0xFFFFFFFF
+                sinal = "-" if m == "sub" else "+"
+                self._emitir(f"sp {sinal}= {imediato};  /* ajuste de pilha */")
+                return
+            if len(op) == 3:
+                destino, a = self._reg(op[0]), self._reg(op[1])
+                b = (hex(op[2].imm & 0xFFFFFFFF) if op[2].type == capstone.arm.ARM_OP_IMM
+                     else self._reg(op[2]))
+            elif len(op) == 2:
+                destino, a = self._reg(op[0]), self._reg(op[0])
+                b = (hex(op[1].imm & 0xFFFFFFFF) if op[1].type == capstone.arm.ARM_OP_IMM
+                     else self._reg(op[1]))
+            else:
+                raise _NaoLevantado("forma inesperada")
+            if m == "cmp":
+                self._emitir(f"{{ u32 a_ = {a}, b_ = {b}; u32 r_ = a_ - b_;")
+                self._emitir("  c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;")
+                self._emitir("  z = (r_ == 0); n = (r_ >> 31); }")
+                return
+            if m in ("adds", "add", "adcs"):
+                entrada = "c" if m == "adcs" else "0"
+                self._emitir(f"{{ u32 a_ = {a}, b_ = {b} + {entrada}; u32 r_ = a_ + b_;")
+                self._emitir("  c = (r_ < a_); v = ((a_ ^ r_) & (b_ ^ r_)) >> 31;")
+                self._emitir(f"  z = (r_ == 0); n = (r_ >> 31); {destino} = r_; }}")
+                return
+            if m == "sbcs":
+                self._emitir(f"{{ u32 a_ = {a}, b_ = {b} + (c ? 0u : 1u); u32 r_ = a_ - b_;")
+                self._emitir("  c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;")
+                self._emitir(f"  z = (r_ == 0); n = (r_ >> 31); {destino} = r_; }}")
+                return
+            self._emitir(f"{{ u32 a_ = {a}, b_ = {b}; u32 r_ = a_ - b_;")
+            self._emitir("  c = (a_ >= b_); v = ((a_ ^ b_) & (a_ ^ r_)) >> 31;")
+            self._emitir(f"  z = (r_ == 0); n = (r_ >> 31); {destino} = r_; }}")
+            return
+        if m == "rsbs":
+            destino = self._reg(op[0])
+            b = (hex(op[1].imm & 0xFFFFFFFF) if op[1].type == capstone.arm.ARM_OP_IMM
+                 else self._reg(op[1]))
+            self._emitir(f"{{ u32 a_ = {b}; u32 r_ = 0u - a_; c = (0u >= a_);")
+            self._emitir(f"  v = ((0u ^ a_) & (0u ^ r_)) >> 31; z = (r_ == 0);")
+            self._emitir(f"  n = (r_ >> 31); {destino} = r_; }}")
+            return
+        raise _NaoLevantado("forma aritmetica nao implementada")
+
+    def _logica(self, ins) -> None:
+        m, op = ins.mnemonic, ins.operands
+        destino = "z_aux" if m == "tst" else self._reg(op[0])
+        # ATENCAO: em `mvns Rd, Rm` a FONTE e o SEGUNDO operando. Usar o primeiro
+        # (que coincide em `mvns r3, r3`, mas nao em `mvns r2, r0`) gera C errado
+        # que compila e roda -- foi exatamente esse bug que a verificacao pegou.
+        a = self._reg(op[-1]) if m == "mvns" else self._reg(op[0])
+        b = (hex(op[-1].imm & 0xFFFFFFFF) if op[-1].type == capstone.arm.ARM_OP_IMM
+             else self._reg(op[-1]))
+        operacao = {"ands": "&", "orrs": "|", "eors": "^", "bics": "& ~",
+                    "tst": "&", "mvns": "~"}[m]
+        if m == "mvns":
+            self._emitir(f"{destino} = ~{a};")
+        elif m == "tst":
+            self._emitir(f"{{ u32 t_ = {a} {operacao} {b};")
+            self._emitir("  z = (t_ == 0); n = (t_ >> 31); }")
+            return
+        else:
+            self._emitir(f"{destino} = {a} {operacao} {b};")
+        self._flags_logicas(destino)
+
+    def _deslocamento(self, ins) -> None:
+        m, op = ins.mnemonic, ins.operands
+        destino = self._reg(op[0])
+        # 3 operandos (imediato): `lsls rd, rs, #N` -- desloca rs.
+        # 2 operandos (Thumb, por registrador): `lsls rd, rs` -- desloca o PROPRIO rd,
+        # com a quantidade nos 8 bits baixos de rs.
+        if len(op) >= 3:
+            base = self._reg(op[1])
+            quantos = (hex(op[2].imm & 0xFF) if op[2].type == capstone.arm.ARM_OP_IMM
+                       else f"({self._reg(op[2])} & 0xFFu)")
+        elif len(op) == 2:
+            base = self._reg(op[0])
+            quantos = (hex(op[1].imm & 0xFF) if op[1].type == capstone.arm.ARM_OP_IMM
+                       else f"({self._reg(op[1])} & 0xFFu)")
+        else:
+            raise _NaoLevantado("forma de deslocamento inesperada")
+        funcao_c = {"lsls": "sh_lsl", "lsl": "sh_lsl", "lsrs": "sh_lsr",
+                    "lsr": "sh_lsr", "asrs": "sh_asr", "asr": "sh_asr"}[m]
+        self._emitir(f"{{ u32 c_ = c; u32 r_ = {funcao_c}({base}, {quantos}, &c_);")
+        self._emitir(f"  c = c_; {destino} = r_; z = (r_ == 0); n = (r_ >> 31); }}")
+
+    def _memoria(self, ins) -> None:
+        m, op = ins.mnemonic, ins.operands
+        destino = self._reg(op[0]) if op[0].type == capstone.arm.ARM_OP_REG else None
+        if op[-1].type != capstone.arm.ARM_OP_MEM:
+            raise _NaoLevantado("enderecamento nao suportado")
+        mem = op[-1].mem
+        base = self.cs.reg_name(mem.base)
+        # ATENCAO: no Thumb o PC vale (endereco + 4) com o bit1 zerado; no ARM,
+        # endereco + 8. Errar isso desloca o pool de literais em 4 bytes.
+        if base == "pc":
+            pc = (ins.address + 4) & ~3 if self.f.modo == "thumb" else ins.address + 8
+            endereco = pc + mem.disp
+            valor = int.from_bytes(self.imagem[endereco - self.base:endereco - self.base + 4],
+                                   "little")
+            if destino is None:
+                raise _NaoLevantado("escrita em pool literal")
+            self._emitir(f"{destino} = 0x{valor:08X}u;  /* pool 0x{endereco:08X} */")
+            return
+        desp = mem.disp
+        endereco = f"({base} + {desp})" if desp else base
+        if m in ("ldr",):
+            self._emitir(f"{destino} = carrega32({endereco});")
+        elif m == "ldrb":
+            self._emitir(f"{destino} = carrega8({endereco});")
+        elif m == "ldrh":
+            self._emitir(f"{destino} = carrega16({endereco});")
+        elif m == "ldrsb":
+            self._emitir(f"{destino} = (u32)carrega8s({endereco});")
+        elif m == "ldrsh":
+            self._emitir(f"{destino} = (u32)carrega16s({endereco});")
+        elif m == "str":
+            self._emitir(f"guarda32({endereco}, {destino});")
+        elif m == "strb":
+            self._emitir(f"guarda8({endereco}, (u8){destino});")
+        elif m == "strh":
+            self._emitir(f"guarda16({endereco}, (u16){destino});")
+        else:
+            raise _NaoLevantado(f"variante de memoria {m} nao implementada")
+
+    def _multipla(self, ins) -> None:
+        m = ins.mnemonic
+        registradores = [self._reg(o) for o in ins.operands if o.type == capstone.arm.ARM_OP_REG]
+        base = registradores[0]
+        lista = registradores[1:]
+        if m.startswith("ldm"):
+            for i, r in enumerate(lista):
+                self._emitir(f"{r} = carrega32(({base} + {4 * i}));")
+        else:
+            for i, r in enumerate(lista):
+                self._emitir(f"guarda32(({base} + {4 * i}), {r});")
+        if base in lista:
+            self._emitir(f"/* writeback com {base} na lista: comportamento do "
+                         f"ARM e imprevisivel aqui */")
+            raise _NaoLevantado("writeback com registrador base na lista")
+        # O writeback tem de ser lido em QUALQUER posicao do texto: em
+        # `stm r0!, {r2}` a string termina em `}`, nao em `!` -- testar o final
+        # da string perdia a atualizacao do registrador base (bug real).
+        if "!" in ins.op_str:
+            self._emitir(f"{base} += {4 * len(lista)};  /* writeback */")
+
+
+class _NaoLevantado(Exception):
+    """Instrucao que este levantador nao traduz (registrada, nunca ignorada)."""
+
+
+def decompilar(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE,
+               nomes: dict[int, str] | None = None) -> CodigoC:
+    """Levanta todas as funcoes descobertas para C."""
+    nomes = dict(nomes or {})
+    for endereco in desmontagem.funcoes:
+        nomes.setdefault(endereco, f"fn_{endereco:08X}")
+    saida = CodigoC()
+    for endereco in sorted(desmontagem.funcoes):
+        funcao = desmontagem.funcoes[endereco]
+        emissor = _Emissor(funcao, imagem, base, nomes)
+        levantada = emissor.levantar()
+        saida.funcoes.append(levantada)
+        if not levantada.completa:
+            saida.avisos.append(f"0x{endereco:08X}: {len(levantada.nao_levantadas)} "
+                                f"instrucao(oes) nao levantada(s)")
+    if desmontagem.dados_lidos:
+        saida.avisos.append(f"{len(desmontagem.dados_lidos)} literais de pool lidos "
+                            f"do binario")
+    return saida
