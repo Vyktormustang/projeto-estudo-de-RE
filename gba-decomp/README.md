@@ -39,11 +39,30 @@ diz nada sobre qualquer ROM de terceiros.
 
 ## O que está provado e o que não está
 
-**Provado:** o ciclo completo funciona em código Thumb real, incluindo as
-armadilhas que quebraram o pipeline durante o desenvolvimento (veja
-`../gba-re/RELATORIO_gbadecomp.md`): modo de execução herdado da chamada,
-semântica de PUSH/POP, deslocamento por registrador, `mvns` com fonte no
-segundo operando, writeback do `stm`, e o offset `PC+4` do pool de literais.
+**Provado:** o ciclo completo funciona em código Thumb real. As armadilhas que
+quebraram o pipeline durante o desenvolvimento e que os testes agora travam
+(regressões reais, cada uma produzia resultado plausível e errado):
+
+1. **Modo de execução do destino de `bl`.** O alvo vem **par**; escolher o modo
+   pela paridade desmonta a função inteira em ARM e gera lixo que parece código.
+   O modo correto é herdado de quem chama.
+2. **Semântica de PUSH/POP.** O push desce o `sp` e grava em endereços
+   crescentes; um `pop {r1}` posterior recupera o **primeiro** item empilhado.
+   Tratar a pilha como LIFO clássico entrega o endereço de retorno ao
+   registrador errado.
+3. **Deslocamento por registrador** (`lsls r3, r2`): quantidade nos 8 bits
+   baixos, com regras próprias para n = 0, 32 e > 32.
+4. **`mvns Rd, Rm`**: a fonte é o **segundo** operando (`mvns r3, r3` esconde o
+   erro; `mvns r2, r0` não).
+5. **Writeback do `stm r0!, {…}`**: a string termina em `}`, não em `!` — testar
+   o fim da string perde a atualização do registrador base.
+6. **`PC + 4` no pool de literais do Thumb** (bit1 zerado): errar desloca a
+   constante em 4 bytes.
+7. **Símbolos somem** se as funções geradas não forem `noinline, used`: o
+   compilador embute tudo e a verificação por endereço deixa de existir.
+
+Evidências gravadas em `evidencias/`: listagem legível, desmontagem em JSON,
+o C levantado e o resumo numérico da rodada.
 
 **NÃO provado (e não será sem a ROM):** nada sobre o FireRed/BPRE do projeto
 `../gba-re`. Sem o arquivo da ROM no disco, o melhor que este pipeline pode
