@@ -39,23 +39,32 @@ diz nada sobre qualquer ROM de terceiros.
 
 ## ROM real (Pokemon - Fire Red BR): números medidos
 
-Com a ROM no disco (`/home/user/gba-re/rom/pokemon_firered_bpre_trabalho.gba`,
-sha256 `6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae` — bate
-exatamente com o `inventory.json` do projeto):
+Tudo nesta seção sai de **um comando**, que grava a evidência em JSON:
+
+```bash
+python -m gbadecomp.cli analisar ROM.gba --censo functions.csv \
+       --json evidencias/rom_bpre_analise.json -o levantado_rom.c
+```
+
+ROM: `pokemon_firered_bpre_trabalho.gba`, sha256
+`6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae` — bate
+exatamente com o `inventory.json` do projeto. Duas execuções seguidas produzem
+**JSON idêntico e o mesmo `.c` byte a byte**.
 
 | medida | valor |
 |---|---|
-| censo do projeto | 5 981 funções (5 980 Thumb, 1 ARM) |
-| descoberta **só a partir do vetor de reset** | 1 876 funções, 73 792 instruções, 3 432 arestas |
-| …das quais confirmadas no censo | 1 382 · e **494 que o censo não tinha** |
-| descoberta com o censo como semente | **7 717 funções, 352 918 instruções, 16 387 arestas** |
-| censo coberto | 5 981/5 981 (100%) · **1 736 funções fora do censo** |
-| funções **com C para ler** | **7 634 de 7 717 (98,9%)** — 7 311 completas + 406 parciais marcadas |
-| C gerado | 832 192 linhas / 31 MB — **compila sem erros** (`zig cc -mcpu=arm7tdmi`, objeto de 1,76 MB) |
+| censo do projeto | 5 981 funções |
+| descoberta **só a partir do vetor de reset** | 1 866 funções, 73 321 instruções, 3 432 arestas, 10 descartes |
+| descoberta com o censo como semente | **7 634 funções, 352 918 instruções, 16 387 arestas** |
+| censo coberto | 5 981/5 981 (100%) · **1 653 funções fora do censo** |
+| funções **com C para ler** | **7 634 de 7 634 (100%)** — 7 228 completas + 406 parciais marcadas |
+| funções sem corpo nenhum | **0** |
+| C gerado | 831 870 linhas / 31,2 MB — **compila sem erro** (`zig cc -mcpu=arm7tdmi`, objeto de 1 761 916 B) |
 | condições fundidas nos desvios | 15 541 (`if (r0 >= 0x64)` em vez de `if ((n == v))`) |
 | conferência byte a byte | **352 888/352 918 (99,991%)** remontam idênticas ao binário |
+| endereços tentados como função e **descartados** | 83 (73 de ponteiro de pool, 10 de `bl`) — não são código |
 
-### Três descobertas que valem mais que os números
+### As descobertas que valem mais que os números
 
 1. **Metade do que a varredura ingênua produzia era dado lido como código.** A
    primeira passada devolveu 675 389 "instruções"; rejeitando o que *não existe*
@@ -63,56 +72,29 @@ exatamente com o `inventory.json` do projeto):
    **352 918**. Eram opcodes de Thumb-2/ARMv5 — impossíveis no GBA — vindos de
    tabelas percorridas como código. Sem esse filtro o levantamento teria gerado
    C bonito e falso.
-2. **`salto calculado` ≠ variável.** 306 instruções `mov pc, rN` são tabelas de
-   casos (dispatchers). Traduzi-las como atribuição seria mentira silenciosa:
-   agora a função sai **PARCIAL**, com o motivo no cabeçalho e `g_erro |= 2` no
-   ponto exato — legível, e detectável por quem executar.
-3. **Função sem corpo nenhum: 0.** Antes as 448 incompletas viravam só um
-   protótipo; agora todas as 7 717 têm algo para ler (406 com lacuna marcada).
+2. **83 "funções" não tinham uma linha de C — e contavam como completas.** O
+   resumo dizia 7 634 funções levantadas; as listas diziam 7 311 completas + 406
+   parciais. A diferença passou uma rodada inteira porque a conta não estava
+   escrita em lugar nenhum. Causa: endereços vindos de ponteiro de pool (73) ou
+   de `bl` decodificado de dado (10) que não decodificam como instrução do
+   ARM7TDMI. Efeito: viravam funções de corpo vazio **sem nenhuma recusa
+   registrada** — logo, "completas". Agora não são função: vão para `descartes`,
+   com motivo e bytes, e a medição **falha** se alguém reintroduzir o caso
+   (`analise._classificar` recusa publicar o número).
+3. **`salto calculado` ≠ variável.** 306 instruções `mov pc, rN` são tabelas de
+   casos. Traduzi-las como atribuição seria mentira silenciosa: a função sai
+   **PARCIAL**, com o motivo no cabeçalho e `g_erro |= 2` no ponto exato.
+   (Estudadas em `ferramentas/estudo_switch.py`: 309 dos 320 sítios seguem o
+   mesmo idioma `lsls` → `ldr r1,[pc,#N]` → `adds r0,r0,r1` → `ldr r0,[r0]` →
+   `mov pc, r0`, e em **todos** os casos o guarda `cmp rN, #k` confere com o
+   número de entradas lido da tabela — mas os alvos ainda não estão todos
+   desmontados, então um `switch` hoje só trocaria o texto.)
 
 O que esses números **não** dizem: que o C esteja semanticamente certo. Num
 binário de terceiros não existe verdade-terreno, então o que se prova é
-fidelidade de bytes e compilabilidade — **não comportamento**. O único lugar
-onde comportamento está provado é o corpus sintético (59/59 por emulação, no
-binário e no C rele_vantado e recompilado).
-
-## O que está provado e o que não está## O que está provado e o que não está
-
-**Provado:** o ciclo completo funciona em código Thumb real. As armadilhas que
-quebraram o pipeline durante o desenvolvimento e que os testes agora travam
-(regressões reais, cada uma produzia resultado plausível e errado):
-
-1. **Modo de execução do destino de `bl`.** O alvo vem **par**; escolher o modo
-   pela paridade desmonta a função inteira em ARM e gera lixo que parece código.
-   O modo correto é herdado de quem chama.
-2. **Semântica de PUSH/POP.** O push desce o `sp` e grava em endereços
-   crescentes; um `pop {r1}` posterior recupera o **primeiro** item empilhado.
-   Tratar a pilha como LIFO clássico entrega o endereço de retorno ao
-   registrador errado.
-3. **Deslocamento por registrador** (`lsls r3, r2`): quantidade nos 8 bits
-   baixos, com regras próprias para n = 0, 32 e > 32.
-4. **`mvns Rd, Rm`**: a fonte é o **segundo** operando (`mvns r3, r3` esconde o
-   erro; `mvns r2, r0` não).
-5. **Writeback do `stm r0!, {…}`**: a string termina em `}`, não em `!` — testar
-   o fim da string perde a atualização do registrador base.
-6. **`PC + 4` no pool de literais do Thumb** (bit1 zerado): errar desloca a
-   constante em 4 bytes.
-7. **Símbolos somem** se as funções geradas não forem `noinline, used`: o
-   compilador embute tudo e a verificação por endereço deixa de existir.
-
-Evidências gravadas em `evidencias/`: listagem legível, desmontagem em JSON,
-o C levantado e o resumo numérico da rodada.
-
-**NÃO provado (e não será sem a ROM):** nada sobre o FireRed/BPRE do projeto
-`../gba-re`. Sem o arquivo da ROM no disco, o melhor que este pipeline pode
-fazer com ele é: nada. Não existe verdade-terreno, não existe byte para ler.
-
-Para ROM de terceiros sem verdade-terreno, o caminho `rodada_binario` /
-`cli levantar` grava explicitamente no relatório:
-
-> ROM de terceiros: não existe verdade-terreno conhecida, então NÃO foi possível
-> afirmar se o C levantado está correto — só foi possível compilá-lo e registrar
-> o que ele executa.
+fidelidade de bytes e compilabilidade — **não comportamento**. Comportamento
+está provado no corpus sintético (59/59 por emulação, no binário e no C
+levantado e recompilado).
 
 ## Como usar
 
@@ -129,6 +111,10 @@ python -m gbadecomp.cli decompilar ROM.gba -o levantado.c
 # cabeçalho, espaço livre e cruzamento com o censo de funções
 python -m gbadecomp.cli relatorio ROM.gba --censo functions.csv
 
+# medir a rodada inteira e gravar a evidencia (numeros do README saem daqui)
+python -m gbadecomp.cli analisar ROM.gba --censo functions.csv \
+        --json evidencias/rom_bpre_analise.json -o levantado_rom.c
+
 # ROM de verdade, usando o censo como sementes (endereços + nomes)
 python -m gbadecomp.cli levantar ROM.gba --censo functions.csv -o levantado_rom.c
 ```
@@ -144,6 +130,8 @@ Testes: `python -m pytest tests/ -q`
 | `disasm.py` | descoberta recursiva (bl, desvios, pools de literais) com modo herdado da chamada |
 | `decompile.py` | tradução instrução-a-instrução para C, com pilha em memória real e conferência de balanceamento |
 | `verificador.py` | emulador unicorn + comparação com a verdade-terreno, caso a caso, sem maquiagem |
+| `analise.py` | mede a rodada inteira e grava a evidência; categorias exaustivas conferidas por asserção |
+| `conferir_bytes.py` | remonta cada instrução e compara com o binário (fidelidade de bytes, não semântica) |
 | `reconstruir.py` | junta tudo: disasm → C → compilação → imagem → verificação |
 | `cli.py` | linha de comando |
 

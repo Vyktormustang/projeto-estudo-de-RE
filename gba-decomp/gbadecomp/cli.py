@@ -17,6 +17,7 @@ import json
 import sys
 from pathlib import Path
 
+from . import analise as analise_mod
 from . import decompile as decompile_mod
 from . import disasm as disasm_mod
 from . import reconstruir as reconstruir_mod
@@ -111,11 +112,25 @@ def _cmd_levantar(args) -> int:
     print(f"instrucoes ..............: {desmontagem.total_instrucoes}")
     print(f"funcoes levantadas p/ C .: {len(codigo.completas)} "
           f"(incompletas: {len(codigo.incompletas)})")
+    if desmontagem.descartes:
+        print(f"enderecos descartados ..: {len(desmontagem.descartes)} "
+              f"(nenhuma instrucao valida do ARM7TDMI; nao contam como funcao)")
     print(f"C gravado em ............: {destino}")
     print()
     print("LIMITE HONESTO: nesta ROM nao existe verdade-terreno conhecida, entao o "
           "C acima NAO esta provado -- so foi gerado. Prova exige comparar com o "
           "comportamento do binario original.")
+    return 0
+
+
+def _cmd_analisar(args) -> int:
+    """Mede a rodada inteira e grava o JSON de evidencia (numeros reproduziveis)."""
+    medicao = analise_mod.medir(args.rom, censo=args.censo, caminho_c=args.output,
+                                zig=args.zig, conferir=not args.sem_conferencia)
+    print(medicao.texto())
+    if args.json:
+        Path(args.json).write_text(medicao.para_json(), encoding="utf-8")
+        print(f"\nJSON de evidencia gravado em {args.json}")
     return 0
 
 
@@ -163,6 +178,15 @@ def main(argv=None) -> int:
     p.add_argument("rom")
     p.add_argument("--censo", help="functions.csv do censo do projeto")
     p.set_defaults(func=_cmd_relatorio)
+
+    p = sub.add_parser("analisar", help="medir a rodada inteira e gravar a evidencia")
+    p.add_argument("rom")
+    p.add_argument("--censo", help="functions.csv (sementes por nome/endereco)")
+    p.add_argument("--json", help="arquivo JSON de evidencia")
+    p.add_argument("-o", "--output", help="gravar o C levantado neste arquivo")
+    p.add_argument("--sem-conferencia", action="store_true", default=False,
+                   help="pular a conferencia byte a byte (mais rapido)")
+    p.set_defaults(func=_cmd_analisar)
 
     p = sub.add_parser("levantar", help="ROM real: censo + boot como sementes")
     p.add_argument("rom")

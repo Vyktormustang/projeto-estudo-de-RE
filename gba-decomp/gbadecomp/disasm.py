@@ -121,12 +121,37 @@ class FuncaoDesmontada:
 
 
 @dataclass
+class Descartado:
+    """Endereco tentado como funcao que NAO tem codigo do ARM7TDMI no inicio.
+
+    Existe por um motivo concreto: um ponteiro lido de pool (ou um desvio vindo
+    de dado lido como codigo) pode apontar para uma tabela. O endereco entra na
+    fila como candidato a funcao e nao decodifica -- nem como Thumb, nem como
+    ARM -- ou decodifica para instrucao que o GBA nao tem (Thumb-2: `cbnz`,
+    `it`, `addw`...). Antes isso virava uma "funcao" de corpo vazio que contava
+    como completa: um erro silencioso. Agora nao entra na lista de funcoes e
+    tambem nao desaparece -- fica aqui, com o motivo e os bytes, para auditoria.
+    """
+
+    entrada: int
+    modo: str
+    semente: str = "?"
+    motivo: str = "?"
+    bytes_: bytes = b""
+
+    def texto(self) -> str:
+        return (f"descartado 0x{self.entrada:08X} ({self.modo}, semente: {self.semente})"
+                f": {self.motivo} | bytes iniciais: {self.bytes_.hex(' ')}")
+
+
+@dataclass
 class Desmontagem:
     """Resultado de uma descoberta recursiva."""
 
     base: int
     funcoes: dict[int, FuncaoDesmontada] = field(default_factory=dict)
     dados_lidos: dict[int, int] = field(default_factory=dict)      # pool -> valor
+    descartes: dict[int, Descartado] = field(default_factory=dict)
     avisos: list[str] = field(default_factory=list)
 
     @property
@@ -146,6 +171,10 @@ class Desmontagem:
     def texto(self) -> str:
         linhas = [f"desmontagem: {len(self.funcoes)} funcoes, "
                   f"{self.total_instrucoes} instrucoes, {len(self.arestas())} arestas"]
+        if self.descartes:
+            linhas.append(f"  {len(self.descartes)} enderecos tentados como funcao e "
+                          f"descartados: nenhuma instrucao valida do ARM7TDMI no inicio "
+                          f"(provavel ponteiro para tabela; lista completa no JSON)")
         for f in sorted(self.funcoes.values(), key=lambda x: x.entrada):
             linhas.extend(f.texto())
             linhas.append("")
@@ -173,6 +202,11 @@ class Desmontagem:
                 ],
                 "arestas": [[f"0x{a:08X}", f"0x{b:08X}"] for a, b in self.arestas()],
                 "dados_lidos": {f"0x{k:08X}": f"0x{v:08X}" for k, v in self.dados_lidos.items()},
+                "descartes": [
+                    {"entrada": f"0x{d.entrada:08X}", "modo": d.modo, "semente": d.semente,
+                     "motivo": d.motivo, "bytes": d.bytes_.hex(" ")}
+                    for d in sorted(self.descartes.values(), key=lambda x: x.entrada)
+                ],
                 "avisos": self.avisos,
             },
             indent=2,
@@ -221,14 +255,28 @@ def desmontar_por_sementes(
 
     while fila and len(saida.funcoes) < max_funcoes:
         entrada, modo, origem = fila.pop(0)
-        if entrada in saida.funcoes or not (base <= entrada < base + len(imagem)):
+        if (entrada in saida.funcoes or entrada in saida.descartes
+                or not (base <= entrada < base + len(imagem))):
             continue
-        funcao, novas = _seguir_funcao(imagem, base, entrada, modo, origem,
-                                       saida.dados_lidos if seguir_pool else None)
+        funcao, novas, origens = _seguir_funcao(imagem, base, entrada, modo, origem,
+                                                 saida.dados_lidos if seguir_pool else None)
+        if not funcao.instrucoes:
+            # NENHUMA instrucao do ARM7TDMI no endereco: isto nao e funcao.
+            # Nao entra na lista (nao inventa codigo) e nao some (fica em
+            # descartes com o motivo e os bytes). O bug que isto conserta: antes
+            # essas entradas ficavam em `funcoes` com corpo vazio e, como nao
+            # havia recusa nenhuma, contavam como COMPLETAS -- 83 funcoes
+            # "levantadas" que nao tinham uma linha de C (achado por conferencia
+            # do .c gerado contra o resumo impresso: 7634 + 83 = 7717).
+            inicio = entrada - base
+            saida.descartes[entrada] = Descartado(
+                entrada=entrada, modo=modo, semente=origem,
+                motivo=funcao.terminacao, bytes_=imagem[inicio:inicio + 8])
+            continue
         saida.funcoes[entrada] = funcao
         for destino, modo_destino in novas.items():
-            if destino not in saida.funcoes:
-                fila.append((destino, modo_destino, f"referencia de 0x{entrada:08X}"))
+            if destino not in saida.funcoes and destino not in saida.descartes:
+                fila.append((destino, modo_destino, origens.get(destino, "referencia")))
     return saida
 
 
@@ -245,7 +293,7 @@ def _entrada_de_boot(imagem: bytes, base: int) -> int | None:
 
 def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: str,
                    dados: dict[int, int] | None
-                   ) -> tuple[FuncaoDesmontada, dict[int, str]]:
+                   ) -> tuple[FuncaoDesmontada, dict[int, str], dict[int, str]]:
     """Percorre uma funcao ate o retorno, coletando chamadas e novas sementes.
 
     Ponto delicado ja verificado na pratica: o destino de um `bl` do Thumb vem
@@ -257,6 +305,7 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
     cs = _capstone(modo)
     funcao = FuncaoDesmontada(entrada=entrada, modo=modo, semente=origem)
     novas: dict[int, str] = {}
+    origens: dict[int, str] = {}          # de onde veio cada candidato a funcao
     visitados: set[int] = set()
     pendente = [entrada]
     limite = base + len(imagem)
@@ -291,6 +340,8 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                     if apontado:
                         endereco, modo_alvo = apontado
                         novas[endereco] = modo_alvo
+                        origens[endereco] = (f"ponteiro de pool em "
+                                             f"0x{ins.address:08X}")
 
             # 2) chamadas: destino entra na fila como nova funcao
             if ins.group(capstone.CS_GRP_CALL):
@@ -300,6 +351,8 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                     # modo: herda de quem chama; blx (ARM) troca para Thumb
                     modo_alvo = "thumb" if (modo == "thumb" or ins.mnemonic == "blx") else "arm"
                     novas[alvo & ~1] = modo_alvo
+                    origens[alvo & ~1] = (f"chamada ({ins.mnemonic}) em "
+                                          f"0x{ins.address:08X}")
                 atual = ins.address + len(ins.bytes)
                 continue
 
@@ -327,7 +380,7 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
     if funcao.terminacao == "indefinida":
         funcao.terminacao = "limite de leitura (sem retorno encontrado)"
     funcao.instrucoes.sort(key=lambda i: i.endereco)
-    return funcao, novas
+    return funcao, novas, origens
 
 
 def _ponteiro_de_codigo(ins, valor: int, imagem: bytes, base: int, modo: str, cs):

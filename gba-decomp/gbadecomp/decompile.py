@@ -120,6 +120,7 @@ class FuncaoDec:
     nao_levantadas: list[str] = field(default_factory=list)
     externos: list[str] = field(default_factory=list)   # alvos de chamada sem corpo
     balanceamento: str = "desconhecido"
+    terminacao: str = "indefinida"                      # como o fluxo terminou
 
     @property
     def completa(self) -> bool:
@@ -136,6 +137,17 @@ class FuncaoDec:
 
     def assinatura(self) -> str:
         return f"u32 {self.nome}(u32 r0, u32 r1, u32 r2, u32 r3)"
+
+
+def _terminacao_notavel(terminacao: str) -> bool:
+    """A terminacao so interessa ao leitor quando NAO e um retorno normal.
+
+    `bx lr` / `pop {pc}` / `mov pc, lr` sao o caso comum e nao dizem nada. Ja
+    "parou em 0x...", "salto para fora", "codigo invalido" e "limite de leitura"
+    sao informacao de verdade: dizem onde a leitura do fluxo parou e por que.
+    """
+    marcadores = ("parou em", "codigo invalido", "limite de leitura", "salto para fora")
+    return any(m in terminacao for m in marcadores)
 
 
 @dataclass
@@ -210,7 +222,11 @@ class CodigoC:
                 if len(quem_chama) > 6:
                     resumo += f", ... (+{len(quem_chama) - 6})"
                 linhas.append(f"/* chamada por {len(quem_chama)}: {resumo} */")
-            linhas.append(f"/* origem: 0x{f.endereco:08X} ({f.modo}), pilha: {f.balanceamento} */")
+            origem = (f"/* origem: 0x{f.endereco:08X} ({f.modo}), "
+                      f"pilha: {f.balanceamento}")
+            if _terminacao_notavel(f.terminacao):
+                origem += f", fim: {f.terminacao}"
+            linhas.append(origem + " */")
             linhas.append(f"__attribute__((noinline, used)) "
                           f"u32 {f.nome}(u32 r0, u32 r1, u32 r2, u32 r3) {{")
             # Todos os registradores do ARM7TDMI viram variaveis C com o MESMO
@@ -281,6 +297,13 @@ class _Emissor:
         self.linhas.append(texto)
 
     def levantar(self) -> FuncaoDec:
+        # Invariante de honestidade: funcao sem instrucao nenhuma NAO pode sair
+        # como "completa". Sem corpo e sem motivo, o resumo mentiria -- foi
+        # exatamente o caso das 83 entradas fantasma da ROM real.
+        if not self.f.instrucoes:
+            self.nao_levantadas.append(
+                "nenhuma instrucao desmontavel no endereco (bytes que nao sao "
+                "codigo do ARM7TDMI)")
         for indice, ins in enumerate(self.f.instrucoes):
             self._indice_instrucao = indice
             if ins.endereco in self.rotulos:
@@ -301,6 +324,7 @@ class _Emissor:
             externos=sorted(self.externos),
             balanceamento=("balanceada" if self.sp_modelo == 0
                            else f"desequilibrada ({self.sp_modelo} slots)"),
+            terminacao=self.f.terminacao,
         )
 
     # -- traducao ---------------------------------------------------------

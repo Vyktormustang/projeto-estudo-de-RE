@@ -7,3 +7,6 @@ __pycache__/
 
 # ROM do usuario: nunca versionar (fica fora do repositorio, em /home/user/gba-re/*)
 *.gba
+
+# nenhuma imagem de ROM pode entrar no repositorio (imagem de terceiros)
+gba-decomp/**/*.gba

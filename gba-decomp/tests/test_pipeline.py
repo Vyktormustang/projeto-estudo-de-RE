@@ -21,7 +21,15 @@ import pytest
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ))
 
-from gbadecomp import corpus, decompile, disasm, reconstruir, rom, verificador  # noqa: E402
+from gbadecomp import (  # noqa: E402
+    analise as analise_mod,
+    corpus,
+    decompile,
+    disasm,
+    reconstruir,
+    rom,
+    verificador,
+)
 
 
 @pytest.fixture(scope="module")
@@ -186,16 +194,63 @@ def test_salto_calculado_marca_funcao_como_parcial():
     assert "return r0;" in funcao.corpo
 
 
-def test_desmontador_para_em_byte_invalido_sem_inventar():
-    """Byte que nao e instrucao valida encerra a varredura e fica registrado --
-    o desmontador nao pode 'adivinhar' o que vem depois."""
+def test_endereco_sem_codigo_vira_descarte_e_nunca_funcao():
+    """Byte invalido no endereco: nao vira funcao E nao desaparece.
+
+    Bug real (ROM de estudo): entradas que nao decodificavam ficavam na lista de
+    funcoes com corpo vazio e, como nao havia recusa registrada, contavam como
+    COMPLETAS -- 83 "funcoes levantadas" sem uma linha de C. O contrato agora e
+    explicito: sem nenhuma instrucao valida do ARM7TDMI, nao e funcao; vai para
+    `descartes` com o motivo e os bytes.
+    """
     imagem = (bytes(0xC0) + bytes.fromhex("00009fe5") + bytes.fromhex("10ff2fe1")
               + (0x080000CD).to_bytes(4, "little") + bytes.fromhex("ffff")
               + b"\xff" * 64)
     desmontagem = disasm.desmontar_por_sementes(imagem)
-    funcao = next(iter(desmontagem.funcoes.values()))
-    assert funcao.instrucoes == []
-    assert "invalido" in funcao.terminacao
+    assert desmontagem.funcoes == {}, "endereco sem codigo nao pode virar funcao"
+    (descartado,) = desmontagem.descartes.values()
+    assert descartado.entrada == 0x080000CC
+    assert "invalido" in descartado.motivo
+    # o descarte fica auditavel no JSON (endereco, motivo e bytes iniciais)
+    registro = json.loads(desmontagem.para_json())["descartes"][0]
+    assert registro["entrada"] == "0x080000CC" and registro["bytes"].startswith("ff ff")
+
+
+def test_lifter_marca_funcao_sem_instrucao_como_incompleta():
+    """Segunda barreira: mesmo que uma funcao vazia chegue ao lifter, ela nao
+    pode sair como 'completa' -- o resumo mentiria."""
+    vazia = disasm.FuncaoDesmontada(entrada=0x08000100, modo="thumb")
+    codigo = decompile.decompilar(
+        disasm.Desmontagem(base=rom.ROM_BASE, funcoes={0x08000100: vazia}),
+        bytes(0x200))
+    (levantada,) = codigo.funcoes
+    assert not levantada.completa and not levantada.tem_corpo
+    assert "nenhuma instrucao" in levantada.nao_levantadas[0]
+    assert "NAO levantada" in codigo.texto()   # o .c explica, nao fica em branco
+
+
+def test_medicao_recusa_publicar_numero_que_mente():
+    """A medicao tem de FALHAR se alguem reintroduzir o bug, em vez de publicar
+    o numero inflado (7 311 completas contra 7 228 com corpo)."""
+    codigo = decompile.CodigoC()
+    codigo.funcoes.append(decompile.FuncaoDec(
+        endereco=0x08000100, nome="fn_08000100", modo="thumb",
+        corpo="", nao_levantadas=[]))
+    with pytest.raises(RuntimeError, match="COMPLETAS sem nenhuma linha de C"):
+        analise_mod._classificar(codigo)
+
+
+def test_medicao_do_corpus_fecha_as_contas(corpus_pronto):
+    """As categorias da medicao sao exaustivas e batem com a verdade-terreno."""
+    medicao = analise_mod.medir(corpus_pronto.rom_path, conferir=False)
+    lev = medicao.levantamento
+    assert lev["funcoes"] == 24
+    assert lev["com_c_para_ler"] + lev["sem_corpo"] == lev["funcoes"]
+    assert lev["completas"] + lev["parciais"] == lev["com_c_para_ler"]
+    assert lev["com_c_para_ler"] == lev["funcoes"], "no corpus tudo tem C para ler"
+    assert medicao.completo["descartes"] == 0
+    assert medicao.sha256 == corpus_pronto.sha256
+    assert "com C para ler" in medicao.texto()
 
 
 def test_verificador_reporta_divergencia_sem_maquiar(tmp_path):
