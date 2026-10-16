@@ -64,10 +64,16 @@ FORA_DO_ARMV4T_SEMPRE = {
     "smlaltt", "smlawb", "smlawt", "smulbb", "smulbt", "smultb", "smultt",
     "smulwb", "smulwt", "smulwy", "smlalwy",
 }
-# Formas de coprocessador com letra colada no nome: `ldcl`, `stcl`, `ldc2`,
-# `stc2`, `cdp2`, `mcr2`, `mrc2` (o `l`/`2` faz parte da mesma instrucao). A
-# lista abaixo so' pega a forma exata, e foi por isso que `ldcl` (3 vezes) e
-# `stcl` (3 vezes) passaram pelo filtro no modo Thumb.
+# Coprocessador: o ARM7TDMI DECODIFICA estas instrucoes e as deixa INDEFINIDAS
+# quando nao ha coprocessador ligado -- e o GBA nao liga nenhum. Entao qualquer
+# `ldc`/`stc`/`cdp`/`mcr`/`mrc` aqui e' dado lido como codigo, NOS DOIS MODOS.
+# A pergunta e' por PREFIXO porque a forma vem colada no nome: a comparacao por
+# igualdade deixou passar `ldcl` (3 vezes na ROM) e `stcl` (3 vezes). Medido: as 6
+# estavam em janelas THUMB; em ARM nao ha nenhuma na ROM (varredura r17), mas a
+# regra vale nos dois modos -- a mensagem "falta traduzir" seria falsa ali tambem.
+# Conferido com keystone+capstone: `ldc`/`ldcl`/`stcl`/`cdp`/`mcr`/`mrc`/`ldc2`/
+# `mcrr` decodificam com esses nomes, e nenhuma instrucao VALIDA do ARMv4T comeca
+# com esses prefixos (nao ha' falso positivo).
 FORMAS_DE_COPROCESSADOR = ("ldc", "stc", "cdp", "mcr", "mrc")
 TAMANHO_THUMB1 = 2      # toda instrucao Thumb que o ARM7TDMI executa
 TAMANHO_THUMB2 = 4      # codificacao de 32 bits: prefixos 11101/11110/11111
@@ -123,11 +129,12 @@ def forma_impossivel_no_thumb1(ins, modo: str) -> str | None:
 # "mul", que EXISTEM no Thumb-1 -- e o estrago apareceu na medicao: **56 funcoes
 # terminavam em `adr`** por causa disso. `02 a0` e' `adr r0, #8`, que no Thumb-1 e'
 # `add r0, pc, #8`; `48 43` e' `muls r0, r1, r0`, do Thumb-1 tambem. O que NAO
-# existe no Thumb-1 (e fica): `rev`/`swp`/`mrs`/`msr`/`umull`/`smull` (ARMv5), as
-# de coprocessador, `ldmib`/`stmib` e `blx` (ARMv5T).
+# existe no Thumb-1 (e fica): `rev`/`swp`/`mrs`/`msr`/`umull`/`smull` (ARMv5),
+# `ldmib`/`stmib` e `blx` (ARMv5T). As de COPROCESSADOR sairam daqui: elas sao
+# dado nos DOIS modos, e quem responde por elas e' `FORMAS_DE_COPROCESSADOR`.
 FORA_DO_V4T_SO_NO_THUMB = {
     "rev", "mrs", "msr", "umull", "umlal", "smull", "smlal", "swp",
-    "swpb", "ldc", "stc", "mcr", "mrc", "cdp", "ldmib", "stmib",
+    "swpb", "ldmib", "stmib",
 }
 SUFIXOS_THUMB2 = (".w", ".n")
 
@@ -148,14 +155,19 @@ def impossivel_no_arm7tdmi(ins, modo: str) -> str | None:
     if base.startswith("v"):
         return f"{base}: NEON/VFP nao existe no ARM7TDMI"
     for prefixo in ("addw", "subw", "movw", "movt", "sbfx", "ubfx", "bfi", "bfc",
-                    "ldc2", "stc2", "cdp2", "mcr2", "mrc2", "blx", "bxns", "vc"):
+                    "blx", "bxns", "vc"):
         if base.startswith(prefixo):
-            return f"{base}: coprocessador 2 nao existe no ARM7TDMI"
+            return f"{base}: forma larga que nao existe no ARM7TDMI"
+    if base.startswith(FORMAS_DE_COPROCESSADOR):
+        # FORA do ramo do Thumb: vale nos dois modos (ver acima). O modo entra so'
+        # no texto, porque a razao e' a mesma -- o GBA nao tem coprocessador.
+        onde = "no Thumb-1" if modo == "thumb" else "no ARM do ARM7TDMI"
+        return (f"{base}: coprocessador {onde} -- o GBA nao tem coprocessador "
+                f"nenhum, entao a instrucao nao executa: aqui a leitura passou "
+                f"por dado")
     if modo == "thumb":
         if base in FORA_DO_V4T_SO_NO_THUMB:
             return f"{base}: existe no ARM do ARMv4T, mas nao no Thumb-1"
-        if base.startswith(FORMAS_DE_COPROCESSADOR):
-            return f"{base}: coprocessador nao existe no Thumb-1"
         if base in ("stmdb", "ldmdb", "stmib", "ldmib"):
             return (f"{base}: no Thumb-1 os blocos so' existem como `push`/`pop`/"
                     f"`stmia`/`ldmia` -- isto e' a forma do Thumb-2")

@@ -1422,6 +1422,54 @@ def _imagem_de_teste(*instrucoes: tuple[int, str], tamanho: int = 0x600) -> byte
     return bytes(imagem)
 
 
+def test_coprocessador_e_dado_nos_dois_modos_nao_so_no_thumb():
+    """`ldc`/`stc`/`cdp`/`mcr`/`mrc` nao existem no GBA -- em modo NENHUM.
+
+    A regra vivia DENTRO do ramo do Thumb. Em ARM, uma instrucao de coprocessador
+    sairia como "mnemonico nao implementado (a instrucao existe no ARMv4T; falta
+    traduzir)" -- e' FALSA: o ARM7TDMI decodifica essas instrucoes e as deixa
+    indefinidas quando nao ha coprocessador ligado, e o GBA nao liga nenhum. O
+    que esta' ali e' dado lido como codigo. Varredura r17 na ROM de estudo: 75
+    instrucoes ARM nas janelas, **zero** de coprocessador (as 6 que aparecem --
+    `ldcl` 3 vezes, `stcl` 3 vezes -- estao em janelas Thumb); a regra passou a
+    valer nos dois modos mesmo assim, porque o proximo erro desse tipo nao avisa.
+
+    Bytes montados com keystone (`ldc p1, c0, [r0]` -> `00 01 90 ed`) e conferidos
+    pelo capstone ANTES de julgar o filtro.
+    """
+    coprocessador = [
+        ("00 01 90 ed", "ldc"),     # ldc p1, c0, [r0]
+        ("00 01 d0 ed", "ldcl"),    # ldcl p1, c0, [r0]   (letra colada no nome)
+        ("00 32 c1 ed", "stcl"),    # stcl p2, c3, [r1]
+        ("c5 31 24 ee", "cdp"),     # cdp p1, #2, c3, c4, c5, #6
+        ("72 0f 01 ee", "mcr"),     # mcr p15, #0, r0, c1, c2, #3
+        ("10 0f 11 ee", "mrc"),     # mrc p15, #0, r0, c1, c0, #0
+        ("00 01 90 fd", "ldc2"),    # ldc2 p1, c0, [r0]
+        ("23 01 41 ec", "mcrr"),    # mcrr p1, #2, r0, r1, c3
+    ]
+    for hexa, mnemonic in coprocessador:
+        ins = _decodifica(bytes.fromhex(hexa), 0x08000000, "arm")
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)   # o que esta' la
+        motivo = disasm.impossivel_no_arm7tdmi(ins, "arm")
+        assert motivo is not None, f"{mnemonic} deveria ser impossivel em ARM"
+        assert "coprocessador" in motivo, motivo
+
+    # o que EXISTE no ARMv4T continua passando (o teste do Thumb ja' cobria os dois
+    # primeiros; aqui eles sao conferidos no modo em que o filtro foi mexido)
+    for hexa, mnemonic in (("00 40 2d e9", "stmdb"),     # stmdb sp!, {lr} = push
+                           ("00 00 4f e1", "mrs"),       # mrs r0, spsr
+                           ("00 00 a0 e1", "mov")):      # mov r0, r0
+        ins = _decodifica(bytes.fromhex(hexa), 0x08000368, "arm")
+        assert ins.mnemonic == mnemonic, (ins.mnemonic, mnemonic)
+        assert disasm.impossivel_no_arm7tdmi(ins, "arm") is None, mnemonic
+
+    # e a leitura PARA no ponto: o dado nao continua sendo lido como codigo
+    imagem = _imagem_de_teste((0x08000020, "00 01 90 ed"))       # ldc p1, c0, [r0]
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "arm"})
+    assert 0x08000020 in desmontagem.descartes, desmontagem.descartes
+    assert desmontagem.total_instrucoes == 0, desmontagem.total_instrucoes
+
+
 def test_pc_lido_como_operando_vira_constante_e_nao_a_variavel_pc():
     """`add lr, pc, #0` (bytes REAIS da ROM: 00 e0 8f e2) tem valor constante.
 

@@ -291,6 +291,31 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    `test_stmdb_sp_do_arm_e_o_push_da_pilha_do_modelo` (bytes montados com keystone,
    conferidos pelo capstone e conferidos contra os bytes da ROM).
 
+16. **A regra de coprocessador so' valia no Thumb.** `ldc`/`stc`/`cdp`/`mcr`/
+   `mrc` sao dado nos DOIS modos -- o ARM7TDMI decodifica essas instrucoes e as
+   deixa indefinidas quando nao ha coprocessador ligado, e o GBA nao liga nenhum
+   --, mas a checagem estava **dentro do ramo do Thumb**. Em ARM, uma delas sairia
+   como "mnemonico nao implementado (a instrucao existe no ARMv4T; falta
+   traduzir)", que e' afirmacao falsa. Medido ANTES de mexer (varredura r17): nas
+   janelas da ROM ha' **75 instrucoes ARM, e zero delas e' de coprocessador** (as
+   6 que aparecem -- `ldcl` 3 vezes, `stcl` 3 vezes -- estao em janelas Thumb, ja'
+   cobertas pela regra antiga). Ou seja: a mudanca nao tinha como alterar leitura
+   nenhuma; o que ela conserta e' o **texto**, e isso aparece em 50 entradas de
+   `descartes` reescritas (`ldc2l` 45, `stc2` 2, `stc2l` 1, `mcr` 1, `ldc2` 1) --
+   `ldc2l` dizia "coprocessador 2 nao existe no ARM7TDMI" quando a razao e' nao
+   existir coprocessador **nenhum**. A pergunta passou a ser por PREFIXO (a forma
+   vem colada no nome: `ldcl`, `stcl`, `ldc2l`) e vale nos dois modos. Efeito
+   medido na rodada r17: **tudo identico a r16** -- 8 172 funcoes, 460 868
+   instrucoes, 191 recusas, 8 027 + 145 completas/parciais, 460 639/460 868 na
+   conferencia, 1 056 638 linhas de C (2 692 bytes a mais, so' texto de recusa) e
+   **objeto byte a byte identico** (`sha256` 82b93d74… igual): a prosa mudou, o
+   codigo gerado nao. Teste
+   `test_coprocessador_e_dado_nos_dois_modos_nao_so_no_thumb`: 8 formas montadas
+   com keystone e conferidas pelo capstone antes do veredito, 3 negativos que
+   EXISTEM no ARMv4T (`stmdb sp!` = push do ARM, `mrs`, `mov`) e o caso em que a
+   leitura **para** no ponto (vira `descarte`, com 0 instrucoes lidas). Conferido
+   quebrando de proposito: com a regra de volta so' no Thumb, o teste cai.
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**

@@ -9,7 +9,7 @@
 
      python -m gbadecomp.cli analisar ROM.gba --censo censo/functions.csv \
             --json evidencias/rom_bpre_analise.json -o levantado_rom.c
-     sha256 do .c levantado: fcc41d716540ac26d1a4104ca648dec2...
+     sha256 do .c levantado: 83ba731c17b271c2925d28926265169f...
      sha256 da ROM ........: 6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae
 
    Estado medido (tudo em evidencias/rom_bpre_analise.json, gerado por
@@ -27,7 +27,7 @@
                           recuperados como janela propria
      com C para ler .....: 8027 completas + 145 parciais
                           (100.0% com C)
-     C ..................: 1056638 linhas / 39944129 bytes
+     C ..................: 1056638 linhas / 39946821 bytes
      conferencia bytes ..: 460639/460868 (99.95%) remontam identicas ao
                           binario; 226 divergencias, 3 fora da sintaxe
      compilacao .........: OK, 0 erros

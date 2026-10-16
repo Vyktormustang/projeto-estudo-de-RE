@@ -120,7 +120,7 @@
       "entrada": "0x081A6CE2",
       "modo": "thumb",
       "semente": "salto para tras em 0x081A6D18",
-      "motivo": "parou em 0x081A6CE2: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x081A6CE2: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "fe fd 03 00 ca c9 c5 1b"
     },
     {
@@ -197,7 +197,7 @@
       "entrada": "0x081C5646",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0806F986",
-      "motivo": "parou em 0x081C5646: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x081C5646: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 01 00 e7 d5 e0 ea"
     },
     {
@@ -239,7 +239,7 @@
       "entrada": "0x08231C84",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080073FC",
-      "motivo": "parou em 0x08231C84: stc2: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08231C84: stc2: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "20 fc fc f8 f8 f0 f0 e0"
     },
     {
@@ -253,7 +253,7 @@
       "entrada": "0x0825DEA4",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0804107E",
-      "motivo": "parou em 0x0825DEA4: stc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0825DEA4: stc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "c0 fc f3 cf 3f 01 04 10"
     },
     {
@@ -281,14 +281,14 @@
       "entrada": "0x083FBBE8",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08042E54",
-      "motivo": "parou em 0x083FBBE8: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FBBE8: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 0f 00 d7 e3 e1 d9"
     },
     {
       "entrada": "0x083FC210",
       "modo": "thumb",
       "semente": "salto para tras em 0x083FC810",
-      "motivo": "parou em 0x083FC210: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FC210: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "fe fd 14 00 d5 e7 00 dd"
     },
     {
@@ -316,14 +316,14 @@
       "entrada": "0x083FCD22",
       "modo": "thumb",
       "semente": "salto para tras em 0x083FCD44",
-      "motivo": "parou em 0x083FCD22: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FCD22: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "fe fd 20 ab ff ca e0 d5"
     },
     {
       "entrada": "0x083FCD9E",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D76A8",
-      "motivo": "parou em 0x083FCD9E: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FCD9E: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 10 11 00 fd 20 00"
     },
     {
@@ -337,14 +337,14 @@
       "entrada": "0x083FD0F0",
       "modo": "thumb",
       "semente": "salto para tras em 0x083FD120",
-      "motivo": "parou em 0x083FD0F0: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD0F0: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 0f 00 dd db e2 e3"
     },
     {
       "entrada": "0x083FD134",
       "modo": "thumb",
       "semente": "salto para tras em 0x083FD182",
-      "motivo": "parou em 0x083FD134: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD134: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 0f 00 dd e7 fe e0"
     },
     {
@@ -358,49 +358,49 @@
       "entrada": "0x083FD296",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D73F2",
-      "motivo": "parou em 0x083FD296: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD296: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 06 00 e7 d9 e0 ea"
     },
     {
       "entrada": "0x083FD382",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D73AC",
-      "motivo": "parou em 0x083FD382: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD382: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 20 fe cb e9 d9 e6"
     },
     {
       "entrada": "0x083FD396",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D7398",
-      "motivo": "parou em 0x083FD396: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD396: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 20 00 d5 e2 d8 00"
     },
     {
       "entrada": "0x083FD3B0",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D74B8",
-      "motivo": "parou em 0x083FD3B0: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD3B0: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 1c 00 fd 1d 00 00"
     },
     {
       "entrada": "0x083FD3C6",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D748C",
-      "motivo": "parou em 0x083FD3C6: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD3C6: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 1c 00 fd 1d 00 e1"
     },
     {
       "entrada": "0x083FD3F6",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D74B0",
-      "motivo": "parou em 0x083FD3F6: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD3F6: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 20 00 d9 e2 ea dd"
     },
     {
       "entrada": "0x083FD406",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D7494",
-      "motivo": "parou em 0x083FD406: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD406: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 20 00 e7 d9 e2 e8"
     },
     {
@@ -414,49 +414,49 @@
       "entrada": "0x083FD4B4",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D744E",
-      "motivo": "parou em 0x083FD4B4: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD4B4: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 1f 00 e1 d5 e2 d8"
     },
     {
       "entrada": "0x083FD4CC",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D74E2",
-      "motivo": "parou em 0x083FD4CC: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD4CC: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 00 b8 00 c0 e3 dd"
     },
     {
       "entrada": "0x083FD4EA",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D7500",
-      "motivo": "parou em 0x083FD4EA: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD4EA: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 00 b8 00 ea e3 e0"
     },
     {
       "entrada": "0x083FD50C",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D750C",
-      "motivo": "parou em 0x083FD50C: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD50C: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 00 b8 00 00 00 00"
     },
     {
       "entrada": "0x083FD524",
       "modo": "thumb",
       "semente": "salto para tras em 0x083FD5DC",
-      "motivo": "parou em 0x083FD524: stc2: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD524: stc2: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "00 fd 1d fe eb dd e8 dc"
     },
     {
       "entrada": "0x083FD534",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D7534",
-      "motivo": "parou em 0x083FD534: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD534: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 20 00 eb dd e8 dc"
     },
     {
       "entrada": "0x083FD544",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D753C",
-      "motivo": "parou em 0x083FD544: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD544: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 22 00 eb dd e8 dc"
     },
     {
@@ -491,21 +491,21 @@
       "entrada": "0x083FD57A",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080D7642",
-      "motivo": "parou em 0x083FD57A: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FD57A: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 0f 00 e9 e7 e3 e9"
     },
     {
       "entrada": "0x083FE87A",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0800F6E8",
-      "motivo": "parou em 0x083FE87A: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FE87A: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 02 00 c6 e3 e7 e7"
     },
     {
       "entrada": "0x083FE882",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0800F5D6",
-      "motivo": "parou em 0x083FE882: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x083FE882: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 02 00 be e6 d5 eb"
     },
     {
@@ -603,7 +603,7 @@
       "entrada": "0x084162A8",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0806EEC4",
-      "motivo": "parou em 0x084162A8: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x084162A8: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 ba fd 03 fe bc"
     },
     {
@@ -624,7 +624,7 @@
       "entrada": "0x084162FE",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08109B6E",
-      "motivo": "parou em 0x084162FE: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x084162FE: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 fe e7 d9 e0 d9"
     },
     {
@@ -638,28 +638,28 @@
       "entrada": "0x084166FE",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08131D52",
-      "motivo": "parou em 0x084166FE: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x084166FE: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 06 00 ff fc 06 02"
     },
     {
       "entrada": "0x08416702",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08131DCE",
-      "motivo": "parou em 0x08416702: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416702: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 06 02 ff 00 00 ff"
     },
     {
       "entrada": "0x08416A54",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08127BC4",
-      "motivo": "parou em 0x08416A54: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416A54: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 de 17 00 da"
     },
     {
       "entrada": "0x08416A74",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08127B28",
-      "motivo": "parou em 0x08416A74: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416A74: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 e2 f4 e3 00"
     },
     {
@@ -680,56 +680,56 @@
       "entrada": "0x08416C48",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0812052A",
-      "motivo": "parou em 0x08416C48: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416C48: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 de 17 00 d9"
     },
     {
       "entrada": "0x08416DB2",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08125CA0",
-      "motivo": "parou em 0x08416DB2: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416DB2: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 d5 e4 e6 d9"
     },
     {
       "entrada": "0x08416DF6",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x081267A6",
-      "motivo": "parou em 0x08416DF6: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416DF6: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 e5 e9 d9 e6"
     },
     {
       "entrada": "0x08416F26",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08126B1A",
-      "motivo": "parou em 0x08416F26: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416F26: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 e6 d9 e7 e8"
     },
     {
       "entrada": "0x08416F6E",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0812511A",
-      "motivo": "parou em 0x08416F6E: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416F6E: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 da e3 dd 00"
     },
     {
       "entrada": "0x08416FEC",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08125156",
-      "motivo": "parou em 0x08416FEC: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08416FEC: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 da dd d7 e3"
     },
     {
       "entrada": "0x08417016",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x081263E0",
-      "motivo": "parou em 0x08417016: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08417016: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 da e3 dd 00"
     },
     {
       "entrada": "0x08417074",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08125142",
-      "motivo": "parou em 0x08417074: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08417074: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 da dd d7 e3"
     },
     {
@@ -876,7 +876,7 @@
       "entrada": "0x0841B2E4",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x0811E8B2",
-      "motivo": "parou em 0x0841B2E4: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0841B2E4: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 06 00 ae fc 06 02"
     },
     {
@@ -1023,14 +1023,14 @@
       "entrada": "0x0841E1E8",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08052862",
-      "motivo": "parou em 0x0841E1E8: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0841E1E8: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 03 00 e7 d9 e6 17"
     },
     {
       "entrada": "0x0841E20C",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08053590",
-      "motivo": "parou em 0x0841E20C: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0841E20C: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 e6 d9 d7 d9"
     },
     {
@@ -1058,14 +1058,14 @@
       "entrada": "0x0841E404",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080E4AB6",
-      "motivo": "parou em 0x0841E404: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0841E404: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fd 02 00 d5 e4 e6 d9"
     },
     {
       "entrada": "0x0841E492",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080E4E3A",
-      "motivo": "parou em 0x0841E492: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0841E492: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 08 20 a2 b8 00 fc"
     },
     {
@@ -1135,7 +1135,7 @@
       "entrada": "0x0843F8DA",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x08101098",
-      "motivo": "parou em 0x0843F8DA: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0843F8DA: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 11 11 ff 00 d8 a8"
     },
     {
@@ -1170,14 +1170,14 @@
       "entrada": "0x08535682",
       "modo": "thumb",
       "semente": "salto para tras em 0x08535730",
-      "motivo": "parou em 0x08535682: mcr: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)",
+      "motivo": "parou em 0x08535682: mcr: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ef ee fe 9d 23 32 22 22"
     },
     {
       "entrada": "0x0860112E",
       "modo": "thumb",
       "semente": "salto para tras em 0x08601228",
-      "motivo": "parou em 0x0860112E: ldc2: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0860112E: ldc2: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "b5 fd 07 bd 68 63 8f 97"
     },
     {
@@ -1191,7 +1191,7 @@
       "entrada": "0x0871A4A0",
       "modo": "thumb",
       "semente": "ponteiro de pool em 0x080CF184",
-      "motivo": "parou em 0x0871A4A0: ldc2l: coprocessador 2 nao existe no ARM7TDMI (provavel dado lido como codigo)",
+      "motivo": "parou em 0x0871A4A0: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
       "bytes": "ff fc 05 05 fc 04 0d 0e"
     },
     {
@@ -1247,7 +1247,7 @@
   "linhas_c": 1056638,
   "desvios_com_comparacao": 7077,
   "desvios_por_flag": 16073,
-  "bytes_c": 39944129,
+  "bytes_c": 39946821,
   "conferencia": {
     "total": 460868,
     "identicas": 460639,
@@ -1301,5 +1301,5 @@
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/levantado_r16.c"
+  "caminho_c": "/home/user/gba-re/saida/levantado_r17.c"
 }
