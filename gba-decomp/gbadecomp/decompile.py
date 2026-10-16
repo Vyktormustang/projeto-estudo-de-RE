@@ -788,21 +788,72 @@ class _Emissor:
                          f"tirou da pilha */")
             self._emitir("return r0;")
             return
-        raise _NaoLevantado(self._motivo_bx_sem_origem())
+        raise _NaoLevantado(self._motivo_bx_sem_origem(r))
 
-    def _motivo_bx_sem_origem(self) -> str:
+    def _valor_da_anterior(self, registrador: str):
+        """O valor que a instrucao ANTERIOR deixa em `registrador`, se conhecido.
+
+        Devolve `(valor, como)` ou `None`. Re-desmonta os BYTES da instrucao (o
+        `Instrucao` da janela guarda texto, nao operandos do capstone) e cobre as
+        duas formas que carregam um ENDERECO em registrador sem ler memoria de
+        trabalho -- as duas que a ROM de estudo usa nos 4 `bx rN` recusados com
+        valor conhecido (medido, nao suposto: 3 `adr`, 1 literal de pool):
+          * `adr rD, #imm`: no Thumb-1 e' `add rD, pc, #imm*4`, conta identica a
+            do tradutor do `adr` (`_pc_da_instrucao`);
+          * `ldr rD, [pc, #N]`: literal do pool, lido da IMAGEM -- e' dado da ROM,
+            e o valor dele E' medivel em tempo de traducao.
+        `mov rD, #imm` fica de fora de proposito: nao ha caso medido, e um
+        registrador carregado de constante pequena nao aponta para codigo.
+        """
+        anterior = self._anterior()
+        if anterior is None:
+            return None
+        ins = next(self.cs.disasm(bytes(anterior.bytes_), anterior.endereco), None)
+        if ins is None or len(ins.operands) < 2:
+            return None
+        if ins.mnemonic == "adr":
+            if (ins.operands[0].type != capstone.arm.ARM_OP_REG
+                    or ins.operands[1].type != capstone.arm.ARM_OP_IMM):
+                return None
+            if self._reg(ins.operands[0]) != registrador:
+                return None
+            return (self._pc_da_instrucao(ins) + ins.operands[1].imm, "adr")
+        if (ins.mnemonic.startswith("ldr")
+                and ins.operands[1].type == capstone.arm.ARM_OP_MEM
+                and ins.operands[1].mem.base == capstone.arm.ARM_REG_PC):
+            if self._reg(ins.operands[0]) != registrador:
+                return None
+            endereco = self._pc_da_instrucao(ins) + ins.operands[1].mem.disp
+            deslocamento = endereco - self.base
+            if deslocamento < 0 or deslocamento + 4 > len(self.imagem):
+                return None
+            return (int.from_bytes(self.imagem[deslocamento:deslocamento + 4], "little"),
+                    "ldr do pool")
+        return None
+
+    def _motivo_bx_sem_origem(self, registrador: str) -> str:
         """Por que este `bx rN` nao vira C -- dito com precisao, caso a caso.
 
-        Tres situacoes MUITO diferentes caem no mesmo "sem origem conhecida", e
-        junta-las faz o relatorio enganar quem le: parece falha do levantador o
-        que na verdade e' uma construcao que nao tem traducao literal (o alvo e'
-        um PARAMETRO, por desenho). Medido na ROM de estudo:
-          * janelas de 4 bytes `bx rN` + nop (`mov r8, r8`), alinhadas a cada 4
-            bytes em 0x081E3BA8.., chamadas por `bl` de dezenas de sitios: sao
+        Cinco situacoes MUITO diferentes caiam todas no mesmo "sem origem
+        conhecida", e junta-las faz o relatorio enganar quem le: parece falha do
+        levantador o que na verdade e' uma construcao que nao tem traducao
+        literal (o alvo e' um PARAMETRO, por desenho) -- ou, nos dois ultimos
+        casos, um valor que o levantador LE' e ainda assim nao traduz. Medido na
+        ROM de estudo, nas 39 recusas `bx rN`:
+          * 11 janelas de 4 bytes `bx rN` + nop (`mov r8, r8`), alinhadas a cada
+            4 bytes em 0x081E3BA8.., chamadas por `bl` de dezenas de sitios: sao
             thunks "chame pelo registrador N" -- o destino vem de quem chamou;
-          * `stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN` (ARM): chamada
+          * 1 `stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN` (ARM): chamada
             indireta ARM->Thumb com o endereco de retorno montado a mao (o
-            `add lr, pc, #0` marca o bit do modo Thumb).
+            `add lr, pc, #0` marca o bit do modo Thumb);
+          * 3 `adr rD, #imm` + `bx rD` cujo valor da' endereco PAR (bit0 = 0): no
+            ARM7TDMI bit0 = 0 em `bx` quer dizer modo ARM, ou seja o destino e' o
+            trecho no OUTRO modo, que esta janela nao levanta (medido: 0x081DC012
+            vai para 0x081DC014, que em ARM e' `umull r2, r3, r0, r1`);
+          * 1 `ldr rD, [pc, #N]` + `bx rD` cujo literal cai FORA da imagem
+            (0x030028E1, RAM com o bit do modo): so' existe em tempo de execucao;
+          * os outros 23: sem valor em tempo de traducao -- o destino esta' num
+            PARAMETRO, e recusar e' a resposta certa, nao defeito.
         """
         if self._indice_instrucao == 0:
             return ("thunk de salto indireto: a janela comeca em `bx rN` (com nop "
@@ -813,6 +864,27 @@ class _Emissor:
             return ("chamada indireta ARM->Thumb montada a mao (`stmdb sp!, {lr}` + "
                     "`add lr, pc, #0` + `bx rN`): o alvo veio de dado lido na ROM, "
                     "sem assinatura declarada")
+        medido = self._valor_da_anterior(registrador)
+        if medido is not None:
+            valor, como = medido
+            na_imagem = self.base <= (valor & ~1) < self.base + len(self.imagem)
+            if na_imagem and not valor & 1:
+                return (f"troca de modo de CPU: `{como}` em 0x{anterior.endereco:08X} "
+                        f"da' 0x{valor:08X} com o bit0 em 0 (modo ARM) -- o "
+                        f"levantador traduz a janela no modo dela e o corpo no "
+                        f"outro modo nao esta' levantado")
+            if not na_imagem:
+                return (f"o `{como}` em 0x{anterior.endereco:08X} vale 0x{valor:08X}, "
+                        f"fora da imagem (espaco de RAM/IO): o destino so' existe em "
+                        f"tempo de execucao")
+            # Texto proprio (e nao `_motivo_saida`) de proposito: a frase do
+            # `_motivo_saida` carrega "sem rotulo nesta janela", que e' o
+            # predicado de OUTRA linha da tabela de lacunas do README -- se uma
+            # rodada futura cair aqui, o site seria contado duas vezes e a soma
+            # da tabela deixaria de fechar com o total (o teste cai).
+            return (f"o `{como}` em 0x{anterior.endereco:08X} vale 0x{valor:08X} "
+                    f"(bit0 = 1, modo Thumb) -- o alvo 0x{valor & ~1:08X} esta' "
+                    f"{self._onde_esta(valor & ~1)}")
         return "desvio indireto por registrador sem origem conhecida"
 
     def _motivo_saida(self, alvo: int, verbo: str) -> str:
@@ -1276,13 +1348,25 @@ class IndiceDeJanelas:
         return None
 
     def descrever(self, alvo: int, propria: int, fim_propria: int) -> str:
-        """Em uma frase: onde este endereco esta (ou nao esta) desmontado."""
+        """Em uma frase: onde este endereco esta (ou nao esta) desmontado.
+
+        A ordem das perguntas importa e foi MEDIDA: a versao anterior perguntava
+        primeiro "esta dentro do intervalo desta janela?" e so' depois consultava
+        o indice de instrucoes -- o que fazia dizer "em trecho nao desmontado" de
+        um endereco que ESTA desmontado (numa instrucao da propria janela). O
+        indice vem primeiro porque ele e' a resposta factual; o intervalo e' so'
+        um palpite grosso.
+        """
+        dono = self.endereco_dono.get(alvo)
+        if dono is not None:
+            if dono == propria:
+                return (f"nesta janela, numa INSTRUCAO que a leitura alcancou "
+                        f"(0x{alvo:08X}): o que falta nao e' traducao, e' o "
+                        f"desvio calculado ter para onde ir")
+            return f"a leitura continua em INSTRUCAO da janela 0x{dono:08X}"
         if propria <= alvo < fim_propria:
             return ("dentro desta janela, em trecho nao desmontado (a leitura "
                     "parou antes de alcancar)")
-        dono = self.endereco_dono.get(alvo)
-        if dono is not None:
-            return f"a leitura continua em INSTRUCAO da janela 0x{dono:08X}"
         dono = self.faixa_que_contem(alvo)
         if dono is not None:
             return (f"dentro da faixa da janela 0x{dono:08X}, em trecho nao "

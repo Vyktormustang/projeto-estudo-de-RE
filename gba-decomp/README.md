@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `56 passed` |
+| testes automatizados | `59 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -351,6 +351,45 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    (`test_tabela_sem_guarda_que_bata_nao_vira_switch`) passou a exigir a medicao
    no lugar do rotulo ("a entrada 3 da tabela ... nao e' endereco de codigo").
 
+18. **Os 39 `bx rN`: 4 tem valor conhecido em traducao e diziam "sem origem
+   conhecida".** Era a maior lacuna do levantamento (39 das 191 recusas) e o
+   relatorio tratava as 39 como um bloco so'. Medido ANTES de mexer, com sonda no
+   caminho de VERDADE do levantador (`ferramentas/medir_bx_recusados.py`, espiao
+   em `_Emissor._bx`):
+   * **11** sao janelas de 4 bytes `bx rN` + nop (`mov r8, r8`), alinhadas a cada
+     4 bytes em `0x081E3BA8..`, chamadas por `bl` de dezenas de sitios: o destino
+     e' um PARAMETRO de quem chamou -- nao ha' traducao literal a inventar;
+   * **1** e' `stmdb sp!, {lr}` + `add lr, pc, #0` + `bx rN` (ARM): chamada
+     indireta ARM->Thumb com o retorno montado a mao;
+   * **3** sao `adr rD, #imm` + `bx rD` (`0x081DC012`, `0x081DC0AC`, `0x081DC23E`,
+     nas janelas `0x081DC010` e `0x081DC0A4`): o valor e' PAR, e no ARM7TDMI
+     bit0 = 0 em `bx` quer dizer **modo ARM** -- o destino e' o trecho no OUTRO
+     modo (`0x081DC014` lido como ARM e' `umull r2, r3, r0, r1; add r0, r3, #0;
+     bx lr`), que uma janela Thumb nao levanta;
+   * **1** e' `ldr r3, [pc, #0xc]` + `bx r3`, e o literal em `0x081DC094` vale
+     `0x030028E1` (**RAM**, ja' com o bit do modo): so' existe em tempo de
+     execucao;
+   * **os outros 23** nao tem valor em traducao: a instrucao anterior nao carrega
+     o registrador (`adds r3, r2, #6`, `subs r4, #0`, ...), entao o destino vem
+     de PARAMETRO -- recusar e' a resposta certa, nao defeito.
+   O que mudou: a frase da recusa passou a carregar a MEDICAO nos 4 casos em que
+   existe valor, e continua generica nos 23 em que nao existe (onde ela ja' era
+   verdadeira). Efeito medido na r19: recusas continuam **191** (os 39 `bx`
+   seguem recusados: 3 caem em trecho de outro modo de CPU, 1 em RAM, 23 em
+   parametro, 11 em thunk, 1 em chamada montada a mao), `recusas_motivo` foi de 18
+   para **20 chaves** (a generica caiu de 27 para 23; entraram "troca de modo de
+   CPU" com 3 e o literal de RAM com 1), 1 056 638 linhas de C (431 bytes a mais,
+   so' texto de recusa) e **objeto byte a byte identico** ao da r18 (`sha256`
+   82b93d74…): r17, r18 e r19 sao as tres rodadas em que a prosa mudou e o codigo
+   gerado nao. Testes `test_bx_com_valor_conhecido_diz_o_que_mediu_em_vez_de_sem_
+   origem` (3 casos, um deles sintetico) e `test_sonda_de_bx_recusado_mede_o_valor_
+   e_pode_discordar_da_mensagem` -- a sonda mede por FORA de proposito, porque so'
+   assim ela pode discordar da mensagem em vez de repeti-la. O caso sintetico
+   expos um defeito de ordem em `IndiceDeJanelas.descrever`: ele perguntava o
+   intervalo grosso da janela ANTES do indice de instrucoes e dizia "trecho nao
+   desmontado" de um endereco que ESTA' desmontado; a r19 confirma que nenhum dos
+   191 sitios da ROM caia nessa ordem (no JSON, so' os 4 textos de `bx` mudaram).
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
@@ -370,7 +409,7 @@ levantado e recompilado.
 
 | lacuna | ocorrencias |
 |---|---|
-| `bx rN` com origem nao rastreada | 39 (11 sao `bx rN`+nop *thunk*, 1 e' chamada indireta ARM→Thumb, 27 sao salto calculado) |
+| `bx rN` com origem nao rastreada | 39 (11 sao `bx rN`+nop *thunk*, 1 e' chamada indireta ARM→Thumb, **4 tem valor conhecido** -- 3 troca de modo Thumb→ARM por `adr`, 1 literal de pool em RAM -- e 23 sao salto calculado sem valor em traducao) |
 | desvio que sai da funcao (bloco comum de outra rotina) | 98 |
 | desvio condicional para endereco sem rotulo nesta janela | 32 — mesmas 4 classes de destino |
 | instrucao que **nao existe** no ARM7TDMI (dado lido como codigo) | 17 (codificacao de 32 bits do Thumb-2; ARMv5+/coprocessador nem chega aqui: **para** a leitura e vira `descarte`, 162 deles) |
@@ -405,6 +444,10 @@ python ferramentas/diagnosticar_tabela.py ROM.gba --censo censo/functions.csv
 python ferramentas/checar_determinismo.py ROM.gba --censo censo/functions.csv
 # "o objeto mudou" quase nunca quer dizer "o CODIGO mudou": esta ferramenta separa
 python ferramentas/conferir_objetos.py objeto_da_rodada_antiga.o objeto_da_rodada_nova.o
+
+# por que os 39 `bx rN` (a maior lacuna) continuam recusados: mede, site por site,
+# o valor que a instrucao anterior deixa no registrador
+python ferramentas/medir_bx_recusados.py ROM.gba --censo censo/functions.csv
 
 # a amostra versionada (evidencias/rom_bpre_amostra_levantada.c) sai daqui: o
 # cabecalho vem do JSON acima e os trechos, do .c da mesma rodada
@@ -520,8 +563,11 @@ Testes: `python -m pytest tests/ -q`
   lista de não levantadas** — nunca é ignorada em silêncio.
 - **ARM**: o desmontador entende ARM e começa por ele (o vetor de boot de um GBA
   executa em ARM), mas o levantamento para C foi exercitado apenas em Thumb.
-- **Desvio indireto por registrador** sem origem conhecida (`bx rN` que não veio
-  de um `pop`) interrompe o levantamento daquela função, com o motivo registrado.
+- **Desvio indireto por registrador** (`bx rN` que não veio de um `pop`)
+  interrompe o levantamento daquela função, com o motivo registrado. Dos 39 da
+  ROM, 4 têm valor conhecido em tempo de tradução (3 são troca de modo para ARM
+  por `adr`, 1 é literal de pool na RAM) e o resto só existe em tempo de execução
+  (item 18).
 - **Flags imprevisíveis**: onde o ARM não define o resultado (ex.: flag C após
   `MUL`), o C gerado não inventa valor — o comportamento fica anotado.
 - **Sem nomes, sem estruturas.** O C gerado tem `fn_08000258` e `goto`; a

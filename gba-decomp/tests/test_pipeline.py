@@ -582,6 +582,45 @@ def test_bx_por_registrador_calculado_continua_recusado():
     assert "NAO LEVANTADO: bx r0" in levantada.corpo
 
 
+def test_bx_com_valor_conhecido_diz_o_que_mediu_em_vez_de_sem_origem():
+    """`bx rN` cujo valor E' conhecido: a frase carrega a medicao, nao um palpite.
+
+    Medido na ROM de estudo, nas 39 recusas `bx rN`: 4 tem valor conhecido em
+    tempo de traducao -- 3 vem de `adr rD, #imm` (valor PAR: no ARM7TDMI bit0 = 0
+    em `bx` quer dizer modo ARM, entao o alvo e' o trecho no OUTRO modo, que uma
+    janela Thumb nao levanta) e 1 vem de literal de pool (0x030028E1: RAM, com o
+    bit do modo). As 4 diziam "sem origem conhecida", que e' falso -- a origem
+    esta' na instrucao anterior e o levantador consegue le'-la. O caso (c) e'
+    sintetico (nao ha' ocorrencia na ROM): valor dentro da imagem com bit0 = 1.
+    """
+    # (a) `adr r2, #0` + `bx r2`: 0x08000024 (par) -> o hardware muda para ARM
+    imagem = _imagem_de_janela(0xA200, 0x4710)
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    (levantada,) = decompile.decompilar(desmontagem, imagem).funcoes
+    assert not levantada.completa
+    assert any("troca de modo de CPU" in item and "0x08000024" in item
+               and "bit0 em 0" in item for item in levantada.nao_levantadas), \
+        levantada.nao_levantadas
+
+    # (b) `ldr r3, [pc, #0]` + `bx r3`, literal 0x030028E1: fora da imagem
+    imagem = _imagem_de_janela(0x4B00, 0x4718, 0x28E1, 0x0300)
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    (levantada,) = decompile.decompilar(desmontagem, imagem).funcoes
+    assert any("fora da imagem (espaco de RAM/IO)" in item and "0x030028E1" in item
+               for item in levantada.nao_levantadas), levantada.nao_levantadas
+
+    # (c) valor conhecido dentro da IMAGEM e 0x08000021 (bit0 = 1, Thumb): o
+    # endereco 0x08000020 esta' desmontado, entao a frase tem de dizer isso --
+    # antes ela dizia "trecho nao desmontado" porque perguntava o intervalo
+    # grosso antes de consultar o indice de instrucoes.
+    imagem = _imagem_de_janela(0x4B00, 0x4718, 0x0021, 0x0800)
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    (levantada,) = decompile.decompilar(desmontagem, imagem).funcoes
+    assert any("bit0 = 1, modo Thumb" in item and "o alvo 0x08000020 esta'" in item
+               and "numa INSTRUCAO que a leitura alcancou" in item
+               for item in levantada.nao_levantadas), levantada.nao_levantadas
+
+
 def test_medicao_conta_tabelas_lidas_da_rom_e_nao_switch_no_texto():
     """O numero de tabelas/casos vem da descoberta, nao de `grep` no C gerado.
 
@@ -1299,6 +1338,40 @@ def test_sonda_de_tabela_diz_quando_o_pool_aponta_para_fora_da_imagem(tmp_path):
     assert "FORA da imagem" in processo.stdout, processo.stdout
     assert "veredito: recusada" in processo.stdout, processo.stdout
     assert "nao ha' tabela de codigo ali" in processo.stdout, processo.stdout
+
+
+def test_sonda_de_bx_recusado_mede_o_valor_e_pode_discordar_da_mensagem():
+    """A sonda dos `bx rN` mede o valor POR FORA, para poder discordar do lifter.
+
+    `bx rN` e' a maior lacuna do levantamento (39 das 191 recusas na ROM), e a
+    pergunta que decide se ha' o que implementar e' se o valor do registrador
+    existe em tempo de traducao. A sonda tem dois papeis: numerar isso na ROM
+    inteira (`ferramentas/medir_bx_recusados.py`) e, aqui, mostrar que a medida e'
+    independente -- ela recalcula valor e categoria em vez de repetir a frase de
+    recusa. Conferido na rodada r19: 3 sites com valor PAR (`adr` + `bx`: bit0 = 0
+    em `bx` = modo ARM) e 1 com o literal do pool fora da imagem (0x030028E1,
+    RAM); nenhum com bit0 = 1 na imagem.
+    """
+    imagem = bytearray(0x40)
+    imagem[0x20:0x24] = bytes.fromhex("00a21047")     # adr r2, #0 ; bx r2
+    imagem[0x30:0x34] = bytes.fromhex("004b1847")     # ldr r3, [pc, #0] ; bx r3
+    imagem[0x34:0x38] = (0x030028E1).to_bytes(4, "little")   # o literal do pool
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(imagem), sementes={0x08000020: "thumb", 0x08000030: "thumb"})
+    sonda = _carregar_ferramenta("medir_bx_recusados.py")
+    medido = sonda.medir(desmontagem, bytes(imagem))
+    assert medido["recusas_bx"] == 2, medido["sites"]
+    assert medido["por_tipo"] == {"valor fora da imagem (RAM/IO)": 1,
+                                  "valor par: troca de modo de CPU (ARM)": 1}, \
+        medido["por_tipo"]
+    por_site = {s["site"]: s for s in medido["sites"]}
+    assert por_site["0x08000022"]["valor"] == "0x08000024"
+    assert por_site["0x08000022"]["como"] == "adr"
+    assert por_site["0x08000032"]["valor"] == "0x030028E1"
+    assert "pool" in por_site["0x08000032"]["como"]
+    # a CATEGORIA medida por fora tem de bater com a frase que o levantador escreveu
+    assert "troca de modo de CPU" in por_site["0x08000022"]["motivo"]
+    assert "fora da imagem" in por_site["0x08000032"]["motivo"]
 
 
 def _carregar_ferramenta(nome: str):
