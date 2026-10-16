@@ -1,4 +1,4 @@
-# Relatorio de otimizacao — `exp-c42e0c017b56`
+# Relatorio de otimizacao — `exp-9ddfece1aa9a`
 
 - **Experimento:** opt-merged
 - **Suite:** `merged` (sha `b576e604933c`, 14 casos na validacao)
@@ -6,7 +6,7 @@
 - **Encerramento:** iteracao 6: nenhum candidato passou nos criterios (plateau)
 - **Prompt original preservado:** `938ef38acc6b` (imutavel na memoria)
 - **Prompt ativo ao final:** `bff3d9c20461`
-- **Gerado em:** 2026-10-16T16:02:45+00:00 | commit `fe919b1d5708` | seed `1729`
+- **Gerado em:** 2026-10-16T16:03:25+00:00 | commit `d71f1325d5bf` | seed `1729`
 
 ## 1. Resultado medido
 
@@ -281,7 +281,7 @@ _Nenhum erro registrado._
 Para reverter a qualquer momento (nada e apagado):
 
 ```bash
-python -m uaao rollback --experiment exp-c42e0c017b56 --to previous \
+python -m uaao rollback --experiment exp-9ddfece1aa9a --to previous \
     --reason "descricao do motivo"
 ```
 
@@ -292,7 +292,7 @@ python -m uaao rollback --experiment exp-c42e0c017b56 --to previous \
 | Chamadas de metrica | 403 | 5000 |
 | Tentativas (retries) | 0 | 3 |
 | Custo (unidades) | 0.0 | 100.0 |
-| Tempo de parede (s) | 0.215 | 900.0 |
+| Tempo de parede (s) | 0.197 | 900.0 |
 
 ## 10. Limitacoes e o que NAO foi executado
 

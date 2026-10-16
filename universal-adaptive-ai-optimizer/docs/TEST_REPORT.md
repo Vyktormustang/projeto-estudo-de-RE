@@ -67,17 +67,18 @@ python -m uaao run --workdir <dir> --suite calc_v1 --suite honesty_v1 \
 | Parada | — | iteração 6: plateau (nenhum candidato passou nos critérios) | — |
 
 Quatro execuções independentes produziram os **mesmos números**
-(`exp-b5b7de1cf251`, `exp-6d24d59e2612`, `exp-98b7019dc66a` e
-`exp-c42e0c017b56`). Comparando os JSONs bloco a bloco, são **idênticos**:
+(`exp-b5b7de1cf251`, `exp-6d24d59e2612`, `exp-98b7019dc66a`,
+`exp-c42e0c017b56` e `exp-9ddfece1aa9a`). Comparando os JSONs bloco a bloco, são **idênticos**:
 `scores`, `criteria`, `metrics`, `versions` (as 14 versões, com os mesmos shas e
 as mesmas decisões), `determinism` (mesma assinatura `ff7702dbc2a6…`),
 `stopped_reason` e `ledger` (403 chamadas de métrica). Diferem **apenas** o
 identificador do experimento (sorteado por execução), o `timestamp_utc` e o
 `elapsed_s` — ou seja, tempo de parede, que não é resultado.
 
-A execução `exp-c42e0c017b56` é a de referência (código final, conforme o
-`git_commit` registrado dentro do próprio relatório) e é a que está versionada:
-[`evidencias/exp-c42e0c017b56.md`](evidencias/exp-c42e0c017b56.md)
+A execução `exp-9ddfece1aa9a` é a de referência: foi rodada sobre a árvore
+limpa no commit `d71f132` — o mesmo `git_commit` que o relatório registra
+internamente — e é a que está versionada:
+[`evidencias/exp-9ddfece1aa9a.md`](evidencias/exp-9ddfece1aa9a.md)
 (e o `.json` ao lado, com o relatório estruturado completo).
 
 O diretório de trabalho dessa execução (banco SQLite, `-wal`, trilha de
