@@ -466,13 +466,28 @@ class _Emissor:
                     self._emitir("}")
                     self._emitir("return r0;   /* inalcancavel: todo caso salta */")
                     return
-                self._emitir(f"/* PC calculado em {origem}: tabela de casos nao "
-                             f"reconhecida */")
+                # O motivo NAO pode ser rotulo generico ("salto calculado nao
+                # modelado"): ele manda procurar defeito onde nao tem. Quem mediu
+                # o que faltou para o idioma fechar foi o desmontador, por site
+                # (`FuncaoDesmontada.tabelas_recusadas`), e e' esse o texto que vai
+                # para o C e para o JSON. Medido nos 2 sitios da ROM de estudo: em
+                # 0x081DBEBA a instrucao anterior e' um `bhs` (o destino vem de um
+                # ponteiro lido da memoria, `ldr r2, [r0, #0x28]`), em 0x083F62EC e'
+                # um `cmp r1, #0x53` no meio de um trecho que parece dado.
+                medido = next((m for endereco, m in self.f.tabelas_recusadas
+                               if endereco == ins.address), None)
+                detalhe = medido or ("o desmontador nao registrou o criterio deste "
+                                     "site")
+                self._emitir(f"/* PC calculado em {origem}: o destino so' existe em "
+                             f"tempo de execucao (vem de registrador); o idioma de "
+                             f"tabela de casos nao fechou -- "
+                             f"{_comentario(detalhe)} */")
                 self._emitir("g_erro |= 2;")
                 self._emitir("return r0;")
                 self.nao_levantadas.append(
-                    f"0x{ins.address:08X} mov pc, {origem}: salto calculado "
-                    f"(tabela de casos) nao modelado")
+                    f"0x{ins.address:08X} mov pc, {origem}: salto por registrador "
+                    f"(o destino so' existe em tempo de execucao; o idioma de tabela "
+                    f"de casos nao fechou) -- {detalhe}")
                 return
             destino, fonte = self._reg(op[0]), op[1]
             if fonte.type == capstone.arm.ARM_OP_IMM:

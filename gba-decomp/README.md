@@ -316,6 +316,41 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    leitura **para** no ponto (vira `descarte`, com 0 instrucoes lidas). Conferido
    quebrando de proposito: com a regra de volta so' no Thumb, o teste cai.
 
+17. **A recusa do `mov pc, rX` mandava procurar tabela onde nao tem.** Ela dizia
+   "salto calculado (tabela de casos) nao modelado" -- o que sugere um `switch`
+   que quase fechou. As **2** que sobram na ROM **nao sao tabela**, e isso foi
+   medido antes de mexer (`ferramentas/diagnosticar_tabela.py`, rodada r17):
+   * `0x081DBEBA` (janela `0x081DBEA6`, descoberta por um `bl` em `0x080EC620`):
+     o que esta' antes e' `ldr r2, [r0, #0x28]` + `cmp r2, #0` + `beq` + `bhs` --
+     o destino do salto e' **ponteiro lido da memoria** (chamada indireta), nao
+     tabela; e o pool da janela (`0x081DC000`) carrega `0x04000120`,
+     registrador de I/O do GBA, **fora da imagem**: mesmo que o idioma fechasse,
+     nao ha' tabela de codigo ali;
+   * `0x083F62EC` (janela `0x083F61FA`, descoberta por um ponteiro de pool em
+     `0x080CCA84`): antes dele ha' `asrs r5, r1, #2` e `cmp r1, #0x53` no meio de
+     um trecho de `00 00` (o decodificador ve `movs r0, r0`) -- **dado** lido como
+     codigo.
+   O que faltava era o texto dizer o **criterio que falhou**, e nao um rotulo. O
+   motivo medido pelo desmontador por site ja' existia
+   (`FuncaoDesmontada.tabelas_recusadas`, item 13); agora ele viaja com a recusa
+   ate' o C:
+
+   ```
+   /* PC calculado em r2: o destino so' existe em tempo de execucao (vem de
+      registrador); o idioma de tabela de casos nao fechou -- a instrucao anterior a
+      0x081DBEBA nao e' `ldr rI, [rI]` (medido: `bhs #0x81dbeca` em 0x081DBEB8) */
+   ```
+
+   Efeito medido na r18: recusas continuam **191** (as 2 continuam recusadas --
+   recusa correta, e' dado/ponteiro, nao tabela), **377** tabelas, **6 303**
+   casos, 1 056 638 linhas de C (658 bytes a mais, so' texto de recusa) e
+   **objeto byte a byte identico** ao da r17 (`sha256` 82b93d74… igual): de novo,
+   a prosa mudou e o codigo gerado nao. Teste
+   `test_salto_calculado_marca_funcao_como_parcial` (estendido): o criterio medido
+   tem de aparecer no motivo **e** no comentario do C; o outro teste
+   (`test_tabela_sem_guarda_que_bata_nao_vira_switch`) passou a exigir a medicao
+   no lugar do rotulo ("a entrada 3 da tabela ... nao e' endereco de codigo").
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
@@ -340,7 +375,7 @@ levantado e recompilado.
 | desvio condicional para endereco sem rotulo nesta janela | 32 — mesmas 4 classes de destino |
 | instrucao que **nao existe** no ARM7TDMI (dado lido como codigo) | 17 (codificacao de 32 bits do Thumb-2; ARMv5+/coprocessador nem chega aqui: **para** a leitura e vira `descarte`, 162 deles) |
 | o PSR nao existe no MODELO (`mrs` lendo, `msr` escrevendo o campo de controle) | 3 — o valor lido no ARMv4T carrega modo e mascara de IRQ, que o C levantado nao tem (so' z/n/c/v) |
-| salto calculado por tabela que nao passou nos criterios | 2 |
+| `mov pc, rN` com o destino em registrador (nao e' o idioma de tabela de casos) | 2 — o motivo diz QUAL criterio faltou, medido: `bhs` antes de 0x081DBEBA e `cmp r1, #0x53` antes de 0x083F62EC |
 | **total** | **191** (13 em funcao do censo, 178 fora dele) |
 | destino de cada desvio recusado (relatorio separado) | 130: 47 buraco de outra janela, 31 instrucao de outra janela, 29 buraco da propria faixa, 23 ninguem desmontou |
 | o que HA' nos alvos que nenhuma janela cobriu | 110 de 65 911: 53 ja' tentados como semente e descartados, 55 nunca tentados (**os 55 param na primeira instrucao**), 2 fora da imagem — **0 sao codigo** |

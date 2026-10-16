@@ -198,6 +198,17 @@ def test_salto_calculado_marca_funcao_como_parcial():
     assert "PC calculado" in funcao.corpo
     # e o C gerado continua compilando (nao vira lixo sintatico)
     assert "return r0;" in funcao.corpo
+    # O TEXTO: a recusa tem de dizer o que foi MEDIDO, nao um rotulo generico.
+    # "salto calculado (tabela de casos) nao modelado" mandava procurar um
+    # `switch` que quase fechou -- e as 2 recusas da ROM de estudo nao sao tabela
+    # nenhuma (uma e' ponteiro lido da memoria, a outra cai em trecho que parece
+    # dado). O criterio vem do desmontador, por site, e agora viaja com a recusa.
+    motivo = funcao.nao_levantadas[0]
+    assert "salto por registrador" in motivo, motivo
+    for texto in (motivo, funcao.corpo):
+        assert "o idioma de tabela de casos nao fechou" in texto, texto
+    assert "so' 1 instrucoes antes do" in motivo, motivo
+    assert "PC calculado em r0" in funcao.corpo, funcao.corpo
 
 
 def test_endereco_sem_codigo_vira_descarte_e_nunca_funcao():
@@ -389,7 +400,11 @@ def test_tabela_sem_guarda_que_bata_nao_vira_switch():
     codigo = decompile.decompilar(desmontagem, imagem)
     (levantada,) = codigo.funcoes
     assert not levantada.completa
-    assert "nao reconhecida" in levantada.corpo
+    # o comentario do C diz o QUE foi medido, e nao um rotulo: aqui, qual entrada
+    # da tabela nao existe no alvo (antes dizia so' "tabela de casos nao
+    # reconhecida", que manda procurar defeito no lugar errado -- item 17)
+    assert "o idioma de tabela de casos nao fechou" in levantada.corpo
+    assert "a entrada 3 da tabela" in levantada.corpo, levantada.corpo
     assert "switch" not in levantada.corpo
 
 
@@ -1080,9 +1095,17 @@ def test_readme_conta_a_mesma_rodada_da_evidencia():
                 "| o PSR nao existe no MODELO (`mrs` lendo, `msr` escrevendo o campo "
                 "de controle) | {} — o valor lido no ARMv4T carrega modo e mascara "
                 "de IRQ, que o C levantado nao tem (so' z/n/c/v) |"),
-        "salto por tabela": (soma(lambda k: "salto calculado" in k),
-                             "| salto calculado por tabela que nao passou nos "
-                             "criterios | {} |"),
+        # "salto calculado (tabela de casos) nao modelado" virou um texto que diz
+        # QUAL criterio do idioma faltou, medido por site (item 17): o rotulo
+        # antigo mandava procurar tabela onde nao tem -- e as 2 recusas da ROM nao
+        # sao tabela (uma e' ponteiro lido da memoria, a outra cai em trecho que
+        # parece dado).
+        "salto por registrador": (soma(lambda k: "salto por registrador" in k),
+                                  "| `mov pc, rN` com o destino em registrador "
+                                  "(nao e' o idioma de tabela de casos) | {} — o "
+                                  "motivo diz QUAL criterio faltou, medido: `bhs` "
+                                  "antes de 0x081DBEBA e `cmp r1, #0x53` antes de "
+                                  "0x083F62EC |"),
     }
     assert sum(valor for valor, _ in linhas.values()) == analise["recusas_total"]
     fora = {rotulo: formato.format(valor) for rotulo, (valor, formato) in linhas.items()
