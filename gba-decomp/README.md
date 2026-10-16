@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `55 passed` |
+| testes automatizados | `56 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -59,6 +59,7 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 | conferencia byte a byte | **99,950%** das instrucoes remontam identicas ao binario |
 | compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 164 988 bytes) |
 | determinismo | C, JSON e objeto compilado **identicos** em duas rodadas (`ferramentas/checar_determinismo.py`) |
+| o que uma mudanca mexe no objeto | medido por funcao, nao pelo sha256 (`ferramentas/conferir_objetos.py`): a r16 mudou o codigo de **2** funcoes de 8 172 |
 
 ### Achados que valem mais que os números
 
@@ -279,7 +280,12 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    de C, objeto 2 164 980 → 2 164 988 B (`sha256` 82b93d74…); **todo o resto
    identico** (8 172 funcoes, 460 868 instrucoes, 20 492 arestas, 377 tabelas /
    6 303 casos, 8 027 + 145 completas/parciais, 460 639 identicas em 460 868).
-   Testes: `test_pc_lido_como_operando_vira_constante_e_nao_a_variavel_pc`,
+   O objeto mudou **onde tinha de mudar**, e isso foi medido funcao por funcao e
+   nao pelo sha256: das 8 172 funcoes, **2** mudaram de tamanho
+   (`IRQ_HANDLER_arm_boot`, 80 → 84 bytes, porque o `stmdb sp!, {lr}` passou a sair
+   pelo caminho da pilha; e `fn_0800C280`, 22 → 28, porque o `mov r2, pc` virou
+   constante) e 20 so' deslocaram, de mesmo tamanho. Testes:
+   `test_pc_lido_como_operando_vira_constante_e_nao_a_variavel_pc`,
    `test_mov_e_add_com_pc_no_thumb1_usam_o_pc_alinhado`,
    `test_leitura_de_pc_em_forma_sem_valor_constante_e_recusada` e
    `test_stmdb_sp_do_arm_e_o_push_da_pilha_do_modelo` (bytes montados com keystone,
@@ -337,6 +343,8 @@ python ferramentas/estudo_switch.py ROM.gba --censo censo/functions.csv
 python ferramentas/onde_estao_as_lacunas.py ROM.gba --censo censo/functions.csv
 python ferramentas/diagnosticar_tabela.py ROM.gba --censo censo/functions.csv
 python ferramentas/checar_determinismo.py ROM.gba --censo censo/functions.csv
+# "o objeto mudou" quase nunca quer dizer "o CODIGO mudou": esta ferramenta separa
+python ferramentas/conferir_objetos.py objeto_da_rodada_antiga.o objeto_da_rodada_nova.o
 
 # a amostra versionada (evidencias/rom_bpre_amostra_levantada.c) sai daqui: o
 # cabecalho vem do JSON acima e os trechos, do .c da mesma rodada
@@ -366,6 +374,21 @@ e' um `cmp`/`bhs`). A classificacao vem da MESMA funcao que o desmontador usa
 regra da sonda, nao a do programa — e o veredito sai com os numeros medidos: o
 guarda, o pool, cada entrada lida e qual delas nao existe no alvo.
 (`--site 0x...` detalha um sitio; `--censo`/`--entrada` dao as sementes.)
+
+`conferir_objetos.py` responde "o objeto mudou **no codigo** ou so' em rotulo?".
+Ele existe porque esta rodada produziu os **dois** casos e eles se parecem: um
+polimento de legibilidade que tirou `+ 0x0u` de uma linha de C (7 bytes menos de
+C) deu objeto com o **mesmo sha256**; e o conserto do `pc`/`stmdb`, que na mesma
+passada mudou uma linha de CODIGO, deu objeto diferente. A ferramenta compara
+secao por secao (`.text`, `.rodata`, tabelas do ELF) e, quando o `.text` muda, diz
+**qual funcao** mudou de tamanho pelo nome: na r16, de 8 172 funcoes, exatamente
+**2** -- `IRQ_HANDLER_arm_boot` (80 → 84 bytes: o `stmdb sp!, {lr}` passou a sair
+pela pilha) e `fn_0800C280` (22 → 28: o `mov r2, pc` virou constante) -- com 20
+outras so' deslocadas, de mesmo tamanho. Ela tambem mede a armadilha do proprio
+instrumento: o **caminho da fonte entra no `.symtab`** (simbolo `STT_FILE`), entao
+o MESMO C compilado noutro diretorio nao da objeto byte a byte igual -- e' por
+isso que o objeto de 2 164 988 B da rodada publicada nao bate com um build local
+em outro caminho, e nao por causa de codigo.
 
 `onde_estao_as_lacunas.py` responde o que o resumo nao responde: onde as lacunas
 se concentram (por pagina de 4 KB), se cairam em funcao do censo ou fora dele,

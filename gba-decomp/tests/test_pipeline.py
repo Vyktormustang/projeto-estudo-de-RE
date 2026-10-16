@@ -1278,6 +1278,68 @@ def test_sonda_de_tabela_diz_quando_o_pool_aponta_para_fora_da_imagem(tmp_path):
     assert "nao ha' tabela de codigo ali" in processo.stdout, processo.stdout
 
 
+def _carregar_ferramenta(nome: str):
+    """Ferramentas em `ferramentas/` sao scripts, nao modulo do pacote."""
+    import importlib.util
+    caminho = RAIZ / "ferramentas" / nome
+    especificacao = importlib.util.spec_from_file_location(caminho.stem, caminho)
+    modulo = importlib.util.module_from_spec(especificacao)
+    especificacao.loader.exec_module(modulo)
+    return modulo
+
+
+def test_conferidor_de_objetos_separa_codigo_de_metadados(tmp_path):
+    """O instrumento que responde "o objeto mudou no CODIGO ou no rotulo?".
+
+    A pergunta apareceu de verdade, nos dois sentidos: um conserto que so' mexia
+    em TEXTO de recusa (dentro de comentario C) mudou o `.text` -- na mesma
+    passada o `stmdb sp!, {lr}` do ARM entrou no caminho da pilha --, e um
+    polimento que mexia em 7 bytes de C nao mudou byte nenhum do objeto. "O
+    sha256 mudou" nao distingue os dois casos; medir secao por secao distingue.
+    """
+    base = "int soma(int a, int b) { return a + b; }\n"
+    # `compilar_thumb` grava a fonte ao lado do .o (e o CAMINHO da fonte entra no
+    # .symtab como simbolo STT_FILE): para comparar "so' o comentario mudou", o
+    # .o e a fonte tem de sair no MESMO caminho nas duas compilacoes.
+    corpus.compilar_thumb(base, tmp_path / "mesmo.o")
+    (tmp_path / "guarda.o").write_bytes((tmp_path / "mesmo.o").read_bytes())
+    corpus.compilar_thumb("/* so' comentario */\n" + base, tmp_path / "mesmo.o")
+    conferidor = _carregar_ferramenta("conferir_objetos.py")
+
+    # 1) comentario NAO entra no objeto (o mesmo byte a byte do polimento da r16)
+    igual = conferidor.conferir(tmp_path / "guarda.o", tmp_path / "mesmo.o")
+    assert igual["veredito"] == "objetos IDENTICOS byte a byte", igual["veredito"]
+
+    # 2) o MESMO texto com outro NOME de arquivo muda metadado, nao codigo -- e a
+    #    ferramenta diz que e' metadado, em vez de gritar que o objeto mudou
+    (tmp_path / "sub").mkdir()
+    corpus.compilar_thumb(base, tmp_path / "sub" / "caminho_bem_mais_longo.o")
+    so_metadado = conferidor.conferir(tmp_path / "mesmo.o",
+                                      tmp_path / "sub" / "caminho_bem_mais_longo.o")
+    assert so_metadado["veredito"].startswith("mesmo CODIGO e mesmas funcoes"), so_metadado
+    assert [d["secao"] for d in so_metadado["secoes_diferentes"]] == [".strtab", ".symtab"]
+
+    # 3) codigo diferente aparece como codigo diferente, e diz QUAL secao
+    corpus.compilar_thumb("int soma(int a, int b) { return a * b + (a >> 3) - 7; }\n",
+                          tmp_path / "mesmo.o")
+    diferente = conferidor.conferir(tmp_path / "guarda.o", tmp_path / "mesmo.o")
+    assert diferente["veredito"] == "CODIGO GERADO DIFERENTE", diferente["veredito"]
+    assert ".text" in diferente["codigo_diferente"]
+    # o nome da funcao que mudou de tamanho e' o que interessa numa rodada real
+    # (na r16 foram 2 funcoes de 8 172); o tamanho exato depende do compilador,
+    # entao aqui se confere a FORMA da resposta, nao o numero
+    mudou = diferente["simbolos"]["tamanho_mudou"]
+    assert len(mudou) == 1 and mudou[0].startswith("soma: "), mudou
+
+    # 4) e a ferramenta roda pela linha de comando, que e' como ela e' usada
+    processo = subprocess.run(
+        [sys.executable, str(RAIZ / "ferramentas" / "conferir_objetos.py"),
+         str(tmp_path / "guarda.o"), str(tmp_path / "mesmo.o")],
+        capture_output=True, text=True)
+    assert processo.returncode == 0, processo.stderr[-2000:]
+    assert "veredito: CODIGO GERADO DIFERENTE" in processo.stdout, processo.stdout
+
+
 def _carregar_sonda_de_lacunas():
     """`ferramentas/onde_estao_as_lacunas.py` e' script, nao modulo do pacote."""
     import importlib.util
