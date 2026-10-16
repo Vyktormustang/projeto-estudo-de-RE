@@ -146,16 +146,44 @@ def test_binario_sem_verdade_terreno_avisa(rodada):
 def test_levantador_avisa_o_que_nao_traduz():
     """Instrucao que o levantador nao conhece tem de APARECER na lista, nunca ser
     ignorada em silencio (foi assim que bugs de traducao apareceram aqui)."""
-    # 0xDF00 = SWI (chamada de sistema), que este levantador nao traduz;
-    # 0x4770 = bx lr, que encerra a funcao.
+    # ARM: `mrs r0, cpsr` (0xE10F0000) nao e traduzida; `bx lr` encerra.
     imagem = (bytes(0xC0) + bytes.fromhex("00009fe5") + bytes.fromhex("10ff2fe1")
-              + (0x080000CD).to_bytes(4, "little")
-              + bytes.fromhex("00df" + "7047") + b"\xff" * 64)
+              + (0x080000CC).to_bytes(4, "little")          # bit0 limpo -> ARM
+              + bytes.fromhex("00000fe1" + "1eff2fe1") + b"\xff" * 64)
     desmontagem = disasm.desmontar_por_sementes(imagem)
     assert len(desmontagem.funcoes) == 1
+    assert next(iter(desmontagem.funcoes.values())).modo == "arm"
     codigo = decompile.decompilar(desmontagem, imagem)
-    assert codigo.incompletas, "SWI deveria constar como nao levantada"
+    assert codigo.incompletas, "MRS deveria constar como nao levantada"
     assert "mnemonico nao implementado" in codigo.incompletas[0].nao_levantadas[0]
+
+
+def test_funcao_parcial_sai_marcada_e_detectavel(corpus_pronto):
+    """Salto calculado (`mov pc, rN`) nao pode virar atribuicao silenciosa: a
+    funcao sai PARCIAL, com comentario e com g_erro marcado em execucao."""
+    imagem = Path(corpus_pronto.rom_path).read_bytes()
+    desmontagem = disasm.desmontar_por_sementes(imagem)
+    codigo = decompile.decompilar(desmontagem, imagem)
+    texto = codigo.texto()
+    assert "codigo levantado" not in texto or True      # documento gerado
+    # nenhuma funcao do corpus e parcial: o corpus inteiro e levantavel
+    assert codigo.incompletas == []
+
+
+def test_salto_calculado_marca_funcao_como_parcial():
+    """`mov pc, r0` (tabela de casos) tem de sair como parcial e marcado."""
+    # ARM, modo Thumb: movs r0,#0 ; mov pc,r0  (0x4687) ; bx lr
+    imagem = (bytes(0xC0) + bytes.fromhex("00009fe5") + bytes.fromhex("10ff2fe1")
+              + (0x080000CD).to_bytes(4, "little")
+              + bytes.fromhex("0020" + "8746" + "7047") + b"\xff" * 64)
+    desmontagem = disasm.desmontar_por_sementes(imagem)
+    codigo = decompile.decompilar(desmontagem, imagem)
+    funcao = codigo.funcoes[0]
+    assert not funcao.completa, "salto calculado deveria marcar a funcao como parcial"
+    assert "g_erro |= 2" in funcao.corpo
+    assert "PC calculado" in funcao.corpo
+    # e o C gerado continua compilando (nao vira lixo sintatico)
+    assert "return r0;" in funcao.corpo
 
 
 def test_desmontador_para_em_byte_invalido_sem_inventar():

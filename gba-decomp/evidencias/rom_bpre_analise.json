@@ -1,49 +1,15 @@
 {
-  "rom": {
-    "arquivo": "pokemon_firered_bpre_trabalho.gba",
-    "sha256": "6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae",
-    "bytes": 16777216,
-    "titulo": "POKEMON FIRE",
-    "game_code": "BPRE",
-    "complement_ok": false,
-    "observacao": "imagem PT-BR modificada: complemento e byte fixo invalidos, coerente com o inventario do projeto"
-  },
-  "censo": {
-    "funcoes": 5981,
-    "thumb": 5980,
-    "arm": 1
-  },
-  "descoberta_so_pelo_reset": {
-    "funcoes": 1876,
-    "instrucoes": 73792,
-    "arestas": 3432,
-    "confirmadas_no_censo": 1382,
-    "novas": 494
-  },
-  "descoberta_com_censo": {
-    "funcoes": 7717,
-    "instrucoes": 353854,
-    "arestas": 16387,
-    "censo_coberto": 5981,
-    "extra_fora_do_censo": 1736,
-    "param_em_instrucao_impossivel": 187
-  },
-  "levantamento": {
-    "funcoes_completas": 7269,
-    "funcoes_incompletas": 448,
-    "percentual_completas": 94.2,
-    "linhas_c": 776324,
-    "bytes_c": 29021330,
-    "compila": true,
-    "bytes_objeto_arm": 1703796,
-    "compilador": "zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os"
-  },
-  "conferencia_bytes": {
-    "instrucoes": 353854,
-    "identicas": 353821,
-    "taxa": 99.991,
-    "divergentes": 28,
-    "falhas_de_sintaxe": 5,
-    "nota": "as divergentes sao o MESMO cmp em codificacao alternativa (0x453E vs 0x42BE), semantica identica"
-  }
+  "funcoes_descobertas": 7717,
+  "instrucoes": 352918,
+  "arestas": 16387,
+  "completas": 7311,
+  "parciais": 406,
+  "com_c_para_ler": 7634,
+  "percentual_com_c": 98.9,
+  "linhas_c": 832192,
+  "bytes_c": 31224839,
+  "condicoes_fundidas_no_desvio": 15541,
+  "conferencia_bytes": "352888/352918 (99.991%)",
+  "compila": "sem erros (zig cc -mcpu=arm7tdmi -Os)",
+  "bytes_objeto": 1785952
 }

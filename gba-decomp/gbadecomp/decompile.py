@@ -52,6 +52,12 @@ static inline u32 sh_lsr(u32 v, u32 n, u32 *pc) {
     if (n == 32) { *pc = (v >> 31) & 1; return 0; }
     *pc = 0; return 0;
 }
+static inline u32 sh_ror(u32 v, u32 n, u32 *pc) {
+    if (n == 0) { return v; }
+    n &= 31;
+    if (n == 0) { *pc = (v >> 31) & 1; return v; }   /* 32 volta no mesmo lugar */
+    { u32 r = (v >> n) | (v << (32 - n)); *pc = (r >> 31) & 1; return r; }
+}
 static inline u32 sh_asr(u32 v, u32 n, u32 *pc) {
     s32 s = (s32)v;
     if (n == 0) { return v; }
@@ -63,6 +69,11 @@ static inline u32 sh_asr(u32 v, u32 n, u32 *pc) {
    pilha do proprio harness (0x03007F00). Assim `str r0,[sp,#12]` funciona sem
    traducao especial, o transbordo de registrador para a pilha sai igual ao do
    hardware e a recursao funciona. g_erro acusa desbalanceamento na saida. */
+/* Fronteira de BIOS: SWI/SVC nao e codigo do jogo, e chamada ao firmware do
+   GBA. Fica declarada e NAO definida de proposito -- o link acusa onde a
+   traducao para no limite da BIOS, em vez de inventar o que ela faz. */
+u32 bios_svc(u32 numero, u32 r0, u32 r1, u32 r2, u32 r3);
+
 #define PILHA_BASE 0x03005000u
 #define PILHA_TOPO (PILHA_BASE + 0x800u)
 static int g_erro;
@@ -107,11 +118,21 @@ class FuncaoDec:
     modo: str
     corpo: str
     nao_levantadas: list[str] = field(default_factory=list)
+    externos: list[str] = field(default_factory=list)   # alvos de chamada sem corpo
     balanceamento: str = "desconhecido"
 
     @property
     def completa(self) -> bool:
         return not self.nao_levantadas
+
+    @property
+    def tem_corpo(self) -> bool:
+        return bool(self.corpo.strip())
+
+    @property
+    def parcial(self) -> bool:
+        """Tem corpo, mas com lacuna registrada (ex.: salto calculado)."""
+        return self.tem_corpo and not self.completa
 
     def assinatura(self) -> str:
         return f"u32 {self.nome}(u32 r0, u32 r1, u32 r2, u32 r3)"
@@ -123,6 +144,7 @@ class CodigoC:
 
     funcoes: list[FuncaoDec] = field(default_factory=list)
     avisos: list[str] = field(default_factory=list)
+    chamadores: dict[str, list[str]] = field(default_factory=dict)
 
     @property
     def completas(self) -> list[FuncaoDec]:
@@ -130,7 +152,13 @@ class CodigoC:
 
     @property
     def incompletas(self) -> list[FuncaoDec]:
+        """Funcoes sem corpo (so prototipo) -- nao ha C para ler."""
         return [f for f in self.funcoes if not f.completa]
+
+    @property
+    def parciais(self) -> list[FuncaoDec]:
+        """Funcoes com corpo e lacuna marcada dentro do proprio C."""
+        return [f for f in self.funcoes if f.parcial]
 
     def texto(self, nome_arquivo: str = "gbadecomp_lift.c") -> str:
         linhas = [
@@ -147,21 +175,41 @@ class CodigoC:
         # sem declaracao e mascarar o problema.
         completas = [f for f in sorted(self.funcoes, key=lambda x: x.endereco) if f.completa]
         for f in sorted(self.funcoes, key=lambda x: x.endereco):
-            if not f.completa:
+            if not f.tem_corpo:
                 linhas.append(f"/* 0x{f.endereco:08X}: NAO levantada -- sem corpo aqui */")
                 linhas.append(f"__attribute__((noinline, used)) "
                               f"u32 {f.nome}(u32 r0, u32 r1, u32 r2, u32 r3);")
-        for f in completas:
+        for f in sorted(self.funcoes, key=lambda x: x.endereco):
             # noinline+used: sem isso o compilador embute as funcoes nas chamadas
             # e elimina os simbolos, e a verificacao por endereco deixa de existir.
             linhas.append(f"__attribute__((noinline, used)) "
                           f"u32 {f.nome}(u32 r0, u32 r1, u32 r2, u32 r3);")
+        externos = sorted({nome for f in self.funcoes for nome in f.externos})
+        if externos:
+            linhas.append("")
+            linhas.append(f"/* {len(externos)} alvos de chamada que NAO foram "
+                          f"descobertos como funcao (dado lido como codigo ou trecho "
+                          f"nao alcancado): declarados, sem corpo. */")
+            for nome in externos:
+                linhas.append(f"u32 {nome}(u32 r0, u32 r1, u32 r2, u32 r3);")
         for f in sorted(self.funcoes, key=lambda x: x.endereco):
-            if not f.completa:
+            if not f.tem_corpo:
                 linhas.append(f"/* 0x{f.endereco:08X}: NAO levantada -- "
                               f"{'; '.join(f.nao_levantadas)} */")
                 continue
             linhas.append("")
+            if f.parcial:
+                linhas.append(f"/* PARCIAL (0x{f.endereco:08X}): o corpo abaixo tem "
+                              f"lacunas marcadas -- em execucao, marca g_erro:")
+                for motivo in f.nao_levantadas[:6]:
+                    linhas.append(f"     {motivo}")
+                linhas.append("   */")
+            quem_chama = self.chamadores.get(f.nome, [])
+            if quem_chama:
+                resumo = ", ".join(quem_chama[:6])
+                if len(quem_chama) > 6:
+                    resumo += f", ... (+{len(quem_chama) - 6})"
+                linhas.append(f"/* chamada por {len(quem_chama)}: {resumo} */")
             linhas.append(f"/* origem: 0x{f.endereco:08X} ({f.modo}), pilha: {f.balanceamento} */")
             linhas.append(f"__attribute__((noinline, used)) "
                           f"u32 {f.nome}(u32 r0, u32 r1, u32 r2, u32 r3) {{")
@@ -199,6 +247,9 @@ class _Emissor:
         self.linhas: list[str] = []
         self.nao_levantadas: list[str] = []
         self.rotulos: dict[int, str] = {}
+        self.externos: set[str] = set()     # alvos de chamada sem funcao descoberta
+        self._flags_recentes = None         # (indice da instrucao, descritor)
+        self._indice_instrucao = 0
         self.lr_regs: set[str] = set()      # registradores que carregam o retorno
         # Modelo de pilha por endereco (mesma semantica do hardware): guarda, para
         # cada slot, se ali foi salvo o endereco de retorno.
@@ -230,7 +281,8 @@ class _Emissor:
         self.linhas.append(texto)
 
     def levantar(self) -> FuncaoDec:
-        for ins in self.f.instrucoes:
+        for indice, ins in enumerate(self.f.instrucoes):
+            self._indice_instrucao = indice
             if ins.endereco in self.rotulos:
                 self._emitir(f"{self._rotulo(ins.endereco)}: ;")
             try:
@@ -246,6 +298,7 @@ class _Emissor:
             modo=self.f.modo,
             corpo="\n".join(l for l in self.linhas if l),
             nao_levantadas=self.nao_levantadas,
+            externos=sorted(self.externos),
             balanceamento=("balanceada" if self.sp_modelo == 0
                            else f"desequilibrada ({self.sp_modelo} slots)"),
         )
@@ -257,12 +310,18 @@ class _Emissor:
         cond, base, define_flags = _separar_condicao(completo, self.f.modo)
         self._condicao = cond
         self._define_flags = define_flags
+        # Nao limpar aqui: o teste de indice (`indice_atual - 1`) ja garante que
+        # so a instrucao IMEDIATAMENTE anterior pode ser fundida.
         antes = len(self.linhas)
         try:
             self._traduzir_base(ins, base)
         finally:
             self._condicao = None
             self._define_flags = False
+        if cond and define_flags:
+            # `addeq`/`subsne`... so mexe nas flags se a condicao valer: depois
+            # disso, fundir o desvio seguinte com estes operandos seria errado.
+            self._flags_recentes = None
         if cond and len(self.linhas) > antes:
             # Instrucao condicional no ARM: so executa (e so mexe em flags) se a
             # condicao valer. Envolver em `if` preserva as duas coisas.
@@ -292,11 +351,22 @@ class _Emissor:
             return self._bx(ins)
         if m in ("movs", "mov"):
             if self._reg(op[0]) == "pc":
-                if self._nome(op[1].reg) == "lr":
+                origem = self._nome(op[1].reg) if op[1].type == capstone.arm.ARM_OP_REG \
+                    else "?"
+                if origem == "lr":
                     self._emitir("return r0;  /* mov pc, lr */")
                     return
-                raise _NaoLevantado("escrita em pc sem ser retorno (desvio "
-                                    "indireto nao modelado)")
+                # `mov pc, rN` = salto CALCULADO (tabela de casos). Traduzir como
+                # atribuicao a uma variavel seria mentira silenciosa: fica marcado
+                # e a funcao passa a ser PARCIAL, com o aviso na saida.
+                self._emitir(f"/* PC calculado em {origem}: tabela de casos nao "
+                             f"modelada */")
+                self._emitir("g_erro |= 2;")
+                self._emitir("return r0;")
+                self.nao_levantadas.append(
+                    f"0x{ins.address:08X} mov pc, {origem}: salto calculado "
+                    f"(tabela de casos) nao modelado")
+                return
             destino, fonte = self._reg(op[0]), op[1]
             if fonte.type == capstone.arm.ARM_OP_IMM:
                 self._emitir(f"{destino} = 0x{fonte.imm & 0xFFFFFFFF:X}u;")
@@ -311,7 +381,8 @@ class _Emissor:
         if m in ("ands", "orrs", "eors", "bics", "mvns", "tst", "teq", "and",
                  "orr", "eor", "bic", "mvn"):
             return self._logica(ins, m)
-        if m in ("lsls", "lsrs", "asrs", "lsl", "lsr", "asr"):
+        if m in ("lsls", "lsrs", "asrs", "lsl", "lsr", "asr", "ror", "rors",
+                 "rorn"):
             return self._deslocamento(ins, m)
         if m in ("muls", "mul"):
             # ATENCAO: `muls Rd, Rn, Rm` (3 operandos, forma que o compilador
@@ -328,6 +399,13 @@ class _Emissor:
             return
         if m in ("stm", "stmia", "ldm", "ldmia"):
             return self._multipla(ins, m)
+        if m in ("svc", "swi"):
+            numero = (op[0].imm if op and op[0].type == capstone.arm.ARM_OP_IMM else 0)
+            self._emitir(f"r0 = bios_svc(0x{numero:X}u, r0, r1, r2, r3);  "
+                         f"/* chamada de BIOS */")
+            return
+        if m in ("ror", "rors", "rorn"):
+            return self._deslocamento(ins, "asrs" if False else m)
         if m == "nop":
             self._emitir(";")
             return
@@ -335,6 +413,14 @@ class _Emissor:
 
     def _flags_logicas(self, resultado: str) -> None:
         self._emitir(f"z = ({resultado} == 0); n = ({resultado} >> 31);")
+        self._anotar_flags(("resultado", resultado))
+
+    def _anotar_flags(self, descritor) -> None:
+        """Guarda como a condicao do desvio seguinte pode ser escrita direto."""
+        self._flags_recentes = (self._indice_instrucao, descritor)
+
+    def _limpar_flags(self) -> None:
+        self._flags_recentes = None
 
     def _retornar(self) -> None:
         """Saida da funcao com conferencia de balanceamento da pilha."""
@@ -387,21 +473,52 @@ class _Emissor:
     def _desvio(self, ins) -> None:
         alvo = ins.operands[0].imm & 0xFFFFFFFF
         if ins.mnemonic == "b":
-            if self.f.entrada <= alvo < self.f.fim:
+            # Tem de ser o conjunto de enderecos REALMENTE desmontados, nao o
+            # intervalo da funcao: dentro do intervalo pode haver buraco (dado
+            # entre trechos de codigo) e o `goto` sairia sem rotulo -- o C nao
+            # compila. Buraco + funcao conhecida = chamada de cauda.
+            if alvo in self.enderecos_desmontados:
                 self._emitir(f"goto {self._rotulo(alvo)};")
+            elif alvo in self.nomes:
+                # Salto para a ENTRADA de outra funcao = chamada de cauda.
+                self._emitir(f"/* chamada de cauda para 0x{alvo:08X} */")
+                self._emitir(f"r0 = {self.nomes[alvo]}(r0, r1, r2, r3);")
+                self._emitir("return r0;")
             else:
                 raise _NaoLevantado(f"salto para fora da funcao (0x{alvo:08X})")
             return
         if ins.mnemonic in ("bl", "blx"):
+            if (alvo & ~1) not in self.nomes:
+                # Chamada para endereco que NAO foi descoberto como funcao (dado
+                # lido como codigo ou trecho nao alcancado). Fica declarada e sem
+                # corpo -- o link acusa, em vez de o C fingir que existe.
+                self.externos.add(f"fn_{alvo & ~1:08X}")
             destino = self.nomes.get(alvo & ~1, f"fn_{alvo & ~1:08X}")
             fora = "externo" if alvo & ~1 not in self.nomes else "no modulo"
             self._emitir(f"/* bl 0x{alvo:08X} ({fora}) */")
             self._emitir(f"r0 = {destino}(r0, r1, r2, r3);")
             return
-        cond = CONDICOES.get(ins.mnemonic[1:])
+        sufixo = ins.mnemonic[1:]
+        cond = CONDICOES.get(sufixo)
         if cond is None:
             raise _NaoLevantado("condicao desconhecida")
+        # Fusao de flags: se o desvio vem IMEDIATAMENTE depois da instrucao que
+        # define as flags, a condicao pode ser escrita direto sobre os operandos
+        # (`if ((s32)r0 >= (s32)r1)`) em vez de testar z/n/c/v. So vale quando e
+        # a instrucao seguinte -- com instrucoes no meio os operandos podem ter
+        # mudado, e ai o teste das flags continua sendo a unica leitura correta.
+        if self._flags_recentes and self._flags_recentes[0] == self._indice_instrucao - 1:
+            direta = _condicao_direta(sufixo, self._flags_recentes[1])
+            if direta:
+                alvo_certo = (alvo in self.enderecos_desmontados)
+                if alvo_certo:
+                    self._emitir(f"if ({direta}) goto {self._rotulo(alvo)};")
+                    return
         if alvo not in self.enderecos_desmontados:
+            if alvo in self.nomes:
+                self._emitir(f"if ({cond}) {{ r0 = {self.nomes[alvo]}(r0, r1, r2, r3); "
+                             f"return r0; }}  /* chamada de cauda condicional */")
+                return
             raise _NaoLevantado(f"desvio para 0x{alvo:08X}, que nao foi desmontado "
                                 f"(rotulo inexistente)")
         self._emitir(f"if ({cond}) goto {self._rotulo(alvo)};")
@@ -426,6 +543,8 @@ class _Emissor:
                 raise _NaoLevantado("forma inesperada")
             flags = self._define_flags
             if m in ("cmp", "cmn"):
+                if m == "cmp":
+                    self._anotar_flags(("cmp", a, b))
                 operacao = "a_ + b_" if m == "cmn" else "a_ - b_"
                 self._emitir(f"{{ u32 a_ = {a}, b_ = {b}; u32 r_ = {operacao};")
                 if operacao.endswith("+"):
@@ -435,6 +554,8 @@ class _Emissor:
                 self._emitir("  z = (r_ == 0); n = (r_ >> 31); }")
                 return
             if m in ("adds", "add", "adcs", "adc"):
+                if m == "adds":
+                    self._anotar_flags(("adds", destino))
                 entrada = "c" if m in ("adcs", "adc") else "0"
                 self._emitir(f"{{ u32 a_ = {a}, b_ = {b} + {entrada}; u32 r_ = a_ + b_;")
                 if flags:
@@ -507,7 +628,8 @@ class _Emissor:
         else:
             raise _NaoLevantado("forma de deslocamento inesperada")
         funcao_c = {"lsls": "sh_lsl", "lsl": "sh_lsl", "lsrs": "sh_lsr",
-                    "lsr": "sh_lsr", "asrs": "sh_asr", "asr": "sh_asr"}[m]
+                    "lsr": "sh_lsr", "asrs": "sh_asr", "asr": "sh_asr",
+                    "rors": "sh_ror", "ror": "sh_ror", "rorn": "sh_ror"}[m]
         self._emitir(f"{{ u32 c_ = c; u32 r_ = {funcao_c}({base}, {quantos}, &c_);")
         if self._define_flags:
             self._emitir(f"  c = c_; {destino} = r_; z = (r_ == 0); n = (r_ >> 31); }}")
@@ -599,6 +721,12 @@ class _Emissor:
         carga = m.startswith("ldm")
         escrita_back = "!" in ins.op_str
         n = len(lista)
+        # Modo de enderecamento do bloco (ARM): o deslocamento inicial e o
+        # delta do writeback mudam em cada um -- tratar todos como se fossem
+        # "increment after" le os enderecos errados.
+        sufixo = m[3:] if len(m) > 3 else "ia"
+        modo = {"ia": 0, "ib": 4, "da": 4 - 4 * n, "db": -4 * n}.get(sufixo, 0)
+        delta = {"ia": 4 * n, "ib": 4 * n, "da": -4 * n, "db": -4 * n}.get(sufixo, 4 * n)
 
         # Snapshot do endereco base: `ldmia r1!, {r0, r1, ...}` e rotina comum
         # no codigo compilado, e depois de carregar em r1 os enderecos seguintes
@@ -606,10 +734,12 @@ class _Emissor:
         # para o endereco errado -- bug silencioso classico de levantador.
         self._emitir(f"{{ u32 base_ = {base};")
         for i, r in enumerate(lista):
+            desloc = modo + 4 * i
+            termo = f"base_ + {desloc}" if desloc >= 0 else f"base_ - {-desloc}"
             if carga:
-                self._emitir(f"    {r} = carrega32((base_ + {4 * i}));")
+                self._emitir(f"    {r} = carrega32({termo});")
             else:
-                self._emitir(f"    guarda32((base_ + {4 * i}), {r});")
+                self._emitir(f"    guarda32({termo}, {r});")
         if escrita_back:
             if carga and base in lista:
                 # ARM: em LDM com a base na lista, o valor CARREGADO prevalece
@@ -621,9 +751,9 @@ class _Emissor:
                 self._emitir(f"    /* ATENCAO: STM com {base} na lista e writeback "
                              f"e marcado IMPREVISIVEL pelo manual do ARM; aqui o "
                              f"valor gravado e o original e o writeback acontece */")
-                self._emitir(f"    {base} = base_ + {4 * n};")
+                self._emitir(f"    {base} = base_ + {delta};")
             else:
-                self._emitir(f"    {base} = base_ + {4 * n};  /* writeback */")
+                self._emitir(f"    {base} = base_ + {delta};  /* writeback */")
         self._emitir("}")
 
 
@@ -648,6 +778,33 @@ def _separar_condicao(mnemonic: str, modo: str) -> tuple[str | None, str, bool]:
     return None, mnemonic, False
 
 
+def _condicao_direta(sufixo: str, descritor) -> str | None:
+    """Como escrever a condicao sem passar pelas flags, quando e equivalente.
+
+    Regras (validadas pela bateria de execucao do corpus): para `cmp A, B` as
+    comparacoes com e sem sinal sao exatamente as definidas pelo ARM; para
+    instrucoes que ESCREVEM o resultado (subs/adds/ands/movs/deslocamentos) so
+    eq/ne/mi/pl valem, lidas do proprio destino -- carry e overflow nao sao
+    expressos com seguranca sem recomputar a operacao.
+    """
+    tipo = descritor[0]
+    if tipo == "cmp":
+        _, a, b = descritor
+        return {
+            "eq": f"{a} == {b}", "ne": f"{a} != {b}",
+            "cs": f"{a} >= {b}", "hs": f"{a} >= {b}",
+            "cc": f"{a} < {b}", "lo": f"{a} < {b}",
+            "hi": f"{a} > {b}", "ls": f"{a} <= {b}",
+            "ge": f"(s32){a} >= (s32){b}", "lt": f"(s32){a} < (s32){b}",
+            "gt": f"(s32){a} > (s32){b}", "le": f"(s32){a} <= (s32){b}",
+        }.get(sufixo)
+    if tipo in ("subs", "adds", "resultado"):
+        destino = descritor[1]
+        return {"eq": f"{destino} == 0", "ne": f"{destino} != 0",
+                "mi": f"(s32){destino} < 0", "pl": f"(s32){destino} >= 0"}.get(sufixo)
+    return None
+
+
 class _NaoLevantado(Exception):
     """Instrucao que este levantador nao traduz (registrada, nunca ignorada)."""
 
@@ -658,6 +815,18 @@ def identificador_c(nome: str) -> str:
     if not limpo or limpo[0].isdigit():
         limpo = "_" + limpo
     return limpo
+
+
+def chamadores_de(desmontagem, nomes: dict[int, str]) -> dict[str, list[str]]:
+    """Inverte o grafo de chamadas: quem chama cada funcao (por nome)."""
+    saida: dict[str, list[str]] = {}
+    for origem, destino in desmontagem.arestas():
+        nome_origem = nomes.get(origem, f"fn_{origem:08X}")
+        nome_destino = nomes.get(destino, f"fn_{destino:08X}")
+        saida.setdefault(nome_destino, []).append(nome_origem)
+    for lista in saida.values():
+        lista.sort()
+    return saida
 
 
 def decompilar(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE,
@@ -679,7 +848,7 @@ def decompilar(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE,
         nomes[endereco] = candidato
     for endereco in desmontagem.funcoes:
         nomes.setdefault(endereco, f"fn_{endereco:08X}")
-    saida = CodigoC()
+    saida = CodigoC(chamadores=chamadores_de(desmontagem, nomes))
     for endereco in sorted(desmontagem.funcoes):
         funcao = desmontagem.funcoes[endereco]
         emissor = _Emissor(funcao, imagem, base, nomes)

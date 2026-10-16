@@ -48,30 +48,35 @@ exatamente com o `inventory.json` do projeto):
 | censo do projeto | 5 981 funções (5 980 Thumb, 1 ARM) |
 | descoberta **só a partir do vetor de reset** | 1 876 funções, 73 792 instruções, 3 432 arestas |
 | …das quais confirmadas no censo | 1 382 · e **494 que o censo não tinha** |
-| descoberta com o censo como semente | **7 717 funções, 353 854 instruções, 16 387 arestas** |
+| descoberta com o censo como semente | **7 717 funções, 352 918 instruções, 16 387 arestas** |
 | censo coberto | 5 981/5 981 (100%) · **1 736 funções fora do censo** |
-| funções levantadas para C | **7 269 de 7 717 (94,2%)** |
-| C gerado | 776 324 linhas / 29 MB — **compila sem erros** com `zig cc -mcpu=arm7tdmi` (objeto ARM de 1,7 MB) |
-| conferência byte a byte | **353 821/353 854 instruções (99,991%)** remontam idênticas ao binário |
+| funções **com C para ler** | **7 634 de 7 717 (98,9%)** — 7 311 completas + 406 parciais marcadas |
+| C gerado | 832 192 linhas / 31 MB — **compila sem erros** (`zig cc -mcpu=arm7tdmi`, objeto de 1,76 MB) |
+| condições fundidas nos desvios | 15 541 (`if (r0 >= 0x64)` em vez de `if ((n == v))`) |
+| conferência byte a byte | **352 888/352 918 (99,991%)** remontam idênticas ao binário |
 
-Duas descobertas que valem mais que os números:
+### Três descobertas que valem mais que os números
 
 1. **Metade do que a varredura ingênua produzia era dado lido como código.** A
-   primeira passada devolveu 675 389 "instruções"; ao rejeitar o que *não existe*
-   no ARM7TDMI (`strd`, `cbnz`, `it`, `cdp2`, `.w`) sobraram **353 854**. Os
-   opcodes válidos eram de Thumb-2/ARMv5 — impossíveis no GBA — vinham de tabelas
-   de dados percorridas como código. Sem esse filtro, o levantamento teria
-   gerado C bonito e completamente falso.
-2. **As 28 divergências de bytes são o mesmo `cmp r6, r7`** gravado em outra
-   codificação (`0x453E` vs `0x42BE`): codificação alternativa, semântica
-   idêntica. As 5 restantes o remontador não aceitou na sintaxe usada.
+   primeira passada devolveu 675 389 "instruções"; rejeitando o que *não existe*
+   no ARM7TDMI (`strd`, `cbnz`, `it`, `cdp2`, sufixos `.w`, NEON/VFP) sobraram
+   **352 918**. Eram opcodes de Thumb-2/ARMv5 — impossíveis no GBA — vindos de
+   tabelas percorridas como código. Sem esse filtro o levantamento teria gerado
+   C bonito e falso.
+2. **`salto calculado` ≠ variável.** 306 instruções `mov pc, rN` são tabelas de
+   casos (dispatchers). Traduzi-las como atribuição seria mentira silenciosa:
+   agora a função sai **PARCIAL**, com o motivo no cabeçalho e `g_erro |= 2` no
+   ponto exato — legível, e detectável por quem executar.
+3. **Função sem corpo nenhum: 0.** Antes as 448 incompletas viravam só um
+   protótipo; agora todas as 7 717 têm algo para ler (406 com lacuna marcada).
 
 O que esses números **não** dizem: que o C esteja semanticamente certo. Num
 binário de terceiros não existe verdade-terreno, então o que se prova é
-fidelidade (bytes) e compilabilidade — não comportamento. As 448 funções que
-ficaram incompletas (5,8%) aparecem no arquivo com o motivo, uma por uma.
+fidelidade de bytes e compilabilidade — **não comportamento**. O único lugar
+onde comportamento está provado é o corpus sintético (59/59 por emulação, no
+binário e no C rele_vantado e recompilado).
 
-## O que está provado e o que não está
+## O que está provado e o que não está## O que está provado e o que não está
 
 **Provado:** o ciclo completo funciona em código Thumb real. As armadilhas que
 quebraram o pipeline durante o desenvolvimento e que os testes agora travam

@@ -64,7 +64,12 @@ def impossivel_no_arm7tdmi(ins, modo: str) -> str | None:
         return f"IT block ({base}): nao existe no ARMv4T"
     if base in FORA_DO_ARM7TDMI:
         return f"{base}: instrucao inexistente no ARM7TDMI"
-    for prefixo in ("ldc2", "stc2", "cdp2", "mcr2", "mrc2", "blx", "bxns", "vc"):
+    # NEON/VFP: o ARM7TDMI do GBA nao tem FPU nem vetoriais. Qualquer mnemonic
+    # comecando com "v" aqui e dado lido como codigo (visto: vhadd.u8, vrev64.8).
+    if base.startswith("v"):
+        return f"{base}: NEON/VFP nao existe no ARM7TDMI"
+    for prefixo in ("addw", "subw", "movw", "movt", "sbfx", "ubfx", "bfi", "bfc",
+                    "ldc2", "stc2", "cdp2", "mcr2", "mrc2", "blx", "bxns", "vc"):
         if base.startswith(prefixo):
             return f"{base}: coprocessador 2 nao existe no ARM7TDMI"
     if modo == "thumb" and base in FORA_DO_V4T_SO_NO_THUMB:
