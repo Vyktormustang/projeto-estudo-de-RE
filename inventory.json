@@ -4,7 +4,7 @@
   "atualizado_utc": "2026-10-16T10:58:37.083913+00:00",
   "rom": {
     "status": "COPIA_VERIFICADA",
-    "observacao": "ROM fornecida pelo usuario via Google Drive ('Pokemon - Fire Red (BR).gba', id 14JCEJp6LFgdkzKMOtI5-l3XvowJ1SxnC); sha256 verificado. Copia de trabalho em rom/ (gitignored). Nunca entra em repositorios publicos.",
+    "observacao": "ROM fornecida pelo usuario via Google Drive ('Pokemon - Fire Red (BR).gba', id 14JCEJp6LFgdkzKMOtI5-l3XvowJ1SxnC); sha256 verificado (6035a98f...b4ae, reconferido em 2026-10-16). Copia de trabalho restaurada em rom/pokemon_firered_bpre_trabalho.gba (gitignored). Nunca entra em repositorios publicos.",
     "caminho_copia_trabalho": "rom/pokemon_firered_bpre_trabalho.gba",
     "nome_original_informado": null,
     "sha256": "6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae",

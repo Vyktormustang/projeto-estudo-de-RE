@@ -27,7 +27,7 @@ por prova em frames/screenshots/dumps de RAM.
 | Emulador headless **completo** (frames, input agendado, snaps PNG, save-state, mem-dumps) | ✅ | `scripts/gba_libretro_emu.py` |
 | **Mapa da mochila**: array @ `0x020258B8`, 4 B/slot `{id:u16, qty:u16}` | ✅ CONFIRMADO | este README ↓ |
 | Formatos/offsets no save-state (EWRAM/IWRAM) p/ inspeção offline | ✅ | `notes_mods_codigo.md` |
-| **Mod v3** (hook-veneer + combo L+R+START → preencher 8 slots) | 🛠 em validação | `rom_mod/BAG_MOD_v3.gba` |
+| **Mod v4** (hook-veneer + gating REG_KEYINPUT + combo L+R+START → preencher 8 slots) | 🛠 provado no boot; combo dentro do jogo ABERTO | `rom_mod/BAG_MOD_v4.gba` (gerado por `scripts/apply_mod_v4.py`) |
 | Patch de texto demo (safe-text-slot) — primeiro modificador de ROM | ✅ | `rom_mod/PATCH_TEXTO_DEMO_PIDGEY.gba` |
 
 ---
@@ -153,16 +153,15 @@ python3 scripts/gba_ident.py rom/seu_jogo.gba -o reports --update-inventory inve
 # 2) bateria de testes (fixtures sintéticas — serve sem ROM)
 bash scripts/run_all_tests.sh
 
-# 3) aplicar o mod (gera rom_mod/BAG_MOD_v3.gba a partir dos .hex em reports/)
-python3 scripts/apply_mod_v3.py           # mounter/verificador em construção
-# or manual: python3 - <<'PY' ... (ver docs/apply_mod_manual.py)
+# 3) aplicar o mod v4 (gera rom_mod/BAG_MOD_v4.gba a partir de reports/tramp_v4.hex)
+python3 scripts/gen_tramp_v4.py && python3 scripts/test_tramp_v4.py   # prova semântica 5/5
+python3 scripts/apply_mod_v4.py           # exige rom/pokemon_firered_bpre_trabalho.gba
 
-# 4) testar no emulador headless
-python3 scripts/gba_libretro_emu.py --rom rom_mod/BAG_MOD_v3.gba \
-    --frames 900 --input 100:L:250 --input 100:R:250 --input 100:START:250 \
-    --save-state out.bin --snap 890=bag.png
-python3 scripts/gba_state_dump.py out.bin --read 0x020258B8:0x10
-# esperado (quando validado): 01 00 63 00 02 00 63 00 ...
+# 4) testar no emulador headless (combo no frame 150, bolsa lida no state)
+python3 scripts/gba_libretro_emu.py --rom rom_mod/BAG_MOD_v4.gba --frames 600 \
+    --input 150:L:200 --input 150:R:200 --input 150:START:200 --save-state out.bin
+python3 scripts/gba_state_dump.py out.bin --read 0x020258B8:0x20
+# esperado (FATO, 2026-10-16): 01 00 63 00 02 00 63 00 04 00 63 00 0D 00 63 00 1C 00 32 00 2D 00 1E 00 32 00 1E 00 13 00 63 00
 ```
 
 ---

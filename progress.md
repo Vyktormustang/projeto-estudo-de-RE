@@ -648,3 +648,14 @@ Projeto encerrado nesta fase. Ponto de entrada para retomar: **`RETOMADA.md`**.
 * Ambiente: `rom/`, `emu/*.bin`, `/tmp` e saves do usuário ficam fora do git (ignorados).
   Restaure a ROM do Drive e confira o sha256 antes de retomar.
 * Documentos corrigidos: `HANDOFF.md` (veneer e retorno), `README.md` (retorno), `MEMORIA_CONSOLIDADA.md` §5.
+
+### Ciclo 36 — 2026-10-16: teste do PROMPT_OTIMIZACAO.md em tarefa real (restauração + verificação)
+* Início: 14:44:50 UTC · fim: 2026-10-16T14:46:21+00:00
+* FATO: ROM restaurada do Drive (14JCEJp6…) → `rom/pokemon_firered_bpre_trabalho.gba`, sha256 6035a98f…b4ae = inventory.json. Pasta `google_drive/` removida.
+* FATO: `reports/tramp_v4.hex` regenerado idêntico ao versionado; `scripts/test_tramp_v4.py` 5/5 (capstone 5.0.7).
+* FATO: `rom_mod/BAG_MOD_v4.gba` sha256 b73987a3…01dc.
+* FATO: 600 f sem combo → PNG idêntico ao original (sha256 b284fdc2…); bolsa 0x020258B8 zerada.
+* FATO: 600 f com L+R+START @150 → 8 slots `01/63 02/63 04/63 0D/63 1C/32 2D/1E 32/1E 13/63`.
+* FATO: segundo `.sav` do Drive (13:29Z, id 1oVGnP…) também vazio (todos 0xFF). Trilha B segue bloqueada.
+* Docs: README (pipeline e linha do mod → v4), RETOMADA §5 (segundo .sav), inventory.json (ROM restaurada).
+* ABERTO: combo dentro do jogo (hook só no boot); navegação ao overworld; save real do usuário.

@@ -74,6 +74,9 @@ encontrados 6 erros de montagem manual ao longo do ciclo.
 
 - `emu/states_usuario/fr_usuario.sav` (`Pokemon - Fire Red (BR).sav` no Drive, do **mGBA**):
   131072 bytes, **todos `0xFF`** → cartucho sem nenhum save gravado no jogo.
+- Segunda versão do `.sav` no Drive (`Pokemon - Fire Red (BR).sav`, id `1oVGnP1Z7RWusqj4lnZ80xXMI1N7Aryz0`,
+  modificada em 2026-10-16 13:29Z): **FATO, também vazia** (131072 B, todos `0xFF`). Cópia local:
+  `emu/states_usuario/fr_usuario_v2.sav` (ignorada pelo git). O bloqueio da Trilha B continua.
 - `emu/states_usuario/fr_usuario.st0` (do **MyBoy**, pasta `MyBoy/` no Drive): state fechado de
   37 KB comprimido (gzip), cabeçalho `GBASTATE` + `POKEMON FIRE` / `BPRE`, descompactado 527.992 B.
   - Miniatura `MyBoy/Pokemon - Fire Red (BR).st0.png`: overworld de Pallet Town (FATO pela imagem).
