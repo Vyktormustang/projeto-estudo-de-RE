@@ -139,3 +139,60 @@ Mas `ResetBag` tem **dois** chamadores -- `0x08054B06` e `0x08111374` -- e os 6
 chamadores de `ClearItemSlots` foram instrumentados juntos em `rom_quem.gba`:
 nenhum contador subiu no fluxo de jogo novo. A bag e' inicializada por outro
 caminho, ainda nao localizado.
+
+## 13. A resposta: qual campo da' poke bolas (MEDIDO EM JOGO)
+
+**Campo**: `SaveBlock1 + 0x430` (pocket de Poke Balls), slot 0.
+
+```
++0x430 + 4*n + 0  u16 itemId     -> 4 = POKe BOLA
++0x430 + 4*n + 2  u16 quantidade -> qtd XOR (*(u32*)(SaveBlock2+0xF20) & 0xFFFF)
+```
+
+**Como o XOR foi descoberto (nao deduzido)**: com a mochila vazia, todos os 5
+slots das 5 pockets liam `00 00 04 85`, isto e', itemId 0 e quantidade
+`0x8504`. A chave de cifra naquele instante era `0x0E078504` -- a metade baixa
+e' exatamente `0x8504`. Ou seja: slot vazio guarda `0 ^ (chave & 0xFFFF)`, nao
+zero. Gravar 99 "cru" teria dado quantidade lida = `99 ^ 0x8504`, um numero
+absurdo.
+
+**Prova em jogo** (`evidencias/mochila_pokebola_99.png`): com o jogo rodando no
+overworld, escrevi `itemId=4`, `qtd=99^0x8504`, abri o menu (START) -> BOLSA ->
+duas vezes DIREITA. A tela mostra **"POKe BOLA x 99"** na pocket "POKe BOLAS",
+com a descricao do item. Nenhuma outra escrita foi feita.
+
+**Estado salvo**: `/tmp/overworld.state` (528 448 B) permite repetir o
+experimento em ~6 s em vez de ~190 s (`emulador_console.salvar_estado` /
+`carregar_estado`, novos).
+
+## 14. O patch de ROM automatico ainda NAO fecha (honesto)
+
+Tentei 5 caminhos para injetar a escrita sem intervencao do emulador. Todos
+**medidos como nao executados** ou sem efeito:
+
+| ponto | o que era | resultado |
+|---|---|---|
+| `0x08054B06` | `bl ResetBag` em NewGameInitData | contador 0 (com stub correto) |
+| `0x08111374` | 2o chamador de ResetBag | contador 0 |
+| 6 chamadores de `ClearItemSlots` | inclui `0x0809A2EA`, dentro de ResetBag | contador 0 |
+| 13 chamadores de `GetBagItemQuantity` | leitura de quantidade | contador 0 ao abrir a mochila |
+| 28 `bl` do modulo da mochila (0x08099E00-0x0809A300) | desenho/consulta da bolsa | 1 disparo, nao relacionado a bolsa |
+| 12 `bl` da UI (0x081085xx/0x08108Exx/0x081096xx) | UI que usa `gBagPockets` | nenhum |
+| entry de `0x08000844` / `0x0800080C` | supostos VBlank/HBlank | nao chamados |
+
+**O que ficou medido no caminho**:
+
+- A tabela de callbacks de IRQ fica em **`0x03007438`** (literal do `IntrMain`)
+  e as entradas apontam para **IWRAM** (`0x03001FC4`, `0x0300150C`, ...), nao
+  para ROM. Logo, nao da' para hookar IRQ por arquivo.
+- `IntrMain` esta' em **`0x08000248`** e e' copiado inteiro para IWRAM em
+  `0x03003580` (>0x400 bytes identicos, medido byte a byte). Qualquer `bl` que
+  eu inserir nesse bloco aponta certo em ROM e errado na copia -- **nao hookar
+  o bloco copiado**.
+- A UI da mochila **nao chama `GetBagItemQuantity`** (medido: nenhum dos 13
+  call-sites disparou com a bolsa aberta e navegada). Ela le' o slot direto.
+- Contadores em EWRAM escritos no boot sao **apagados pelo memset do init**.
+  Para instrumentar o boot, o stub tem de travar a CPU (`b .`) depois de contar
+  -- foi assim que `probe_reset2` provou contador = 1.
+- Stub ARM exige endereco **alinhado a 4**; `achar_espaco_livre(...,
+  alinhamento=4)`. Com `alinhamento=2` (padrao) o codigo ARM nao roda.

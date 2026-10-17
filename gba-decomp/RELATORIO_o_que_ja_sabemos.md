@@ -579,3 +579,50 @@ endereços da seção 9.6.
 *Gerado a partir de `evidencias/rom_bpre_boot_sem_censo.json`,
 `evidencias/rom_bpre_analise.json` e das medições descritas no `README.md`
 (itens 1–22). Todo número aqui pode ser refeito com os comandos do README.*
+
+## 15. Mochila: qual campo da' poke bolas (2026-10-17, MEDIDO EM JOGO)
+
+Esta secao responde a pergunta "qual campo mudar para conseguir poke bolas" com
+prova dentro do jogo, e nao por inferencia de estrutura.
+
+**MEDIDO**:
+
+- `gBagPockets` e' o ARRAY em `0x0203988C` (nao um ponteiro para ele). Cada
+  entrada tem 8 bytes: `{ u32 itemSlots; u8 capacity; u8 pad[3] }`.
+- As cinco entradas, lidas com o jogo em execucao no overworld:
+
+  | indice | itemSlots | offset em SaveBlock1 | capacity |
+  |---|---|---|---|
+  | 0 | `S1+0x310` | +0x310 | 42 |
+  | 1 | `S1+0x3B8` | +0x3B8 | 30 |
+  | 2 | `S1+0x430` | +0x430 | 13 |
+  | 3 | `S1+0x464` | +0x464 | 58 |
+  | 4 | `S1+0x54C` | +0x54C | 43 |
+
+  Bate exatamente com `include/global.h` do pret/pokefirered. Medido, nao
+  suposto: os cinco ponteiros foram lidos de `0x0203988C` em tempo de execucao.
+
+- Cada slot tem 4 bytes: `u16 itemId` e `u16 quantidade`.
+- **A quantidade e' cifrada**: slot vazio NAO e' zero. Com a mochila vazia os
+  slots liam `00 00 04 85` (itemId 0, quantidade `0x8504`) e a chave em
+  `SaveBlock2+0xF20` era `0x0E078504`. A metade baixa da chave e' `0x8504`:
+  a quantidade gravada e' `qtd ^ (chave & 0xFFFF)`.
+- **Prova visual**: gravando `itemId=4` e `99 ^ 0x8504` em `S1+0x430`, abrindo
+  o menu e a BOLSA, a tela mostra "POKe BOLA x 99" na pocket POKe BOLAS
+  (`evidencias/mochila_pokebola_99.png`).
+
+**NAO PROVADO**:
+
+- Que exista um ponto unico no codigo que inicialize a bag e que possa ser
+  patchado para ja' nascer com bolas. Sete conjuntos de call-sites foram
+  instrumentados (NewGameInitData, ResetBag, ClearItemSlots, GetBagItemQuantity,
+  modulo da mochila, UI da bolsa, handlers de IRQ) e **nenhum** disparou no
+  fluxo de jogo novo / abertura de bolsa -- ver `NOTAS_DE_TRABALHO.md` secao 14.
+- Portanto o patch de ROM que da' bolas automaticamente continua **aberto**. O
+  que existe e' (a) o campo e a codificacao, provados em jogo, e (b) a prova de
+  que codigo injetado em espaco livre executa (stub ARM no reset, contador = 1).
+
+**Efeito colateral medido**: o keystone 0.9.2 resolve `ldr rX, =VALOR` com
+deslocamento errado a partir do segundo literal do bloco. Isso ja' foi corrigido
+(`patch.montar_thumb_literais`, 5 testes). Era a causa de varios "o hook nao
+roda" anteriores.

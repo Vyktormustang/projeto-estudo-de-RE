@@ -177,6 +177,7 @@ class EmuladorConsole:
         self._core = C.CDLL(str(self.core))
         self._core.retro_get_memory_data.restype = C.c_void_p
         self._core.retro_get_memory_size.restype = C.c_size_t
+        self._core.retro_serialize_size.restype = C.c_size_t
 
         def _env(cmd, data):
             try:
@@ -314,6 +315,29 @@ class EmuladorConsole:
         return self._fotogramas
 
     # -- leitura de memoria -------------------------------------------------
+    def salvar_estado(self, caminho: Path) -> None:
+        """Salva o estado do core em arquivo (retro_serialize).
+
+        Existe para nao repetir a navegacao: chegar ao overworld custa ~190 s
+        de emulacao e ~200 apertos de A. Com estado salvo, cada experimento
+        comeca do mesmo ponto. O estado NAO e' portavel entre versoes do core
+        -- se o .so mudar, o estado pode ser recusado.
+        """
+        tamanho = self._core.retro_serialize_size()
+        if not tamanho:
+            raise ErroDeEmulacao("o core nao sabe serializar estado")
+        buf = C.create_string_buffer(tamanho)
+        if not self._core.retro_serialize(buf, tamanho):
+            raise ErroDeEmulacao("retro_serialize falhou")
+        Path(caminho).write_bytes(buf.raw[:tamanho])
+
+    def carregar_estado(self, caminho: Path) -> None:
+        """Carrega um estado salvo por `salvar_estado`."""
+        dados = Path(caminho).read_bytes()
+        buf = C.create_string_buffer(dados, len(dados))
+        if not self._core.retro_unserialize(buf, len(dados)):
+            raise ErroDeEmulacao(f"retro_unserialize recusou {caminho}")
+
     def ler(self, endereco_gba: int, tamanho: int) -> bytes:
         """Le a memoria do console pelo mapa que o core publicou."""
         for d in self._mmaps:
