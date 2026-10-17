@@ -626,3 +626,41 @@ prova dentro do jogo, e nao por inferencia de estrutura.
 deslocamento errado a partir do segundo literal do bloco. Isso ja' foi corrigido
 (`patch.montar_thumb_literais`, 5 testes). Era a causa de varios "o hook nao
 roda" anteriores.
+
+## 16. Injeção de código: o que passou a estar **medido** (2026-10-17)
+
+**Medido:**
+
+- O `bl` do Thumb no ARM7TDMI alcanca **so' ±4 MiB**. Keystone e capstone o
+  tratam como o `bl` do Thumb-2 (±16 MiB) e **nao avisam**. Todo codigo injetado
+  em `0x0871A906` a partir de um hook em `0x0800xxxx` estava saltando para
+  `0x0831A906` -- lixo. Isso invalida os testes anteriores de hook que ficaram
+  a mais de 4 MiB (`rom_bolas_v3`, `rom_bagmap`, `rom_marca_c/a2`, `rom_bolas_c`,
+  entre outros): eles nao provavam "o codigo nao executa", provavam que o salto
+  estava errado.
+- Com o stub perto do hook (padding `0x080000C0`, 64 bytes livres) e a chamada
+  longa feita por um thunk (`ldr r3,=alvo|1; bl thunk; ... thunk: bx r3`), o
+  codigo roda: `rom_marca_c3.gba` incrementa `0x02037F00` ~1 vez por quadro
+  desde o boot (570 em 600 quadros; 11 588 em 12 000).
+- O hook `0x080004A6` e' o `bl 0x08000890` do `AgbMain`, e `0x08000890` e' uma
+  **espera de VBlank** (gira em `0x080008AA..B2` ate' o bit 0 de
+  `0x0300310C`). O PC amostrado por save state fica nesse laco a maior parte
+  do tempo -- o jogo nao esta' travado, esta' esperando o VBlank.
+
+**Nao provado / bloqueio aberto:**
+
+- Nesta ROM (traducao BR), o jogo **nao sai da tela de titulo** no emulador
+  mGBA: as teclas chegam (`KEYINPUT` = `f703` com START; `gMain.heldKeys`
+  0x03003118 e `newKeys` 0x0300311C = `0x0008`), mas START/A/B/direcional nao
+  abrem o menu, e forcar essas variaveis por codigo injetado tambem nao.
+  Os callbacks vistos no ciclo sao `0x08078BB5` (intro/titulo), `0x080EC9ED` e
+  `0x080EC5A5`. A causa (hack de traducao x core libretro) **nao foi
+  determinada**.
+- Estados salvos do mGBA (`salvar_estado`) carregaram **inertes** em pelo menos
+  dois casos: o jogo nao responde a botao nenhum depois de carregar, nem na ROM
+  sem patch. Nao usar estado salvo como banco de teste sem validar a resposta a
+  um botao.
+- A rotina `0x08056644` chama `NewGameInitData` e parece ser o inicio de um
+  jogo novo, mas chama-la pelo hook (aos 1 600 quadros) zerou
+  `gMain.callback2` e deixou a tela parada. Nao serve como atalho sem entender
+  o estado esperado.

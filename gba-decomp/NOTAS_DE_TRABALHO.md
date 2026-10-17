@@ -196,3 +196,89 @@ Tentei 5 caminhos para injetar a escrita sem intervencao do emulador. Todos
   -- foi assim que `probe_reset2` provou contador = 1.
 - Stub ARM exige endereco **alinhado a 4**; `achar_espaco_livre(...,
   alinhamento=4)`. Com `alinhamento=2` (padrao) o codigo ARM nao roda.
+
+## 16. `BL` do Thumb no ARM7TDMI: ±4 MiB (e por que metade dos hooks "nao disparava")
+
+**Medido.** O `bl` do Thumb no ARM7TDMI tem **22 bits de deslocamento**
+(`S` + `imm10` + `imm11`, vezes 2) e alcanca **so' ±4 MiB**. O keystone 0.9.2
+monta e o capstone desmonta esse salto na forma do Thumb-2 (`bl` de 32 bits,
+±16 MiB) --- e **nenhum dos dois avisa**. Resultado: um `bl` "para `0x0871A906`"
+a partir de `0x080004A6` vira, no silicio, um salto para `0x0831A906` (4 MiB
+antes), que e' lixo. Foi essa a causa de uma serie de "o hook nao roda".
+
+Decodificador correto, usado para conferir tudo:
+
+```python
+def bl_armv4t(hw1, hw2, pc):
+    s = (hw1 >> 10) & 1
+    off = ((s << 21) | ((hw1 & 0x3FF) << 11) | (hw2 & 0x7FF)) << 1
+    if s:
+        off -= 1 << 23
+    return pc + 4 + off        # alcance: +/- 4 MiB
+```
+
+Consequencias praticas:
+
+- **Nunca** injetar codigo a mais de 4 MiB do ponto de hook usando `bl`.
+  `ferramentas/injetar_c.py` agora tem `conferir_alcance()` e **recusa** o patch.
+- O espaco livre grande desta ROM (`0x0871A906`, ~940 kB) esta' a 7,1 MiB do
+  loop principal. Para usa-lo, o stub fica **perto do hook** (padding
+  `0x080000C0`, 64 bytes livres) e chama o codigo por um **thunk**:
+
+  ```
+  push {r0, r1, r2, r3, lr}
+  ldr  r3, =destino|1
+  bl   thunk            ; o `bl` seta lr com o bit Thumb ligado
+  pop  {r0, r1, r2, r3}
+  bl   original
+  pop  {pc}
+  thunk: bx r3
+  ```
+
+  O idioma "classico" `mov lr, pc; bx r3` **nao funciona** no Thumb do
+  ARM7TDMI: a leitura de PC devolve o endereco com o **bit 0 zerado**, entao o
+  `bx lr` do destino voltaria em estado ARM. O `bl` seta o bit.
+- Toda chamada indireta gerada pelo `zig cc -mcpu=arm7tdmi` tambem sai nesse
+  formato (`ldr r0,=fn|1; bl thunk; bx r0`) --- conferido por desmontagem.
+
+### 16.1 A prova de que o stub roda
+
+`rom_marca_c3.gba`: stub em `0x080000C0`, codigo em `0x0871A908`
+(`*(u32*)0x02037F00 += 1`), `--reexecutar 0x08000890`. Rodando **desde o boot,
+sem estado salvo**, o contador sobe ~1 por quadro:
+
+| quadro | 600 | 1 800 | 3 600 | 7 200 | 12 000 |
+|---|---|---|---|---|---|
+| contador | 570 | 1 761 | 3 467 | 6 959 | 11 588 |
+
+Ou seja: o hook em `0x080004A6` (`bl 0x08000890`, a espera de VBlank do
+`AgbMain`) e' alcancado praticamente todo quadro, e o caminho
+hook -> stub -> thunk -> codigo C -> chamada original -> retorno esta' correto.
+
+### 16.2 O que ainda NAO funciona: entrar no jogo
+
+Medido no emulador (mGBA libretro), com a ROM original e com as patchadas:
+
+- O jogo boota, passa por copyright/GAME FREAK, anima a intro e chega ao
+  "PRESS START" (VRAM `a5a949e7`).
+- As teclas **chegam ao jogo**: `KEYINPUT` (0x04000130) vai a `f703` com START
+  e o `gMain` do jogo fica com `heldKeys` (0x03003118) = `newKeys`
+  (0x0300311C) = `0x0008`.
+- Mesmo assim nenhuma tela muda: START/A/B/direcional no titulo nao abrem o
+  menu, e o callback ativo continua sendo o da intro (`0x08078BB5`); os outros
+  dois vistos no ciclo sao `0x080EC9ED` e `0x080EC5A5`.
+- Forcar `heldKeys`/`newKeys` para `0x0008` todo quadro via codigo injetado
+  (`rom_forca.gba`) **tambem nao muda nada**.
+- Chamar a rotina de novo jogo (`0x08056644`, que chama `NewGameInitData`)
+  pelo hook, aos 1 600 quadros, zera `gMain.callback2` e deixa a tela parada.
+- **Nao esta' provado** se a causa e' o hack de traducao (o titulo do BR pode
+  estar quebrado) ou o core libretro. Fica registrado como bloqueio aberto.
+
+### 16.3 Estados salvos nao servem como banco de teste
+
+`salvar_estado` -> `carregar_estado` do mGBA produziu estados **inertes** pelo
+menos duas vezes (`/tmp/overworld.state`, `/tmp/p4_04800.state`): o jogo nao
+responde a nenhum botao depois de carregar (nem a ROM controle), embora a IRQ
+continue rodando. Regra: **validar qualquer estado pela resposta a um botao**
+antes de usa-lo; na duvida, rodar continuo desde o boot (custa ~1 min por
+12 000 quadros, mas e' confiavel).
