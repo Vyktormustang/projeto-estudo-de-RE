@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `62 passed` |
+| testes automatizados | `63 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -48,9 +48,9 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 
 | medida | valor |
 |---|---|
-| descoberta partindo **so do vetor de reset** | 3 586 funcoes · 2 599 das 5 981 do censo (43,4%) |
-| descoberta usando o **censo como sementes** | **8 172 funcoes**, 460 868 instrucoes listadas, 20 492 arestas |
-| cobertura do censo | 5 981/5 981 (100%) · **2 191 funcoes que o censo nao tinha** |
+| descoberta partindo **so do vetor de reset** (sem censo, **reproduzivel daqui**) | **3 587 funcoes**, 208 457 instrucoes, objeto de 956 772 B |
+| descoberta usando o **censo como sementes** (r19, **nao** reproduzivel daqui -- ver abaixo) | **8 172 funcoes**, 460 868 instrucoes listadas, 20 492 arestas |
+| cobertura do censo (r19) | 5 981/5 981 (100%) · **2 191 funcoes que o censo nao tinha** |
 | enderecos descartados | 164 (nenhuma instrucao valida do ARM7TDMI no inicio) |
 | saltos que saem da funcao para tras | 241 · 148 trechos orfaos voltaram como janela propria |
 | tabelas de casos | **377 reconhecidas**, 6 303 casos lidos da ROM → `switch` no C |
@@ -433,6 +433,31 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    nenhuma no C. Pego porque as duas funcoes ficaram com zero lacunas na sonda
    segmentada; o teste `test_veneer_adr_bx_para_ilha_e_recusado_dizendo_que_a_
    continuacao_fica_dentro` agora exige a recusa e a ausencia de `fn_...` no C.
+
+20. **"trecho nao desmontado" mandava procurar defeito onde nao tem.** 7 sitios
+   (5 desvios condicionais + 2 saltos) tinham alvo DENTRO da faixa da janela mas
+   nunca decodificado, e a frase parava em "a leitura parou antes de alcancar" --
+   que e' verdade e nao ajuda: manda procurar buraco na leitura. Medidos os BYTES
+   no alvo de cada um (rodada sem censo), lidos no modo da janela:
+
+   | site | alvo | o que ha' no alvo |
+   |---|---|---|
+   | `0x080528A0 b` | `0x08052C76` | `mrc2` (coprocessador: nao existe no ARM7TDMI) |
+   | `0x081A6F4A b` | `0x081A7320` | `bkpt` (ARMv5) |
+   | `0x081A6F96 bls` | `0x081A6F46` | `itee gt` (IT block, ARMv6) |
+   | `0x081A73F2 bmi` | `0x081A72F6` | `cbnz` (ARMv6) |
+   | `0x081C5D4C blt` | `0x081C5D10` | nem decodifica |
+   | `0x083FE2FC beq` | `0x083FE390` | `sxth` (ARMv6) |
+   | `0x0841A0FC bpl` | `0x0841A0B8` | `ldrd` (ARMv5TE) |
+
+   Nenhum e' codigo do ARM7TDMI: a janela passou por dado. Agora a frase diz
+   isso (`-- e o alvo NAO e' codigo do ARM7TDMI (<motivo>): a leitura desta
+   janela passou por dado`). Efeito medido: recusas continuam **64** (sao
+   recusas CORRETAS -- o que muda e' a explicacao), `recusas_motivo` passa de 13
+   para **18 grupos** (os 7 se separam pelo motivo medido), 482 643 linhas de C
+   (839 bytes a mais, so' texto) e **objeto byte a byte identico**
+   (`sha256` 51f70b40...). Determinismo conferido ANTES desta mudanca, em duas
+   execucoes do mesmo codigo: JSON, `.c` e objeto identicos (mesmo `sha256`).
 
 ### O que isso prova e o que nao prova
 

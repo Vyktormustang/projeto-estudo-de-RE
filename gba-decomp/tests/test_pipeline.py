@@ -1483,6 +1483,40 @@ def test_sonda_de_bx_recusado_mede_o_valor_e_pode_discordar_da_mensagem():
     assert "fora da imagem" in por_site["0x08000032"]["motivo"]
 
 
+def test_desvio_para_trecho_nao_desmontado_mede_se_o_alvo_e_codigo():
+    """"trecho nao desmontado" sozinho manda procurar defeito onde nao tem.
+
+    Medido na ROM (rodada sem censo): os 7 sitios cujo alvo cai dentro da faixa
+    da janela mas nunca foi decodificado tem, nos BYTES do alvo, `itee gt`,
+    `cbnz`, `sxth`, `ldrd`, `bkpt`, `mrc2` e um endereco que nem decodifica --
+    nenhum e' codigo do ARM7TDMI. A frase agora diz isso: a acao de quem le muda
+    (nao ha' o que consertar no levantador; a janela passou por dado).
+
+    A imagem reproduz o caso: um `beq` aponta para 0x0800002A, onde estao os
+    bytes de um `it` (Thumb-2, nao existe no ARMv4T); o `b` em 0x08000024 pula
+    para 0x08000030, entao o alvo fica num buraco DENTRO da faixa da janela.
+    """
+    imagem = bytearray(0x40)
+    for endereco, meio in (
+        (0x08000020, 0x2B00),      # cmp r3, #0
+        (0x08000022, 0xD002),      # beq 0x0800002A
+        (0x08000024, 0xE004),      # b   0x08000030 (pula o buraco)
+        (0x08000030, 0x4770),      # bx lr
+    ):
+        imagem[endereco - rom.ROM_BASE:endereco - rom.ROM_BASE + 2] = meio.to_bytes(2, "little")
+    imagem[0x2A:0x2C] = bytes.fromhex("08bf")          # `it eq` -- dado, nao codigo
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(imagem), sementes={0x08000020: "thumb"})
+    assert 0x0800002A not in {i.endereco for f in desmontagem.funcoes.values()
+                              for i in f.instrucoes}
+    (levantada,) = decompile.decompilar(desmontagem, bytes(imagem)).funcoes
+    motivo = next(m for m in levantada.nao_levantadas if "beq" in m)
+    assert "dentro desta janela, em trecho nao desmontado" in motivo, motivo
+    assert "NAO e' codigo do ARM7TDMI" in motivo, motivo
+    assert "IT block (it)" in motivo, motivo
+    assert "passou por dado" in motivo, motivo
+
+
 def _carregar_ferramenta(nome: str):
     """Ferramentas em `ferramentas/` sao scripts, nao modulo do pacote."""
     import importlib.util

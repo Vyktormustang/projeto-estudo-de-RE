@@ -965,10 +965,38 @@ class _Emissor:
         para_tras = _saida_para_tras(alvo, self.f.entrada)
         if para_tras:
             return f"{para_tras} -- {self._onde_esta(alvo)}"
+        onde = self._onde_esta(alvo)
+        diagnostico = self._diagnostico_do_alvo(alvo) if "nao desmontado" in onde else None
         if verbo == "salto":
-            return f"salto para fora da funcao (0x{alvo:08X}): {self._onde_esta(alvo)}"
-        return (f"desvio para 0x{alvo:08X}, sem rotulo nesta janela: "
-                f"{self._onde_esta(alvo)}")
+            texto = f"salto para fora da funcao (0x{alvo:08X}): {onde}"
+        else:
+            texto = (f"desvio para 0x{alvo:08X}, sem rotulo nesta janela: "
+                     f"{onde}")
+        if diagnostico:
+            texto += (f" -- e o alvo NAO e' codigo do ARM7TDMI ({diagnostico}): "
+                      f"a leitura desta janela passou por dado")
+        return texto
+
+    def _diagnostico_do_alvo(self, alvo: int) -> str | None:
+        """O alvo do desvio decodifica como instrucao do ARM7TDMI neste modo?
+
+        Existe porque "dentro desta janela, em trecho nao desmontado" e' uma
+        frase VERDADEIRA e inutil: manda procurar buraco na leitura quando, nos
+        7 sitios que a ROM tem (medido, rodada sem censo), o que ha' no alvo e'
+        dado. Medido: `itee gt` (IT block, ARMv6), `cbnz` (ARMv6), `sxth`
+        (ARMv6), `ldrd` (ARMv5TE) e um endereco que nem decodifica. Dizer isso
+        separa "o levantador nao chegou la'" de "ali nao tem codigo deste
+        processador" -- a acao de quem le e' diferente (a segunda nao tem
+        conserto no levantador).
+        """
+        deslocamento = alvo - self.base
+        if deslocamento < 0 or deslocamento + 4 > len(self.imagem):
+            return None
+        lidas = list(self.cs.disasm(self.imagem[deslocamento:deslocamento + 4],
+                                    alvo, count=1))
+        if not lidas:
+            return "o endereco nao decodifica como instrucao"
+        return disasm_mod.impossivel_no_arm7tdmi(lidas[0], self.f.modo)
 
     def _onde_esta(self, alvo: int) -> str:
         """Onde o destino do desvio esta desmontado -- ou se nao esta em lugar nenhum."""

@@ -60,14 +60,19 @@
     "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- a leitura continua em INSTRUCAO da janela 0x...": 11,
     "instrucao que nao existe no ARM7TDMI (codificacao de 32 bits do Thumb-2: o ARM7TDMI executa so' as formas Thumb de 16 bits (e o `bl` de 32 bits, que o capstone escreve sem sufixo)): aqui a leitura passou por dado, nao por codigo": 9,
     "thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o destino vem NO REGISTRADOR, de quem chamou -- traduzir exigiria inventar a assinatura": 9,
-    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 5,
     "escrita no PSR (`cpsr_fc`) no campo de CONTROLE: o C levantado nao tem modo do processador nem mascara de IRQ -- so' as flags z/n/c/v, que sao o campo `f`; o bit Q tambem nao existe no modelo": 2,
-    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar)": 2,
     "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 2,
     "ILHA de codigo arm: o bloco em 0x... nao e' rotina (nao devolve pelo `lr`) -- ele sai para 0x..., dentro DESTA janela, e essa continuacao nao tem traducao: o C levantado e' de UM modo de CPU por funcao": 2,
+    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (mrc2: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (bkpt: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (IT block (itee): nao existe no ARMv4T): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (cbnz: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (o endereco nao decodifica como instrucao): a leitura desta janela passou por dado": 1,
     "salto por registrador (o destino so' existe em tempo de execucao; o idioma de tabela de casos nao fechou) -- a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `bhs #0x...` em 0x...)": 1,
     "salto por registrador (o destino so' existe em tempo de execucao; o idioma de tabela de casos nao fechou) -- a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `cmp r1, #0x...` em 0x...)": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (sxth: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
     "desvio para 0x..., sem rotulo nesta janela: fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (ldrd: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
     "salto para fora da funcao (0x...): fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 1
   },
   "tabelas_recusadas_total": 2,
@@ -400,7 +405,7 @@
   "linhas_c": 482643,
   "desvios_com_comparacao": 3446,
   "desvios_por_flag": 8130,
-  "bytes_c": 18242489,
+  "bytes_c": 18243328,
   "conferencia": {
     "total": 208457,
     "identicas": 208248,
@@ -454,5 +459,5 @@
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/boot_depois.c"
+  "caminho_c": "/home/user/gba-re/saida/boot_alvo.c"
 }
