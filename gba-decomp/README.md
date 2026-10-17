@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `59 passed` |
+| testes automatizados | `62 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -390,6 +390,50 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    desmontado" de um endereco que ESTA' desmontado; a r19 confirma que nenhum dos
    191 sitios da ROM caia nessa ordem (no JSON, so' os 4 textos de `bx` mudaram).
 
+19. **O par `adr`+`bx` e' VENEER de troca de modo -- e so' metade dos casos e'
+   rotina.** Os 3 `bx rN` com valor par da r19 apontavam para blocos ARM que nao
+   eram janela nenhuma. Medido o que ha' no destino de cada um:
+   * `0x081DC014` (via `0x081DC010`): `umull r2, r3, r0, r1; add r0, r3, #0;
+     bx lr` -- devolve pelo `lr`, e' **rotina** do outro modo; o `bx` e' chamada
+     de cauda, e o alvo passa a ser janela ARM (semente
+     `veneer \`adr\`+\`bx\` em 0x081DC010`);
+   * `0x081DC0B0` e `0x081DC240` (via `0x081DC0A4`): terminam em
+     `add r0, pc, #imm; bx r0` e voltam para **`0x081DC132` e `0x081DC43C`** --
+     os dois enderecos estao **dentro** da janela Thumb que fez a troca. Sao
+     **ilhas** de codigo ARM embutidas no corpo Thumb, e chamar de cauda
+     devolveria `r0` sem executar o resto da rotina: esconderia a lacuna atras de
+     C errado. Nao viram janela; a recusa passa a dizer o que foi medido:
+     `ILHA de codigo arm: o bloco em 0x... nao e' rotina (...) sai para 0x...,
+     dentro DESTA janela`.
+   A decisao e' do DESMONTADOR (`_veneer_de_modo` + `_fim_do_bloco`), que mede a
+   forma do bloco antes de semear; o tradutor so' chama de cauda o que esta' em
+   `ilhas`/`nomes` conforme essa medida. Na mesma passada, `umull` ganhou
+   traducao (64 bits sem sinal, sem flags na forma sem `s` -- e' a primeira
+   instrucao nova que apareceu porque uma janela nova apareceu).
+
+   **Escopo, e e' importante:** a rodada r19 com o censo de 5 981 funcoes foi a
+   ultima que pode ser medida com aquele censo -- o arquivo `functions.csv` vive
+   fora do repositorio e nao foi preservado (ver "O que e' reproduzivel" abaixo).
+   O efeito da mudanca foi medido na rodada **sem censo** (so' a partir do vetor
+   de reset), nas duas versoes do codigo:
+
+   | medido (boot so', sem censo) | antes | depois |
+   |---|---|---|
+   | funcoes | 3 586 | **3 587** (+1: a rotina ARM `0x081DC014`) |
+   | instrucoes | 208 454 | **208 457** (+3: `umull`, `add`, `bx lr`) |
+   | recusas | 65 | **64** (uma virou chamada de cauda; as 2 ilhas continuam recusadas) |
+   | motivo "troca de modo de CPU" | 3 | **0** (viraram 1 chamada de cauda + 2 "ILHA de codigo arm") |
+   | completas / parciais | 3 530 / 56 | **3 532 / 55** |
+   | objeto | 956 568 B | **956 772 B** |
+
+   Um erro MEU no caminho, que vale registrar porque e' o pior tipo deste
+   projeto: a primeira versao deste conserto fazia `return` da frase dentro de
+   `_bx` em vez de `raise _NaoLevantado`. Resultado: a recusa **desaparecia em
+   silencio** -- a funcao saia "completa", sem lacuna marcada e sem linha
+   nenhuma no C. Pego porque as duas funcoes ficaram com zero lacunas na sonda
+   segmentada; o teste `test_veneer_adr_bx_para_ilha_e_recusado_dizendo_que_a_
+   continuacao_fica_dentro` agora exige a recusa e a ausencia de `fn_...` no C.
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
@@ -459,6 +503,25 @@ python ferramentas/recortar_amostra.py levantado_rom.c \
         --caso 0x08000248 "no ARM, stmdb sp! E' o push da pilha, e add lr, pc virou constante" \
         --orcamento 150 --saida evidencias/rom_bpre_amostra_levantada.c
 ```
+
+### O que e' reproduzivel -- e o que nao e'
+
+`evidencias/rom_bpre_analise.json` (rodada r19) foi medido **com o censo externo**
+de 5 981 funcoes. Esse arquivo (`functions.csv`) vive fora deste repositorio e
+**nao esta' versionado** -- entao a rodada de 8 172 funcoes nao pode ser refeita
+a partir daqui, e os numeros dela sao os da ultima medicao, nao os de hoje. O que
+este repositorio reproduz sozinho, tendo a ROM (que tambem nao esta' aqui, por
+ser imagem de terceiros), e' a rodada **sem censo** -- a descoberta a partir do
+vetor de reset --, versionada em `evidencias/rom_bpre_boot_sem_censo.json`:
+
+```
+python -m gbadecomp.cli analisar ROM.gba --json evidencias/rom_bpre_boot_sem_censo.json
+```
+
+Essa rodada e' menor (3 587 funcoes contra 8 172) porque o censo informa 5 981
+entradas de inicio que a descoberta recursiva nao alcanca sozinha. As duas medem
+a mesma ROM, com a mesma ferramenta; nenhuma das duas e' "a" certa -- sao
+escopos diferentes, e o numero de uma nao vale para a outra.
 
 Os arquivos de `evidencias/` **nao sao retratos antigos**: dois testes comparam
 cada um com o que o pipeline produz agora — `test_readme_conta_a_mesma_rodada_

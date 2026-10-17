@@ -582,6 +582,80 @@ def test_bx_por_registrador_calculado_continua_recusado():
     assert "NAO LEVANTADO: bx r0" in levantada.corpo
 
 
+def test_veneer_adr_bx_vira_chamada_de_cauda_quando_o_bloco_retorna():
+    """`adr`+`bx` que troca de modo para uma ROTINA e' chamada de cauda.
+
+    Medido na ROM de estudo: 3 pares no universo inteiro; o de 0x081DC010 vai
+    para 0x081DC014, que e' `umull r2, r3, r0, r1; add r0, r3, #0; bx lr` --
+    devolve pelo `lr`, logo e' rotina do outro modo. O desmontador passa a
+    semear esse alvo no modo do bit0 e o `bx` vira `r0 = fn_X(...); return r0;`.
+
+    Aqui o bloco ARM e' so' `bx lr`, e o `beq` existe porque `bx` encerra a
+    leitura: sem ele a janela Thumb terminaria no `bx` e nao haveria continuacao.
+    """
+    # montagem explicita, instrucao por instrucao (o hexa em uma linha so' esconde
+    # de onde vem cada uma)
+    imagem = bytearray(0x40)
+    for endereco, meio in (
+        (0x08000020, 0x2B00),      # cmp r3, #0
+        (0x08000022, 0xD003),      # beq 0x0800002C
+        (0x08000024, 0xA204),      # adr r2, #4  -> 0x08000038 (par: ARM)
+        (0x08000026, 0x4710),      # bx r2
+        (0x0800002C, 0x2001),      # movs r0, #1   (continuacao)
+        (0x0800002E, 0x4770),      # bx lr
+    ):
+        imagem[endereco - rom.ROM_BASE:endereco - rom.ROM_BASE + 2] = meio.to_bytes(2, "little")
+    imagem[0x38:0x3C] = bytes.fromhex("1eff2fe1")          # ARM: bx lr
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(imagem), sementes={0x08000020: "thumb"})
+    assert 0x08000038 in desmontagem.funcoes, sorted(desmontagem.funcoes)
+    assert desmontagem.funcoes[0x08000038].modo == "arm"
+    assert "veneer" in desmontagem.funcoes[0x08000038].semente
+    codigo = decompile.decompilar(desmontagem, bytes(imagem))
+    levantada = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
+    assert levantada.completa, levantada.nao_levantadas
+    assert "chamada de cauda" in levantada.corpo
+    assert "r0 = fn_08000038(r0, r1, r2, r3);" in levantada.corpo
+
+
+def test_veneer_adr_bx_para_ilha_e_recusado_dizendo_que_a_continuacao_fica_dentro():
+    """O mesmo par, com o bloco ARM saindo para DENTRO da janela, NAO e' rotina.
+
+    Medido na ROM de estudo: `0x081DC0B0` e `0x081DC240` terminam em
+    `add r0, pc, #imm; bx r0` e voltam para `0x081DC132` / `0x081DC43C` -- os
+    DOIS enderecos estao dentro da janela Thumb que fez a troca. Chamar de cauda
+    devolveria r0 sem executar o resto da rotina: esconderia a lacuna atras de C
+    errado. A recusa tem de dizer isso, e nao "nao ha' janela ARM" (ha' -- ela
+    foi lida; o que nao fecha e' a continuacao no outro modo).
+    """
+    imagem = bytearray(0x40)
+    for endereco, meio in (
+        (0x08000020, 0x2B00),      # cmp r3, #0
+        (0x08000022, 0xD007),      # beq 0x08000034
+        (0x08000024, 0xA000),      # adr r0, #0  -> 0x08000028 (par: ARM)
+        (0x08000026, 0x4700),      # bx r0
+        (0x08000034, 0x4770),      # bx lr -- continuacao thumb (alvo do beq)
+    ):
+        imagem[endereco - rom.ROM_BASE:endereco - rom.ROM_BASE + 2] = meio.to_bytes(2, "little")
+    imagem[0x28:0x30] = bytes.fromhex("05008fe210ff2fe1")   # add r0, pc, #5 ; bx r0
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(imagem), sementes={0x08000020: "thumb"})
+    assert 0x08000028 not in desmontagem.funcoes        # ilha nao vira janela
+    (janela,) = [f for f in desmontagem.funcoes.values() if f.entrada == 0x08000020]
+    assert janela.ilhas, "o desmontador tem de MEDIR a ilha, nao so' recusar"
+    site, alvo, modo_alvo, forma, saida = janela.ilhas[0]
+    assert (site, alvo, modo_alvo) == (0x08000024, 0x08000028, "arm")
+    assert forma == "ilha" and saida == 0x08000035, janela.ilhas
+    codigo = decompile.decompilar(desmontagem, bytes(imagem))
+    levantada = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
+    assert not levantada.completa
+    motivo = next(m for m in levantada.nao_levantadas if "bx r0" in m)
+    assert "ILHA de codigo arm" in motivo, motivo
+    assert "0x08000035" in motivo and "dentro DESTA janela" in motivo, motivo
+    # e o C NAO inventa a chamada: nada de `fn_08000028`
+    assert "fn_08000028" not in levantada.corpo
+
+
 def test_bx_com_valor_conhecido_diz_o_que_mediu_em_vez_de_sem_origem():
     """`bx rN` cujo valor E' conhecido: a frase carrega a medicao, nao um palpite.
 
@@ -593,13 +667,16 @@ def test_bx_com_valor_conhecido_diz_o_que_mediu_em_vez_de_sem_origem():
     esta' na instrucao anterior e o levantador consegue le'-la. O caso (c) e'
     sintetico (nao ha' ocorrencia na ROM): valor dentro da imagem com bit0 = 1.
     """
-    # (a) `adr r2, #0` + `bx r2`: 0x08000024 (par) -> o hardware muda para ARM
+    # (a) `adr r2, #0` + `bx r2`: 0x08000024 (par) -> o hardware muda para ARM.
+    # A frase mudou quando o desmontador passou a MEDIR a forma do bloco do
+    # outro modo (rotina que devolve pelo `lr` x ilha): aqui o bloco nao devolve,
+    # entao dizer "troca de modo de CPU" sozinho era menos do que se sabia.
     imagem = _imagem_de_janela(0xA200, 0x4710)
     desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
     (levantada,) = decompile.decompilar(desmontagem, imagem).funcoes
     assert not levantada.completa
-    assert any("troca de modo de CPU" in item and "0x08000024" in item
-               and "bit0 em 0" in item for item in levantada.nao_levantadas), \
+    assert any("troca de modo para arm em 0x08000024" in item
+               and "NAO devolve pelo `lr`" in item for item in levantada.nao_levantadas), \
         levantada.nao_levantadas
 
     # (b) `ldr r3, [pc, #0]` + `bx r3`, literal 0x030028E1: fora da imagem
@@ -1153,6 +1230,34 @@ def test_readme_conta_a_mesma_rodada_da_evidencia():
     assert f"| **total** | **{analise['recusas_total']}** (" in readme
 
 
+def test_readme_conta_a_rodada_SEM_CENSO_na_tabela_do_veneer():
+    """A tabela do item 19 tem de sair da evidencia boot-only, nao da memoria.
+
+    O censo externo (functions.csv) nao esta' versionado, entao a rodada de 8 172
+    funcoes nao pode ser refeita daqui -- o que este repositorio reproduz sozinho
+    e' a rodada sem censo, e ela virou evidencia (`rom_bpre_boot_sem_censo.json`).
+    Numero publicado a mao ja' sobreviveu a tres rodadas neste projeto; a tabela
+    do item 19 nao entra nessa lista.
+    """
+    readme = (RAIZ / "README.md").read_text(encoding="utf-8")
+    evidencia = json.loads((RAIZ / "evidencias" / "rom_bpre_boot_sem_censo.json")
+                           .read_text(encoding="utf-8"))
+    esperados = {
+        "funcoes": _milhar(evidencia["completo"]["funcoes"]),
+        "instrucoes": _milhar(evidencia["completo"]["instrucoes"]),
+        "recusas": _milhar(evidencia["recusas_total"]),
+        "completas": _milhar(evidencia["levantamento"]["completas"]),
+        "parciais": _milhar(evidencia["levantamento"]["parciais"]),
+        "objeto": _milhar(evidencia["compilacao"]["bytes_objeto"]),
+    }
+    ausentes = {rotulo: valor for rotulo, valor in esperados.items() if valor not in readme}
+    assert not ausentes, f"o README nao conta a rodada boot-only: {ausentes}"
+    # a rodada sem censo NAO tem numeros de censo: se o README publicasse um,
+    # estaria inventando (o campo existe no JSON e vale None)
+    assert evidencia["censo"] is None
+    assert evidencia["completo"]["no_censo"] is None
+
+
 def test_forma_que_nao_existe_e_checada_antes_do_despacho_por_mnemonico():
     """`adc` existe no ARMv4T -- mas `adc` COM IMEDIATO no Thumb-1 nao existe.
 
@@ -1361,16 +1466,20 @@ def test_sonda_de_bx_recusado_mede_o_valor_e_pode_discordar_da_mensagem():
     sonda = _carregar_ferramenta("medir_bx_recusados.py")
     medido = sonda.medir(desmontagem, bytes(imagem))
     assert medido["recusas_bx"] == 2, medido["sites"]
-    assert medido["por_tipo"] == {"valor fora da imagem (RAM/IO)": 1,
-                                  "valor par: troca de modo de CPU (ARM)": 1}, \
-        medido["por_tipo"]
+    assert medido["por_tipo"] == {
+        "valor fora da imagem (RAM/IO)": 1,
+        "valor par, bloco do outro modo NAO e' rotina (ilha)": 1}, medido["por_tipo"]
     por_site = {s["site"]: s for s in medido["sites"]}
     assert por_site["0x08000022"]["valor"] == "0x08000024"
     assert por_site["0x08000022"]["como"] == "adr"
+    assert por_site["0x08000022"]["forma_do_alvo"] not in (None, "retorno")
     assert por_site["0x08000032"]["valor"] == "0x030028E1"
     assert "pool" in por_site["0x08000032"]["como"]
-    # a CATEGORIA medida por fora tem de bater com a frase que o levantador escreveu
-    assert "troca de modo de CPU" in por_site["0x08000022"]["motivo"]
+    # a MEDICAO e a MENSAGEM tem de contar a mesma coisa (e' o que a sonda
+    # confere: nao se a medicao concorda consigo mesma, mas se o texto publicado
+    # bate com ela)
+    assert "troca de modo" in por_site["0x08000022"]["motivo"]
+    assert "NAO devolve pelo `lr`" in por_site["0x08000022"]["motivo"]
     assert "fora da imagem" in por_site["0x08000032"]["motivo"]
 
 

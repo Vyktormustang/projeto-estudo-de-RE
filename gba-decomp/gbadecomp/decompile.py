@@ -28,6 +28,7 @@ TIPOS_C = """typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed int s32;
+typedef unsigned long long u64;
 
 static inline u32 carrega32(u32 end) { return *(volatile u32 *)end; }
 static inline u16 carrega16(u32 end) { return *(volatile u16 *)end; }
@@ -519,6 +520,20 @@ class _Emissor:
                 # Nao inventamos valor para eles: so N e Z sao atualizados.
                 self._emitir(f"z = ({destino} == 0); n = ({destino} >> 31);")
             return
+        if m == "umull":
+            # UMULL RdLo, RdHi, Rn, Rm -- multiplicacao SEM sinal de 32x32 para
+            # 64 bits. Medido na ROM de estudo: 1 sitio, 0x081DC014, que virou
+            # janela quando o veneer `adr`+`bx` passou a ser seguido. Em ARMv4
+            # sem o `s` NAO mexe em flag nenhuma (com `s`, N e Z vem do
+            # resultado de 64 bits; nao ha' caso medido, entao `umulls` nao e'
+            # tratado aqui e cai como "mnemonico nao implementado").
+            if len(op) != 4:
+                raise _NaoLevantado("umull fora da forma RdLo, RdHi, Rn, Rm")
+            baixo, alto = self._reg(op[0]), self._reg(op[1])
+            a, b = self._reg(op[2]), self._reg(op[3])
+            self._emitir("{ u64 p_ = (u64)" + a + " * (u64)" + b + ";")
+            self._emitir(f"  {baixo} = (u32)p_; {alto} = (u32)(p_ >> 32); }}")
+            return
         if m in ("stmdb", "ldmia"):
             # No ARM, PUSH E' `stmdb sp!` e POP E' `ldmia sp!` -- as MESMAS
             # instrucoes, com o sp escrito por extenso. Elas vao para o caminho da
@@ -788,6 +803,54 @@ class _Emissor:
                          f"tirou da pilha */")
             self._emitir("return r0;")
             return
+        # TERCEIRO CAMINHO: VENEER de troca de modo. `adr rD, #imm` (ou literal
+        # de pool) seguido de `bx rD`, com o valor conhecido e o bit0 dizendo o
+        # OUTRO modo: o desmontador semeia uma janela naquele endereco, no modo
+        # do bit0 (ver `disasm._veneer_de_modo`), e o destino passa a existir
+        # como funcao. O transferir de controle e' uma chamada de cauda: o
+        # codigo do outro modo devolve pelo `lr` de quem chamou a janela, e o
+        # C modela isso chamando a funcao e devolvendo o r0 dela -- o mesmo
+        # idioma que o `b` para a entrada de outra funcao ja' usa.
+        #
+        # Sem isso a recusa ("troca de modo de CPU") esta' CORRETA mas e'
+        # evitavel: medido na ROM, 3 sitios, e o alvo dos 3 e' codigo ARM real.
+        medido = self._valor_da_anterior(r)
+        if medido is not None:
+            valor, como = medido
+            alvo, modo_alvo = valor & ~1, ("thumb" if valor & 1 else "arm")
+            # o desmontador registra a ilha no endereco do `adr` (a instrucao
+            # ANTERIOR ao `bx`), nao no do `bx`
+            ilha = self._ilha_no_site(anterior.endereco if anterior else ins.address)
+            if ilha is not None and modo_alvo != self.f.modo:
+                # O desmontador MEDIU que o bloco do outro modo nao e' rotina:
+                # ele sai para um endereco fixo, e na ROM de estudo esse endereco
+                # cai DENTRO desta janela. Chamar de cauda devolveria r0 sem
+                # executar a continuacao -- esconderia a lacuna atras de C errado.
+                site, alvo_medido, modo_medido, forma, saida = ilha
+                onde = ("dentro DESTA janela" if saida is not None
+                        and self.f.entrada <= saida < self.f.fim
+                        else "fora desta janela")
+                # ATENCAO: e' `raise`, nao `return`. A primeira versao devolvia a
+                # frase daqui (funcao que devolve None) e a recusa SUMIA em
+                # silencio: a funcao saia "completa", sem a lacuna marcada e sem
+                # linha nenhuma no C -- o pior defeito possivel neste projeto.
+                if saida is not None:
+                    raise _NaoLevantado(
+                        f"ILHA de codigo {modo_medido}: o bloco em 0x{alvo_medido:08X} "
+                        f"nao e' rotina (nao devolve pelo `lr`) -- ele sai para "
+                        f"0x{saida:08X}, {onde}, e essa continuacao nao tem traducao: "
+                        f"o C levantado e' de UM modo de CPU por funcao")
+                raise _NaoLevantado(
+                    f"troca de modo para {modo_medido} em 0x{alvo_medido:08X}: o "
+                    f"bloco NAO devolve pelo `lr` (e a saida dele nao chegou a ser "
+                    f"medida) -- nao ha' rotina a chamar nem continuacao a emendar")
+            if alvo in self.nomes and modo_alvo != self.f.modo:
+                self._emitir(f"/* veneer: `{como}` + `bx {r}` troca de "
+                             f"{self.f.modo} para {modo_alvo} (bit0 = {valor & 1}) "
+                             f"-- chamada de cauda */")
+                self._emitir(f"r0 = {self.nomes[alvo]}(r0, r1, r2, r3);")
+                self._emitir("return r0;")
+                return
         raise _NaoLevantado(self._motivo_bx_sem_origem(r))
 
     def _valor_da_anterior(self, registrador: str):
@@ -869,10 +932,14 @@ class _Emissor:
             valor, como = medido
             na_imagem = self.base <= (valor & ~1) < self.base + len(self.imagem)
             if na_imagem and not valor & 1:
+                # So' chega aqui quando o alvo NAO virou janela (o desmontador
+                # semeia `adr`+`bx` de troca de modo; se o alvo nao foi
+                # descoberto, e' porque a leitura parou la'). Dizer isso e'
+                # diferente de dizer que o levantador nao sabe fazer a troca.
                 return (f"troca de modo de CPU: `{como}` em 0x{anterior.endereco:08X} "
-                        f"da' 0x{valor:08X} com o bit0 em 0 (modo ARM) -- o "
-                        f"levantador traduz a janela no modo dela e o corpo no "
-                        f"outro modo nao esta' levantado")
+                        f"da' 0x{valor:08X} com o bit0 em 0 (modo ARM), mas nao ha' "
+                        f"janela ARM em 0x{valor:08X} -- a leitura no outro modo "
+                        f"parou ou nem foi tentada")
             if not na_imagem:
                 return (f"o `{como}` em 0x{anterior.endereco:08X} vale 0x{valor:08X}, "
                         f"fora da imagem (espaco de RAM/IO): o destino so' existe em "
@@ -908,6 +975,13 @@ class _Emissor:
         if self.indice is None:
             return "destino nao desmontado"
         return self.indice.descrever(alvo, self.f.entrada, self.f.fim)
+
+    def _ilha_no_site(self, site: int):
+        """A medicao do desmontador para este `adr`+`bx`, se ele a fez."""
+        for ilha in self.f.ilhas:
+            if ilha[0] == site:
+                return ilha
+        return None
 
     def _anterior(self):
         """Instrucao imediatamente anterior NA ORDEM EMITIDA (nao por endereco)."""

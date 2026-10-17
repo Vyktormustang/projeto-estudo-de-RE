@@ -7,6 +7,7 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed int s32;
+typedef unsigned long long u64;
 
 static inline u32 carrega32(u32 end) { return *(volatile u32 *)end; }
 static inline u16 carrega16(u32 end) { return *(volatile u16 *)end; }

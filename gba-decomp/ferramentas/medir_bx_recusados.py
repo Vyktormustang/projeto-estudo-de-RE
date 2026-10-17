@@ -18,13 +18,19 @@ valor e' LIDO -- `adr` calculado pela mesma conta do levantador, literal do pool
 lido da imagem. E a classificacao aqui e' refeita POR FORA, de proposito: so'
 assim esta sonda pode DISCORDAR da mensagem de recusa, em vez de repeti-la.
 
-Medido com esta sonda na ROM de estudo (rodada r19): 39 recusas `bx rN` -- 11 sao
-thunks de janela de 4 bytes, 1 e' chamada indireta ARM->Thumb montada a mao, 3
-sao `adr` + `bx` dando valor PAR (bit0 = 0 em `bx` = modo ARM, ou seja o destino e'
-o trecho no outro modo, que uma janela Thumb nao levanta), 1 e' literal de pool
-apontando para RAM (0x030028E1, fora da imagem) e os outros 23 nao tem valor em
-traducao. A primeira versao desta sonda errou feio por nao usar o caminho do
-levantador: filtrando `bx` por conta propria ela mediu 6 973 sitios em vez de 39.
+Medido com esta sonda na ROM de estudo (rodada r19, com o censo externo): 39
+recusas `bx rN` -- 11 sao thunks de janela de 4 bytes, 1 e' chamada indireta
+ARM->Thumb montada a mao, **3** sao `adr` + `bx` dando valor PAR (bit0 = 0 em `bx`
+= modo ARM), 1 e' literal de pool apontando para RAM (0x030028E1, fora da imagem)
+e os outros 23 nao tem valor em traducao. A primeira versao desta sonda errou feio
+por nao usar o caminho do levantador: filtrando `bx` por conta propria ela mediu
+6 973 sitios em vez de 39.
+
+A categoria dos 3 de valor par foi refinada depois da r19: o valor par so' vira
+chamada se o bloco do outro modo devolver pelo `lr`. Medido: 1 dos 3 e' rotina
+(`0x081DC014`: `umull; add; bx lr`) e 2 sao ILHA de codigo ARM embutida no corpo
+Thumb (`add r0, pc, #imm; bx r0` voltando para DENTRO da janela). Por isso o
+campo `forma_do_alvo` existe: `retorno` (pode ser chamada) x `ilha` (nao pode).
 
 Uso:
     python ferramentas/medir_bx_recusados.py ROM.gba [--censo functions.csv] \\
@@ -118,6 +124,7 @@ def medir(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE) -> dict:
     for entrada, site, registrador, motivo in recusas_de_bx(desmontagem, imagem, base):
         medido = _valor_da_anterior(desmontagem.funcoes[entrada], imagem, base,
                                     site, registrador)
+        forma = None
         if medido is None:
             tipo = "sem valor em traducao"
         else:
@@ -127,13 +134,22 @@ def medir(desmontagem, imagem: bytes, base: int = rom_mod.ROM_BASE) -> dict:
             elif valor & 1:
                 tipo = "valor na imagem com bit0 = 1 (Thumb)"
             else:
-                tipo = "valor par: troca de modo de CPU (ARM)"
+                # O valor PAR diz "modo ARM", mas isso so' vira chamada se o
+                # bloco do outro modo devolver pelo `lr`. A forma e' medida pela
+                # MESMA funcao que o desmontador usa (`_fim_do_bloco`) de
+                # proposito: o que esta sonda confere e' se a MENSAGEM conta o que
+                # a medicao achou -- nao se a medicao concorda consigo mesma.
+                forma, _saida = disasm_mod._fim_do_bloco(valor & ~1, "arm", imagem, base)
+                tipo = ("valor par, bloco do outro modo RETORNA (veneers de rotina)"
+                        if forma == "retorno" else
+                        "valor par, bloco do outro modo NAO e' rotina (ilha)")
         por_tipo[tipo] += 1
         sites.append({
             "site": f"0x{site:08X}", "janela": f"0x{entrada:08X}",
             "registrador": registrador,
             "valor": None if medido is None else f"0x{medido[0]:08X}",
             "como": None if medido is None else medido[1],
+            "forma_do_alvo": forma,
             "tipo": tipo, "motivo": motivo,
         })
     return {"recusas_bx": len(sites), "por_tipo": dict(por_tipo.most_common()),

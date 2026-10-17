@@ -205,6 +205,11 @@ class FuncaoDesmontada:
     # podia dizer "salto calculado nao reconhecido": as quatro recusas da ROM de
     # estudo parecem a mesma coisa de longe e nao sao.
     tabelas_recusadas: list[tuple[int, str]] = field(default_factory=list)
+    # `adr`+`bx` de troca de modo cujo alvo NAO e' rotina: (site, alvo, modo do
+    # alvo, forma, endereco de saida). Na ROM de estudo os dois casos sao ILHAS
+    # de codigo ARM embutidas no corpo Thumb, e o endereco de saida cai DENTRO da
+    # propria janela -- chamar de funcao perderia a continuacao.
+    ilhas: list[tuple[int, int, str, str, int | None]] = field(default_factory=list)
     # Saltos para endereco ABAIXO da entrada: a leitura saiu desta funcao (bloco
     # comum de outra rotina). Ver a regra no ponto 4 de _seguir_funcao.
     saidas: list[tuple[int, int]] = field(default_factory=list)
@@ -533,6 +538,21 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                         origens[endereco] = (f"ponteiro de pool em "
                                              f"0x{ins.address:08X}")
 
+            # 1b) `adr rD, #imm` + `bx rD` -> veneer de troca de modo
+            veneer = _veneer_de_modo(ins, imagem, base, modo, cs)
+            if veneer:
+                endereco, modo_alvo, forma, saida = veneer
+                if forma == "retorno":
+                    # rotina do outro modo: devolve pelo `lr`, entao e' funcao
+                    novas[endereco] = modo_alvo
+                    origens[endereco] = (f"veneer `adr`+`bx` em 0x{ins.address:08X} "
+                                         f"(troca para {modo_alvo})")
+                else:
+                    # ilha embutida (ou forma nao reconhecida): NAO vira funcao.
+                    # Fica registrada com a medicao para a recusa poder dizer o
+                    # que e' -- e para nao ser "consertada" por engano depois.
+                    funcao.ilhas.append((ins.address, endereco, modo_alvo, forma, saida))
+
             # 2) chamadas: destino entra na fila como nova funcao
             if ins.group(capstone.CS_GRP_CALL):
                 alvo = _destino_imediato(ins)
@@ -630,13 +650,110 @@ def _ponteiro_de_codigo(ins, valor: int, imagem: bytes, base: int, modo: str, cs
 
 def _segue_bx(imagem: bytes, base: int, ins, modo: str, cs) -> bool:
     """A instrucao seguinte e `bx rX` para o MESMO registrador? (padrao de tabela)"""
-    if ins.mnemonic != "ldr" or not ins.operands:
+    if ins.mnemonic not in ("ldr", "adr") or not ins.operands:
         return False
     destino = ins.operands[0].reg
     off = ins.address + len(ins.bytes) - base
     seguintes = list(cs.disasm(imagem[off:off + 4], ins.address + len(ins.bytes), count=1))
     return bool(seguintes) and seguintes[0].mnemonic == "bx" and \
         seguintes[0].operands and seguintes[0].operands[0].reg == destino
+
+
+def _fim_do_bloco(endereco: int, modo: str, imagem: bytes, base: int,
+                  limite: int = 600) -> tuple[str, int | None]:
+    """Como o bloco que comeca em `endereco` termina? ("retorno" | "ilha" | "?").
+
+    A pergunta existe porque o par `adr`+`bx` de troca de modo aparece em DUAS
+    formas na ROM de estudo, e so' uma delas e' funcao:
+
+      * `... ; bx lr` -- ROTINA do outro modo; ela devolve pelo `lr` de quem
+        chamou a janela, entao o `bx` e' chamada de cauda (caso de 0x081DC014);
+      * `add rD, pc, #imm` + `bx rD` -- o bloco sai para um endereco FIXO, e na
+        ROM esse endereco cai DENTRO da propria janela que fez a troca
+        (0x081DC0B0 volta para 0x081DC132; 0x081DC240 volta para 0x081DC43C).
+        Isso e' ILHA de codigo ARM embutida no corpo Thumb -- nao funcao.
+        Tratar como funcao e chamar de cauda PERDERIA a continuacao: o C
+        devolveria r0 e nao executaria o resto da rotina.
+
+    Medir isso antes de semear e' o que separa "fechei 3 recusas" de "escondi 3
+    recusas atras de C errado".
+    """
+    cs = Cs(CS_ARCH_ARM, CS_MODE_THUMB if modo == "thumb" else CS_MODE_ARM)
+    cs.detail = True
+    atual = endereco
+    limite_addr = base + len(imagem)
+    for _ in range(limite):
+        if not (base <= atual < limite_addr):
+            return "?", None
+        lidas = list(cs.disasm(imagem[atual - base:atual - base + 4], atual, count=1))
+        if not lidas:
+            return "?", None
+        ins = lidas[0]
+        if impossivel_no_arm7tdmi(ins, modo) is not None:
+            return "?", None
+        if _eh_retorno(ins):
+            return "retorno", None
+        seguinte = list(cs.disasm(imagem[ins.address + len(ins.bytes) - base:
+                                          ins.address + len(ins.bytes) - base + 4],
+                                  ins.address + len(ins.bytes), count=1))
+        # `add rD, pc, #imm` + `bx rD`: saida para endereco FIXO
+        if (ins.mnemonic in ("add", "sub") and len(ins.operands) >= 3
+                and ins.operands[1].type == capstone.arm.ARM_OP_REG
+                and ins.operands[1].reg == capstone.arm.ARM_REG_PC
+                and ins.operands[2].type == capstone.arm.ARM_OP_IMM
+                and seguinte and seguinte[0].mnemonic == "bx"):
+            pc = ins.address + (4 if modo == "thumb" else 8)
+            valor = pc + ins.operands[2].imm
+            if ins.mnemonic == "sub":
+                valor = pc - ins.operands[2].imm
+            return "ilha", valor
+        if (ins.group(capstone.CS_GRP_JUMP) and not ins.group(capstone.CS_GRP_CALL)
+                and not _condicional(ins)):
+            # Salto INCONDICIONAL: seguir so' quando e' para a FRENTE e o alvo
+            # esta' perto -- e' o idioma de "pular para o epilogo comum", que a
+            # ilha 0x081DC240 usa (`beq` + `bl` + `b 0x081DC424`, e o epilogo em
+            # 0x081DC424 termina em `add r0, pc, #1; bx r0`). Salto para tras ou
+            # longe nao e' seguido: ali a forma nao pode ser prevista sem o
+            # grafo, e prever seria adivinhar. Desvio CONDICIONAL continua sendo
+            # seguido no fall-through -- a ilha 0x081DC0B0 tem um laco (`bgt`)
+            # no meio do caminho para a saida.
+            alvo = _destino_imediato(ins)
+            if alvo is None or alvo <= ins.address or alvo - ins.address > 0x400:
+                return "?", None
+            atual = alvo
+            continue
+        atual = ins.address + len(ins.bytes)
+    return "?", None
+
+
+def _veneer_de_modo(ins, imagem: bytes, base: int, modo: str, cs):
+    """`adr rD, #imm` + `bx rD` que troca de MODO: alvo, modo e forma do bloco.
+
+    Este e' o idioma que o compilador usa para chamar codigo ARM de codigo Thumb
+    (e vice-versa) sem `blx`: o `adr` calcula o destino e o `bx` troca de modo
+    pelo bit0. Medido na ROM de estudo: **3 pares** no universo inteiro, todos
+    Thumb->ARM (`0x081DC010`, `0x081DC0A4`).
+
+    Mesmo modo NAO e' veneer: `adr` + `bx` para o proprio modo e' salto
+    calculado (despacho), e semear ali leria como codigo um alvo que a leitura
+    ainda nao alcancou por outro caminho. Alvo fora da imagem tambem nao:
+    e' ponteiro de RAM/IO, e o destino so' existe em tempo de execucao.
+    """
+    if ins.mnemonic != "adr" or len(ins.operands) < 2:
+        return None
+    if ins.operands[1].type != capstone.arm.ARM_OP_IMM:
+        return None
+    pc = (ins.address + 4) & ~3 if modo == "thumb" else ins.address + 8
+    valor = pc + ins.operands[1].imm
+    if not (base <= (valor & ~1) < base + len(imagem)):
+        return None
+    modo_alvo = "thumb" if valor & 1 else "arm"
+    if modo_alvo == modo:
+        return None
+    if not _segue_bx(imagem, base, ins, modo, cs):
+        return None
+    forma, saida = _fim_do_bloco(valor & ~1, modo_alvo, imagem, base)
+    return valor & ~1, modo_alvo, forma, saida
 
 
 def _condicional(ins) -> bool:
