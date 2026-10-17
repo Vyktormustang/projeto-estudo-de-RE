@@ -117,7 +117,15 @@ def coletar(rom_caminho: str, censo: str | None) -> dict:
                 "motivo": _motivo(item),
                 "texto": item,
             })
+    # Janelas cuja LEITURA parou em dado/codigo invalido nao sao recusa de
+    # instrucao: entram numa lista propria, contadas no relatorio, para a sonda
+    # nao dar a impressao de que o universo de lacunas e' so' o de cima.
+    paradas = [
+        {"funcao": f.endereco, "nome": f.nome, "do_censo": f.endereco in do_censo,
+         "texto": item}
+        for f in codigo.funcoes for item in f.paradas]
     return {"desmontagem": desmontagem, "codigo": codigo, "lacunas": lacunas,
+            "paradas": paradas,
             "nomes": nomes, "do_censo": do_censo, "imagem": rom.data}
 
 
@@ -199,6 +207,7 @@ def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> 
 
     return {
         "total_lacunas": len(lacunas),
+        "paradas_de_leitura": len(dados.get("paradas") or []),
         "por_motivo": dict(por_motivo.most_common()),
         "por_mnemonico": dict(por_mnemonico.most_common()),
         "no_censo": do_censo,
@@ -218,7 +227,10 @@ def analisar(dados: dict, pagina: int, exemplos: int, so_motivo: str | None) -> 
 
 
 def relatar(medido: dict, exemplos: int) -> str:
+    paradas = medido.get("paradas_de_leitura") or 0
     saida = [f"lacunas (instrucoes recusadas pelo lifter): {medido['total_lacunas']}",
+             f"  + {paradas} janelas cuja LEITURA parou em dado/codigo invalido "
+             f"(nao sao recusa; marcadas no C e analisadas a parte)",
              f"  no censo: {medido['no_censo']} | fora do censo: {medido['fora_do_censo']}",
              "", "por motivo:"]
     for motivo, n in list(medido["por_motivo"].items())[:15]:

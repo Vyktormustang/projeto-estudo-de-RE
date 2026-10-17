@@ -97,7 +97,10 @@ class ResultadoRodada:
         if self.codigo.incompletas:
             linhas.append("funcoes que ficaram de fora do levantamento:")
             for f in self.codigo.incompletas:
-                linhas.append(f"  0x{f.endereco:08X}: {'; '.join(f.nao_levantadas[:2])}")
+                # `paradas` entra junto: funcao que so' para em dado nao tem
+                # recusa nenhuma, e a linha sairia vazia
+                linhas.append(f"  0x{f.endereco:08X}: "
+                              f"{'; '.join((f.nao_levantadas + f.paradas)[:2])}")
         if self.erros:
             linhas.append("erros:")
             linhas.extend(f"  {e}" for e in self.erros)

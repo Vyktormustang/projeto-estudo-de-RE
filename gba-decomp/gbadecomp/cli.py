@@ -77,7 +77,10 @@ def _cmd_decompilar(args) -> int:
     print(f"funcoes completas .....: {len(codigo.completas)}")
     print(f"funcoes incompletas ...: {len(codigo.incompletas)}")
     for funcao in codigo.incompletas[:20]:
-        print(f"   0x{funcao.endereco:08X}: {'; '.join(funcao.nao_levantadas[:2])}")
+        # `paradas` entra junto: funcao que so' para em dado nao tem recusa
+        # nenhuma, e a linha sairia vazia ("0x...: ") -- parecendo bug.
+        print(f"   0x{funcao.endereco:08X}: "
+              f"{'; '.join((funcao.nao_levantadas + funcao.paradas)[:2])}")
     if len(codigo.incompletas) > 20:
         print(f"   ... {len(codigo.incompletas) - 20} outras (lista completa no cabecalho "
               f"de cada funcao no .c)")
