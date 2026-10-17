@@ -274,6 +274,27 @@ Medido no emulador (mGBA libretro), com a ROM original e com as patchadas:
 - **Nao esta' provado** se a causa e' o hack de traducao (o titulo do BR pode
   estar quebrado) ou o core libretro. Fica registrado como bloqueio aberto.
 
+O que ja' foi descartado como causa (medido em 2026-10-17):
+
+- **A ROM nao esta' corrompida**: MD5 local `4ec27a4b580a5a883ba66f924810cbd7`
+  e' identico ao `md5Checksum` que o Drive informa para o arquivo.
+- **O binario do core nao e' o problema**: compilei o mGBA 0.10.5 do fonte
+  (`/tmp/mgba-src/build/mgba_libretro.so`, sem shim de glibc) e o
+  comportamento e' identico (titulo nao responde ao START).
+- **Nao e' ordem de escrita das teclas**: forcar `heldKeys`/`newKeys` em
+  `0x080004A2` (antes da chamada de callback do quadro) tambem nao muda nada.
+- **Nao e' o `mov lr,pc`**: o stub agora usa `bl thunk; bx r3` e o contador
+  prova que o codigo roda.
+- O usuario confirmou que a mesma ROM **abre o menu normalmente em outro
+  emulador** -- entao a divergencia esta' no nosso harness/core, nao no jogo.
+
+Sugestoes para quem for continuar: (a) comparar com o que o RetroArch faz de
+diferente (input poll por quadro, `retro_set_controller_port_device` antes do
+load, audio batch de verdade); (b) pedir um save state do usuario feito em
+outro emulador e testar; (c) investigar se o core esta' entregando a IRQ de
+VBlank no meio do quadro (o `IF` fica em 0x0001 e o CPSR tem I=0, mas nenhum
+handler e' visto).
+
 ### 16.3 Estados salvos nao servem como banco de teste
 
 `salvar_estado` -> `carregar_estado` do mGBA produziu estados **inertes** pelo
