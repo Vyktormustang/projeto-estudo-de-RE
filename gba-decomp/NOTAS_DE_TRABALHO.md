@@ -68,6 +68,7 @@ Ela **pode sumir** com o ambiente: rebaixar do Drive (`14JCEJp6LFgdkzKMOtI5-l3Xv
 | lógica (99 Poké Bolas no jogo novo) | `ferramentas/aplicar_patch_pokebolas.py` | emulação do stub + `GetBagItemQuantity` + `ItemId_GetPocket` | sim, no emulador |
 | dado (preço 200→1, dinheiro 3000→999999) | `patches/exemplo_dados.json` | `ItemId_GetPrice` do jogo | sim, no emulador |
 | texto (POKé BOLA→BOLA NOVA) | `patches/exemplo_texto.json` | decodificação com o charset da §9.5 | **não por emulação** |
+| **comportamento** (limite 999→99 por slot) | `patches/exemplo_limite.json` | `AddBagItem(4,10)` com 95 no slot: original soma p/ 105 e retorna 1; patchado retorna 0 e deixa 95 | sim, no emulador |
 
 - **Não provado**: que o boot real chegue com `gBagPockets` apontado; que a tela
   exiba; **nada foi jogado** (sem emulador de console no ambiente).
@@ -81,10 +82,11 @@ Ela **pode sumir** com o ambiente: rebaixar do Drive (`14JCEJp6LFgdkzKMOtI5-l3Xv
 
 ## Próximos passos
 
-1. ~~Medir os dígitos~~ (feito). Achar o `CopyItemName` — `ItemId_GetId`
+1. ~~Medir os dígitos~~ (feito) e ~~patch de comportamento~~ (feito, limite).
+   Achar o `CopyItemName` — `ItemId_GetId`
    (`0x0809A8DC`) tem **0 chamadores** por `bl`, então ou é chamado por tabela
    indireta ou foi inlined; não insistir pelo caminho de `bl`.
-2. Um patch de **constante de comportamento** que não seja só dado: ex. limite de
-   itens por pocket (o `999`/`0x3E7` em `0x0809A0D8`).
+2. Verificar se o limite de 99 também é usado por `MoveItem`/`SortAndCompactBagPocket`
+   (o `0x3E7` pode aparecer em mais de um pool; aqui só `0x0809A0D8` usa `0x0809A0E4`).
 3. Fim do trabalho: consolidar tudo em `RELATORIO` (§11 cresce) e `README`;
    aí sim atualizar o corpo do PR com o resumo.
