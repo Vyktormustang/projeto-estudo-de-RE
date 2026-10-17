@@ -128,10 +128,16 @@ class FuncaoDec:
     semente: str = "?"
     terminacao: str = "indefinida"                      # como o fluxo terminou
     declaracoes: list[str] = field(default_factory=list)  # temporarios do switch
+    # Onde a LEITURA da janela parou porque os bytes dali nao sao codigo (dado
+    # lido como codigo / bytes que nao decodificam). Separado de `nao_levantadas`
+    # de proposito: recusa e' instrucao que o lifter viu e nao traduziu; parada
+    # e' o fim do fluxo lido. Somar as duas inflaria `recusas_total`, que e'
+    # numero publicado.
+    paradas: list[str] = field(default_factory=list)
 
     @property
     def completa(self) -> bool:
-        return not self.nao_levantadas
+        return not self.nao_levantadas and not self.paradas
 
     @property
     def tem_corpo(self) -> bool:
@@ -144,6 +150,29 @@ class FuncaoDec:
 
     def assinatura(self) -> str:
         return f"u32 {self.nome}(u32 r0, u32 r1, u32 r2, u32 r3)"
+
+
+def _parada_da_janela(terminacao: str) -> tuple[str, str] | None:
+    """`(endereco, motivo)` quando a leitura da janela parou por NAO ser codigo.
+
+    Duas terminacoes do desmontador dizem exatamente isso, e as duas viram
+    lacuna no C:
+
+      * `parou em 0x...: <motivo> (provavel dado lido como codigo)` -- o
+        endereco seguinte tem instrucao que nao existe no ARM7TDMI;
+      * `codigo invalido em 0x...` -- os bytes nao decodificam em modo nenhum.
+
+    As outras terminacoes NAO entram: `bx lr` e' retorno, `salto para fora` ja'
+    vira lacuna no proprio ponto do desvio, e `limite de leitura` e' o fim da
+    leitura recursiva (a janela acabou, nao ha' prova de dado).
+    """
+    if terminacao.startswith("codigo invalido em 0x"):
+        return terminacao.split(" em ", 1)[1].strip(), "os bytes nao decodificam"
+    if terminacao.startswith("parou em 0x"):
+        resto = terminacao[len("parou em "):]
+        endereco, _, motivo = resto.partition(": ")
+        return endereco.strip(), motivo.strip()
+    return None
 
 
 def _terminacao_notavel(terminacao: str) -> bool:
@@ -220,7 +249,7 @@ class CodigoC:
             if f.parcial:
                 linhas.append(f"/* PARCIAL (0x{f.endereco:08X}): o corpo abaixo tem "
                               f"lacunas marcadas -- em execucao, marca g_erro:")
-                for motivo in f.nao_levantadas[:6]:
+                for motivo in (f.nao_levantadas + f.paradas)[:6]:
                     linhas.append(f"     {motivo}")
                 linhas.append("   */")
             quem_chama = self.chamadores.get(f.nome, [])
@@ -273,6 +302,7 @@ class _Emissor:
         self.indice = indice
         self.linhas: list[str] = []
         self.nao_levantadas: list[str] = []
+        self.paradas: list[str] = []
         self.rotulos: dict[int, str] = {}
         self.externos: set[str] = set()     # alvos de chamada sem funcao descoberta
         self._flags_recentes = None         # (indice da instrucao, descritor)
@@ -348,12 +378,29 @@ class _Emissor:
                 self.nao_levantadas.append(f"0x{ins.endereco:08X} {ins.mnemonic} "
                                            f"{ins.operadores}: {exc}")
                 self._emitir(f"/* NAO LEVANTADO: {ins.mnemonic} {ins.operadores} */")
+        # A LEITURA PAROU EM DADO: isso e' lacuna, mesmo sem instrucao recusada.
+        #
+        # `disasm` encerra a janela quando os bytes do proximo endereco nao sao
+        # codigo do ARM7TDMI ("parou em 0x...") ou nao decodificam ("codigo
+        # invalido em 0x..."). Essas janelas nao tinham NENHUMA entrada em
+        # `nao_levantadas`, entao saiam com `completa = True` e o C delas
+        # terminava no meio do fluxo, com um `return r0;` que o programa nunca
+        # executaria ali -- sem uma linha dizendo que a leitura parou. Medido na
+        # rodada sem censo: 141 janelas (86 param em dado + 55 em codigo
+        # invalido) contavam como completas. E' a mesma classe do defeito da
+        # ILHA, que saia "completa" sem lacuna: o que falta tem de estar escrito.
+        parada = _parada_da_janela(self.f.terminacao)
+        if parada is not None:
+            onde, motivo = parada
+            self.paradas.append(f"{onde} (fim da janela): a leitura parou aqui -- {motivo}")
+            self._emitir(f"/* NAO LEVANTADO: a leitura parou em {onde} -- {motivo} */")
         return FuncaoDec(
             endereco=self.f.entrada,
             nome=self.nomes.get(self.f.entrada, f"fn_{self.f.entrada:08X}"),
             modo=self.f.modo,
             corpo="\n".join(l for l in self.linhas if l),
             nao_levantadas=self.nao_levantadas,
+            paradas=self.paradas,
             externos=sorted(self.externos),
             balanceamento=("balanceada" if self.sp_modelo == 0
                            else f"desequilibrada ({self.sp_modelo} slots)"),

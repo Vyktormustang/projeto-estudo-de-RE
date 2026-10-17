@@ -1579,6 +1579,48 @@ def test_bx_com_lr_montado_a_mao_e_chamada_e_a_leitura_continua():
     assert any("sem origem conhecida" in item for item in levantada.nao_levantadas)
 
 
+def test_janela_que_para_em_dado_e_PARCIAIS_e_diz_onde_parou():
+    """Janela cuja leitura para em dado tem de contar como LACUNA, nao completar.
+
+    Medido na rodada sem censo: 159 janelas terminam assim (64 com bytes que nao
+    decodificam + 95 que param numa instrucao que o ARM7TDMI nao tem), e 141
+    delas nao tinham NENHUMA outra recusa -- saiam com `completa = True` e o C
+    acabava no meio do fluxo, com um `return r0;` que o codigo nunca executaria
+    ali, sem uma linha dizendo que a leitura parou. E' a mesma classe do defeito
+    da ILHA (lacuna que some em silencio), e o conserto e' o mesmo: o que falta
+    tem de estar escrito.
+
+    A parada NAO e' recusa: `recusas_total` conta instrucao que o lifter viu e
+    nao traduziu, e continua em 63 -- por isso ela vive em `paradas`, a parte.
+    """
+    imagem = bytearray(0x40)
+    # 0x08000020: movs r0, #1 ; 0x08000022: `b0 bf` (hint) -- Thumb-2, para a leitura
+    imagem[0x20:0x24] = bytes.fromhex("0120b0bf")
+    desmontagem = disasm.desmontar_por_sementes(imagem, sementes={0x08000020: "thumb"})
+    janela = desmontagem.funcoes[0x08000020]
+    assert [i.endereco for i in janela.instrucoes] == [0x08000020]
+    assert janela.terminacao.startswith("parou em 0x08000022"), janela.terminacao
+
+    levantada = next(f for f in decompile.decompilar(desmontagem, bytes(imagem)).funcoes
+                     if f.endereco == 0x08000020)
+    assert not levantada.completa, "janela que para em dado nao pode sair completa"
+    assert levantada.nao_levantadas == [], levantada.nao_levantadas   # nao e' recusa
+    assert len(levantada.paradas) == 1, levantada.paradas
+    assert "0x08000022" in levantada.paradas[0] and "hint" in levantada.paradas[0]
+    assert "NAO LEVANTADO: a leitura parou em 0x08000022" in levantada.corpo
+    # o cabecalho do C diz PARCIAL (e' o que o leitor ve antes do corpo)
+    codigo = decompile.decompilar(desmontagem, bytes(imagem))
+    assert f"/* PARCIAL (0x08000020)" in codigo.texto()
+
+    # e o caso comum NAO pode virar parcial: janela que devolve normalmente
+    limpa = bytearray(0x40)
+    limpa[0x20:0x22] = bytes.fromhex("7047")      # bx lr
+    desmontagem = disasm.desmontar_por_sementes(limpa, sementes={0x08000020: "thumb"})
+    levantada = next(f for f in decompile.decompilar(desmontagem, bytes(limpa)).funcoes
+                     if f.endereco == 0x08000020)
+    assert levantada.completa and levantada.paradas == []
+
+
 def _carregar_ferramenta(nome: str):
     """Ferramentas em `ferramentas/` sao scripts, nao modulo do pacote."""
     import importlib.util

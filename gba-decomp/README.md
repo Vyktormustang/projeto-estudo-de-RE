@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `64 passed` |
+| testes automatizados | `65 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -49,6 +49,8 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 | medida | valor |
 |---|---|
 | descoberta partindo **so do vetor de reset** (sem censo, **reproduzivel daqui**) | **3 587 funcoes**, 208 458 instrucoes, objeto de 956 768 B |
+| C para ler nessa rodada | **3 391 completas + 196 parciais** (o resto nao existe: 100% tem corpo) |
+| janelas cuja leitura parou em dado | **159** (marcadas no C; nao sao recusa -- ver item 22) |
 | descoberta usando o **censo como sementes** (r19, **nao** reproduzivel daqui -- ver abaixo) | **8 172 funcoes**, 460 868 instrucoes listadas, 20 492 arestas |
 | cobertura do censo (r19) | 5 981/5 981 (100%) · **2 191 funcoes que o censo nao tinha** |
 | enderecos descartados | 164 (nenhuma instrucao valida do ARM7TDMI no inicio) |
@@ -418,6 +420,7 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    de reset), nas duas versoes do codigo:
 
    | medido (boot so', sem censo) | antes | depois |
+   | (passo do item 19; os itens 20-22 mudaram isto depois -- ver a tabela do topo) | | |
    |---|---|---|
    | funcoes | 3 586 | **3 587** (+1: a rotina ARM `0x081DC014`) |
    | instrucoes | 208 454 | **208 457** (+3: `umull`, `add`, `bx lr`) |
@@ -486,6 +489,33 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    de C nao tem modo de processador nem mascara de IRQ) e o callee `0x080003A4`
    continua sendo uma janela propria, descoberta por semente.
 
+22. **141 janelas terminavam sem dizer que a leitura parou.** O desmontador
+   encerra a janela quando o endereco seguinte nao e' codigo do ARM7TDMI: 95
+   param numa instrucao que o alvo nao tem (`add.w`, `cbnz`, `udf`, `blxns`,
+   bloco IT...) e 64 em bytes que nao decodificam. Nenhuma dessas janelas
+   registrava recusa -- nao houve instrucao RECUSADA, so' o fim do fluxo --,
+   entao saiam com `completa = True`, e o C delas acabava no meio com um
+   `return r0;` que o codigo nunca executaria ali, sem uma linha dizendo que a
+   leitura parou. E' a mesma classe do defeito da ILHA (a lacuna que some em
+   silencio), e o conserto e' o mesmo: o que falta tem de estar escrito. Agora
+   cada janela leva `/* NAO LEVANTADO: a leitura parou em 0x... -- <motivo> */`
+   e o cabecalho `PARCIAL`:
+
+   | medido (boot so', sem censo) | antes | depois |
+   |---|---|---|
+   | janelas com a parada marcada | 0 | **159** |
+   | completas / parciais | 3 532 / 55 | **3 391 / 196** |
+   | linhas de C | 482 644 | 483 244 (+600) |
+   | bytes de C | 18 243 390 | 18 292 786 |
+   | **objeto compilado** | 956 768 B | **956 768 B, mesmo `sha256`** |
+
+   O objeto identico e' a prova de que nada de CODIGO mudou: so' comentario.
+   A parada e' contada A PARTE das recusas, de proposito: `recusas_total`
+   continua **63** (instrucao que o lifter viu e nao traduziu) e a parada entra
+   em `paradas_total` (159). Somar as duas inflaria um numero publicado -- e o
+   primeiro defeito desta lane foi exatamente esse (a parada entrava em
+   `nao_levantadas` e `recusas_total` ia para 204).
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
@@ -502,6 +532,10 @@ funcoes; a 25ª e' o proprio `main_teste`), por emulacao, no binario e no C
 levantado e recompilado.
 
 ### As lacunas que ficam (todas marcadas dentro do C)
+
+Tabela da rodada **r19, com o censo** (3 586 funcoes do boot + as do censo).
+A rodada reproduzivel daqui (sem censo) tem os numeros dela no item 22 e no
+`evidencias/rom_bpre_boot_sem_censo.json`; os dois escopos nao se somam.
 
 | lacuna | ocorrencias |
 |---|---|

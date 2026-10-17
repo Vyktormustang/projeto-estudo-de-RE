@@ -157,6 +157,25 @@ def _recusas(codigo: decompile_mod.CodigoC) -> tuple[dict, dict, int]:
             dict(por_motivo.most_common()), total)
 
 
+def _paradas(codigo: decompile_mod.CodigoC) -> tuple[dict, int]:
+    """Onde a leitura da janela parou por nao haver codigo ali, agrupado.
+
+    Fica FORA de `_recusas` porque `recusas_total` e' numero publicado (o de
+    instrucoes que o lifter viu e nao traduziu). Uma janela que para em dado
+    nao recusa instrucao nenhuma -- ela so' acaba. Medido na rodada sem censo:
+    159 janelas (95 param em dado, 64 em bytes que nao decodificam), das quais
+    141 nao tinham nenhuma outra lacuna e por isso saiam como COMPLETAS.
+    """
+    por_motivo: collections.Counter = collections.Counter()
+    total = 0
+    for f in codigo.funcoes:
+        for item in f.paradas:
+            total += 1
+            _, _, motivo = item.partition(": ")
+            por_motivo[motivo_canonico(motivo)] += 1
+    return dict(por_motivo.most_common()), total
+
+
 def motivo_canonico(motivo: str) -> str:
     """Troca os enderecos de um motivo por `0x...` -- para os motivos agruparem."""
     return re.sub(r"0x[0-9A-Fa-f]+", "0x...", motivo)
@@ -177,6 +196,12 @@ class Medicao:
     recusas_total: int = 0
     recusas_mnemonico: dict = field(default_factory=dict)
     recusas_motivo: dict = field(default_factory=dict)
+    # Janelas cuja LEITURA parou porque os bytes dali nao sao codigo do
+    # ARM7TDMI. Nao e' recusa (nenhuma instrucao foi vista e rejeitada): e' o
+    # fim do fluxo. Contadas a parte para que `recusas_total` continue querendo
+    # dizer a mesma coisa.
+    paradas_total: int = 0
+    paradas_motivo: dict = field(default_factory=dict)
     tabelas_recusadas_total: int = 0
     tabelas_recusadas_motivo: dict = field(default_factory=dict)
     descartes_por_semente: dict = field(default_factory=dict)
@@ -261,6 +286,14 @@ class Medicao:
                 linhas.append(f"     {n:5d}  {motivo[:140]}")
             if len(self.recusas_motivo) > 8:
                 linhas.append(f"  ... (+{len(self.recusas_motivo) - 8} motivos; "
+                              f"o JSON tem todos)")
+        if self.paradas_total:
+            linhas += ["", f"janelas cuja leitura PAROU em dado/codigo invalido: "
+                           f"{self.paradas_total} (marcadas no C como lacuna):"]
+            for motivo, n in list(self.paradas_motivo.items())[:6]:
+                linhas.append(f"  {n:5d}  {motivo}")
+            if len(self.paradas_motivo) > 6:
+                linhas.append(f"  ... (+{len(self.paradas_motivo) - 6} motivos; "
                               f"o JSON tem todos)")
         if self.conferencia:
             c = self.conferencia
@@ -366,6 +399,7 @@ def medir(caminho_rom: str | Path, censo: str | Path | None = None,
     medicao.levantamento = _classificar(codigo)
     (medicao.recusas_mnemonico, medicao.recusas_motivo,
      medicao.recusas_total) = _recusas(codigo)
+    (medicao.paradas_motivo, medicao.paradas_total) = _paradas(codigo)
     (medicao.tabelas_recusadas_motivo,
      medicao.tabelas_recusadas_total) = _tabelas_recusadas(desmontagem)
 

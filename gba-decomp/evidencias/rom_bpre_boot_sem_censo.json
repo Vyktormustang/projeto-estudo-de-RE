@@ -31,11 +31,11 @@
   "levantamento": {
     "funcoes": 3587,
     "com_c_para_ler": 3587,
-    "completas": 3532,
-    "parciais": 55,
+    "completas": 3391,
+    "parciais": 196,
     "sem_corpo": 0,
     "percentual_com_c": 100.0,
-    "funcoes_com_lacuna": 55
+    "funcoes_com_lacuna": 196
   },
   "recusas_total": 63,
   "recusas_mnemonico": {
@@ -74,6 +74,37 @@
     "desvio para 0x..., sem rotulo nesta janela: fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 1,
     "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (ldrd: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
     "salto para fora da funcao (0x...): fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 1
+  },
+  "paradas_total": 159,
+  "paradas_motivo": {
+    "a leitura parou aqui -- os bytes nao decodificam": 64,
+    "a leitura parou aqui -- forma larga do Thumb-2 (add.w) (provavel dado lido como codigo)": 23,
+    "a leitura parou aqui -- cbnz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 16,
+    "a leitura parou aqui -- udf: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 8,
+    "a leitura parou aqui -- blxns: forma larga que nao existe no ARM7TDMI (provavel dado lido como codigo)": 5,
+    "a leitura parou aqui -- mcr2: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 5,
+    "a leitura parou aqui -- vhadd: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 3,
+    "a leitura parou aqui -- rev: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)": 3,
+    "a leitura parou aqui -- ldrd: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 3,
+    "a leitura parou aqui -- strd: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- IT block (it): nao existe no ARMv4T (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- cdp2: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- vrev64: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- IT block (itt): nao existe no ARMv4T (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- sxth: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- bkpt: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- vqshlu: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- cbz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- stc2: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vst1: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vabal: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- stc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- IT block (ittt): nao existe no ARMv4T (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vcge: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- IT block (itet): nao existe no ARMv4T (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vtbx: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1
   },
   "tabelas_recusadas_total": 2,
   "tabelas_recusadas_motivo": {
@@ -402,10 +433,10 @@
       "bytes": "ff ff ff ff ff ff ff ff"
     }
   ],
-  "linhas_c": 482644,
+  "linhas_c": 483244,
   "desvios_com_comparacao": 3446,
   "desvios_por_flag": 8130,
-  "bytes_c": 18243390,
+  "bytes_c": 18292786,
   "conferencia": {
     "total": 208458,
     "identicas": 208249,
@@ -459,5 +490,5 @@
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/boot_chamada.c"
+  "caminho_c": "/home/user/gba-re/saida/boot_paradas.c"
 }
