@@ -149,3 +149,45 @@ def test_cabecalho_da_rom_real_era_valido_e_o_projeto_reprovava():
     assert patch.complemento_correto(bytes(dados)) == dados[0xBD]
     soma_errada = sum(dados[0x00:0xBD]) & 0xFF
     assert (0x100 - (soma_errada + 0x19)) & 0xFF != dados[0xBD]
+
+
+# --- manifesto declarativo -------------------------------------------------
+
+def test_manifesto_aceita_hex_com_espaco_sem_espaco_e_lista():
+    manifesto = {"patches": [
+        {"endereco": "0x08000010", "esperado": "c8 00", "novo": "01 00", "motivo": "a"},
+        {"endereco": 0x08000020, "esperado": "c800", "novo": [1, 0], "motivo": "b"},
+        {"endereco": 0x08000030, "esperado": "0xc8 0x00", "novo": "0x01 0x00", "motivo": "c"},
+    ]}
+    patches = patch.patches_de_manifesto(manifesto)
+    assert [p.esperado for p in patches] == [b"\xc8\x00"] * 3
+    assert [p.novo for p in patches] == [b"\x01\x00"] * 3
+
+
+def test_manifesto_recusa_sobreposicao():
+    manifesto = {"patches": [
+        {"endereco": 0x08000000, "esperado": "0102", "novo": "0304", "motivo": "a"},
+        {"endereco": 0x08000001, "esperado": "05", "novo": "06", "motivo": "b"},
+    ]}
+    with pytest.raises(patch.ErroDePatch, match="sobrepostos"):
+        patch.patches_de_manifesto(manifesto)
+
+
+def test_manifesto_recusa_campo_faltando():
+    with pytest.raises(patch.ErroDePatch, match="motivo"):
+        patch.patches_de_manifesto({"patches": [
+            {"endereco": 0x08000000, "esperado": "01", "novo": "02"}]})
+    with pytest.raises(patch.ErroDePatch, match="patches"):
+        patch.patches_de_manifesto({})
+
+
+def test_manifesto_aplica_e_recalcula_o_cabecalho():
+    dados = bytearray(_imagem())
+    dados[0xBD] = 0x00
+    manifesto = {"patches": [
+        {"endereco": rom.to_addr(0x100), "esperado": "0000",
+         "novo": "c800", "motivo": "preco"}]}
+    nova, patches = patch.aplicar_manifesto(bytes(dados), manifesto)
+    assert nova[0x100:0x102] == b"\xc8\x00"
+    assert nova[0xBD] == patch.complemento_correto(bytes(dados))
+    assert len(patches) == 1

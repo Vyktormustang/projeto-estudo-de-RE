@@ -1,0 +1,11 @@
+{
+  "descricao": "Muda o NOME do item 4 (POKe BOLA -> BOLA NOVA). Patch de texto: 14 bytes do campo name[], terminados em 0xFF.",
+  "patches": [
+    {
+      "endereco": "0x083DB0D8",
+      "esperado": "ca c9 c5 1b 00 bc c9 c6 bb ff 00 00 00 00",
+      "novo": "bc c9 c6 bb 00 c8 c9 d0 bb ff ff ff ff ff",
+      "motivo": "gItems[4].name: POKe BOLA -> BOLA NOVA (charset medido, secao 9.5)"
+    }
+  ]
+}

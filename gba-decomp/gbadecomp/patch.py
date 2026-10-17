@@ -180,3 +180,68 @@ def relatar(imagem: bytes, patches: list[Patch]) -> str:
                       + ("(correto)" if atual == certo
                          else f"(INCORRETO, deveria ser 0x{certo:02X})"))
     return "\n".join(linhas)
+
+
+# --- manifesto declarativo -------------------------------------------------
+# Motivo: cada patch novo nao deveria exigir um script novo. Um manifesto JSON
+# descreve endereco/esperado/novo, e a mesma guarda do `Patch` vale para todos.
+
+def _como_bytes(valor, campo: str) -> bytes:
+    """Aceita "c8 00", "c800", [200, 0] ou 200 (u8) -- e devolve bytes."""
+    if isinstance(valor, int):
+        if not 0 <= valor <= 0xFF:
+            raise ErroDePatch(f"{campo}: inteiro solto tem de caber em 1 byte")
+        return bytes([valor])
+    if isinstance(valor, (list, tuple)):
+        try:
+            return bytes(valor)
+        except ValueError as exc:
+            raise ErroDePatch(f"{campo}: {exc}") from exc
+    texto = str(valor).strip().replace(",", " ")
+    if texto.lower().startswith("0x"):
+        texto = texto[2:]
+    if " " in texto:
+        partes = texto.split()
+        try:
+            return bytes(int(p, 16) for p in partes)
+        except ValueError as exc:
+            raise ErroDePatch(f"{campo}: byte invalido em {texto!r}") from exc
+    try:
+        return bytes.fromhex(texto)
+    except ValueError as exc:
+        raise ErroDePatch(f"{campo}: hex invalido em {texto!r}") from exc
+
+
+def patches_de_manifesto(manifesto: dict) -> list[Patch]:
+    """Converte o JSON em `Patch`, recusando sobreposicao e campo faltando."""
+    itens = manifesto.get("patches")
+    if not itens:
+        raise ErroDePatch("manifesto sem a lista 'patches'")
+    patches: list[Patch] = []
+    for indice, item in enumerate(itens):
+        for campo in ("endereco", "esperado", "novo", "motivo"):
+            if campo not in item:
+                raise ErroDePatch(f"patch #{indice} sem o campo {campo!r}")
+        endereco = item["endereco"]
+        if isinstance(endereco, str):
+            endereco = int(endereco, 16)
+        patches.append(Patch(
+            endereco=int(endereco),
+            esperado=_como_bytes(item["esperado"], f"patch #{indice} esperado"),
+            novo=_como_bytes(item["novo"], f"patch #{indice} novo"),
+            motivo=str(item["motivo"]),
+        ))
+    ordenados = sorted(patches, key=lambda p: p.endereco)
+    for anterior, seguinte in zip(ordenados, ordenados[1:]):
+        fim = anterior.endereco + len(anterior.esperado)
+        if seguinte.endereco < fim:
+            raise ErroDePatch(
+                f"patches sobrepostos: 0x{anterior.endereco:08X}..0x{fim:08X} e "
+                f"0x{seguinte.endereco:08X} -- aplicar um desfaria o outro")
+    return patches
+
+
+def aplicar_manifesto(imagem: bytes, manifesto: dict) -> tuple[bytes, list[Patch]]:
+    """Aplica o manifesto e devolve (imagem nova, patches) -- cabecalho incluso."""
+    patches = patches_de_manifesto(manifesto)
+    return corrigir_cabecalho(aplicar(imagem, patches)), patches
