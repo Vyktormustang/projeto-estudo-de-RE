@@ -312,6 +312,130 @@ não aparece nenhuma vez na imagem** (0 ocorrências de `B8 58 02 02`) — está
 descartado. Sem executar o jogo ou sem uma referência externa de símbolos, o
 endereço absoluto não sai do estático.
 
+## 9.6. A BAG: onde ficam os itens — **medido na ROM**
+
+Esta seção responde "qual campo mudar para ter Poké Bolas". Ela existe porque a
+cadeia toda foi **fechada dos dois lados**: o que a ROM faz (medido nos bytes) e
+o que a decompilação pública `pret/pokefirered` diz (referência externa), sem
+nenhum dos dois depender do outro.
+
+### 9.6.1 A tabela de itens
+
+**[medido]** Em `0x083DB028` há uma tabela de entradas de **44 bytes (0x2C)**, com
+o nome inline nos primeiros 14 bytes (charset da seção 9.5, terminado em `0xFF`).
+A base é referenciada por **15 literais** na imagem. Preços conferem com os
+oficiais: Master 0, Ultra 1200, Great 600, Poké 200, Potion 300.
+
+| offset | campo | accessor na ROM |
+|---|---|---|
+| +0x00 | `name[14]` | (inline) |
+| +0x0E | `itemId` (u16) | `0x0809A8DC` |
+| +0x10 | `price` (u16) | `0x0809A900` |
+| +0x12 | `holdEffect` (u8) | `0x0809A924` |
+| +0x13 | `holdEffectParam` (u8) | `0x0809A948` |
+| +0x14 | `description` (ptr) | `0x0809A96C` |
+| +0x18 | `importance` (u8) | `0x0809A990` |
+| +0x19 | `registrability` (u8) | `0x0809A9B4` |
+| **+0x1A** | **`pocket` (u8)** | `0x0809A9D8` |
+| +0x1B | `type` (u8) | `0x0809A9FC` |
+| +0x1C | `fieldUseFunc` (ptr) | `0x0809AA20` |
+| +0x20 | `battleUsage` (u8) | `0x0809AA44` |
+| +0x24 | `battleUseFunc` (ptr) | `0x0809AA68` |
+| +0x28 | `secondaryId` (u8) | `0x0809AA8C` |
+
+Os **14 campos batem um a um** com `struct Item` de `include/item.h` do
+`pokefirered` — nenhum sobrando, nenhum faltando.
+
+**Verificação independente:** lendo o campo `pocket` na tabela, os itens caem
+exatamente nas cinco pockets: bolas (1–5) → **3**; poções (13, 20, 21) → **1**;
+frutos (133, 134, 175) → **5**; TMs (290+) → **4**. Isso é consistência interna da
+ROM, não confiança na referência.
+
+### 9.6.2 Onde as pockets ficam
+
+**[medido]** A rotina em `0x08099E44` inicializa o array `gBagPockets`
+(`0x0203988C`, passo 8: ponteiro do pocket em +0, capacidade em +4):
+
+```
+08099E46  ldr r0, [pc, #0x40]   ; = 0x03005008   (gSaveBlock1Ptr)
+08099E48  ldr r2, [r0]          ; r2 = *gSaveBlock1Ptr
+08099E4A  movs r3, #0xc4
+08099E4C  lsls r3, r3, #2       ; r3 = 0x310
+08099E4E  adds r0, r2, r3        ; ITENS        +0x310
+08099E52  movs r0, #0x2a        ; 42 slots
+08099E56  adds r3, #0xa8        ; +0x3B8       ITENS-CHAVE
+08099E5C  movs r0, #0x1e        ; 30 slots
+08099E60  adds r3, #0x78        ; +0x430       POKé BOLAS
+08099E66  movs r0, #0xd         ; 13 slots
+08099E6A  adds r3, #0x34        ; +0x464       TM/HM
+08099E70  movs r0, #0x3a        ; 58 slots
+08099E74  ldr r0, [pc, #0x14]   ; = 0x54C     FRUTOS
+08099E7C  movs r0, #0x2b        ; 43 slots
+```
+
+| pocket | offset em SaveBlock1 | slots |
+|---|---|---|
+| Itens | `+0x310` | 42 |
+| Itens-chave | `+0x3B8` | 30 |
+| **Poké Bolas** | **`+0x430`** | **13** |
+| TM/HM | `+0x464` | 58 |
+| Frutos | `+0x54C` | 43 |
+
+A aritmética fecha com a tabela de estrutura (`0x310 + 42×4 = 0x3B8`,
+`0x3B8 + 30×4 = 0x430`, `0x430 + 13×4 = 0x464`, `0x464 + 58×4 = 0x54C`,
+`0x54C + 43×4 = 0x5F8` = `seen1`).
+
+### 9.6.3 O slot, e o XOR na quantidade
+
+**[medido]** `struct ItemSlot` = `{ u16 itemId; u16 quantity; }` — 4 bytes. A ROM
+escreve `strh` no offset 0 (itemId) e no offset +2 (quantity).
+
+**[medido]** A quantidade é guardada **cifrada**. `0x08099DBC`:
+
+```
+08099DC0  ldr r2, [pc, #0x10]   ; = 0x0300500C   (gSaveBlock2Ptr)
+08099DC2  ldr r2, [r2]
+08099DC4  movs r3, #0xf2
+08099DC6  lsls r3, r3, #4       ; r3 = 0xF20
+08099DC8  adds r2, r2, r3
+08099DCA  ldr r2, [r2]          ; encryptionKey
+08099DCC  eors r1, r2
+08099DCE  strh r1, [r0]         ; guarda quantity ^ key
+```
+
+Bate com `src/item.c` do `pokefirered`
+(`*ptr = value ^ gSaveBlock2Ptr->encryptionKey;`) e com `SaveBlock2`, que tem
+`/*0xF20*/ u32 encryptionKey;`.
+
+### 9.6.4 Resposta: qual campo
+
+```
+base = *(u32 *)0x03005008          # gSaveBlock1Ptr
+slot = base + 0x430 + i * 4        # i = 0..12, pocket de Poké Bolas
+*(u16 *)(slot + 0) = itemId        # 1=Master, 2=Ultra, 3=Super, 4=Poké, 5=Safari
+*(u16 *)(slot + 2) = N ^ (encryptionKey & 0xFFFF)
+
+encryptionKey = *(u32 *)(*(u32 *)0x0300500C + 0xF20)
+```
+
+**[medido] Endereços de referência:** `gSaveBlock1Ptr` = `0x03005008` (453
+ocorrências na imagem), `gSaveBlock2Ptr` = `0x0300500C` (266). O endereço do
+Emerald, `0x03005D8C`, aparece **0 vezes** — é linha FireRed, coerente com o
+cabeçalho `BPRE`.
+
+**O que isto NÃO é:** não é um offset de ROM que se possa patchear. É RAM: o
+valor vale para a sessão e é o que o jogo grava no save quando você salva. Um
+patch de ROM que "dê Poké Bolas" tem de mexer na rotina que entrega item ou no
+script que a chama — não numa constante.
+
+**[medido]** A rotina que efetivamente escreve o slot está em `0x0809A19E`:
+`strh r6, [r0]` (itemId) e, em `0x0809A1A4`–`0x0809A1C2`, a quantidade pelo
+`strh` cifrado de `0x08099DBC`; ela chega ali depois de validar o item com
+`ItemId_GetPocket` e buscar um slot livre com `0x0809A088`. **O que não foi
+feito:** separar `AddBagItem` de `RemoveBagItem` por nome — as duas usam o mesmo
+par de escritas, e a diferença está na aritmética da quantidade, que não segui
+até o fim.
+
 ## 10. Números da rodada (sem censo — a reproduzível daqui)
 
 | medida | valor |
