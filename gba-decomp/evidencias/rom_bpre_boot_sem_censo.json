@@ -8,7 +8,7 @@
     "tabelas_de_casos": 166,
     "casos_de_tabela": 3066,
     "funcoes": 3587,
-    "instrucoes": 208457,
+    "instrucoes": 208458,
     "arestas": 8588,
     "descartes": 45,
     "saidas_para_tras": 52,
@@ -20,7 +20,7 @@
     "tabelas_de_casos": 166,
     "casos_de_tabela": 3066,
     "funcoes": 3587,
-    "instrucoes": 208457,
+    "instrucoes": 208458,
     "arestas": 8588,
     "descartes": 45,
     "saidas_para_tras": 52,
@@ -37,9 +37,9 @@
     "percentual_com_c": 100.0,
     "funcoes_com_lacuna": 55
   },
-  "recusas_total": 64,
+  "recusas_total": 63,
   "recusas_mnemonico": {
-    "bx": 29,
+    "bx": 28,
     "b": 11,
     "and": 5,
     "adc": 4,
@@ -56,7 +56,7 @@
     "bgt": 1
   },
   "recusas_motivo": {
-    "desvio indireto por registrador sem origem conhecida": 18,
+    "desvio indireto por registrador sem origem conhecida": 17,
     "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- a leitura continua em INSTRUCAO da janela 0x...": 11,
     "instrucao que nao existe no ARM7TDMI (codificacao de 32 bits do Thumb-2: o ARM7TDMI executa so' as formas Thumb de 16 bits (e o `bl` de 32 bits, que o capstone escreve sem sufixo)): aqui a leitura passou por dado, nao por codigo": 9,
     "thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o destino vem NO REGISTRADOR, de quem chamou -- traduzir exigiria inventar a assinatura": 9,
@@ -402,13 +402,13 @@
       "bytes": "ff ff ff ff ff ff ff ff"
     }
   ],
-  "linhas_c": 482643,
+  "linhas_c": 482644,
   "desvios_com_comparacao": 3446,
   "desvios_por_flag": 8130,
-  "bytes_c": 18243328,
+  "bytes_c": 18243390,
   "conferencia": {
-    "total": 208457,
-    "identicas": 208248,
+    "total": 208458,
+    "identicas": 208249,
     "taxa": 99.9,
     "divergentes": 209,
     "divergentes_por_mnemonico": {
@@ -454,10 +454,10 @@
     "codigo_de_saida": 0,
     "n_erros": 0,
     "primeiros_erros": [],
-    "bytes_objeto": 956772,
-    "sha256_objeto": "51f70b4089cdd243320caae039f0f6ef22544d43b5f09120e7ab28d7c4ef98aa",
+    "bytes_objeto": 956768,
+    "sha256_objeto": "641ffbb5b14ecf55382b3ba3236a4f6a7b5ecfb7ecbfc96c3ab9493e5812f8ee",
     "diretorio_de_build": "/tmp/gbadecomp-build",
     "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
   },
-  "caminho_c": "/home/user/gba-re/saida/boot_alvo.c"
+  "caminho_c": "/home/user/gba-re/saida/boot_chamada.c"
 }

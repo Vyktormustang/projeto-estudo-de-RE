@@ -31,7 +31,7 @@ binário  --disasm-->  funções + grafo de chamadas
 | C levantado | 25/25 funções traduzidas, 0 não levantadas |
 | tabela de verdade **no C levantado, recompilado e emulado** | **60/60** |
 | C compilado (tamanho do modulo) | 1 096 bytes |
-| testes automatizados | `63 passed` |
+| testes automatizados | `64 passed` |
 
 A ROM sintética é código **autoral** (funções triviais: soma, fatorial, laço
 decrescente, classificação por faixas, leitura/escrita de memória, chamadas
@@ -48,16 +48,16 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
 
 | medida | valor |
 |---|---|
-| descoberta partindo **so do vetor de reset** (sem censo, **reproduzivel daqui**) | **3 587 funcoes**, 208 457 instrucoes, objeto de 956 772 B |
+| descoberta partindo **so do vetor de reset** (sem censo, **reproduzivel daqui**) | **3 587 funcoes**, 208 458 instrucoes, objeto de 956 768 B |
 | descoberta usando o **censo como sementes** (r19, **nao** reproduzivel daqui -- ver abaixo) | **8 172 funcoes**, 460 868 instrucoes listadas, 20 492 arestas |
 | cobertura do censo (r19) | 5 981/5 981 (100%) · **2 191 funcoes que o censo nao tinha** |
 | enderecos descartados | 164 (nenhuma instrucao valida do ARM7TDMI no inicio) |
 | saltos que saem da funcao para tras | 241 · 148 trechos orfaos voltaram como janela propria |
 | tabelas de casos | **377 reconhecidas**, 6 303 casos lidos da ROM → `switch` no C |
-| funcoes com C para ler | **8 027 completas + 145 parciais = 100%** |
+| funcoes com C para ler (r19) | **8 027 completas + 145 parciais = 100%** |
 | C levantado | 1 056 638 linhas / 39,9 MB |
-| conferencia byte a byte | **99,950%** das instrucoes remontam identicas ao binario |
-| compilacao | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 164 988 bytes) |
+| conferencia byte a byte (r19) | **99,950%** das instrucoes remontam identicas ao binario |
+| compilacao (r19) | **0 erros** com `zig cc -mcpu=arm7tdmi` (objeto de 2 164 988 bytes) |
 | determinismo | C, JSON e objeto compilado **identicos** em duas rodadas (`ferramentas/checar_determinismo.py`) |
 | o que uma mudanca mexe no objeto | medido por funcao, nao pelo sha256 (`ferramentas/conferir_objetos.py`): a r16 mudou o codigo de **2** funcoes de 8 172 |
 
@@ -458,6 +458,33 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    (839 bytes a mais, so' texto) e **objeto byte a byte identico**
    (`sha256` 51f70b40...). Determinismo conferido ANTES desta mudanca, em duas
    execucoes do mesmo codigo: JSON, `.c` e objeto identicos (mesmo `sha256`).
+
+21. **`bx` com o retorno montado a mao era lido como fim de fluxo.** O vetor de
+   reset chama a entrada Thumb assim (unico sitio com esse idioma na rodada sem
+   censo, medido):
+
+   ```
+   0x08000228  ldr r1, [pc, #0x14]   ; r1 = 0x080003A5 (bit0 = 1: entrada Thumb)
+   0x0800022C  mov lr, pc            ; retorno = 0x08000234
+   0x08000230  bx  r1                ; chamada ARM -> Thumb
+   0x08000234  b   0x08000204        ; a continuacao -- nunca era lida
+   ```
+
+   Dois defeitos, um em cada ponta: o desmontador tratava o `bx` como
+   terminador (a instrucao de retorno ficava fora da janela) e o tradutor
+   recusava o mesmo `bx` com "desvio indireto sem origem conhecida", mesmo tendo
+   o valor no pool (a busca olhava so' a instrucao imediatamente anterior).
+   Agora o valor e' buscado para tras (ate' 6 instrucoes, e a busca DESISTE na
+   primeira instrucao que le' o registrador -- trocar "nao sei" por valor errado
+   seria pior) e o `bx` vira chamada: `r0 = fn_080003A4(r0, r1, r2, r3);` com a
+   execucao continuando. Efeito medido: **208 457 -> 208 458 instrucoes**,
+   **64 -> 63 recusas** (o `bx` estava entre elas), objeto **956 772 -> 956 768 B**,
+   o mesmo conjunto de 3 587 funcoes, e o C agora mostra a chamada e o `goto`
+   de volta ao laco em vez de `/* NAO LEVANTADO: bx r1 */`.
+
+   O que **nao** mudou: os 2 `msr` do mesmo trecho continuam recusados (o modelo
+   de C nao tem modo de processador nem mascara de IRQ) e o callee `0x080003A4`
+   continua sendo uma janela propria, descoberta por semente.
 
 ### O que isso prova e o que nao prova
 

@@ -1517,6 +1517,68 @@ def test_desvio_para_trecho_nao_desmontado_mede_se_o_alvo_e_codigo():
     assert "passou por dado" in motivo, motivo
 
 
+def test_bx_com_lr_montado_a_mao_e_chamada_e_a_leitura_continua():
+    """`mov lr, pc` + `bx rN` com alvo conhecido: CHAMADA, nao fim de fluxo.
+
+    Medido na ROM (rodada sem censo, 1 sitio -- o vetor de reset):
+
+        0x08000228  ldr r1, [pc, #0x14]   ; r1 = 0x080003A5 (Thumb, bit0 = 1)
+        0x0800022C  mov lr, pc            ; retorno = 0x08000234
+        0x08000230  bx  r1                ; chamada ARM -> Thumb
+        0x08000234  b   0x08000204        ; a continuacao, que nunca era lida
+
+    O desmontador encerrava a janela no `bx` (ele e' terminador de fluxo), entao
+    a instrucao de retorno ficava fora; e o tradutor recusava o `bx` com "sem
+    origem conhecida" mesmo tendo o valor no pool. Agora: o valor e' buscado
+    para tras (o `ldr` nao precisa ser a instrucao anterior) e o `bx` vira
+    chamada, com a execucao continuando.
+    """
+    imagem = bytearray(0x60)
+    for endereco, palavra in (
+        (0x08000020, 0xE59F1014),   # ldr r1, [pc, #0x14] -> 0x0800003C
+        (0x08000024, 0xE1A0E00F),   # mov lr, pc
+        (0x08000028, 0xE12FFF11),   # bx  r1
+        (0x0800002C, 0xEAFFFFFB),   # b   0x08000020 (laco)
+        (0x0800003C, 0x08000051),   # literal: entrada Thumb (bit0 = 1)
+        (0x08000050, 0x47704770),   # thumb: bx lr ; bx lr
+    ):
+        deslocamento = endereco - rom.ROM_BASE
+        imagem[deslocamento:deslocamento + 4] = palavra.to_bytes(4, "little")
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(imagem), sementes={0x08000020: "arm", 0x08000050: "thumb"})
+    janela = desmontagem.funcoes[0x08000020]
+    # 1) a leitura NAO parou no `bx`: a instrucao de retorno foi lida
+    assert [i.endereco for i in janela.instrucoes] == [0x08000020, 0x08000024,
+                                                       0x08000028, 0x0800002C], \
+        [f"{i.endereco:08X}" for i in janela.instrucoes]
+    assert "chamada: lr montado a mao" in janela.terminacao, janela.terminacao
+    # 2) o C chama de verdade (nao `return`), e segue para o laco
+    codigo = decompile.decompilar(desmontagem, bytes(imagem))
+    levantada = next(f for f in codigo.funcoes if f.endereco == 0x08000020)
+    assert levantada.completa, levantada.nao_levantadas
+    assert "chamada arm->thumb com o retorno montado a mao" in levantada.corpo
+    # a chamada e' seguida do laco (se fosse `return`, a continuacao sumiria)
+    linhas = [linha.strip() for linha in levantada.corpo.splitlines()]
+    posicao = linhas.index("r0 = fn_08000050(r0, r1, r2, r3);")
+    assert linhas[posicao + 1] == "goto L_08000020;", linhas[posicao:posicao + 2]
+
+    # 3) sem valor conhecido o `bx` continua RECUSADO (nao inventa alvo)
+    sem_valor = bytearray(0x60)
+    for endereco, palavra in (
+        (0x08000020, 0xE1A0E00F),   # mov lr, pc
+        (0x08000024, 0xE12FFF11),   # bx r1  -- r1 desconhecido
+        (0x08000028, 0xEAFFFFFD),   # b 0x08000024
+    ):
+        deslocamento = endereco - rom.ROM_BASE
+        sem_valor[deslocamento:deslocamento + 4] = palavra.to_bytes(4, "little")
+    desmontagem = disasm.desmontar_por_sementes(
+        bytes(sem_valor), sementes={0x08000020: "arm"})
+    levantada = next(f for f in decompile.decompilar(desmontagem, bytes(sem_valor)).funcoes
+                     if f.endereco == 0x08000020)
+    assert not levantada.completa
+    assert any("sem origem conhecida" in item for item in levantada.nao_levantadas)
+
+
 def _carregar_ferramenta(nome: str):
     """Ferramentas em `ferramentas/` sao scripts, nao modulo do pacote."""
     import importlib.util

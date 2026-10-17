@@ -803,6 +803,27 @@ class _Emissor:
                          f"tirou da pilha */")
             self._emitir("return r0;")
             return
+        # CAMINHO DA CHAMADA COM RETORNO MONTADO A MAO: `mov lr, pc` (ou
+        # `add lr, pc, #imm`) + `bx rN` com o valor de rN conhecido. Nao e' salto
+        # de cauda: o callee volta para o `lr`, entao a execucao CONTINUA na
+        # instrucao seguinte -- o desmontador ja' segue a leitura nesse caso
+        # (`disasm._lr_montado_a_mao`). Emitir `return` aqui perderia a
+        # continuacao; emitir so' a recusa deixaria de modelar a chamada.
+        anterior = self._anterior()
+        if anterior is not None and _monta_lr_com_pc(anterior):
+            medido = self._valor_do_registrador(r)
+            if medido is not None:
+                valor, como = medido
+                alvo = valor & ~1
+                modo_alvo = "thumb" if valor & 1 else "arm"
+                if alvo not in self.nomes:
+                    self.externos.add(f"fn_{alvo:08X}")
+                nome = self.nomes.get(alvo, f"fn_{alvo:08X}")
+                self._emitir(f"/* chamada {self.f.modo}->{modo_alvo} com o "
+                             f"retorno montado a mao (`{anterior.mnemonic} lr, pc` "
+                             f"+ `bx {r}`): `{como}` = 0x{valor:08X} */")
+                self._emitir(f"r0 = {nome}(r0, r1, r2, r3);")
+                return
         # TERCEIRO CAMINHO: VENEER de troca de modo. `adr rD, #imm` (ou literal
         # de pool) seguido de `bx rD`, com o valor conhecido e o bit0 dizendo o
         # OUTRO modo: o desmontador semeia uma janela naquele endereco, no modo
@@ -871,7 +892,11 @@ class _Emissor:
         anterior = self._anterior()
         if anterior is None:
             return None
-        ins = next(self.cs.disasm(bytes(anterior.bytes_), anterior.endereco), None)
+        return self._valor_de(anterior, registrador)
+
+    def _valor_de(self, instrucao, registrador: str):
+        """O valor que ESTA instrucao deixa em `registrador`, se ela carrega um."""
+        ins = next(self.cs.disasm(bytes(instrucao.bytes_), instrucao.endereco), None)
         if ins is None or len(ins.operands) < 2:
             return None
         if ins.mnemonic == "adr":
@@ -892,6 +917,42 @@ class _Emissor:
                 return None
             return (int.from_bytes(self.imagem[deslocamento:deslocamento + 4], "little"),
                     "ldr do pool")
+        return None
+
+    def _valor_do_registrador(self, registrador: str, limite: int = 6):
+        """O valor de `registrador`, varrendo para tras ate' 6 instrucoes.
+
+        Existe porque o `ldr` que carrega o destino NAO precisa ser a instrucao
+        imediatamente anterior ao `bx`. Medido na ROM de estudo (vetor de reset,
+        0x08000228..0x08000230):
+
+            ldr r1, [pc, #0x14]   ; r1 = 0x080003A5 (entrada Thumb, bit0 = 1)
+            mov lr, pc            ; retorno montado a mao
+            bx  r1                ; chamada ARM -> Thumb
+
+        A varredura e' conservadora de proposito: para no primeiro instrucao que
+        MENCIONA o registrador e so' aceita se ela for uma ESCRITA pura (o
+        registrador no operando 0) de `adr`/`ldr [pc]`. Qualquer outra mencao
+        (leitura, base de memoria, lista de push) faz a busca desistir -- trocar
+        "nao sei" por um valor errado seria pior que a recusa.
+        """
+        for passo in range(1, limite + 1):
+            indice = self._indice_instrucao - passo
+            if indice < 0:
+                return None
+            candidata = self.f.instrucoes[indice]
+            ins = next(self.cs.disasm(bytes(candidata.bytes_), candidata.endereco), None)
+            if ins is None:
+                return None
+            menciona = any(
+                operando.type == capstone.arm.ARM_OP_REG
+                and self._reg(operando) == registrador
+                for operando in ins.operands)
+            if not menciona:
+                continue
+            if ins.operands and self._reg(ins.operands[0]) == registrador:
+                return self._valor_de(candidata, registrador)
+            return None
         return None
 
     def _motivo_bx_sem_origem(self, registrador: str) -> str:
@@ -1350,6 +1411,12 @@ def _condicao_direta(sufixo: str, descritor) -> str | None:
         return {"eq": f"{destino} == 0", "ne": f"{destino} != 0",
                 "mi": f"(s32){destino} < 0", "pl": f"(s32){destino} >= 0"}.get(sufixo)
     return None
+
+
+def _monta_lr_com_pc(instrucao) -> bool:
+    """`mov lr, pc` / `add lr, pc, #imm` -- o retorno da chamada posto em `lr`."""
+    return (instrucao.mnemonic in ("mov", "add", "adds", "sub", "subs")
+            and instrucao.operadores.replace(" ", "").startswith("lr,pc"))
 
 
 def _monta_retorno_a_mao(instrucao) -> bool:

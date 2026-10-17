@@ -623,8 +623,15 @@ def _seguir_funcao(imagem: bytes, base: int, entrada: int, modo: str, origem: st
                 elif alvo is not None and base <= alvo < limite:
                     pendente.append(alvo)
                 if _termina_fluxo(ins):
-                    funcao.terminacao = f"{ins.mnemonic} {ins.op_str}".strip()
-                    break
+                    if _lr_montado_a_mao(funcao.instrucoes[:-1]):
+                        # chamada com retorno montado a mao: a instrucao seguinte
+                        # e' alcancavel (o callee volta para lr). Registra a
+                        # terminacao para o relatorio, mas SEGUE lendo.
+                        funcao.terminacao = (f"{ins.mnemonic} {ins.op_str} "
+                                             f"(chamada: lr montado a mao)")
+                    else:
+                        funcao.terminacao = f"{ins.mnemonic} {ins.op_str}".strip()
+                        break
             atual = ins.address + len(ins.bytes)
 
     if funcao.terminacao == "indefinida":
@@ -1009,6 +1016,25 @@ def _tabela_de_casos_ou_motivo(imagem: bytes, base: int, anteriores: list, ins, 
                        indice_endereco=antes.address, indice_reg=registrador_indice,
                        deslocamento=deslocamento, guarda=guarda,
                        guarda_fonte=guarda_fonte), ""
+
+
+def _lr_montado_a_mao(anteriores: list) -> bool:
+    """A instrucao anterior ao `bx` poe em `lr` o endereco de retorno?
+
+    Dois idiomas medidos na ROM de estudo:
+      * `mov lr, pc` (0x0800022C, no vetor de reset): LR recebe o endereco da
+        instrucao SEGUINTE ao `bx`;
+      * `add lr, pc, #imm` (0x0800036C, no IRQ): idem, com deslocamento.
+    Nos dois casos o `bx` e' CHAMADA -- ha' retorno --, e nao fim de fluxo. O
+    desmontador encerrava a janela ali, e a instrucao de retorno (0x08000234:
+    `b 0x08000204`) nunca era lida. Medido: 1 sitio na rodada sem censo.
+    """
+    if not anteriores:
+        return False
+    anterior = anteriores[-1]
+    texto = anterior.operadores.replace(" ", "")
+    return (anterior.mnemonic in ("mov", "add", "adds", "sub", "subs")
+            and texto.startswith("lr,pc"))
 
 
 def _termina_fluxo(ins) -> bool:
