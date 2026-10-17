@@ -428,13 +428,30 @@ valor vale para a sessão e é o que o jogo grava no save quando você salva. Um
 patch de ROM que "dê Poké Bolas" tem de mexer na rotina que entrega item ou no
 script que a chama — não numa constante.
 
-**[medido]** A rotina que efetivamente escreve o slot está em `0x0809A19E`:
-`strh r6, [r0]` (itemId) e, em `0x0809A1A4`–`0x0809A1C2`, a quantidade pelo
-`strh` cifrado de `0x08099DBC`; ela chega ali depois de validar o item com
-`ItemId_GetPocket` e buscar um slot livre com `0x0809A088`. **O que não foi
-feito:** separar `AddBagItem` de `RemoveBagItem` por nome — as duas usam o mesmo
-par de escritas, e a diferença está na aritmética da quantidade, que não segui
-até o fim.
+**[medido] As funções da bag, agora separadas por comportamento** (a versão
+anterior desta seção dizia que `AddBagItem` e `RemoveBagItem` não tinham sido
+separadas — foram, lendo a aritmética):
+
+| função | endereço | o que faz, medido nos bytes |
+|---|---|---|
+| `GetBagItemQuantity` | `0x08099DA0` | `*ptr ^ encryptionKey` (lê e trunca em u16) |
+| `SetBagItemQuantity` | `0x08099DBC` | `*ptr = value ^ encryptionKey` |
+| `GetPcItemQuantity` | `0x08099DD8` | `ldrh r0,[r0]` — PC **não** é cifrado |
+| `SetPcItemQuantity` | `0x08099DDC` | `strh r1,[r0]` |
+| `ClearItemSlots` | `0x0809A274` | zera `capacidade` slots de uma pocket |
+| `ResetBag` | `0x0809A2DC` | laço nas 5 pockets → `ClearItemSlots` |
+| **`AddBagItem`** | **`0x0809A084`** | `ItemId_GetPocket` → `pocket-1` em `gBagPockets` → procura o item; se existe, `GetBagItemQuantity`, **soma** `count` e recusa acima de **999** (`0x3E7`); se não existe, acha slot livre com `0x08099ECC` e grava `strh itemId` + `SetBagItemQuantity` |
+| **`RemoveBagItem`** | **`0x0809A1D8`** | mesmo caminho, mas **subtrai**; se a quantidade chega a zero, grava `itemId = 0` |
+| `AddPCItem` | `0x0809A3C8` | **não é bag**: usa `pcItems` (`SaveBlock1+0x298`) e as versões de PC, sem cifra |
+
+A distinção `Add`/`Remove` está medida: `0x0809A084` tem `adds r1,r0,r2` seguido
+de `cmp r1, 0x3E7` e `ble` para o `SetBagItemQuantity`; `0x0809A1D8` tem
+`subs r0,r0,r7` e, em `0x0809A238`, `cmp r4,#0` + `strh r4,[r0]` para limpar o
+`itemId` quando a quantidade zera.
+
+Essa separação é o que permite o patch da seção 11: em vez de reimplementar o
+slot e o XOR, o patch chama `AddBagItem(4, 99)` — a mesma função que o jogo usa
+ao pegar um item.
 
 ## 10. Números da rodada (sem censo — a reproduzível daqui)
 
@@ -458,7 +475,91 @@ diferentes da mesma imagem.
 
 ---
 
-## 11. O que ainda não sabemos
+## 11. Como modificar o jogo (patch binário verificado)
+
+**O que não é:** não é recompilar o jogo a partir do C levantado. Esse C cobre
+2,76% dos bytes e **não tem os dados** (mapas, gráficos, texto, tabelas de
+encontro); recompilar a partir dele produziria um binário que não é o jogo.
+
+**O que é:** trocar bytes na imagem, com quatro guardas, e executar o resultado
+no emulador antes de afirmar que funcionou.
+
+1. **Montar para o endereço certo.** `bl` e pool de literais são relativos;
+   montar para um endereço e injetar em outro desvia para o lugar errado. O
+   `patch.montar_thumb(codigo, endereco)` exige o destino.
+2. **Exigir o byte esperado.** Todo patch carrega o que espera encontrar.
+   Aplicar num endereço com outro conteúdo (ROM diferente, patch já aplicado) é
+   erro, não aviso. O `esperado` tem de ser uma **constante** — ler da própria
+   imagem torna a conferência tautológica e deixa a segunda aplicação passar
+   (foi um defeito real, corrigido durante este trabalho).
+3. **Injetar só em espaço livre de verdade.** Nesta ROM há **66** sequências de
+   `0xFF` maiores que 32 bytes, e a maioria é padding entre funções ou trecho de
+   gráfico comprimido. O primeiro trecho de 81 bytes fica em `0x081BA4E6`, no
+   meio de dados. Exigindo pelo menos **4 KiB** sobram três: `0x088001C7`
+   (5 242 425 B), `0x08EB0B20` (1 373 408 B) e `0x0871A905` (939 771 B).
+4. **Verificar por emulação.** O stub é executado no unicorn sobre a ROM já
+   patcheada, com `SaveBlock1`, `SaveBlock2` e `gBagPockets` montados à mão, e o
+   efeito é lido **pelas funções do jogo**, não por uma reimplementação.
+
+### 11.1 O exemplo medido: 99 Poké Bolas ao começar o jogo
+
+`ferramentas/aplicar_patch_pokebolas.py`. O hook é `0x08054B06`, o
+`bl ResetBag` dentro de `NewGameInitData` (função `0x08054A60`). O stub chama
+`ResetBag` e depois `AddBagItem(4, 99)`:
+
+```
+10 b5              push {r4, lr}
+7f f5 e8 f4        bl   0x0809A2DC      ; ResetBag
+04 20              movs r0, #4         ; ITEM_POKE_BALL
+63 21              movs r1, #99
+7f f5 b8 f3        bl   0x0809A084      ; AddBagItem
+10 bd              pop  {r4, pc}
+```
+
+| medida | valor |
+|---|---|
+| stub | **16 bytes** em `0x0871A906` |
+| bytes alterados na ROM | **20** (4 no hook + 16 no stub) |
+| sha256 da ROM patcheada | `b2f9f0fa0294f050cf6213b9c1082f68b06637fb59f541d3cf869ad0e4db3945` |
+| complemento do cabeçalho | `0xBD = 0x68`, inalterado e conferido |
+| `itemId` no slot 0 | **4** |
+| quantidade lida por `GetBagItemQuantity` (`0x08099DA0`) | **99** (cifrada `0x561B` com chave `0x12345678`) |
+| `ItemId_GetPocket(4)` | **3** (pocket de Poké Bolas) |
+| outras quatro pockets | nenhum slot com item |
+| segunda aplicação | recusada com "ROM diferente ou patch já aplicado" |
+
+A escolha do ponto importa e está medida: `SetSaveBlocksPointers`
+(`0x0804C058`) roda no **boot**, antes de o save existir, e `ResetBag` zera as
+cinco pockets — escrever antes dele seria sobrescrito. O hook é o **único**
+chamador real de `ResetBag` (o outro candidato, `0x08111374`, é **dado**, não
+código).
+
+### 11.2 O que fica provado — e o que não fica
+
+**Provado por execução:** o stub, rodando sobre a ROM patcheada, zera as cinco
+pockets e grava item 4 / quantidade 99 na pocket de Poké Bolas; a leitura feita
+pela função do jogo devolve 99; `ItemId_GetPocket` classifica o item 4 na pocket
+3; nenhuma outra pocket recebe item; o `bl` do hook aponta para o stub; o
+cabeçalho continua válido; a ROM continua reconhecida como `POKEMON FIRE` /
+`BPRE`.
+
+**Não provado:** (a) que o boot real chegue a `0x08054B06` com
+`gBagPockets[2].itemSlots` apontando para `SaveBlock1+0x430` — é **inferência**
+a partir de `SetBagPocketsPointers`, que roda no boot, mas não foi observada;
+(b) que a tela da bag exiba 99 — a leitura usa a função do jogo, mas não houve
+execução num emulador de console; (c) **nada foi jogado**, nem em emulador de
+GBA, nem no aparelho.
+
+### 11.3 Para fazer outro patch
+
+O ferramental é `gbadecomp/patch.py` (`montar_thumb`, `achar_espaco_livre`,
+`Patch`, `aplicar`, `corrigir_cabecalho`) e o exemplo acima é o molde: achar o
+ponto certo no fluxo, montar um stub que chame funções do jogo, trocar uma
+instrução por um `bl`, verificar por emulação. O que muda de um patch para outro
+é **qual função chamar** e **onde pendurar o salto** — por isso o mapa de
+endereços da seção 9.6.
+
+## 12. O que ainda não sabemos
 
 - **Semântica.** Nenhuma afirmação de que uma função levantada *faz* o que a
   original faz. Só o corpus sintético prova comportamento, e ele é sintético.

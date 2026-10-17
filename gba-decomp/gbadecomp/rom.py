@@ -40,10 +40,19 @@ def looks_like_rom(data: bytes) -> bool:
 
 
 def complement_check(data: bytes) -> bool:
-    """O ultimo byte do cabecalho e o complemento da soma (formula oficial)."""
+    """O ultimo byte do cabecalho e o complemento da soma (formula oficial).
+
+    A soma comeca em 0xA0, NAO em 0x00: os bytes 0x04..0x9F sao o logo da
+    Nintendo e o desvio inicial, e nao entram na conta. Esta funcao somava
+    `data[:0xBD]` (ou seja, 0x00..0xBC) e por isso REPROVAVA o cabecalho desta
+    ROM -- que na verdade esta' correto (`0xBD = 0x68`, soma(0xA0..0xBC)=0x7F,
+    (0x7F + 0x68 + 0x19) & 0xFF == 0). O README chegou a publicar "o complemento
+    nao confere" por causa disto; era o teste que estava errado, nao a imagem.
+    Achado ao construir o patcher, que precisa recalcular esse byte.
+    """
     if len(data) < HEADER_SIZE:
         return False
-    soma = sum(data[:COMPLEMENT_OFFSET]) & 0xFF
+    soma = sum(data[0xA0:COMPLEMENT_OFFSET]) & 0xFF
     return ((soma + data[COMPLEMENT_OFFSET] + 0x19) & 0xFF) == 0
 
 

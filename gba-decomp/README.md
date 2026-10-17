@@ -43,8 +43,9 @@ diz nada sobre qualquer ROM de terceiros.
 Imagem de terceiros (modificada PT-BR), fora do repositorio:
 sha256 `6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae`,
 16 777 216 bytes, titulo `POKEMON FIRE`, codigo `BPRE`. O complemento do cabecalho
-nao confere — esperado numa imagem modificada que nao recalculou o cabecalho, e
-coerente com o `inventory.json` do censo, nao um problema do pipeline.
+**confere** (`0xBD = 0x68`). A versao anterior deste README dizia que nao conferia
+porque a conta do projeto somava `0x00..0xBC` em vez de `0xA0..0xBC` — o erro era
+**do projeto**, nao da ROM (item 23).
 
 | medida | valor |
 |---|---|
@@ -516,6 +517,24 @@ coerente com o `inventory.json` do censo, nao um problema do pipeline.
    primeiro defeito desta lane foi exatamente esse (a parada entrava em
    `nao_levantadas` e `recusas_total` ia para 204).
 
+23. **O complemento do cabecalho estava sendo conferido com a formula errada — e
+   agora existe caminho para MODIFICAR o jogo.** A soma oficial e' a de
+   `0xA0..0xBC`; o projeto somava `0x00..0xBC`, entao reprovava uma ROM valida
+   (`0xBD = 0x68`, soma `0xA0..0xBC` = `0x7F`). Consertado em `rom.complement_check`
+   e em `corpus._cabecalho_gba`. O mesmo trabalho mostrou o que faltava para
+   "mudar e jogar": escrita de bytes, nao so' leitura. `gbadecomp/patch.py`
+   monta Thumb (keystone), exige o byte esperado antes de escrever, recusa
+   sequencia de `0xFF` que seja padding (nesta ROM ha' 66 buracos de `0xFF`
+   maiores que 32 B e so' **3** com mais de 4 KiB) e recalcula o complemento.
+   O exemplo `ferramentas/aplicar_patch_pokebolas.py` troca **uma** instrucao em
+   `NewGameInitData` (`0x08054B06`, o `bl ResetBag`) por um salto para um stub de
+   16 B em `0x0871A906`, que chama `ResetBag` e `AddBagItem(4, 99)`. Resultado
+   medido: **20 bytes diferentes** na ROM, complemento intacto, e a verificacao
+   por emulacao (unicorn, com `SaveBlock1`/`SaveBlock2`/`gBagPockets` montados a
+   mao) le **99** pelo proprio `GetBagItemQuantity` (`0x08099DA0`) e confirma
+   `ItemId_GetPocket(4) = 3`. Aplicar duas vezes e' recusado. Nao foi jogado num
+   emulador de console nem no aparelho — ver a secao "Modificar o jogo".
+
 ### O que isso prova e o que nao prova
 
 Prova: a listagem **nao esta deslocada, nao pulou bytes e nao inventou instrucao**
@@ -662,6 +681,43 @@ nenhuma janela cobriu**, lendo os bytes dos 110 alvos: nenhum tem codigo (item 1
 lista o desmonte de uma faixa mostrando **todas** as funcoes donas de cada
 endereco (o caso que mais confunde).
 
+## Modificar o jogo (patch binario verificado)
+
+Isto **nao** e' recompilar o jogo a partir do C levantado: o C cobre 2,76% dos
+bytes e nao tem os dados (mapas, graficos, texto). O caminho que funciona e'
+patch de bytes, com quatro guardas: montar para o endereco certo (`bl` e' relativo),
+conferir o byte esperado antes de escrever, injetar so' em espaco livre de
+verdade, e executar o resultado no emulador antes de dizer que deu certo.
+
+```bash
+# exemplo: comecar o jogo novo com 99 Poke Balls
+python ferramentas/aplicar_patch_pokebolas.py ROM.gba -o ROM_patch.gba \
+        --json patch_pokebolas.json
+```
+
+O que o script faz, medido nesta ROM:
+
+| passo | numero |
+|---|---|
+| hook | `0x08054B06` (`bl ResetBag` dentro de `NewGameInitData`) |
+| stub | 16 B em `0x0871A906` (primeiro trecho com >= 4 KiB de `0xFF`) |
+| bytes alterados na ROM | **20** (4 do `bl` + 16 do stub) |
+| complemento do cabecalho | `0x68`, inalterado e conferido |
+| verificacao por emulacao | `itemId = 4`, quantidade lida por `GetBagItemQuantity` = **99**, `ItemId_GetPocket(4) = 3` |
+| outras quatro pockets | nenhum slot com item |
+
+O que **nao** esta provado: que o boot real chegue naquele ponto com
+`gBagPockets[2].itemSlots` apontando para `SaveBlock1+0x430` (e' inferencia a
+partir de `SetBagPocketsPointers`, que roda no boot) e que a tela da bag exiba o
+valor — a leitura usa a funcao do jogo, mas nao houve execucao num emulador de
+console nem no aparelho. Nada disso foi jogado.
+
+Para fazer outro patch: o metodo esta na secao 11 do relatorio
+(`RELATORIO_o_que_ja_sabemos.md`) e o mapa de funcoes na secao 9.6 —
+`AddBagItem` `0x0809A084`, `RemoveBagItem` `0x0809A1D8`, `ClearItemSlots`
+`0x0809A274`, `ResetBag` `0x0809A2DC`, `GetBagItemQuantity` `0x08099DA0`,
+`SetBagItemQuantity` `0x08099DBC`.
+
 ## Como usar
 
 ```bash
@@ -701,6 +757,7 @@ Testes: `python -m pytest tests/ -q`
 | `verificador.py` | emulador unicorn + comparação com a verdade-terreno, caso a caso, sem maquiagem |
 | `analise.py` | mede a rodada inteira e grava a evidência; categorias exaustivas conferidas por asserção |
 | `conferir_bytes.py` | remonta cada instrução e compara com o binário (fidelidade de bytes, não semântica) |
+| `patch.py` | monta Thumb, injeta com byte esperado, recusa padding como espaco livre, recalcula o complemento |
 | `reconstruir.py` | junta tudo: disasm → C → compilação → imagem → verificação |
 | `cli.py` | linha de comando (inclui `analisar`: mede e grava a evidência) |
 

@@ -421,7 +421,11 @@ def _cabecalho_gba(titulo: str, codigo: str, entrada: int) -> bytes:
     header[0xB0:0xB2] = b"01"
     header[0xB2] = 0x00                     # complement check (calculado abaixo)
     header[0xB4] = 0x00                     # versao do software
-    soma = sum(header[:0xBD]) & 0xFF
+    # Formula oficial: a soma comeca em 0xA0 (o logo e o ramo inicial ficam de
+    # fora). Antes somava 0x00..0xBC, o que gerava um byte de complemento que
+    # "batia" com o verificador do projeto -- igualmente errado -- e nao com a
+    # especificacao. Achado ao construir o patcher.
+    soma = sum(header[0xA0:0xBD]) & 0xFF
     header[0xBD] = (0x100 - ((soma + 0x19) & 0xFF)) & 0xFF
     return bytes(header)
 
