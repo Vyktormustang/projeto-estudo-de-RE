@@ -272,6 +272,46 @@ Nada disso é falha silenciosa: cada janela carrega a semente no cabeçalho do C
 
 ---
 
+## 9.5. O texto do jogo é legível (charset decifrado)
+
+**[medido]** O texto usa o charset ocidental do Gen 3 e decodifica em português.
+Testado por hipótese e **confirmado pelo contexto** (o texto ao redor sai
+coerente, não aleatório):
+
+| byte | carácter |
+|---|---|
+| `0xBB`–`0xD4` | `A`–`Z` |
+| `0xD5`–`0xEE` | `a`–`z` |
+| `0x00` | espaço |
+| `0x1B` | `é` |
+| `0x17` | `á` · `0x1C` `ê` · `0xF4` `ã` |
+| `0xAD` `.` · `0xB8` `,` · `0xAB` `!` · `0xAC` `?` | pontuação |
+| `0xFE` | quebra de linha · `0xFB` novo bloco · `0xFF` fim da string |
+
+Exemplo real em `0x081B44A4`:
+
+```
+éMON selvagem escapa da<FE>POKé BALL, é porque ainda está<FE>muito forte…
+```
+
+E em `0x08176460`:
+
+```
+EQUIPE ROCKET está atrás da MASTER BOLA, é a melhor POKé BOLA.
+```
+
+Isto é o primeiro pedaço de **semântica** que o levantamento conseguiu: até
+aqui só havia estrutura. Ele não diz nada sobre a bag, mas dá o instrumento para
+chegar lá — achar a tabela de nomes de item e o código que a indexa.
+
+**[medido] O que ainda falta para "onde mudar a quantidade de Poké Bolas":**
+a bag não é constante de ROM. Ela vive na RAM (bloco de save), alcançada por
+**ponteiro em RAM**, e o código só tem offsets relativos a esse ponteiro. Uma
+anotação antiga dizia "bolsa = `0x020258B8`"; conferido agora, **esse literal
+não aparece nenhuma vez na imagem** (0 ocorrências de `B8 58 02 02`) — está
+descartado. Sem executar o jogo ou sem uma referência externa de símbolos, o
+endereço absoluto não sai do estático.
+
 ## 10. Números da rodada (sem censo — a reproduzível daqui)
 
 | medida | valor |
