@@ -90,3 +90,52 @@ Ela **pode sumir** com o ambiente: rebaixar do Drive (`14JCEJp6LFgdkzKMOtI5-l3Xv
    (o `0x3E7` pode aparecer em mais de um pool; aqui só `0x0809A0D8` usa `0x0809A0E4`).
 3. Fim do trabalho: consolidar tudo em `RELATORIO` (§11 cresce) e `README`;
    aí sim atualizar o corpo do PR com o resumo.
+
+## 12. O bug que explicava "o hook nao roda" (2026-10-17)
+
+**Sintoma**: hooks em `0x08054B06` (NewGameInitData) e no prologo de
+`ResetBag 0x0809A2DC` nunca incrementavam o contador. A conclusao anterior --
+"esses pontos nao executam" -- estava **incompleta**: o contador tambem nunca
+subiria se o stub carregasse o endereco errado.
+
+**Causa**: o keystone 0.9.2 monta `ldr rX, =VALOR` com deslocamento errado
+quando ha' **mais de um** literal no bloco. Medido, dissecando o stub gerado:
+
+```
+0871A908: 064c   ldr r4, [pc, #0x18]   -> 0x0203FFF0   OK
+0871A90A: 0748   ldr r0, [pc, #0x1c]   -> 0x05000020   ERRADO (queria 0xDEADBEEF)
+0871A90E: 0748   ldr r0, [pc, #0x1c]   -> 0x12345678   ERRADO (queria 0x05000020)
+0871A910: 0749   ldr r1, [pc, #0x1c]   -> 0x34123412   ERRADO (queria 0x12345678)
+```
+
+Nao ha' erro de montagem: a ROM boota e o stub escreve no lugar errado, em
+silencio. O stub de poke bolas usava **quatro** literais -- todos depois do
+primeiro caíam no literal seguinte.
+
+**Correcao**: `patch.montar_thumb_literais()` substitui cada `ldr rX, =VALOR`
+por um `ldr rX, [pc, #0]` de 2 bytes, monta o corpo, calcula o pool **por
+conta propria** e **confere por desmontagem** antes de devolver. Erro de
+literal agora e' excecao, nao surpresa. 5 testes em `tests/test_patch.py`
+cobrem: 1 literal, 3 literais, endereco 2-mod-4, sem literal, e `bl` de 4
+bytes no meio (que nao pode ser confundido com marcador).
+
+Detalhe que custou tempo: o `ldr` literal do Thumb usa `Align(PC,4)`, nao
+`(PC+4)&~2`. Com alinhamento de 2 o deslocamento sai 10 (nao divisivel por 4).
+
+**Prova de que injecao funciona** (`rom_plumb3` -> `probe_reset2`): o branch de
+reset em `0x08000000` foi redirecionado para um stub ARM em espaco livre
+(`0x0871A908`) que incrementa `0x02037F00` e trava com `b .`. Resultado lido do
+emulador: **contador = 1** e CPU travada por 90 quadros. Primeira prova dura de
+que codigo injetado em espaco livre executa nesta ROM.
+
+**Armadilha que mascarou tudo antes**: `0x02037F00` e' EWRAM e o init do jogo
+faz memset nela. Contador escrito antes do init **volta a zero**. Para
+instrumentar o boot, o stub tem de travar a CPU (`b .`) depois de contar, ou
+usar endereco que o init nao zera.
+
+**O que isso reabre**: `0x08054B06` continua sem contador mesmo com stub
+correto (medido com `rom_cnt.gba`), entao *esse* ponto segue nao executado.
+Mas `ResetBag` tem **dois** chamadores -- `0x08054B06` e `0x08111374` -- e os 6
+chamadores de `ClearItemSlots` foram instrumentados juntos em `rom_quem.gba`:
+nenhum contador subiu no fluxo de jogo novo. A bag e' inicializada por outro
+caminho, ainda nao localizado.

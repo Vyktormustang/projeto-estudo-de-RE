@@ -19,6 +19,7 @@ O que este modulo NAO faz: dizer se o patch e' uma boa ideia. Ele obedece.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from keystone import KS_ARCH_ARM, KS_MODE_THUMB, Ks, KsError
@@ -86,6 +87,92 @@ def montar_thumb(codigo: str, endereco: int) -> bytes:
     if not bruto:
         raise ErroDePatch("o assembler nao gerou byte nenhum")
     return bytes(bruto)
+
+
+def montar_thumb_literais(codigo: str, endereco: int) -> bytes:
+    """Monta `codigo` Thumb e anexa o pool de literais com deslocamento CERTO.
+
+    Por que nao usar `montar_thumb` direto com `ldr rX, =VALOR`: o keystone
+    0.9.2 erra o deslocamento quando ha' mais de um literal. Medido nesta
+    maquina: num stub com seis `ldr rX, =VALOR`, o primeiro aponta certo e do
+    segundo em diante o `ldr` cai 4 bytes depois do literal, carregando o
+    valor do literal seguinte. O sintoma e' cruel -- o codigo monta, o `bl`
+    aponta certo, a ROM boota, e o stub escreve no endereco errado sem dar
+    erro nenhum. Foi assim que um contador de depuracao marcou zero num ponto
+    que rodava, e que um patch de item pareceu nao funcionar.
+
+    Aqui cada `ldr rX, =VALOR` vira um `ldr rX, [pc, #0]` (2 bytes), o corpo
+    e' montado, e depois o deslocamento de cada um e' calculado por nos a
+    partir do endereco do pool. O resultado e' conferido por desmontagem: se
+    algum `ldr` nao apontar para o literal pretendido, levanta `ErroDePatch`
+    em vez de devolver codigo silenciosamente errado.
+    """
+    padrao = re.compile(r"^\s*ldr\s+(r\d+)\s*,\s*=\s*(0[xX][0-9a-fA-F]+|\d+)\s*$",
+                        re.MULTILINE)
+    valores: list[int] = [int(m.group(2), 0) for m in padrao.finditer(codigo)]
+    corpo = padrao.sub(lambda m: f"ldr {m.group(1)}, [pc, #0]", codigo)
+    bruto = bytearray(montar_thumb(corpo, endereco))
+    if not valores:
+        return bytes(bruto)
+    while (endereco + len(bruto)) % 4:
+        bruto.append(0)
+    pool = endereco + len(bruto)
+    posicoes = _posicoes_de_ldr_pc(bruto)
+    if len(posicoes) != len(valores):
+        raise ErroDePatch(
+            f"esperava {len(valores)} carregamentos de literal, achei "
+            f"{len(posicoes)}: o codigo mudou de forma inesperada")
+    for ordem, deslocamento in enumerate(posicoes):
+        base_pc = (endereco + deslocamento + 4) & ~3
+        salto = (pool + 4 * ordem - base_pc)
+        if salto % 4 or not 0 <= salto // 4 <= 0xFF:
+            raise ErroDePatch(
+                f"literal {ordem} fora do alcance do `ldr` em "
+                f"0x{endereco + deslocamento:08X} (deslocamento {salto})")
+        metade = bruto[deslocamento] | (bruto[deslocamento + 1] << 8)
+        metade = (metade & 0xFF00) | (salto // 4)
+        bruto[deslocamento] = metade & 0xFF
+        bruto[deslocamento + 1] = metade >> 8
+    for valor in valores:
+        bruto += valor.to_bytes(4, "little")
+    _conferir_literais(bytes(bruto), endereco, valores, len(bruto) - 4 * len(valores))
+    return bytes(bruto)
+
+
+def _posicoes_de_ldr_pc(codigo: bytes) -> list[int]:
+    """Offsets dos `ldr rX, [pc, #0]` -- os marcadores que deixamos no corpo."""
+    posicoes: list[int] = []
+    indice = 0
+    while indice < len(codigo) - 1:
+        metade = codigo[indice] | (codigo[indice + 1] << 8)
+        if (metade & 0xF800) == 0x4800 and (metade & 0xFF) == 0:
+            posicoes.append(indice)
+            indice += 2
+            continue
+        indice += 4 if (metade & 0xF800) == 0xF000 else 2
+    return posicoes
+
+
+def _conferir_literais(codigo: bytes, endereco: int, valores: list[int],
+                       limite: int) -> None:
+    """Desmonta o corpo e confere que cada `ldr pc-relativo` carrega o valor querido.
+
+    `limite` e' o offset onde o pool comeca: sem ele, um literal que por acaso
+    tenha o padrao de `ldr` seria contado como instrucao.
+    """
+    achados = []
+    indice = 0
+    while indice < limite - 1:
+        metade = codigo[indice] | (codigo[indice + 1] << 8)
+        if (metade & 0xF800) == 0x4800:
+            base_pc = (endereco + indice + 4) & ~3
+            alvo = base_pc - endereco + (metade & 0xFF) * 4
+            achados.append(int.from_bytes(codigo[alvo:alvo + 4], "little"))
+            indice += 2
+            continue
+        indice += 4 if (metade & 0xF800) == 0xF000 else 2
+    if achados != valores:
+        raise ErroDePatch(f"literais resolvidos errado: {achados} != {valores}")
 
 
 def achar_espaco_livre(imagem: bytes, tamanho: int, alinhamento: int = 2,

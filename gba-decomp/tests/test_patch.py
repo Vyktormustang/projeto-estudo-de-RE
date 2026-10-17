@@ -191,3 +191,70 @@ def test_manifesto_aplica_e_recalcula_o_cabecalho():
     assert nova[0x100:0x102] == b"\xc8\x00"
     assert nova[0xBD] == patch.complemento_correto(bytes(dados))
     assert len(patches) == 1
+
+
+# --- montar_thumb_literais: o bug do pool de literais do keystone ---------
+#
+# Historia, porque o teste sozinho nao conta: o keystone 0.9.2 monta
+# `ldr rX, =VALOR` com o deslocamento errado quando ha' mais de um literal no
+# mesmo bloco. O primeiro aponta certo e do segundo em diante o `ldr` carrega
+# o valor do literal SEGUINTE. Isso nao da' erro de montagem, o `bl` do hook
+# aponta certo, a ROM boota -- e o stub escreve no lugar errado. Foi assim que
+# um contador de depuracao marcou zero num ponto que rodava de fato.
+#
+# Por isso os testes abaixo desmontam o resultado em vez de comparar bytes:
+# comparar com o que o proprio keystone produziria seria tautologico.
+
+def _literal_carregado(codigo, endereco, indice_da_instrucao):
+    """Valor que o `ldr rX, [pc, #N]` em `indice_da_instrucao` carrega."""
+    metade = codigo[indice_da_instrucao] | (codigo[indice_da_instrucao + 1] << 8)
+    assert (metade & 0xF800) == 0x4800, "nao e' ldr pc-relativo"
+    base = (endereco + indice_da_instrucao + 4) & ~3
+    alvo = base - endereco + (metade & 0xFF) * 4
+    return int.from_bytes(codigo[alvo:alvo + 4], "little")
+
+
+def test_montar_thumb_literais_um_literal():
+    codigo = patch.montar_thumb_literais(
+        "ldr r0, =0x02037F00\nbx lr\n", 0x0871A906)
+    assert _literal_carregado(codigo, 0x0871A906, 0) == 0x02037F00
+
+
+def test_montar_thumb_literais_varios_literais_cadam_um_no_seu():
+    """O caso que o keystone erra: 3 literais no mesmo bloco."""
+    codigo = patch.montar_thumb_literais(
+        "push {r4, lr}\n"
+        "ldr r0, =0x03005008\n"
+        "ldr r1, =0x00000430\n"
+        "ldr r2, =0x0300500C\n"
+        "pop {r4, pc}\n", 0x0871A906)
+    assert _literal_carregado(codigo, 0x0871A906, 2) == 0x03005008
+    assert _literal_carregado(codigo, 0x0871A906, 4) == 0x00000430
+    assert _literal_carregado(codigo, 0x0871A906, 6) == 0x0300500C
+
+
+def test_montar_thumb_literais_endereco_impar_desloca_o_pool():
+    """Stub em endereco 2-mod-4: o pool tem de ficar alinhado em 4 absoluto."""
+    for base in (0x0871A906, 0x0871A908, 0x0871A90A):
+        codigo = patch.montar_thumb_literais(
+            "ldr r0, =0x02037F00\nldr r1, =0xCAFEBABE\nbx lr\n", base)
+        assert _literal_carregado(codigo, base, 0) == 0x02037F00, hex(base)
+        assert _literal_carregado(codigo, base, 2) == 0xCAFEBABE, hex(base)
+        assert (base + len(codigo) - 8) % 4 == 0
+
+
+def test_montar_thumb_literais_sem_literal_nao_muda_nada():
+    puro = patch.montar_thumb("movs r0, #1\nbx lr", 0x0871A906)
+    assert patch.montar_thumb_literais("movs r0, #1\nbx lr", 0x0871A906) == puro
+
+
+def test_montar_thumb_literais_com_bl_preserva_o_desvio():
+    """O `bl` de 4 bytes nao pode ser confundido com um marcador de literal."""
+    codigo = patch.montar_thumb_literais(
+        "push {r4, lr}\nbl 0x0809A2DC\nldr r0, =0x02037F00\n"
+        "pop {r4, pc}\n", 0x0871A906)
+    import capstone
+    cs = capstone.Cs(capstone.CS_ARCH_ARM, capstone.CS_MODE_THUMB)
+    saltos = [i for i in cs.disasm(codigo, 0x0871A906) if i.mnemonic == "bl"]
+    assert len(saltos) == 1
+    assert saltos[0].op_str == "#0x809a2dc"

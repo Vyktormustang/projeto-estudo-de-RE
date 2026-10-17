@@ -54,10 +54,34 @@ POCKET_POKE_BALLS = 2     # indice 0-based: 3 - 1
 ITEM_POKE_BALL = 4
 QUANTIDADE = 99
 
-# O stub NAO reimplementa o formato do slot: chama `AddBagItem`, a mesma
-# funcao que o jogo usa ao pegar um item. Assim a cifra da quantidade e a
-# escolha do slot ficam com o proprio jogo.
-STUB = f"""
+# Dois caminhos, porque o emulador de console mostrou que a diferenca importa:
+#
+#  - "saveblock" (PADRAO): escreve em `[gSaveBlock1Ptr] + 0x430`, que e' o
+#    endereco da pocket de Poke Balls. `gSaveBlock1Ptr` e' valido desde o boot.
+#  - "pockets": chama `AddBagItem`, que e' mais elegante mas depende de
+#    `gBagPockets[]` ja' estar apontado -- e nao estava quando o hook rodou
+#    (medido: as 5 pockets so' aparecem preenchidas ~4 000 quadros depois).
+STUB_SAVEBLOCK = f"""
+push {{r4, lr}}
+bl 0x{RESET_BAG:08X}
+ldr r0, =0x{G_SAVE_BLOCK1_PTR:08X}
+ldr r0, [r0]
+ldr r1, =0x00000430
+adds r0, r0, r1
+movs r1, #{ITEM_POKE_BALL}
+strh r1, [r0]
+ldr r2, =0x{G_SAVE_BLOCK2_PTR:08X}
+ldr r2, [r2]
+movs r3, #0xF2
+lsls r3, r3, #4
+ldr r2, [r2, r3]
+movs r1, #{QUANTIDADE}
+eors r1, r2
+strh r1, [r0, #2]
+pop {{r4, pc}}
+"""
+
+STUB_POCKETS = f"""
 push {{r4, lr}}
 bl 0x{RESET_BAG:08X}
 movs r0, #{ITEM_POKE_BALL}
@@ -67,10 +91,13 @@ pop {{r4, pc}}
 """
 
 
-def aplicar_na_rom(imagem: bytes) -> tuple[bytes, int, list[patch.Patch]]:
+def aplicar_na_rom(imagem: bytes, via: str = "saveblock") -> tuple[bytes, int, list[patch.Patch]]:
     """Monta e injeta o patch; devolve (imagem nova, endereco do stub, patches)."""
+    if via not in ("saveblock", "pockets"):
+        raise patch.ErroDePatch(f"via desconhecida: {via}")
+    texto_stub = STUB_SAVEBLOCK if via == "saveblock" else STUB_POCKETS
     endereco_stub = patch.achar_espaco_livre(imagem, 64)
-    codigo = patch.montar_thumb(STUB, endereco_stub)
+    codigo = patch.montar_thumb_literais(texto_stub, endereco_stub)
     salto = patch.montar_thumb(f"bl 0x{endereco_stub:08X}", HOOK)
     if len(salto) != 4:
         raise patch.ErroDePatch(f"o bl do hook saiu com {len(salto)} bytes, esperado 4")
