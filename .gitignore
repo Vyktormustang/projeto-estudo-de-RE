@@ -1,0 +1,12 @@
+# Ambiente virtual usado para rodar os testes do projeto
+# universal-adaptive-ai-optimizer (pytest). Nao versionar: recriar com
+#   python3 -m venv .venv && .venv/bin/pip install pytest
+.venv/
+__pycache__/
+*.pyc
+
+# ROM do usuario: nunca versionar (fica fora do repositorio, em /home/user/gba-re/*)
+*.gba
+
+# nenhuma imagem de ROM pode entrar no repositorio (imagem de terceiros)
+gba-decomp/**/*.gba

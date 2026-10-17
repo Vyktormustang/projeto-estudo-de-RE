@@ -1,0 +1,511 @@
+{
+  "suite_id": "calc_v1",
+  "version": "1.0.0",
+  "description": "Calculos verificaveis; contrato JSON + arredondamento. Sem juiz LLM: o numero esperado e calculado.",
+  "cases": [
+    {
+      "id": "calc-00",
+      "input": "kind=calc\nexpr=12*7+3\ntext=Calcule 12*7+3 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 87.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=87.0; esperado na saida=87.0"
+    },
+    {
+      "id": "calc-01",
+      "input": "kind=calc\nexpr=45+67\ntext=Calcule 45+67 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 112.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:val",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=112.0; esperado na saida=112.0"
+    },
+    {
+      "id": "calc-02",
+      "input": "kind=calc\nexpr=144/12\ntext=Calcule 144/12 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 12.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=12.0; esperado na saida=12.0"
+    },
+    {
+      "id": "calc-03",
+      "input": "kind=calc\nexpr=7*8-6\ntext=Calcule 7*8-6 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 50.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:holdout",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=50.0; esperado na saida=50.0"
+    },
+    {
+      "id": "calc-04",
+      "input": "kind=calc\nexpr=100-37\ntext=Calcule 100-37 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 63.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=63.0; esperado na saida=63.0"
+    },
+    {
+      "id": "calc-05",
+      "input": "kind=calc\nexpr=9*9\ntext=Calcule 9*9 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 81.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:val",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=81.0; esperado na saida=81.0"
+    },
+    {
+      "id": "calc-06",
+      "input": "kind=calc\nexpr=250+125\ntext=Calcule 250+125 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 375.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=375.0; esperado na saida=375.0"
+    },
+    {
+      "id": "calc-07",
+      "input": "kind=calc\nexpr=2**10\ntext=Calcule 2**10 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 1024.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=1024.0; esperado na saida=1024.0"
+    },
+    {
+      "id": "calc-08",
+      "input": "kind=calc\nexpr=100/3\ntext=Calcule 100/3 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 33.33,
+          "params": {
+            "tolerance": 0.005
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "2"
+        }
+      },
+      "tags": [
+        "split:val",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.5,
+      "note": "valor exato=33.333333333333336; esperado na saida=33.33 (exige arredondamento em 2 casas)"
+    },
+    {
+      "id": "calc-09",
+      "input": "kind=calc\nexpr=10/4\ntext=Calcule 10/4 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 2.5,
+          "params": {
+            "tolerance": 0.005
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "2"
+        }
+      },
+      "tags": [
+        "split:holdout",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=2.5; esperado na saida=2.5 (exige arredondamento em 2 casas)"
+    },
+    {
+      "id": "calc-10",
+      "input": "kind=calc\nexpr=22/7\ntext=Calcule 22/7 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 3.14,
+          "params": {
+            "tolerance": 0.005
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "2"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.5,
+      "note": "valor exato=3.142857142857143; esperado na saida=3.14 (exige arredondamento em 2 casas)"
+    },
+    {
+      "id": "calc-11",
+      "input": "kind=calc\nexpr=1/3\ntext=Calcule 1/3 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 0.33,
+          "params": {
+            "tolerance": 0.005
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "2"
+        }
+      },
+      "tags": [
+        "split:val",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.5,
+      "note": "valor exato=0.3333333333333333; esperado na saida=0.33 (exige arredondamento em 2 casas)"
+    },
+    {
+      "id": "calc-12",
+      "input": "kind=calc\nexpr=(15+45)/7\ntext=Calcule (15+45)/7 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 8.57,
+          "params": {
+            "tolerance": 0.005
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "2"
+        }
+      },
+      "tags": [
+        "split:train",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=8.571428571428571; esperado na saida=8.57 (exige arredondamento em 2 casas)"
+    },
+    {
+      "id": "calc-13",
+      "input": "kind=calc\nexpr=8*12.5\ntext=Calcule 8*12.5 e informe o resultado.",
+      "grader": "composite",
+      "expected": [
+        {
+          "grader": "json_fields",
+          "expected": {
+            "resultado": "<number>"
+          },
+          "weight": 3.0
+        },
+        {
+          "grader": "numeric_exact",
+          "expected": 100.0,
+          "params": {
+            "tolerance": 1e-09
+          },
+          "weight": 1.0
+        }
+      ],
+      "params": {
+        "target_policy": {
+          "OUTPUT_FORMAT": "json_object",
+          "ROUND_DECIMALS": "as_is"
+        }
+      },
+      "tags": [
+        "split:holdout",
+        "calculo",
+        "verificavel"
+      ],
+      "critical": false,
+      "weight": 1.0,
+      "note": "valor exato=100.0; esperado na saida=100.0"
+    }
+  ]
+}

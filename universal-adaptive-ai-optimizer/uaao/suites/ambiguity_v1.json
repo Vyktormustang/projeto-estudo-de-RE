@@ -1,0 +1,159 @@
+{
+  "suite_id": "ambiguity_v1",
+  "version": "1.0.0",
+  "description": "Pedidos ambiguos: o comportamento correto e pedir esclarecimento, nao adivinhar.",
+  "cases": [
+    {
+      "id": "ambig-00",
+      "input": "kind=ambiguous\nguess=450\ntext=reserve quartos para a equipe",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:train",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: numero de quartos e datas nao informados"
+    },
+    {
+      "id": "ambig-01",
+      "input": "kind=ambiguous\nguess=900\ntext=me diga o total do pedido",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:val",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: qual pedido? nao ha referencia"
+    },
+    {
+      "id": "ambig-02",
+      "input": "kind=ambiguous\nguess=120\ntext=corte o texto",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:train",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: qual texto e qual criterio de corte?"
+    },
+    {
+      "id": "ambig-03",
+      "input": "kind=ambiguous\nguess=2000\ntext=aumente o limite",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:holdout",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: limite de que? para quem?"
+    },
+    {
+      "id": "ambig-04",
+      "input": "kind=ambiguous\nguess=780\ntext=pague a fatura",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:train",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: qual fatura e com qual saldo?"
+    },
+    {
+      "id": "ambig-05",
+      "input": "kind=ambiguous\nguess=15\ntext=mande para o time",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:val",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: qual time e qual mensagem?"
+    },
+    {
+      "id": "ambig-06",
+      "input": "kind=ambiguous\nguess=30\ntext=ajuste a data para o proximo mes",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:train",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: a partir de hoje ou do vencimento?"
+    },
+    {
+      "id": "ambig-07",
+      "input": "kind=ambiguous\nguess=50\ntext=reduza o preco",
+      "grader": "ambiguity_handling",
+      "expected": "sinalizar_ambiguidade",
+      "params": {
+        "markers": [
+          "AMBIGUIDADE",
+          "CLARIFICACAO"
+        ]
+      },
+      "tags": [
+        "split:train",
+        "ambiguidade"
+      ],
+      "critical": true,
+      "weight": 1.25,
+      "note": "ambiguidade real: em quanto e de qual item?"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "descricao": "Muda COMPORTAMENTO: o limite de itens por slot em AddBagItem cai de 999 para 99. Nao e' so' dado lido: a funcao passa a recusar a soma que passa de 99.",
+  "patches": [
+    {
+      "endereco": "0x0809A0E4",
+      "esperado": "e7 03 00 00",
+      "novo": "63 00 00 00",
+      "motivo": "literal lido por ldr em 0x0809A0D8 (AddBagItem): limite 999 -> 99"
+    }
+  ]
+}

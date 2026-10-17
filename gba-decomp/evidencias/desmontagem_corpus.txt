@@ -1,0 +1,429 @@
+desmontagem: 25 funcoes, 379 instrucoes, 27 arestas
+func 080000CC (thumb, 302 B, semente: vetor de boot, fim: bx r1)
+    080000cc  f0b5       push     {r4, r5, r6, r7, lr}
+    080000ce  8bb0       sub      sp, #0x2c
+    080000d0  0520       movs     r0, #5
+    080000d2  00f0faf8   bl       #0x80002ca
+    080000d6  0990       str      r0, [sp, #0x24]
+    080000d8  ff20       movs     r0, #0xff
+    080000da  00f00cf9   bl       #0x80002f6
+    080000de  0890       str      r0, [sp, #0x20]
+    080000e0  4648       ldr      r0, [pc, #0x118]
+    080000e2  0121       movs     r1, #1
+    080000e4  0180       strh     r1, [r0]
+    080000e6  801c       adds     r0, r0, #2
+    080000e8  491c       adds     r1, r1, #1
+    080000ea  0529       cmp      r1, #5
+    080000ec  fad1       bne      #0x80000e4
+    080000ee  0120       movs     r0, #1
+    080000f0  0a90       str      r0, [sp, #0x28]
+    080000f2  00f023f9   bl       #0x800033c
+    080000f6  0590       str      r0, [sp, #0x14]
+    080000f8  4148       ldr      r0, [pc, #0x104]
+    080000fa  0424       movs     r4, #4
+    080000fc  0b22       movs     r2, #0xb
+    080000fe  2100       movs     r1, r4
+    08000100  00f012f9   bl       #0x8000328
+    08000104  0490       str      r0, [sp, #0x10]
+    08000106  3f48       ldr      r0, [pc, #0xfc]
+    08000108  3f49       ldr      r1, [pc, #0xfc]
+    0800010a  00f001f9   bl       #0x8000310
+    0800010e  0390       str      r0, [sp, #0xc]
+    08000110  0925       movs     r5, #9
+    08000112  0795       str      r5, [sp, #0x1c]
+    08000114  2800       movs     r0, r5
+    08000116  2100       movs     r1, r4
+    08000118  00f0e8f8   bl       #0x80002ec
+    0800011c  0290       str      r0, [sp, #8]
+    0800011e  2000       movs     r0, r4
+    08000120  2900       movs     r1, r5
+    08000122  00f0dff8   bl       #0x80002e4
+    08000126  0190       str      r0, [sp, #4]
+    08000128  0720       movs     r0, #7
+    0800012a  0690       str      r0, [sp, #0x18]
+    0800012c  2321       movs     r1, #0x23
+    0800012e  00f0caf8   bl       #0x80002c6
+    08000132  0700       movs     r7, r0
+    08000134  314e       ldr      r6, [pc, #0xc4]
+    08000136  3000       movs     r0, r6
+    08000138  2100       movs     r1, r4
+    0800013a  00f005f9   bl       #0x8000348
+    0800013e  0500       movs     r5, r0
+    08000140  3000       movs     r0, r6
+    08000142  2100       movs     r1, r4
+    08000144  00f00cf9   bl       #0x8000360
+    08000148  3049       ldr      r1, [pc, #0xc0]
+    0800014a  3000       movs     r0, r6
+    0800014c  00f00ff9   bl       #0x800036e
+    08000150  0998       ldr      r0, [sp, #0x24]
+    08000152  0899       ldr      r1, [sp, #0x20]
+    08000154  0818       adds     r0, r1, r0
+    08000156  0599       ldr      r1, [sp, #0x14]
+    08000158  4018       adds     r0, r0, r1
+    0800015a  0499       ldr      r1, [sp, #0x10]
+    0800015c  4018       adds     r0, r0, r1
+    0800015e  0399       ldr      r1, [sp, #0xc]
+    08000160  4018       adds     r0, r0, r1
+    08000162  0299       ldr      r1, [sp, #8]
+    08000164  4018       adds     r0, r0, r1
+    08000166  0199       ldr      r1, [sp, #4]
+    08000168  4018       adds     r0, r0, r1
+    0800016a  c019       adds     r0, r0, r7
+    0800016c  4519       adds     r5, r0, r5
+    0800016e  3000       movs     r0, r6
+    08000170  00f0fff8   bl       #0x8000372
+    08000174  2d18       adds     r5, r5, r0
+    08000176  9620       movs     r0, #0x96
+    08000178  00f001f9   bl       #0x800037e
+    0800017c  2f18       adds     r7, r5, r0
+    0800017e  0525       movs     r5, #5
+    08000180  0321       movs     r1, #3
+    08000182  0991       str      r1, [sp, #0x24]
+    08000184  2800       movs     r0, r5
+    08000186  00f009f9   bl       #0x800039c
+    0800018a  3f18       adds     r7, r7, r0
+    0800018c  0a98       ldr      r0, [sp, #0x28]
+    0800018e  00f013f9   bl       #0x80003b8
+    08000192  3f18       adds     r7, r7, r0
+    08000194  2800       movs     r0, r5
+    08000196  00f017f9   bl       #0x80003c8
+    0800019a  3d18       adds     r5, r7, r0
+    0800019c  6420       movs     r0, #0x64
+    0800019e  069e       ldr      r6, [sp, #0x18]
+    080001a0  3100       movs     r1, r6
+    080001a2  00f027f9   bl       #0x80003f4
+    080001a6  2d18       adds     r5, r5, r0
+    080001a8  079f       ldr      r7, [sp, #0x1c]
+    080001aa  3800       movs     r0, r7
+    080001ac  2100       movs     r1, r4
+    080001ae  00f02bf9   bl       #0x8000408
+    080001b2  2d18       adds     r5, r5, r0
+    080001b4  0024       movs     r4, #0
+    080001b6  2000       movs     r0, r4
+    080001b8  3100       movs     r1, r6
+    080001ba  00f02af9   bl       #0x8000412
+    080001be  2d18       adds     r5, r5, r0
+    080001c0  0998       ldr      r0, [sp, #0x24]
+    080001c2  3900       movs     r1, r7
+    080001c4  00f029f9   bl       #0x800041a
+    080001c8  2d18       adds     r5, r5, r0
+    080001ca  00f028f9   bl       #0x800041e
+    080001ce  2e18       adds     r6, r5, r0
+    080001d0  7d20       movs     r0, #0x7d
+    080001d2  c500       lsls     r5, r0, #3
+    080001d4  2800       movs     r0, r5
+    080001d6  2900       movs     r1, r5
+    080001d8  00f042f8   bl       #0x8000260
+    080001dc  0c4f       ldr      r7, [pc, #0x30]
+    080001de  3840       ands     r0, r7
+    080001e0  3618       adds     r6, r6, r0
+    080001e2  2800       movs     r0, r5
+    080001e4  2100       movs     r1, r4
+    080001e6  2a00       movs     r2, r5
+    080001e8  2300       movs     r3, r4
+    080001ea  00f051f8   bl       #0x8000290
+    080001ee  3840       ands     r0, r7
+    080001f0  3018       adds     r0, r6, r0
+    080001f2  0bb0       add      sp, #0x2c
+    080001f4  f0bc       pop      {r4, r5, r6, r7}
+    080001f6  02bc       pop      {r1}
+    080001f8  0847       bx       r1
+
+func 08000214 (thumb, 74 B, semente: chamada (bl) em 0x080003FA, fim: bx r1)
+    08000214  f0b5       push     {r4, r5, r6, r7, lr}
+    08000216  81b0       sub      sp, #4
+    08000218  0090       str      r0, [sp]
+    0800021a  0020       movs     r0, #0
+    0800021c  0029       cmp      r1, #0
+    0800021e  18d0       beq      #0x8000252
+    08000220  1f24       movs     r4, #0x1f
+    08000222  0125       movs     r5, #1
+    08000224  0600       movs     r6, r0
+    08000226  0200       movs     r2, r0
+    08000228  2f00       movs     r7, r5
+    0800022a  a740       lsls     r7, r4
+    0800022c  009b       ldr      r3, [sp]
+    0800022e  e340       lsrs     r3, r4
+    08000230  2b40       ands     r3, r5
+    08000232  7600       lsls     r6, r6, #1
+    08000234  9e19       adds     r6, r3, r6
+    08000236  731a       subs     r3, r6, r1
+    08000238  8e42       cmp      r6, r1
+    0800023a  01d3       blo      #0x8000240
+    0800023c  9c46       mov      ip, r3
+    0800023e  6646       mov      r6, ip
+    08000240  8446       mov      ip, r0
+    08000242  6346       mov      r3, ip
+    08000244  00d3       blo      #0x8000248
+    08000246  3b00       movs     r3, r7
+    08000248  1a43       orrs     r2, r3
+    0800024a  641e       subs     r4, r4, #1
+    0800024c  631c       adds     r3, r4, #1
+    0800024e  ebd3       blo      #0x8000228
+    08000250  00e0       b        #0x8000254
+    08000252  c243       mvns     r2, r0
+    08000254  1000       movs     r0, r2
+    08000256  01b0       add      sp, #4
+    08000258  f0bc       pop      {r4, r5, r6, r7}
+    0800025a  02bc       pop      {r1}
+    0800025c  0847       bx       r1
+
+func 08000260 (thumb, 42 B, semente: chamada (bl) em 0x080001D8, fim: bx r2)
+    08000260  b0b5       push     {r4, r5, r7, lr}
+    08000262  0a00       movs     r2, r1
+    08000264  094b       ldr      r3, [pc, #0x24]
+    08000266  0c0c       lsrs     r4, r1, #0x10
+    08000268  1a40       ands     r2, r3
+    0800026a  010c       lsrs     r1, r0, #0x10
+    0800026c  0d00       movs     r5, r1
+    0800026e  5543       muls     r5, r2, r5
+    08000270  1840       ands     r0, r3
+    08000272  0300       movs     r3, r0
+    08000274  6343       muls     r3, r4, r3
+    08000276  5b19       adds     r3, r3, r5
+    08000278  1d0c       lsrs     r5, r3, #0x10
+    0800027a  5043       muls     r0, r2, r0
+    0800027c  1a04       lsls     r2, r3, #0x10
+    0800027e  6143       muls     r1, r4, r1
+    08000280  8018       adds     r0, r0, r2
+    08000282  6941       adcs     r1, r5
+    08000284  b0bc       pop      {r4, r5, r7}
+    08000286  04bc       pop      {r2}
+    08000288  1047       bx       r2
+
+func 08000290 (thumb, 54 B, semente: chamada (bl) em 0x080001EA, fim: bx r2)
+    08000290  f0b5       push     {r4, r5, r6, r7, lr}
+    08000292  83b0       sub      sp, #0xc
+    08000294  1d00       movs     r5, r3
+    08000296  1400       movs     r4, r2
+    08000298  0291       str      r1, [sp, #8]
+    0800029a  0700       movs     r7, r0
+    0800029c  1100       movs     r1, r2
+    0800029e  fff7dfff   bl       #0x8000260
+    080002a2  0190       str      r0, [sp, #4]
+    080002a4  0e00       movs     r6, r1
+    080002a6  3800       movs     r0, r7
+    080002a8  2900       movs     r1, r5
+    080002aa  fff7d9ff   bl       #0x8000260
+    080002ae  0500       movs     r5, r0
+    080002b0  0298       ldr      r0, [sp, #8]
+    080002b2  2100       movs     r1, r4
+    080002b4  fff7d4ff   bl       #0x8000260
+    080002b8  4019       adds     r0, r0, r5
+    080002ba  8119       adds     r1, r0, r6
+    080002bc  0198       ldr      r0, [sp, #4]
+    080002be  03b0       add      sp, #0xc
+    080002c0  f0bc       pop      {r4, r5, r6, r7}
+    080002c2  04bc       pop      {r2}
+    080002c4  1047       bx       r2
+
+func 080002C6 (thumb, 4 B, semente: chamada (bl) em 0x0800012E, fim: bx lr)
+    080002c6  0818       adds     r0, r1, r0
+    080002c8  7047       bx       lr
+
+func 080002CA (thumb, 26 B, semente: chamada (bl) em 0x080000D2, fim: bx lr)
+    080002ca  0228       cmp      r0, #2
+    080002cc  08db       blt      #0x80002e0
+    080002ce  0100       movs     r1, r0
+    080002d0  0120       movs     r0, #1
+    080002d2  4843       muls     r0, r1, r0
+    080002d4  4a1e       subs     r2, r1, #1
+    080002d6  0229       cmp      r1, #2
+    080002d8  9446       mov      ip, r2
+    080002da  6146       mov      r1, ip
+    080002dc  f9d8       bhi      #0x80002d2
+    080002de  7047       bx       lr
+    080002e0  0120       movs     r0, #1
+    080002e2  7047       bx       lr
+
+func 080002E4 (thumb, 8 B, semente: chamada (bl) em 0x08000122, fim: bx lr)
+    080002e4  8842       cmp      r0, r1
+    080002e6  00dc       bgt      #0x80002ea
+    080002e8  0800       movs     r0, r1
+    080002ea  7047       bx       lr
+
+func 080002EC (thumb, 10 B, semente: chamada (bl) em 0x08000118, fim: bx lr)
+    080002ec  401a       subs     r0, r0, r1
+    080002ee  c117       asrs     r1, r0, #0x1f
+    080002f0  4840       eors     r0, r1
+    080002f2  401a       subs     r0, r0, r1
+    080002f4  7047       bx       lr
+
+func 080002F6 (thumb, 26 B, semente: chamada (bl) em 0x080000DA, fim: bx lr)
+    080002f6  0028       cmp      r0, #0
+    080002f8  08d0       beq      #0x800030c
+    080002fa  0100       movs     r1, r0
+    080002fc  0020       movs     r0, #0
+    080002fe  0122       movs     r2, #1
+    08000300  0b00       movs     r3, r1
+    08000302  1340       ands     r3, r2
+    08000304  c018       adds     r0, r0, r3
+    08000306  4908       lsrs     r1, r1, #1
+    08000308  fad1       bne      #0x8000300
+    0800030a  7047       bx       lr
+    0800030c  0020       movs     r0, #0
+    0800030e  7047       bx       lr
+
+func 08000310 (thumb, 16 B, semente: chamada (bl) em 0x0800010A, fim: bx lr)
+    08000310  034a       ldr      r2, [pc, #0xc]
+    08000312  0240       ands     r2, r0
+    08000314  034b       ldr      r3, [pc, #0xc]
+    08000316  0b40       ands     r3, r1
+    08000318  000a       lsrs     r0, r0, #8
+    0800031a  5840       eors     r0, r3
+    0800031c  1043       orrs     r0, r2
+    0800031e  7047       bx       lr
+
+func 08000328 (thumb, 20 B, semente: chamada (bl) em 0x08000100, fim: bx lr)
+    08000328  521a       subs     r2, r2, r1
+    0800032a  521c       adds     r2, r2, #1
+    0800032c  0023       movs     r3, #0
+    0800032e  db43       mvns     r3, r3
+    08000330  9340       lsls     r3, r2
+    08000332  da43       mvns     r2, r3
+    08000334  8a40       lsls     r2, r1
+    08000336  1040       ands     r0, r2
+    08000338  c840       lsrs     r0, r1
+    0800033a  7047       bx       lr
+
+func 0800033C (thumb, 6 B, semente: chamada (bl) em 0x080000F2, fim: bx lr)
+    0800033c  0149       ldr      r1, [pc, #4]
+    0800033e  4018       adds     r0, r0, r1
+    08000340  7047       bx       lr
+
+func 08000348 (thumb, 24 B, semente: chamada (bl) em 0x0800013A, fim: bx lr)
+    08000348  0129       cmp      r1, #1
+    0800034a  07db       blt      #0x800035c
+    0800034c  0200       movs     r2, r0
+    0800034e  0020       movs     r0, #0
+    08000350  1388       ldrh     r3, [r2]
+    08000352  c018       adds     r0, r0, r3
+    08000354  921c       adds     r2, r2, #2
+    08000356  491e       subs     r1, r1, #1
+    08000358  fad1       bne      #0x8000350
+    0800035a  7047       bx       lr
+    0800035c  0020       movs     r0, #0
+    0800035e  7047       bx       lr
+
+func 08000360 (thumb, 14 B, semente: chamada (bl) em 0x08000144, fim: bx lr)
+    08000360  0129       cmp      r1, #1
+    08000362  03db       blt      #0x800036c
+    08000364  0022       movs     r2, #0
+    08000366  04c0       stm      r0!, {r2}
+    08000368  491e       subs     r1, r1, #1
+    0800036a  fcd1       bne      #0x8000366
+    0800036c  7047       bx       lr
+
+func 0800036E (thumb, 4 B, semente: chamada (bl) em 0x0800014C, fim: bx lr)
+    0800036e  0180       strh     r1, [r0]
+    08000370  7047       bx       lr
+
+func 08000372 (thumb, 12 B, semente: chamada (bl) em 0x08000170, fim: bx lr)
+    08000372  0169       ldr      r1, [r0, #0x10]
+    08000374  0322       movs     r2, #3
+    08000376  4a43       muls     r2, r1, r2
+    08000378  4068       ldr      r0, [r0, #4]
+    0800037a  1018       adds     r0, r2, r0
+    0800037c  7047       bx       lr
+
+func 0800037E (thumb, 30 B, semente: chamada (bl) em 0x08000178, fim: bx lr)
+    0800037e  0a28       cmp      r0, #0xa
+    08000380  01da       bge      #0x8000386
+    08000382  0120       movs     r0, #1
+    08000384  7047       bx       lr
+    08000386  6428       cmp      r0, #0x64
+    08000388  01d2       bhs      #0x800038e
+    0800038a  0220       movs     r0, #2
+    0800038c  7047       bx       lr
+    0800038e  c008       lsrs     r0, r0, #3
+    08000390  7d28       cmp      r0, #0x7d
+    08000392  01d3       blo      #0x8000398
+    08000394  0420       movs     r0, #4
+    08000396  7047       bx       lr
+    08000398  0320       movs     r0, #3
+    0800039a  7047       bx       lr
+
+func 0800039C (thumb, 28 B, semente: chamada (bl) em 0x08000186, fim: bx lr)
+    0800039c  0128       cmp      r0, #1
+    0800039e  03db       blt      #0x80003a8
+    080003a0  0129       cmp      r1, #1
+    080003a2  05db       blt      #0x80003b0
+    080003a4  0818       adds     r0, r1, r0
+    080003a6  7047       bx       lr
+    080003a8  0029       cmp      r1, #0
+    080003aa  03dc       bgt      #0x80003b4
+    080003ac  0020       movs     r0, #0
+    080003ae  7047       bx       lr
+    080003b0  401a       subs     r0, r0, r1
+    080003b2  7047       bx       lr
+    080003b4  081a       subs     r0, r1, r0
+    080003b6  7047       bx       lr
+
+func 080003B8 (thumb, 16 B, semente: chamada (bl) em 0x0800018E, fim: bx r1)
+    080003b8  80b5       push     {r7, lr}
+    080003ba  6421       movs     r1, #0x64
+    080003bc  fff783ff   bl       #0x80002c6
+    080003c0  401c       adds     r0, r0, #1
+    080003c2  80bc       pop      {r7}
+    080003c4  02bc       pop      {r1}
+    080003c6  0847       bx       r1
+
+func 080003C8 (thumb, 44 B, semente: chamada (bl) em 0x08000196, fim: bx r1)
+    080003c8  b0b5       push     {r4, r5, r7, lr}
+    080003ca  0128       cmp      r0, #1
+    080003cc  0edb       blt      #0x80003ec
+    080003ce  0400       movs     r4, r0
+    080003d0  451e       subs     r5, r0, #1
+    080003d2  821e       subs     r2, r0, #2
+    080003d4  0021       movs     r1, #0
+    080003d6  2800       movs     r0, r5
+    080003d8  0b00       movs     r3, r1
+    080003da  fff759ff   bl       #0x8000290
+    080003de  c907       lsls     r1, r1, #0x1f
+    080003e0  4008       lsrs     r0, r0, #1
+    080003e2  4018       adds     r0, r0, r1
+    080003e4  6d43       muls     r5, r5, r5
+    080003e6  6119       adds     r1, r4, r5
+    080003e8  081a       subs     r0, r1, r0
+    080003ea  00e0       b        #0x80003ee
+    080003ec  0020       movs     r0, #0
+    080003ee  b0bc       pop      {r4, r5, r7}
+    080003f0  02bc       pop      {r1}
+    080003f2  0847       bx       r1
+
+func 080003F4 (thumb, 20 B, semente: chamada (bl) em 0x080001A2, fim: bx r1)
+    080003f4  80b5       push     {r7, lr}
+    080003f6  0029       cmp      r1, #0
+    080003f8  02d0       beq      #0x8000400
+    080003fa  fff70bff   bl       #0x8000214
+    080003fe  00e0       b        #0x8000402
+    08000400  0020       movs     r0, #0
+    08000402  80bc       pop      {r7}
+    08000404  02bc       pop      {r1}
+    08000406  0847       bx       r1
+
+func 08000408 (thumb, 10 B, semente: chamada (bl) em 0x080001AE, fim: bx lr)
+    08000408  401a       subs     r0, r0, r1
+    0800040a  c117       asrs     r1, r0, #0x1f
+    0800040c  4840       eors     r0, r1
+    0800040e  401a       subs     r0, r0, r1
+    08000410  7047       bx       lr
+
+func 08000412 (thumb, 8 B, semente: chamada (bl) em 0x080001BA, fim: bx lr)
+    08000412  0122       movs     r2, #1
+    08000414  8a40       lsls     r2, r1
+    08000416  1043       orrs     r0, r2
+    08000418  7047       bx       lr
+
+func 0800041A (thumb, 4 B, semente: chamada (bl) em 0x080001C4, fim: bx lr)
+    0800041a  081a       subs     r0, r1, r0
+    0800041c  7047       bx       lr
+
+func 0800041E (thumb, 18 B, semente: chamada (bl) em 0x080001CA, fim: bx lr)
+    0800041e  c046       mov      r8, r8
+    08000420  c046       mov      r8, r8
+    08000422  01a0       adr      r0, #4
+    08000424  01a1       adr      r1, #4
+    08000426  01e0       b        #0x800042c
+    0800042c  081a       subs     r0, r1, r0
+    0800042e  7047       bx       lr
