@@ -162,6 +162,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", type=Path, default=None)
     args = parser.parse_args(argv)
 
+    if args.saida.resolve() == args.rom.resolve():
+        # a ROM de entrada e' de terceiros e nao esta no repositorio: sobrescrever
+        # apagaria a unica copia local sem volta
+        print("recuso sobrescrever a ROM de entrada; use outro caminho de saida",
+              file=sys.stderr)
+        return 2
+
     original = args.rom.read_bytes()
     if not rom_mod.looks_like_rom(original):
         print(f"{args.rom}: nao parece uma ROM GBA", file=sys.stderr)
