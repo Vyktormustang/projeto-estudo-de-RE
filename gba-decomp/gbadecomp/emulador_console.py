@@ -36,6 +36,7 @@ ENV_GET_CAN_DUPE = 3
 ENV_GET_SYSTEM_DIRECTORY = 9
 ENV_GET_LOG_INTERFACE = 27
 ENV_GET_VARIABLE = 15
+ENV_GET_SAVE_DIRECTORY = 31
 ENV_SET_MEMORY_MAPS = 0x10024          # experimental, e' o que o mGBA usa
 FMT_CODES = {0: ("0RGB1555", 2), 1: ("XRGB8888", 4), 2: ("RGB565", 2)}
 
@@ -76,6 +77,52 @@ class MemMap(C.Structure):
 
 class AvInfo(C.Structure):
     _fields_ = [("geometry", Geometry), ("timing", Timing)]
+
+
+class VariavelRetro(C.Structure):
+    """`struct retro_variable` da ABI libretro: dois ponteiros.
+
+    E' o que `RETRO_ENVIRONMENT_GET_VARIABLE` recebe em `data` -- NAO um
+    buffer de texto. O frontend le `key`, escreve `value` e devolve
+    verdadeiro se a variavel existe.
+    """
+
+    _fields_ = [("key", C.c_char_p), ("value", C.c_char_p)]
+
+
+def escrever_bool_retro(data: int, valor: bool) -> None:
+    """Escreve um `bool` da ABI libretro: **um** byte.
+
+    A versao anterior escrevia um `c_int` (4 bytes) no endereco que o core
+    reservou para um `bool` -- ou seja, sobrescrevia 3 bytes vizinhos na
+    pilha do core a cada `GET_CAN_DUPE`. Encontrado revisando o
+    `libretro_port.py` do projeto gba-harness (2026-10-17).
+    """
+    C.cast(data, C.POINTER(C.c_bool))[0] = valor
+
+
+def responder_get_variable(data: int, opcoes: dict, reservatorio: dict) -> int:
+    """Responde `RETRO_ENVIRONMENT_GET_VARIABLE` pela ABI certa.
+
+    Se a chave esta' em `opcoes`, aponta `value` para um buffer guardado
+    em `reservatorio` (precisa sobreviver a chamada) e devolve 1. Se nao
+    esta', devolve 0 e o core usa o padrao dele.
+
+    A versao anterior tratava `data` como buffer de char: lia "a chave"
+    dos bytes do proprio ponteiro e escrevia zeros por cima dele,
+    devolvendo 1 sempre. Nao era a causa do titulo travado (o mGBA so'
+    olha `value`, que ficava NULL, e cai no padrao), mas era corrupcao
+    de memoria do core.
+    """
+    variavel = C.cast(data, C.POINTER(VariavelRetro)).contents
+    if not variavel.key:
+        return 0
+    chave = variavel.key.decode("ascii", "replace")
+    if chave not in opcoes:
+        return 0
+    reservatorio[chave] = C.create_string_buffer(str(opcoes[chave]).encode())
+    variavel.value = C.addressof(reservatorio[chave])
+    return 1
 
 
 ENV_CB = C.CFUNCTYPE(C.c_int, C.c_uint, C.c_void_p)
@@ -146,6 +193,7 @@ class EmuladorConsole:
     _h: int = 0
     _fmt: tuple | None = None
     _logs: list = field(default_factory=list)
+    _valores_core: dict = field(default_factory=dict)
     opcoes: dict = field(default_factory=dict)
     av: object = None
 
@@ -188,17 +236,13 @@ class EmuladorConsole:
                         return 1
                     return 0
                 if cmd == ENV_GET_CAN_DUPE and data:
-                    C.cast(data, C.POINTER(C.c_int))[0] = 1
+                    escrever_bool_retro(data, True)
                     return 1
                 if cmd == ENV_GET_VARIABLE and data:
-                    # devolve "valor\0chave\0" em buffer de 128 bytes; usado
-                    # para AUTO-ADVANCE (pular dialogos) sem apertar botao
-                    chave = C.string_at(data).decode("ascii", "replace")
-                    valor = self.opcoes.get(chave, "")
-                    buf = C.cast(data, C.POINTER(C.c_char))
-                    C.memmove(buf, valor.encode() + b"\x00\x00", len(valor) + 2)
-                    return 1
-                if cmd == ENV_GET_SYSTEM_DIRECTORY and data:
+                    return responder_get_variable(
+                        data, self.opcoes, self._valores_core)
+                if cmd in (ENV_GET_SYSTEM_DIRECTORY,
+                           ENV_GET_SAVE_DIRECTORY) and data:
                     C.cast(data, C.POINTER(C.c_char_p))[0] = str(self.workdir).encode()
                     return 1
                 if cmd == ENV_GET_LOG_INTERFACE:

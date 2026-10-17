@@ -303,3 +303,94 @@ responde a nenhum botao depois de carregar (nem a ROM controle), embora a IRQ
 continue rodando. Regra: **validar qualquer estado pela resposta a um botao**
 antes de usa-lo; na duvida, rodar continuo desde o boot (custa ~1 min por
 12 000 quadros, mas e' confiavel).
+
+## 17. O "titulo travado" era erro nosso de medicao (2026-10-17) -- RESOLVIDO
+
+A §16.2 esta' **superada**. O jogo sai do titulo no nosso harness, com o
+nosso core, desde sempre -- quem estava errado era a leitura dos campos.
+
+### 17.1 Os offsets certos do `gMain` (base `0x030030F0`)
+
+Conferidos com o `include/main.h` do pret/pokefirered e com o comportamento
+medido quadro a quadro:
+
+| offset | endereco | campo |
+|---|---|---|
+| +0x00 | `0x030030F0` | callback1 |
+| **+0x04** | **`0x030030F4`** | **callback2** |
+| +0x08 | `0x030030F8` | savedCallback |
+| +0x0C | `0x030030FC` | **vblankCallback** (o nosso antigo "cb2"!) |
+| +0x24 | `0x03003114` | vblankCounter2 |
+| +0x28 | `0x03003118` | heldKeysRaw |
+| +0x2A | `0x0300311A` | newKeysRaw |
+| +0x2C | `0x0300311C` | heldKeys |
+| **+0x2E** | **`0x0300311E`** | **newKeys** (o que `JOY_NEW` testa) |
+| +0x438 | `0x03003528` | state |
+
+Consequencia: ficam **invalidados** os experimentos que forcavam campos --
+`rom_forca.gba`/`rom_forca2.gba` escreviam heldKeysRaw/heldKeys e nunca o
+`newKeys`, e o `rom_menu.gba` gravou `0x0800C689` no **vblankCallback**, nao
+no `callback2`. As conclusoes "o jogo ignora o input" e "o despachante nao
+usa o gMain" nasceram dai'.
+
+### 17.2 A maquina do titulo, medida
+
+`gTasks` em `0x03005090`: 16 tarefas x 40 B (`func`, `isActive`, depois
+`s16 data[16]` em +8). Funcoes medidas nesta ROM:
+
+- `Task_TitleScreenMain` = `0x08078C25` -- data[0]=cena, data[1]=estado
+- tarefa do timer = `0x08078BED` (data[0] sobe 1/quadro ate' 2700)
+- `CB2_TitleScreenRun` (callback2) = `0x08078B9D`; VBlankCB do titulo
+  (vblankCallback) = `0x08078BB5`
+
+Sem aperto, o ciclo completo funciona: titulo entra na cena RUN (3) aos
+~1730 quadros, fica 2700 quadros (o timer), vai para RESTART (4) aos ~4200,
+volta para copyright/intro e recomeca (RUN de novo aos ~6050). **Nada esta'
+travado**: e' o loop de atracao do jogo.
+
+### 17.3 Teste de controle (o P0 da PESQUISA)
+
+A homebrew `keyinput_rom.py` do projeto gba-harness (codigo **revisado**
+antes de rodar: monta a ROM por tabela de instrucoes ARM) no NOSSO harness:
+sem botao, os 10 pixels ficam pretos; segurando START, o pixel 3 acende
+(`evidencias/controle_keyinput_start.png`). A cadeia
+agenda -> `input_state` -> KEYINPUT -> VRAM -> framebuffer sempre funcionou.
+
+O gba-harness em si nao foi importado: ele exige Python 3.12 (`type X = ...`)
+e o sandbox e' 3.11.2 (`SyntaxError` conferido). A revisao do
+`libretro_port.py` dele achou mesmo assim 2 bugs latentes nossos, ja'
+corrigidos em `emulador_console.py` com 4 testes novos
+(`tests/test_emulador_console.py`; suite: **104 passed**):
+
+- `GET_CAN_DUPE` escrevia `c_int` (4 B) onde a ABI pede `bool` (1 B);
+- `GET_VARIABLE` tratava `struct retro_variable*` como buffer de texto e
+  escrevia sobre o ponteiro da chave (devolvendo 1 sempre).
+
+Nenhum dos dois era a causa do "travamento"; sao corrupcao real mesmo assim.
+O libretro.py tambem nao precisou ser executado: o controle + a timeline
+isolaram a causa.
+
+### 17.4 A navegacao que funciona (e a licao sobre hash de VRAM)
+
+`ferramentas/ir_ao_menu.py` (repetido 2x, quadros identicos -- deterministico):
+
+- cena RUN alcancada no quadro **1730** (`evidencias/titulo_press_start.png`);
+- A apertado: no quadro **1733**, KEYINPUT=`03fe`, `newKeys`=1 (um quadro
+  so') e a cena salta (3,1) -> (5,0) CRY **no mesmo quadro**;
+- (5,2) aos ~1830 (espera de 90 + fade); tarefa do titulo morre aos **1870**
+  e o callback2 vira `0x0800C301`, depois `0x0812EB11`; primeira tela
+  fotografada depois disso: a pagina CONTROLE
+  (`evidencias/apos_titulo_controle.png`);
+- com pulsos de A a cada 200 quadros, o jogo atravessa a intro inteira ate'
+  a tela de nomear o jogador (`evidencias/intro_nome_jogador.png`, ~6500).
+
+Por que um START so' aos 1500 "nao fazia nada": aos 1500 a cena ainda e' 2
+(FADEIN), e aperto nas cenas 0-2 **pula para a RUN** -- falta o segundo
+aperto, ja' na RUN. E o hash de VRAM nao enxerga nada disso: na RUN a VRAM
+e' constante (quem anima e' paleta/sprite), e fade e' paleta pura. Regra
+nova: **tela se julga por PNG/framebuffer, nunca por hash de VRAM**.
+
+**Nao provado**: se entre os quadros 1860-1875 aparece a lista do menu
+principal ("NOVO JOGO") -- nao amostramos quadro a quadro ali; e os nomes
+`CB2_InitMainMenu`/`CB2_MainMenu` para `0x0800C301`/`0x0812EB11` sao
+inferidos do pret, sem desmontagem nesta ROM ainda.

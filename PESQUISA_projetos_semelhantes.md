@@ -169,6 +169,21 @@ revisar o código primeiro.
 
 ## D. Recomendações priorizadas (só o necessário para acelerar)
 
+> **Atualização 2026-10-17 — P0 (harness) e P0 (mapa do pret) executados.**
+> Revisamos o `libretro_port.py` do gba-harness e rodamos a ROM homebrew
+> de controle dele (`keyinput_rom.py`) no nosso harness: a cadeia de
+> entrada sempre funcionou. O "título travado" era erro nosso de
+> medição — offsets errados do `gMain` (lê-se o `vblankCallback` como se
+> fosse `callback2`, e `heldKeys` como se fosse `newKeys`), um aperto
+> só fora da cena certa, e tela julgada por hash de VRAM. Com o layout
+> do pret/pokefirered confirmado em jogo, o título destrava apertando A
+> na cena RUN (`ferramentas/ir_ao_menu.py`; relato completo na §17 das
+> `NOTAS_DE_TRABALHO.md`). De quebra, a revisão achou e corrigiu 2 bugs
+> de ABI no nosso harness (`GET_CAN_DUPE`/`GET_VARIABLE`, com testes).
+> O `BPRE.ld` do CFRU ainda não foi importado; ficou menos urgente
+> porque o layout do pret está batendo campo a campo nesta ROM.
+
+
 | Pri | Ação | Por quê | Custo/risco |
 |---|---|---|---|
 | **P0** | Teste de controle do bloqueio do título com harness de terceiros: (1) [gba-harness](https://github.com/MaqsudMallick/gba-harness) ou [libretro.py](https://github.com/JesseTG/libretro.py) com a **nossa** ROM e com **outra** ROM que responda a START; (2) se persistir, [pygba](https://github.com/dvruette/pygba) (bindings oficiais, fora do libretro) | É o próximo passo já registrado nas `NOTAS_DE_TRABALHO.md`; agora temos implementações de referência para comparar `_carregar_core` linha a linha (callbacks de áudio/vídeo, `input_poll`) em vez de chutar | Baixo. Exige revisar o código de terceiros antes de executar (regra do projeto) e não baixar ROM de nenhum desses repos |

@@ -664,3 +664,49 @@ roda" anteriores.
   jogo novo, mas chama-la pelo hook (aos 1 600 quadros) zerou
   `gMain.callback2` e deixou a tela parada. Nao serve como atalho sem entender
   o estado esperado.
+
+## 17. Título destravado (2026-10-17): o bloqueio era de medição, não do jogo nem do core
+
+**MEDIDO (nesta ROM, no nosso harness, repetido com os mesmos quadros):**
+
+- O campo que líamos como `callback2` (`0x030030FC`) é o `vblankCallback`
+  (+0x0C do `gMain`); o `callback2` de verdade fica em `0x030030F4` (+0x04),
+  e o `newKeys` que o jogo testa (`JOY_NEW`) fica em `0x0300311E` (+0x2E) —
+  layout do `include/main.h` do pret/pokefirered, confirmado pelo
+  comportamento. Os testes antigos que forçavam "teclas" e "menu"
+  escreviam nos campos vizinhos; as conclusões tiradas deles estão anuladas.
+- A máquina de estados do título é saudável: sem aperto, ela faz o ciclo
+  completo (título → cena RUN/"PRESS START" ~1730 quadros → 2700 quadros de
+  espera → RESTART ~4200 → copyright/intro → título de novo). A tarefa do
+  título é `0x08078C25` (data[0]=cena), o timer é `0x08078BED` e o
+  `callback2` do título é `0x08078B9D`.
+- Apertando A **na cena RUN**, o jogo sai do título: no mesmo quadro do
+  `newKeys=1` (quadro 1733) a cena vira CRY, e aos 1870 a tarefa do título
+  morre e o `callback2` troca. Com pulsos periódicos de A, o jogo chega à
+  tela de nomear o jogador (~6500 quadros). Evidências:
+  `evidencias/titulo_press_start.png`, `apos_titulo_controle.png`,
+  `intro_nome_jogador.png`; ferramenta: `ferramentas/ir_ao_menu.py`.
+- Teste de controle com uma ROM homebrew de terceiros (projeto
+  gba-harness, código revisado antes de rodar): no nosso harness, o pixel
+  do START acende ao segurar START e fica preto sem botão — a cadeia de
+  entrada sempre entregou as teclas.
+- Um aperto nas cenas de abertura (0–2) só pula a animação para a cena
+  RUN; é preciso um **segundo** aperto, já na RUN, para sair do título.
+  Isso, mais julgar a tela por hash de VRAM (que não muda na RUN nem em
+  fades de paleta), explica todas as observações anteriores de "travado".
+- Dois defeitos reais do nosso harness foram encontrados na revisão e
+  corrigidos (com 4 testes novos; suíte em 104 testes verdes), sem serem
+  a causa do bloqueio: escrita de 4 bytes onde a ABI libretro pede um
+  `bool` de 1 byte, e tratamento da `struct retro_variable` como texto.
+
+**NÃO PROVADO:**
+
+- Se a lista do menu principal ("NOVO JOGO") é exibida entre os quadros
+  1860–1875 (a primeira tela capturada depois da transição é a página
+  CONTROLE da sequência de novo jogo) — falta amostragem quadro a quadro.
+- Os nomes dos callbacks pós-título (`0x0800C301` transitório e
+  `0x0812EB11`): são inferidos do fluxo do pret, ainda sem desmontagem
+  confirmando nesta ROM.
+- O harness do gba-harness **não foi executado** (exige Python 3.12; o
+  sandbox tem 3.11.2) — foi apenas lido. O libretro.py também não foi
+  executado; deixou de ser necessário depois do teste de controle.
