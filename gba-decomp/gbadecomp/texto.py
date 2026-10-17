@@ -7,10 +7,14 @@ conhecidas da ROM.
 
 Tabela (medida, nao chutada):
 
-    A-Z  0xBB-0xD4      a-z  0xD5-0xEE      0x00 espaco
+    A-Z  0xBB-0xD4      a-z  0xD5-0xEE      0x00 espaco    0xA1-0xAA '0'-'9'
     0xAB '!'   0xAC '?'   0xAD '.'   0xB8 ','
     0x1B 'e' com acento agudo (e')   0x17 'a' agudo   0x1C 'e' circunflexo
     0xF4 'a' til       0xFE quebra de linha      0xFF fim da string
+
+Os digitos foram **medidos**, nao supostos: a ROM tem 52 strings `TMxx`
+(`CE C7 <digito> <digito> FF`) e os pares usados cobrem `A1A2` (TM01) ate
+`A6A1` (TM50) sem lacuna -- logo `0xA1..0xAA` = `'0'..'9'`.
 
 O `0xFF` termina: tudo depois dele e' lixo e nao deve ser lido.
 """
@@ -46,6 +50,8 @@ def codificar(texto: str, terminador: bool = True) -> bytes:
             saida.append(0xBB + ord(caractere) - ord("A"))
         elif "a" <= caractere <= "z":
             saida.append(0xD5 + ord(caractere) - ord("a"))
+        elif "0" <= caractere <= "9":
+            saida.append(0xA1 + ord(caractere) - ord("0"))
         elif "\n" == caractere:
             saida.append(QUEBRA)
         elif caractere in ACENTOS:
@@ -73,6 +79,8 @@ def decodificar(dados: bytes, parar_no_fim: bool = True) -> str:
             saida.append(chr(ord("A") + byte - 0xBB))
         elif 0xD5 <= byte <= 0xEE:
             saida.append(chr(ord("a") + byte - 0xD5))
+        elif 0xA1 <= byte <= 0xAA:
+            saida.append(chr(ord("0") + byte - 0xA1))
         elif byte in PONTUACAO:
             saida.append(PONTUACAO[byte])
         else:

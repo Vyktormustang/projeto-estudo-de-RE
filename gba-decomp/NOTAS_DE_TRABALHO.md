@@ -7,7 +7,7 @@ para `RELATORIO_o_que_ja_sabemos.md` e `README.md` **no fim** do trabalho.
 
 ```bash
 P=/home/user/projeto-estudo-de-RE/.venv/bin/python
-$P -m pytest tests/ -q                       # 90 testes
+$P -m pytest tests/ -q                       # 91 testes
 $P ferramentas/aplicar_patch_pokebolas.py ROM.gba -o NOVA.gba --json r.json
 $P ferramentas/aplicar_manifesto.py ROM.gba patches/exemplo_dados.json -o NOVA.gba
 $P ferramentas/aplicar_manifesto.py ROM.gba patches/exemplo_texto.json -o NOVA.gba
@@ -74,12 +74,16 @@ Ela **pode sumir** com o ambiente: rebaixar do Drive (`14JCEJp6LFgdkzKMOtI5-l3Xv
 - `CopyItemName` **não foi localizado** (os candidatos `0x0809A7B0`/`0x0809A7D8`
   são outros acessores de pocket) — por isso o texto é verificado por
   decodificação.
-- **Dígitos não estão na tabela medida**: `texto.codificar("TM01")` é recusado.
-  Medir antes de patch de nome com número.
+- **Dígitos medidos** (não inferidos): a ROM tem 52 strings `TMxx`
+  (`CE C7 <d> <d> FF`) e os pares cobrem `A1A2` (TM01) a `A6A1` (TM50) sem
+  lacuna → `0xA1..0xAA` = `'0'..'9'`. `texto.codificar("TM01")` funciona e
+  há teste de ida e volta em TM00..TM50.
 
 ## Próximos passos
 
-1. Medir os dígitos do charset (`0xA1`..`0xAA`?) e o `CopyItemName`.
+1. ~~Medir os dígitos~~ (feito). Achar o `CopyItemName` — `ItemId_GetId`
+   (`0x0809A8DC`) tem **0 chamadores** por `bl`, então ou é chamado por tabela
+   indireta ou foi inlined; não insistir pelo caminho de `bl`.
 2. Um patch de **constante de comportamento** que não seja só dado: ex. limite de
    itens por pocket (o `999`/`0x3E7` em `0x0809A0D8`).
 3. Fim do trabalho: consolidar tudo em `RELATORIO` (§11 cresce) e `README`;

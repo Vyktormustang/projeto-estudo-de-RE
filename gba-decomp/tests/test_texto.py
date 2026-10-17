@@ -42,11 +42,19 @@ def test_para_no_terminador():
     assert texto.decodificar(b"\xbb\xff\xcc") == "A"
 
 
+def test_digitos_foram_medidos_nas_tms():
+    # 52 strings "TMxx" na ROM cobrem TM01..TM50 sem lacuna
+    assert texto.codificar("TM01") == bytes([0xCE, 0xC7, 0xA1, 0xA2, 0xFF])
+    assert texto.codificar("TM50") == bytes([0xCE, 0xC7, 0xA6, 0xA1, 0xFF])
+    for numero in range(0, 51):
+        assert texto.decodificar(texto.codificar(f"TM{numero:02d}")) == f"TM{numero:02d}"
+
+
 def test_recusa_caractere_fora_da_tabela():
     with pytest.raises(ValueError, match="nao esta' na tabela"):
-        texto.codificar("TM01")      # digitos ainda nao foram medidos
-    with pytest.raises(ValueError, match="nao esta' na tabela"):
         texto.codificar("Poção")     # 'ç' nao esta' na tabela
+    with pytest.raises(ValueError, match="nao esta' na tabela"):
+        texto.codificar("POKé#BOLA")  # '#' nao esta' na tabela
 
 
 def test_caber_preenche_com_ff_e_recusa_quando_nao_cabe():
