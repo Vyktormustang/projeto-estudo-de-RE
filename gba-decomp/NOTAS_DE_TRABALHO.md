@@ -693,3 +693,44 @@ as telas, anda `(25,39)->(25,38)`, volta, e item e Pokemon permanecem.
 **Nao provado**: usar a Master Ball numa batalha/captura (nao executado
 -- o objetivo era so' coloca-la na bolsa); persistir pelo SALVAR do menu
 continua sem teste, como nas §20-22. Paramos aqui, como pedido.
+
+## 24. Save jogavel (.sav) gerado pelo SALVAR do jogo e validado por boot frio (2026-10-20)
+
+**Resultado**: fecha o "nao provado" das §20-23 -- as edicoes **persistem
+pelo SALVAR do menu**. A partir de `viridian_masterball.state` (§22+§23),
+o proprio jogo salvou (START -> SALVAR -> SIM) e a SAVE_RAM extraida
+(`retro_get_memory_data(0)` = flash, 131072 B) virou
+`/home/user/gba-re/testes/pokemon_modificado_masterball.sav` (sha256
+`1817043a4d410fc18ef7724d46b98950cfcf4a6000d1655efd93f8d2cfce7567`, fora
+do Git). Conferido setor a setor no arquivo: SB2 (id 0) com a chave
+`0x3CD7453E`, SB1 (id 1) com o Bulbasaur (personalidade `0x5DAD3AC8`) em
++0x38 e a MASTER BALL (item 1, qtd cifrada `0x453F` -> 1) em +0x430.
+
+### 24.1 A armadilha do Quest Log (medida, custou 2 sondas)
+
+Boot frio com esse .sav -> CONTINUAR -> o jogo abre o **Quest Log**
+(recap da jornada) com um SNAPSHOT antigo de SB1/SB2 trocado no lugar:
+nesse instante le-se Pallet, chave `0xF6EA3C4A` e bolsa "vazia" -- e
+qualquer escrita na bolsa durante o recap some em <=10 quadros (medido).
+Isso quase enterrou o .sav como "sem Master Ball". Pulando o recap
+(B/esperas ate' um passo ida-e-volta responder = controle de verdade), o
+jogo restaura o save real: warpa para Viridian `(3,1)`, `(25,39)`, troca
+a chave de cifra (vista `0x45602619`, quantidades recifradas pelo
+proprio jogo) e a pocket volta com `[(1, 1)]`.
+
+### 24.2 Validacao final (boot frio, processo novo)
+
+CONTINUAR -> pular Quest Log -> no overworld em Viridian: Bulbasaur
+integro nv10/EXP 560/IVs 31/HP 32/32/atributos `(17,17,18,21,18)` e a
+tela da bolsa mostra MASTER BOLA x1. Evidencias:
+`evidencias/sav_salvar_dialogo.png` (o salvar em VIRIDIAN) e
+`evidencias/sav_continuar_bolsa.png` (a bolsa apos o boot frio). Suite:
+**119 passed** (sem codigo novo no repo; scripts de geracao/validacao
+ficaram fora do Git em `/home/user/gba-re/testes/gerar_sav.py` e
+`validar_sav_ql.py`).
+
+**Nao provado**: o .sav foi validado no nosso mGBA/libretro; outros
+emuladores devem le-lo como flash 128K padrao, mas nao testamos nenhum;
+usar a Master Ball numa captura continua sem teste (fica para o usuario
+jogando); o mecanismo exato de troca de snapshot do Quest Log foi
+medido pelo efeito (SB1/SB2/chave/posicao), nao desmontado.

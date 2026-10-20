@@ -922,3 +922,38 @@ novos):
   colocá-la na bolsa; nenhuma captura foi executada).
 - Persistir pelo SALVAR do menu no cartucho continua sem teste, como
   nas §§20–22. Este objetivo parou na prova da adição, como pedido.
+
+## §24 — Save jogável (.sav) pelo SALVAR do próprio jogo (2026-10-20)
+
+Fecha o "NÃO PROVADO" que vinha desde a §20: **as edições persistem pelo
+SALVAR do menu**.
+
+**MEDIDO**:
+
+- A partir do estado da §23, o jogo salvou pelo menu (START → SALVAR →
+  SIM; evidência `sav_salvar_dialogo.png`) e a flash extraída
+  (SAVE_RAM, 131.072 bytes) virou um `.sav` padrão, fora do Git
+  (SHA-256 `1817043a…7567`). No arquivo, setor a setor: SB2 com a chave
+  `0x3CD7453E`, SB1 com o Bulbasaur editado em +0x38 e a Master Ball
+  (item 1 ×1, quantidade cifrada coerente) em +0x430.
+- **Armadilha do Quest Log**: no boot frio, CONTINUAR abre o recap da
+  jornada com um snapshot antigo de SB1/SB2 no lugar — nesse instante a
+  bolsa lê "vazia", a chave é outra (`0xF6EA3C4A`), o jogador aparece em
+  Pallet e qualquer escrita some em ≤10 quadros. Duas sondas quase
+  condenaram o arquivo por isso. Pulando o recap até haver controle de
+  verdade (passo ida-e-volta respondendo), o jogo restaura o save real:
+  Viridian `(3,1)`, `(25,39)`, chave trocada pelo próprio jogo
+  (`0x45602619`) e a pocket com a Master Ball.
+- Validação final em boot frio e processo novo: Bulbasaur íntegro
+  (nv10, EXP 560, IVs 31, HP 32/32, atributos `(17,17,18,21,18)`) e a
+  tela da bolsa mostrando MASTER BOLA ×1
+  (`evidencias/sav_continuar_bolsa.png`). Suíte em 119 passed (sem
+  código novo; os scripts de geração/validação ficaram fora do Git).
+
+**NÃO PROVADO**:
+
+- Leitura do `.sav` em outros emuladores além do nosso mGBA/libretro
+  (é o formato flash 128K padrão, mas não foi testado fora daqui).
+- Usar a Master Ball numa captura (fica para jogar de verdade).
+- O mecanismo interno da troca de snapshot do Quest Log — medido pelo
+  efeito em SB1/SB2/chave/posição, não desmontado.
