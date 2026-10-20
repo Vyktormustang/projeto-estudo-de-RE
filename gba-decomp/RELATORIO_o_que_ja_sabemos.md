@@ -807,3 +807,47 @@ reais; ferramentas `mostrar_time.py`/`dar_golpe.py`):
 - Persistir a edição salvando pelo menu do jogo (não executado) e o
   formato nas caixas do PC (nenhuma caixa foi lida ainda).
 - O significado do u16 em +0x1E (0 nos dois espécimes; "unknown" no pret).
+
+## §21 — Rota 1: de Pallet a Viridian (2026-10-20)
+
+**MEDIDO** (`ferramentas/ir_a_viridian.py`; 4 testes puros novos;
+evidências `viridian_*.png`):
+
+- A travessia completa, a partir do estado com o inicial fora do
+  laboratório, chegou a Viridian em 95 s: Pallet `(3,0)`, `(16,14)` →
+  Rota 1 `(3,19)`, `(13,39)` → Viridian `(3,1)`, `(25,39)`. O explorador
+  da Rota 1 levou 124 passos; foram 2 encontros selvagens, ambos
+  encerrados por fuga na primeira tentativa. O Bulbasaur chegou em nv6,
+  HP 22/22 e EXP 204 — sem dano e sem EXP nova.
+- A saída norte de Pallet mudou depois do inicial: a senhora da placa
+  ocupa `(12,2)`, fechando o atalho lateral. A rota medida é coluna 12
+  até `(12,3)`, depois `(13,3)` e o gatilho `(13,2)`, avançar a cena e
+  seguir ao norte. Um buscador Manhattan ingênuo a partir de `(16,14)`
+  entra no laboratório, porque UP empata com LEFT no custo e `(16,13)`
+  é a porta do laboratório.
+- A Rota 1 foi atravessada por um explorador on-line tile a tile:
+  custo `4*y + 3*visitas`, paredes aprendidas quando um passo é recusado
+  e expiração dessas paredes para não eternizar um NPC parado. A
+  penalidade por visitas é decisiva — com custo puro em `y`, um beco
+  horizontal sob um ledge faz o explorador oscilar sem aceitar o recuo.
+- Nos encontros, apertar direções aos 220 quadros ainda é cedo demais: a
+  apresentação está em andamento. A sequência medida é esperar 700q e
+  então `RIGHT`, `DOWN`, `A`; a foto confirma o cursor sobre **SAIR**
+  antes do `A` (`viridian_batalha_sair.png`). Callback transitório de
+  warp (visto `0x0805674D`) não é batalha: só conta encontro quando o
+  callback estabiliza em `0x08011101`.
+- O estado de chegada ficou fora do Git e foi validado em processo novo:
+  abre em Viridian `(25,39)`, anda até `(25,38)`, volta ao tile inicial e
+  abre/fecha o menu START; `mostrar_time.py`, em outro processo, lê o
+  Pokémon íntegro. A suíte completa está em **114 passed**.
+
+**NÃO PROVADO**:
+
+- O comportamento do cursor após uma fuga recusada: na execução final,
+  as duas fugas funcionaram na primeira tentativa.
+- A recuperação automática completa após whiteout na ferramenta
+  consolidada: o whiteout para casa foi medido nas sondas anteriores,
+  mas a volta casa → Viridian com esta versão não foi exercitada.
+- Número e desfecho dos encontros em outras execuções (RNG/tempo de
+  quadro). Nada além da chegada a Viridian foi executado — nem pacote do
+  Oak, nem Pokédex, nem captura.

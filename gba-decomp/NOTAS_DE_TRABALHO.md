@@ -545,3 +545,63 @@ pelo SALVAR do menu (nao executado); o mesmo formato nas caixas do PC
 (a struct de caixa e' a mesma no pret, mas nao lemos nenhuma caixa
 ainda); e o significado do u16 em +0x1E ("unknown" no pret, 0 nos dois
 especimes).
+
+## 21. Rota 1 atravessada ate' Viridian (`ir_a_viridian.py`, 2026-10-20)
+
+**Resultado**: objetivo unico concluido -- de `com_inicial_boot.state`
+(Pallet `(3,0)`, `(16,14)`) a Viridian `(3,1)`, `(25,39)`, em 95 s de
+parede. O explorador levou 124 passos na Rota 1; houve 2 encontros e as
+duas fugas funcionaram na primeira tentativa. O Bulbasaur chegou sem
+dano e sem EXP nova (nv6, HP 22/22, EXP 204), o que tambem confirma que
+os dois desfechos foram fuga, nao batalha vencida.
+
+### 21.1 A saida de Pallet depois do inicial
+
+- A senhora da placa fica em `(12,2)` e fecha o atalho lateral usado
+  antes do inicial. O caminho medido e': horizontal ate' a coluna 12,
+  subir ate' `(12,3)`, ir a `(13,3)`, subir ao gatilho `(13,2)`, avancar
+  a cena com A e continuar ao norte: Rota 1 `(3,19)`, `(13,39)`.
+- Um Manhattan puro a partir da frente do laboratorio `(16,14)` empata
+  LEFT com UP -- e UP e' a porta `(16,13)`, que entra no laboratorio.
+  Por isso a ferramenta primeiro faz a horizontal medida; o explorador
+  so' entra como reserva, com portas proibidas e parada ao mudar de mapa.
+- Warp tambem troca o `callback2` por um valor transitorio (visto
+  `0x0805674D`): o resolvedor agora so' conta batalha quando o callback
+  realmente estabiliza em `0x08011101`.
+
+### 21.2 Rota 1 por explorador on-line
+
+Cada passo segura a direcao ate' `pos` mudar. O explorador escolhe o
+vizinho por `4*y + 3*visitas`; passo recusado vira parede aprendida e
+paredes expiram (NPC parado nao e' parede). A penalidade por visitas e'
+o ponto importante: no custo puro `y`, um beco horizontal sob um ledge
+faz o algoritmo oscilar para sempre, porque qualquer lateral empata e o
+recuo ao sul sempre perde. Na execucao final, ele passou pelos marcos
+y=31, 23, 15 e 7 e cruzou para Viridian em `(25,39)`.
+
+Encontros selvagens: nao apertar direcoes cedo demais. Aos 220 quadros
+ainda era a apresentacao do selvagem; a sequencia provada e' esperar
+700q, `RIGHT`, `DOWN` -- o cursor fica sobre **SAIR**
+(`evidencias/viridian_batalha_sair.png`) -- e `A`. Lutar em todo encontro
+nas sondas anteriores desgastou o HP e causou whiteout. A ferramenta tem
+retentativas de fuga e, como ultimo recurso, lutar com A; se houver
+whiteout, reconhece a casa e recomeca a travessia.
+
+### 21.3 Estado de chegada validado
+
+O estado final ficou **fora do Git** em
+`/home/user/gba-re/testes/viridian.state` (528448 bytes; sha256
+`057ff2bfa90c295dfdaa23d653592282bee5897fa22f4b3b9480e012ece4dca0`).
+Num processo novo: carrega em Viridian `(3,1)`, `(25,39)`, anda
+`(25,39)->(25,38)`, volta e abre o menu START. `mostrar_time.py`, em
+outro processo, le o mesmo Pokemon integro (especie 1, nv6, HP 22/22,
+EXP 204). Evidencias: `viridian_chegada.png`, `viridian_validado.png`,
+`viridian_rota1_entrada.png` e `viridian_batalha_sair.png`. Suite:
+**114 passed** (4 testes puros novos da ordenacao do explorador).
+
+**Nao provado**: o comportamento do cursor apos uma fuga recusada (nas
+duas batalhas da execucao final, a primeira tentativa funcionou); o ramo
+de recuperacao de whiteout da ferramenta final -- whiteout para casa foi
+medido em sondas, mas a volta completa casa -> Viridian com a versao
+consolidada nao foi exercitada; e a contagem de encontros continua
+dependendo do RNG/quadro em outras execucoes.
