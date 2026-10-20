@@ -1,0 +1,494 @@
+{
+  "rom": "/home/user/gba-re/rom/pokemon_firered_bpre_trabalho.gba",
+  "sha256": "6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae",
+  "bytes_rom": 16777216,
+  "censo": null,
+  "censo_funcoes": 0,
+  "boot": {
+    "tabelas_de_casos": 166,
+    "casos_de_tabela": 3066,
+    "funcoes": 3587,
+    "instrucoes": 208458,
+    "arestas": 8588,
+    "descartes": 45,
+    "saidas_para_tras": 52,
+    "saidas_recuperadas": 25,
+    "no_censo": null,
+    "fora_do_censo": null
+  },
+  "completo": {
+    "tabelas_de_casos": 166,
+    "casos_de_tabela": 3066,
+    "funcoes": 3587,
+    "instrucoes": 208458,
+    "arestas": 8588,
+    "descartes": 45,
+    "saidas_para_tras": 52,
+    "saidas_recuperadas": 25,
+    "no_censo": null,
+    "fora_do_censo": null
+  },
+  "levantamento": {
+    "funcoes": 3587,
+    "com_c_para_ler": 3587,
+    "completas": 3391,
+    "parciais": 196,
+    "sem_corpo": 0,
+    "percentual_com_c": 100.0,
+    "funcoes_com_lacuna": 196
+  },
+  "recusas_total": 63,
+  "recusas_mnemonico": {
+    "bx": 28,
+    "b": 11,
+    "and": 5,
+    "adc": 4,
+    "msr": 2,
+    "bls": 2,
+    "blt": 2,
+    "mov": 2,
+    "bmi": 1,
+    "ble": 1,
+    "bge": 1,
+    "beq": 1,
+    "bne": 1,
+    "bpl": 1,
+    "bgt": 1
+  },
+  "recusas_motivo": {
+    "desvio indireto por registrador sem origem conhecida": 17,
+    "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- a leitura continua em INSTRUCAO da janela 0x...": 11,
+    "instrucao que nao existe no ARM7TDMI (codificacao de 32 bits do Thumb-2: o ARM7TDMI executa so' as formas Thumb de 16 bits (e o `bl` de 32 bits, que o capstone escreve sem sufixo)): aqui a leitura passou por dado, nao por codigo": 9,
+    "thunk de salto indireto: a janela comeca em `bx rN` (com nop de alinhamento), ou seja o destino vem NO REGISTRADOR, de quem chamou -- traduzir exigiria inventar a assinatura": 9,
+    "escrita no PSR (`cpsr_fc`) no campo de CONTROLE: o C levantado nao tem modo do processador nem mascara de IRQ -- so' as flags z/n/c/v, que sao o campo `f`; o bit Q tambem nao existe no modelo": 2,
+    "desvio para tras, para fora da funcao (0x... < entrada 0x...) -- fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 2,
+    "ILHA de codigo arm: o bloco em 0x... nao e' rotina (nao devolve pelo `lr`) -- ele sai para 0x..., dentro DESTA janela, e essa continuacao nao tem traducao: o C levantado e' de UM modo de CPU por funcao": 2,
+    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (mrc2: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "salto para fora da funcao (0x...): dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (bkpt: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (IT block (itee): nao existe no ARMv4T): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (cbnz: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (o endereco nao decodifica como instrucao): a leitura desta janela passou por dado": 1,
+    "salto por registrador (o destino so' existe em tempo de execucao; o idioma de tabela de casos nao fechou) -- a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `bhs #0x...` em 0x...)": 1,
+    "salto por registrador (o destino so' existe em tempo de execucao; o idioma de tabela de casos nao fechou) -- a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `cmp r1, #0x...` em 0x...)": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (sxth: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "desvio para 0x..., sem rotulo nesta janela: fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 1,
+    "desvio para 0x..., sem rotulo nesta janela: dentro desta janela, em trecho nao desmontado (a leitura parou antes de alcancar) -- e o alvo NAO e' codigo do ARM7TDMI (ldrd: instrucao inexistente no ARM7TDMI): a leitura desta janela passou por dado": 1,
+    "salto para fora da funcao (0x...): fora de qualquer janela desmontada: nenhuma leitura passou por esse endereco": 1
+  },
+  "paradas_total": 159,
+  "paradas_motivo": {
+    "a leitura parou aqui -- os bytes nao decodificam": 64,
+    "a leitura parou aqui -- forma larga do Thumb-2 (add.w) (provavel dado lido como codigo)": 23,
+    "a leitura parou aqui -- cbnz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 16,
+    "a leitura parou aqui -- udf: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 8,
+    "a leitura parou aqui -- blxns: forma larga que nao existe no ARM7TDMI (provavel dado lido como codigo)": 5,
+    "a leitura parou aqui -- mcr2: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 5,
+    "a leitura parou aqui -- vhadd: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 3,
+    "a leitura parou aqui -- rev: existe no ARM do ARMv4T, mas nao no Thumb-1 (provavel dado lido como codigo)": 3,
+    "a leitura parou aqui -- ldrd: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 3,
+    "a leitura parou aqui -- strd: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- IT block (it): nao existe no ARMv4T (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- cdp2: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- vrev64: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- IT block (itt): nao existe no ARMv4T (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- sxth: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- bkpt: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- vqshlu: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 2,
+    "a leitura parou aqui -- cbz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- stc2: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vst1: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vabal: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- stc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- IT block (ittt): nao existe no ARMv4T (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vcge: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- IT block (itet): nao existe no ARMv4T (provavel dado lido como codigo)": 1,
+    "a leitura parou aqui -- vtbx: NEON/VFP nao existe no ARM7TDMI (provavel dado lido como codigo)": 1
+  },
+  "tabelas_recusadas_total": 2,
+  "tabelas_recusadas_motivo": {
+    "a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `bhs #0x...` em 0x...)": 1,
+    "a instrucao anterior a 0x... nao e' `ldr rI, [rI]` (medido: `cmp r1, #0x...` em 0x...)": 1
+  },
+  "descartes_por_semente": {
+    "ponteiro de pool": 42,
+    "salto": 2,
+    "chamada (bl)": 1
+  },
+  "descartes": [
+    {
+      "entrada": "0x081BFAF0",
+      "modo": "thumb",
+      "semente": "salto para tras em 0x081BFB6E",
+      "motivo": "codigo invalido em 0x081BFAF0",
+      "bytes": "00 ca c9 c5 1b c7 c9 c8"
+    },
+    {
+      "entrada": "0x081C5646",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0806F986",
+      "motivo": "parou em 0x081C5646: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fd 01 00 e7 d5 e0 ea"
+    },
+    {
+      "entrada": "0x081D8DF0",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08020EF2",
+      "motivo": "parou em 0x081D8DF0: bkpt: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "3c be 3c 10 9d 00 12 40"
+    },
+    {
+      "entrada": "0x08231C84",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080073FC",
+      "motivo": "parou em 0x08231C84: stc2: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "20 fc fc f8 f8 f0 f0 e0"
+    },
+    {
+      "entrada": "0x08246BE4",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0804DB54",
+      "motivo": "codigo invalido em 0x08246BE4",
+      "bytes": "00 cd c2 bf be c3 c8 c4"
+    },
+    {
+      "entrada": "0x0825DEA4",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0804218C",
+      "motivo": "parou em 0x0825DEA4: stc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "c0 fc f3 cf 3f 01 04 10"
+    },
+    {
+      "entrada": "0x08261EC6",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0804EF6E",
+      "motivo": "codigo invalido em 0x08261EC6",
+      "bytes": "ff fe ff ba ff 00 b9 e0"
+    },
+    {
+      "entrada": "0x083FD534",
+      "modo": "thumb",
+      "semente": "salto para tras em 0x083FD56A",
+      "motivo": "parou em 0x083FD534: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fd 20 00 eb dd e8 dc"
+    },
+    {
+      "entrada": "0x083FD554",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080D7B64",
+      "motivo": "parou em 0x083FD554: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf e7 e8 d9 00 ff ff"
+    },
+    {
+      "entrada": "0x083FD55A",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080D7B6A",
+      "motivo": "codigo invalido em 0x083FD55A",
+      "bytes": "ff ff ff ff ff ff c0 e3"
+    },
+    {
+      "entrada": "0x083FD56C",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080D8330",
+      "motivo": "parou em 0x083FD56C: cbnz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff bb e0 dd d5 ff c0 e3"
+    },
+    {
+      "entrada": "0x083FE87A",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0800F6E8",
+      "motivo": "parou em 0x083FE87A: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fc 02 00 c6 e3 e7 e7"
+    },
+    {
+      "entrada": "0x083FE882",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0800F5D6",
+      "motivo": "parou em 0x083FE882: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fc 02 00 be e6 d5 eb"
+    },
+    {
+      "entrada": "0x08415F50",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08103204",
+      "motivo": "codigo invalido em 0x08415F50",
+      "bytes": "ff f8 0a cd bf c6 ad 00"
+    },
+    {
+      "entrada": "0x08415FAC",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08105FB4",
+      "motivo": "codigo invalido em 0x08415FAC",
+      "bytes": "ff f8 04 cd c9 c7 ff f8"
+    },
+    {
+      "entrada": "0x08415FB2",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08105FC8",
+      "motivo": "codigo invalido em 0x08415FB2",
+      "bytes": "ff f8 00 c7 bb c3 cd 00"
+    },
+    {
+      "entrada": "0x08415FCE",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08106782",
+      "motivo": "codigo invalido em 0x08415FCE",
+      "bytes": "ff f8 00 cd bb c3 cc 00"
+    },
+    {
+      "entrada": "0x08415FFE",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08104A70",
+      "motivo": "codigo invalido em 0x08415FFE",
+      "bytes": "ff f9 08 ff ca 02 c1 ad"
+    },
+    {
+      "entrada": "0x0841614A",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0806F99C",
+      "motivo": "parou em 0x0841614A: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf e6 e6 e3 00 d5 e3"
+    },
+    {
+      "entrada": "0x084161CC",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080806CE",
+      "motivo": "codigo invalido em 0x084161CC",
+      "bytes": "ff ff 57 84 7e 5e 79 ff"
+    },
+    {
+      "entrada": "0x08416220",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08121976",
+      "motivo": "codigo invalido em 0x08416220",
+      "bytes": "ff b6 ff f9 05 ff f9 08"
+    },
+    {
+      "entrada": "0x08416222",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08121822",
+      "motivo": "codigo invalido em 0x08416222",
+      "bytes": "ff f9 05 ff f9 08 fc 11"
+    },
+    {
+      "entrada": "0x0841623A",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0813C84C",
+      "motivo": "codigo invalido em 0x0841623A",
+      "bytes": "ff ef ff ff ff ff ff ff"
+    },
+    {
+      "entrada": "0x084162A8",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0806EEC4",
+      "motivo": "parou em 0x084162A8: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fd 02 ba fd 03 fe bc"
+    },
+    {
+      "entrada": "0x08418CD8",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080F5266",
+      "motivo": "parou em 0x08418CD8: cbnz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff bb 00 e1 d9 e1 23 e6"
+    },
+    {
+      "entrada": "0x08419C0A",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0813761E",
+      "motivo": "parou em 0x08419C0A: ldrd: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff e8 e6 e3 d7 d5 00 00"
+    },
+    {
+      "entrada": "0x08419C12",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0813760A",
+      "motivo": "parou em 0x08419C12: ldrd: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff e9 e1 00 e0 e9 db d5"
+    },
+    {
+      "entrada": "0x08419C7A",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08137D92",
+      "motivo": "codigo invalido em 0x08419C7A",
+      "bytes": "ff f8 0b ca 02 c1 ad ff"
+    },
+    {
+      "entrada": "0x08419CA8",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08137E0A",
+      "motivo": "codigo invalido em 0x08419CA8",
+      "bytes": "ff f8 0a bf cd bd c9 00"
+    },
+    {
+      "entrada": "0x0841A154",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x081110B0",
+      "motivo": "parou em 0x0841A154: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf e1 00 e7 e9 d5 00"
+    },
+    {
+      "entrada": "0x0841B072",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08112004",
+      "motivo": "parou em 0x0841B072: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf 00 fd 01 00 e7 d5"
+    },
+    {
+      "entrada": "0x0841B314",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0811D47E",
+      "motivo": "parou em 0x0841B314: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf b0 00 00 fb ff cf"
+    },
+    {
+      "entrada": "0x0841CB40",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0813C184",
+      "motivo": "parou em 0x0841CB40: cbnz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff bb c6 c1 cf 06 c7 00"
+    },
+    {
+      "entrada": "0x0841DE9C",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0800AEEC",
+      "motivo": "parou em 0x0841DE9C: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf e6 e6 e3 00 d8 d9"
+    },
+    {
+      "entrada": "0x0841DF04",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0800AE76",
+      "motivo": "parou em 0x0841DF04: cbnz: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "ff bb e4 e6 e3 ec dd e1"
+    },
+    {
+      "entrada": "0x0841DFA4",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0812BC58",
+      "motivo": "codigo invalido em 0x0841DFA4",
+      "bytes": "ff f8 00 ca cc 0e d2 ff"
+    },
+    {
+      "entrada": "0x0841DFC8",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0812B5D0",
+      "motivo": "codigo invalido em 0x0841DFC8",
+      "bytes": "ff f8 0a cd bf c6 ad 00"
+    },
+    {
+      "entrada": "0x0841E0A4",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0804DBAE",
+      "motivo": "parou em 0x0841E0A4: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf e7 e8 d5 00 e8 e6"
+    },
+    {
+      "entrada": "0x0841E1E8",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08052862",
+      "motivo": "parou em 0x0841E1E8: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fd 03 00 e7 d9 e6 17"
+    },
+    {
+      "entrada": "0x0841E20C",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x08053590",
+      "motivo": "parou em 0x0841E20C: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fd 02 00 e6 d9 d7 d9"
+    },
+    {
+      "entrada": "0x0841E324",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0805405A",
+      "motivo": "parou em 0x0841E324: IT block (iteee): nao existe no ARMv4T (provavel dado lido como codigo)",
+      "bytes": "ff bf e7 e4 d9 e6 d5 00"
+    },
+    {
+      "entrada": "0x08463FC0",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x081397D8",
+      "motivo": "parou em 0x08463FC0: mcr2: instrucao inexistente no ARM7TDMI (provavel dado lido como codigo)",
+      "bytes": "01 fe ff 00 01 02 fd fe"
+    },
+    {
+      "entrada": "0x08463FCC",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x0813981C",
+      "motivo": "codigo invalido em 0x08463FCC",
+      "bytes": "03 fb fd ff 00 01 03 05"
+    },
+    {
+      "entrada": "0x0871A4A0",
+      "modo": "thumb",
+      "semente": "ponteiro de pool em 0x080CF184",
+      "motivo": "parou em 0x0871A4A0: ldc2l: coprocessador no Thumb-1 -- o GBA nao tem coprocessador nenhum, entao a instrucao nao executa: aqui a leitura passou por dado (provavel dado lido como codigo)",
+      "bytes": "ff fc 05 05 fc 04 0d 0e"
+    },
+    {
+      "entrada": "0x08F1634A",
+      "modo": "thumb",
+      "semente": "chamada (bl) em 0x084EFF96",
+      "motivo": "codigo invalido em 0x08F1634A",
+      "bytes": "ff ff ff ff ff ff ff ff"
+    }
+  ],
+  "linhas_c": 483244,
+  "desvios_com_comparacao": 3446,
+  "desvios_por_flag": 8130,
+  "bytes_c": 18292786,
+  "conferencia": {
+    "total": 208458,
+    "identicas": 208249,
+    "taxa": 99.9,
+    "divergentes": 209,
+    "divergentes_por_mnemonico": {
+      "bx": 5,
+      "cmp": 204
+    },
+    "nao_remontadas": 0,
+    "divergentes_exemplos": [
+      {
+        "endereco": "0x0845A2DA",
+        "asm": "bx r8",
+        "binario": "4147",
+        "remontado": "4047"
+      },
+      {
+        "endereco": "0x0845A2DA",
+        "asm": "bx r8",
+        "binario": "4147",
+        "remontado": "4047"
+      },
+      {
+        "endereco": "0x0845A2DA",
+        "asm": "bx r8",
+        "binario": "4147",
+        "remontado": "4047"
+      },
+      {
+        "endereco": "0x0845A2DA",
+        "asm": "bx r8",
+        "binario": "4147",
+        "remontado": "4047"
+      },
+      {
+        "endereco": "0x0845A2DA",
+        "asm": "bx r8",
+        "binario": "4147",
+        "remontado": "4047"
+      }
+    ]
+  },
+  "compilacao": {
+    "compila": true,
+    "codigo_de_saida": 0,
+    "n_erros": 0,
+    "primeiros_erros": [],
+    "bytes_objeto": 956768,
+    "sha256_objeto": "641ffbb5b14ecf55382b3ba3236a4f6a7b5ecfb7ecbfc96c3ab9493e5812f8ee",
+    "diretorio_de_build": "/tmp/gbadecomp-build",
+    "comando": "/home/user/projeto-estudo-de-RE/.venv/lib/python3.11/site-packages/ziglang/zig cc -target thumb-freestanding-eabi -mcpu=arm7tdmi -Os -nostdlib -ffreestanding -c"
+  },
+  "caminho_c": "/home/user/gba-re/saida/boot_paradas.c"
+}

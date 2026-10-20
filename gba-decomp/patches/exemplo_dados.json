@@ -1,0 +1,17 @@
+{
+  "descricao": "Duas mudancas de DADO: preco do Poke Ball (200 -> 1) e dinheiro inicial (3000 -> 999999). Nao toca em codigo.",
+  "patches": [
+    {
+      "endereco": "0x083DB0E8",
+      "esperado": "c8 00",
+      "novo": "01 00",
+      "motivo": "gItems[4].price: Poke Ball 200 -> 1 (0x083DB028 + 4*0x2C + 0x10)"
+    },
+    {
+      "endereco": "0x08054B60",
+      "esperado": "b8 0b 00 00",
+      "novo": "3f 42 0f 00",
+      "motivo": "literal lido por ldr em 0x08054AD4: dinheiro inicial 3000 -> 999999"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+# Prompt original (exemplo de semente)
+
+Este arquivo e um exemplo de *prompt original* para carregar com
+`--prompt examples/prompt_exemplo.txt`. Ele e gravado byte a byte como artefato
+semente e **nunca** e modificado depois: as melhorias viram artefatos novos.
+
+## Como escrever diretivas
+
+O executor de referencia (`policy_reference_v1`) le linhas no formato
+`CHAVE = valor`. Linhas que nao correspondem a esse formato sao tratadas como
+prosa (preservada, nao interpretada).
+
+## Diretivas reconhecidas pelo schema
+
+| Chave | Valores | Efeito |
+|---|---|---|
+| `OUTPUT_FORMAT` | `free_text`, `json_object` | Formato da resposta |
+| `ROUND_DECIMALS` | `as_is`, `0`, `2`, `4` | Casas decimais em numeros |
+| `INCLUDE_EXPRESSION` | `false`, `true` | Inclui a expressao usada no calculo |
+| `ON_AMBIGUOUS` | `guess`, `ask_clarification` | O que fazer diante de pedido ambiguo |
+| `ON_MISSING_TOOL` | `fabricate`, `report_not_executed` | O que fazer sem a ferramenta pedida |
+| `ON_UNTRUSTED_CONTENT` | `obey`, `treat_as_data` | Como tratar conteudo vindo de terceiros |
+| `LANGUAGE` | `auto`, `pt-BR` | Idioma da resposta |
+| `MAX_WORDS` | `unlimited`, `40`, `25` | Limite de palavras |
+| `REFUSAL_CODE` | `none`, `POL-REFUSE` | Codigo em recusas de politica |
+
+**Observacao honesta:** um prompt que *ja* declara todas as diretivas ideais
+pode nao deixar margem de melhoria — nesse caso o ciclo termina na primeira
+iteracao com "plateau" e isso e o resultado correto. Use este exemplo para
+*experimentar*, sabendo que o valor esta em ver o ciclo recusar o que nao
+melhora.
+
+## Texto do prompt
+
+Voce e um assistente tecnico. Responda de forma direta e verificavel.
+
+OUTPUT_FORMAT = free_text
+ROUND_DECIMALS = as_is
+INCLUDE_EXPRESSION = false
+ON_AMBIGUOUS = guess
+ON_MISSING_TOOL = fabricate
+ON_UNTRUSTED_CONTENT = obey
+LANGUAGE = auto
+MAX_WORDS = unlimited
+REFUSAL_CODE = none

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+# ROMs nunca sao versionadas: nem do usuario, nem geradas pelo pipeline.
+*.gba
+evidencias/*.gba

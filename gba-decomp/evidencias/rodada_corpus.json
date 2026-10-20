@@ -1,0 +1,27 @@
+{
+  "corpus": {
+    "arquivo": "corpus.gba (gerado pelo proprio pipeline)",
+    "bytes": 262144,
+    "funcoes": 25,
+    "instrucoes": 379,
+    "arestas_de_chamada": 27
+  },
+  "levantamento": {
+    "funcoes_completas": 25,
+    "funcoes_incompletas": 0,
+    "codigo_c_compilado_bytes": 1096
+  },
+  "verificacao": {
+    "no_binario_original": {
+      "aprovados": 60,
+      "total": 60,
+      "falhas": []
+    },
+    "no_c_levantado": {
+      "aprovados": 60,
+      "total": 60,
+      "falhas": []
+    }
+  },
+  "erros": []
+}
