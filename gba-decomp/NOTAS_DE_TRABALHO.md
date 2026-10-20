@@ -734,3 +734,63 @@ emuladores devem le-lo como flash 128K padrao, mas nao testamos nenhum;
 usar a Master Ball numa captura continua sem teste (fica para o usuario
 jogando); o mecanismo exato de troca de snapshot do Quest Log foi
 medido pelo efeito (SB1/SB2/chave/posicao), nao desmontado.
+
+## 25. Ambiente perdido e regeneracao BYTE-IDENTICA + arquivos no Drive (2026-10-20)
+
+**Resultado**: a pedido do usuario ("colocar ambos no drive"), o .sav da
+§24 e o .state da §23 foram enviados ao Google Drive dele -- mas antes
+foi preciso REGERA-LOS: o sandbox reiniciou e `/home/user/gba-re`
+(ROM, core, estados) nao existia mais; e o checkout voltou grafted em
+`eabe82b` com a arvore toda untracked. Fechamento desta secao: checkout
+realinhado a `45705d1` (o snapshot untracked era byte-identico a
+arvore remota; `git reset --hard` nao perdeu nada).
+
+### 25.1 Reconstrucao do ambiente (tudo medido)
+
+- ROM recuperada do Drive do usuario (`Pokemon - Fire Red (BR).gba`
+  via conector): md5 `4ec27a4b580a5a883ba66f924810cbd7`, a mesma imagem
+  de trabalho. (Passo pelo repo por staging do conector; removida sem
+  commit -- nunca reenviada a lugar nenhum.)
+- O .sav de mesmo nome no Drive era 128 KB de `0xFF` (flash virgem,
+  histograma conferido): como doador, inutil.
+- Core recompilado do fonte: tarball mgba 0.10.5 do codeload.github.com
+  + zlib 1.3.1 local (sandbox sem headers) + cmake de wheel (PyPI). O
+  CMake 4.x recusa o `cmake_minimum_required` antigo do mgba: passar
+  `-DCMAKE_POLICY_VERSION_MINIMUM=3.5`. So BUILD_LIBRETRO, resto OFF;
+  sem shim de glibc (core nativo). Smoke test: 600 quadros, 11
+  descritores de memoria.
+- Suíte no venv reconstruido precisa de keystone/unicorn/capstone/
+  ziglang: sem ziglang, 14 erros + 4 falhas em test_pipeline (tudo
+  "compilador cruzado nao encontrado"); com tudo: **119 passed**.
+
+### 25.2 A pipeline repetiu byte a byte
+
+Reexecutadas `ir_ao_inicial --do-boot` -> `ir_a_viridian` ->
+`modificar_pokemon` -> `da_pokebolas` -> SALVAR do menu: os quatro
+artefatos sairam com os SHA-256 registrados nas secoes originais --
+`viridian.state` `057ff2bf...dca0` (§21), estado modificado
+`613394cf...db2d` (§22), `viridian_masterball.state`
+`5ca04ca2...5426` (§23) e `pokemon_modificado_masterball.sav`
+`1817043a...7567` (§24). Ate' os marcos bateram (Rota 1 em 124 passos,
+2 encontros/2 fugas, EXP 204, IVs originais `(19,10,12,24,13,26)`,
+chave da bolsa `0x3CD7453E`) e a armadilha do Quest Log repetiu os
+mesmos valores (chave do snapshot `0xF6EA3C4A`, chave pos-recap
+`0x45602619`). A cadeia inteira e' deterministica nas nossas
+ferramentas guiadas por sinais -- e o serialize do core 0.10.5
+compilado repetiu os bytes do core baixado da vez original.
+
+### 25.3 Entrega no Drive (verificada 2x)
+
+Ambos na raiz do Drive do usuario: `pokemon_modificado_masterball.sav`
+(131072 B, id `11nl17Q3QMauLL-MqLx9C5XhMuuSxt0HS`) e
+`viridian_masterball.state` (528448 B, id
+`1s_b6Kp5DGMCSGGm8jkFySDTdl1fKQhkV`). MD5 calculado pelo Drive ==
+MD5 local dos dois (`ace4e75a...` / `e1dd4d38...`), reconferido nesta
+secao. Antes do upload, boot frio no core novo repetiu a validacao da
+§24 (Viridian `(25,39)`, nv10/IVs 31, MASTER BOLA x1 na tela).
+
+**Nao provado**: que o serialize continue byte-identico em outras
+versoes/configuracoes de core (medido so' neste par); leitura do .sav/
+.state fora do nosso mGBA segue sem teste, como na §24; disponibilidade
+e retencao dos arquivos no Drive dependem da conta do usuario (o que
+provamos foi upload + MD5 no ato e nesta retomada).

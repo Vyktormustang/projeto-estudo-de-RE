@@ -957,3 +957,46 @@ SALVAR do menu**.
 - Usar a Master Ball numa captura (fica para jogar de verdade).
 - O mecanismo interno da troca de snapshot do Quest Log — medido pelo
   efeito em SB1/SB2/chave/posição, não desmontado.
+
+## §25 — Ambiente perdido, regeneração byte-idêntica e entrega no Drive (2026-10-20)
+
+**MEDIDO**:
+
+- Ao retomar para enviar os arquivos ao Google Drive do usuário, o
+  ambiente tinha sido reiniciado: `gba-re/` (ROM, core, estados) não
+  existia mais e o checkout voltou *grafted* na `main` com a árvore
+  inteira *untracked*. A ROM foi recuperada do Drive do usuário (MD5
+  `4ec27a4b…`, a mesma imagem de trabalho — nunca reenviada); o `.sav`
+  de mesmo nome no Drive era 128 KB de `0xFF` (flash virgem, inútil
+  como doador).
+- O core libretro foi recompilado do fonte (mgba 0.10.5 via
+  codeload.github.com + zlib local; o CMake 4.x dos wheels exige
+  `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` para o projeto). Sem shim de
+  glibc, o harness rodou de primeira (600 quadros, 11 descritores).
+- Reexecutada a pipeline completa das §§19–24, os quatro artefatos
+  saíram **byte a byte idênticos** aos registrados: `viridian.state`
+  `057ff2bf…dca0`, estado modificado `613394cf…db2d`,
+  `viridian_masterball.state` `5ca04ca2…5426` e o `.sav` `1817043a…7567`
+  — inclusive marcos da Rota 1 (124 passos, 2 fugas), IVs de origem e a
+  armadilha do Quest Log com as mesmas chaves (`0xF6EA3C4A` no snapshot,
+  `0x45602619` após o recap). A cadeia guiada por sinais é
+  determinística, e o *serialize* do core recompilado repetiu os bytes
+  do core da execução original.
+- Os dois arquivos foram enviados à raiz do Drive do usuário e a
+  integridade foi conferida pelo MD5 que o próprio Drive calcula
+  (`.sav` `ace4e75a…`, `.state` `e1dd4d38…`, iguais aos locais),
+  reconferida nesta retomada. Antes do envio, o boot frio no core novo
+  repetiu a validação da §24. Suíte gba-decomp no ambiente
+  reconstruído: **119 passed** (sem `ziglang`, os testes de corpus
+  falham na coleta — dependência de ambiente, não de código).
+- O checkout foi realinhado à branch remota (`45705d1`): o snapshot
+  *untracked* era idêntico à árvore remota, então o `reset --hard`
+  não perdeu nada.
+
+**NÃO PROVADO**:
+
+- Que o *serialize* de estado continue byte-idêntico em outras versões
+  ou configurações de core (medido só neste par de builds 0.10.5).
+- Leitura do `.sav`/`.state` fora do nosso mGBA (como na §24) e a
+  retenção dos arquivos na conta do usuário além do que foi verificado
+  (upload + MD5, duas vezes).
