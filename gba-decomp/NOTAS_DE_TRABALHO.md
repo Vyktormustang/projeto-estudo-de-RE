@@ -794,3 +794,70 @@ versoes/configuracoes de core (medido so' neste par); leitura do .sav/
 .state fora do nosso mGBA segue sem teste, como na §24; disponibilidade
 e retencao dos arquivos no Drive dependem da conta do usuario (o que
 provamos foi upload + MD5 no ato e nesta retomada).
+
+## 26. Pacote do Oak entregue: Pokedex na mao (2026-10-20)
+
+**Resultado**: a pedido do usuario ("avancar a historia: pacote do Oak
++ Pokedex"), a historia andou a partir de `viridian_masterball.state`
+(§23) SO' jogando -- nenhuma escrita em RAM. Entrou no Mercado de
+Viridian, recebeu o Pacote do Oak, voltou pela Rota 1, falou com Oak
+e parou em Pallet com a Pokedex. Ferramenta consolidada:
+`ferramentas/entregar_pacote.py`. Artefato fora do Git:
+`/home/user/entrega/estados/pacote_entregue.state` (528448 B, sha256
+`94e63e5c1a6f871dfc3b041521e39fb2b1f96c94324f6a4fea0311749a64e574`).
+
+### 26.1 A falha que ensinou a rota (registrada, nao repetir)
+
+O piloto externo chamou `Travessia.ir_para((36,20), VIRIDIAN)` direto
+de `(25,39)`: o explorador Manhattan + penalidade por visitas bateu
+no limite de 360 passos preso em `(35,33)`, no sudeste da cidade
+(entre canteiros/desniveis), sem salvar checkpoint -- o estado de
+entrada ficou intacto. Cidade com predios nao e' rota: Manhattan
+puro escolhe "leste o quanto antes" e nao sabe voltar a avenida.
+
+### 26.2 O caminho que funciona (tudo medido em jogo)
+
+- **Viridian pelas ruas**: norte em x=25 ate' `(25,32)`; esquerda ate'
+  `(22,32)` (avenida a oeste do Centro Pokemon); norte ate' `(22,21)`;
+  direita ate' `(36,21)`; um passo ao norte ate' `(36,20)`, frente do
+  Mercado. So' pernas cardeais (`Travessia.caminhar`); o explorador
+  ficou de reserva e nao foi necessario. Portas/gatilhos evitados
+  vieram do `map.json` do pret: `(26,26) (25,11) (36,10) (25,18)
+  (36,19) (22,11) (36,11) (20,8) (22,8)`.
+- **Mercado**: passo ao norte na porta `(36,19)` -> warp para o mapa
+  `(5,3)` em `(4,7)`. A cena e' automatica (ON_FRAME do pret): o
+  jogador anda sozinho ate' `(4,3)` e, apos avancar o dialogo, a
+  pocket ITEM CHAVE le `{349: 1}` -- `ITEM_OAKS_PARCEL=349`
+  confirmado pela bolsa, nao so' pela tabela. Saida: `(4,6)` e um
+  passo ao sul -> Viridian `(36,20)`.
+- **Volta**: `ir_para (25,39)` em 39 passos; passo ao sul cai na Rota
+  1 `(3,19)` em `(13,0)`; explorador com custo `-y` chega a Pallet
+  `(3,0)` em `(12,0)` em 62 passos. Nenhuma batalha: o time voltou
+  identico (nv10, EXP 560, HP 32/32, IVs 31, integro).
+- **Pallet/lab**: `(13,3)` em 1 passo, sul pela coluna 12 ate' y=14,
+  direita ate' `(16,14)`; porta `(16,13)` -> lab `(4,3)` em `(6,12)`;
+  `ir_para (6,4)` em 8 passos; passo ao norte recusado (Oak em
+  `(6,3)`) so' vira o jogador. Uma rodada de dialogo bastou: pocket
+  chave `{}` e pocket bolas `{1: 1, 4: 5}` (pacote removido, Master
+  Ball intacta, +5 Poke Balls do script). Saida do lab em 9 passos
+  ate' Pallet `(16,14)`, onde o estado final foi salvo.
+
+### 26.3 Reproducao e prova da Pokedex
+
+- A ferramenta do repo foi reexecutada do estado de entrada para
+  `pacote_entregue_repo.state`: **byte-identica** ao piloto (`cmp`
+  limpo, mesmo sha256 acima). Suite: **119 passed**.
+- Validacao em processo novo (`/home/user/entrega/validar_pokedex.py`,
+  fora do Git): carrega so' o estado final, confere Pallet `(16,14)`,
+  Pokemon integro e bolas `{1: 1, 4: 5}`; START abre o menu com
+  **POKeDEX** como primeira opcao (foto md5 `003da6ed`); apertar A
+  troca o cb2 para `0x081024d5` e mostra "AS POKeDEX -- Visto 3,
+  Pegos 1" (foto md5 `484af6c2`); B volta ao overworld e o teste
+  `livre` (passo ida-e-volta) passa sem sair de `(16,14)`.
+
+**Nao provado**: nao foi gerado `.sav` novo nem feito upload -- o
+`.sav`/`.state` do Drive (§25) continuam no ponto anterior (Viridian,
+antes do pacote). A flag da Pokedex foi provada pelo comportamento
+(menu/tela), nao lida direto da RAM. Nao houve batalha na execucao
+medida, entao o ramo de fuga da volta nao foi exercitado desta vez;
+capturar com a Master Ball segue sem teste, como na §24.

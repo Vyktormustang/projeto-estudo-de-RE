@@ -1000,3 +1000,51 @@ SALVAR do menu**.
 - Leitura do `.sav`/`.state` fora do nosso mGBA (como na §24) e a
   retenção dos arquivos na conta do usuário além do que foi verificado
   (upload + MD5, duas vezes).
+
+## §26 — Pacote do Oak entregue: Pokédex na mão (2026-10-20)
+
+**OBJETIVO**: a pedido do usuário, avançar a história a partir do
+estado da §23 e **parar com a Pokédex**: pegar o Pacote do Oak no
+Mercado de Viridian, voltar pela Rota 1 e entregar ao Professor Oak.
+Tudo jogando (entradas + leitura de sinais), sem escrita em RAM.
+
+**MEDIDO**:
+
+- A primeira tentativa falhou e ficou registrada: o explorador
+  Manhattan puro de Viridian `(25,39)` até a frente do Mercado
+  `(36,20)` bateu no limite de 360 passos preso em `(35,33)`
+  (sudeste da cidade). O caminho que funciona segue as ruas em pernas
+  cardeais: `(25,32)` → `(22,32)` → `(22,21)` → `(36,21)` → `(36,20)`,
+  evitando as portas/gatilhos do `map.json` do pret.
+- A porta `(36,19)` leva ao interior do Mercado, mapa `(5,3)`, em
+  `(4,7)`; a cena do pacote é automática ao entrar (script ON_FRAME)
+  e termina com o jogador em `(4,3)` e a pocket ITEM CHAVE lendo
+  `{349: 1}` — `ITEM_OAKS_PARCEL = 349` confirmado pela própria bolsa.
+- A volta: Viridian `(25,39)` em 39 passos; um passo ao sul cai na
+  Rota 1 em `(13,0)`; o explorador com custo `-y` chega a Pallet
+  `(12,0)` em 62 passos, **sem nenhuma batalha** — o Bulbasaur voltou
+  idêntico (nv10, EXP 560, HP 32/32, IVs 31, íntegro).
+- No laboratório `(4,3)`, falando com Oak `(6,3)` a partir de
+  `(6,4)`, uma rodada de diálogo consumiu a cena inteira: pocket
+  chave `{}` (pacote removido pelo script) e pocket de bolas
+  `{1: 1, 4: 5}` (Master Ball intacta + as 5 Poké Balls da entrega).
+- Estado final salvo fora do Git
+  (`/home/user/entrega/estados/pacote_entregue.state`, 528.448 B,
+  sha256 `94e63e5c…e574`) em Pallet `(16,14)`. A ferramenta
+  consolidada `ferramentas/entregar_pacote.py` reexecutou o trajeto e
+  produziu um estado **byte a byte idêntico** ao do piloto; suíte
+  gba-decomp: **119 passed**.
+- Prova da Pokédex em processo novo: o menu START do estado final
+  mostra **POKéDEX** como primeira opção; selecioná-la troca o
+  `callback2` para `0x081024d5` e abre “AS POKéDEX — Visto 3,
+  Pegos 1”; sair com B devolve o controle em `(16,14)`
+  (passo ida-e-volta OK).
+
+**NÃO PROVADO**:
+
+- Nenhum `.sav` novo foi gerado nem enviado: o `.sav`/`.state` do
+  Drive (§25) continuam no ponto anterior (Viridian, antes do pacote).
+- A flag da Pokédex foi provada pelo comportamento (menu e tela),
+  não por leitura direta do bit em RAM; o ramo de fuga de batalha na
+  volta não foi exercitado (não houve encontros); capturar com a
+  Master Ball segue sem teste, como na §24.
