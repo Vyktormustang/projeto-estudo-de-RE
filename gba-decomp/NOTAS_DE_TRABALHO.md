@@ -605,3 +605,57 @@ de recuperacao de whiteout da ferramenta final -- whiteout para casa foi
 medido em sondas, mas a volta completa casa -> Viridian com a versao
 consolidada nao foi exercitada; e a contagem de encontros continua
 dependendo do RNG/quadro em outras execucoes.
+
+## 22. Valores do Pokemon modificados e provados em jogo (`modificar_pokemon.py`, 2026-10-20)
+
+**Resultado**: objetivo unico concluido -- o Bulbasaur do estado de
+Viridian saiu de nv6, HP 22/22, EXP 204, IVs `(19,10,12,24,13,26)` e
+atributos `(11,11,12,13,12)` para **nv10, HP 32/32, EXP 560, IVs
+31/31/31/31/31/31** e atributos `(17,17,18,21,18)` na nossa ordem
+(Atk, Def, Vel, AtkEsp, DefEsp). EVs `(0,0,0,1,0,0)`, golpes `(33,45,0,0)`,
+personalidade e natureza nao mudaram.
+
+### 22.1 O que foi acrescentado
+
+- `gbadecomp/pokemon.py`: `definir_experiencia()` e `definir_ivs()`
+  editam a area segura e passam pelo mesmo caminho de recifrar/checksum
+  da §20; os IVs preservam os bits 30-31 vizinhos (`isEgg`/`abilityNum`).
+  `sincronizar_nivel_atributos()` grava nivel, HP atual/maximo e os 5
+  atributos derivados com `recalcular()` -- sem isso, mudar EXP/IVs na
+  caixa deixaria o extra do time exibindo os valores antigos.
+- `ferramentas/modificar_pokemon.py`: carrega um estado, recusa Pokemon
+  nao integro, valida EXP contra a faixa medio-lenta do nivel, sincroniza
+  apenas especies com bases conhecidas (hoje so' Bulbasaur), reli os 100
+  bytes da RAM apos rodar 10 quadros e so' entao salva estado novo.
+- Os dois testes novos de `tests/test_pokemon.py` provam, sem emulador,
+  a recifragem de EXP/IVs e o caso exato nv10/EXP 560/IVs 31 -> HP 32 e
+  `(17,17,18,21,18)`. Suite completa: **116 passed**.
+
+### 22.2 Execucao e validacao em processo novo
+
+Entrada: `/home/user/gba-re/testes/viridian.state`, sha256
+`057ff2bfa90c295dfdaa23d653592282bee5897fa22f4b3b9480e012ece4dca0`
+antes **e depois** -- nao foi sobrescrita. Saida fora do Git:
+`/home/user/gba-re/testes/viridian_pokemon_modificado.state` (528448
+bytes; sha256
+`613394cf0669cdef54641cec0254764bf58d4d7368be9037032b0dbae8e8db2d`).
+
+Num processo novo, o estado modificado carregou em Viridian `(3,1)`,
+`(25,39)`, decifrou integro e exibiu nas telas do proprio jogo:
+`pokemon_modificado_time.png` (Lv10, HP 32/32) e
+`pokemon_modificado_atributos.png` (HP 32/32; na ordem da tela Atk 17,
+Def 17, AtkEsp 21, DefEsp 18, Vel 18; EXP 560 e 182 para o proximo
+nivel). Depois a validacao saiu das telas, andou `(25,39)->(25,38)`,
+voltou e reliu a estrutura: o jogo nao reverteu nem corrompeu os valores.
+
+Um ajuste de medida importou: na primeira tentativa, mandar START logo
+apos o passo de volta nao abriu o menu e as fotos ficaram no overworld.
+Abrir time/resumo antes de andar e esperar as transicoes de retorno
+(180q por B) tornou a validacao reprodutivel.
+
+**Nao provado**: a sincronizacao so' cobre especie com bases conhecidas
+e o caso medido usa a curva medio-lenta do Bulbasaur; nao adicionamos
+setter de EVs nem editamos especie; subir o nivel na mao nao executa o
+evento de level-up do jogo (golpes continuam 33/45) e nenhum
+level-up/evolucao/batalha posterior foi testado; persistir pelo SALVAR
+do menu continua sem teste. Paramos aqui, como pedido.

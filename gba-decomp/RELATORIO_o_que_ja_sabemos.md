@@ -851,3 +851,44 @@ evidências `viridian_*.png`):
 - Número e desfecho dos encontros em outras execuções (RNG/tempo de
   quadro). Nada além da chegada a Viridian foi executado — nem pacote do
   Oak, nem Pokédex, nem captura.
+
+## §22 — Modificar os valores do Pokémon atual (2026-10-20)
+
+**MEDIDO** (`ferramentas/modificar_pokemon.py`; 2 testes puros novos;
+suíte completa em **116 passed**):
+
+- A biblioteca ganhou escrita segura para experiência e IVs na área
+  cifrada (recifrar + checksum, preservando os bits 30–31 vizinhos aos
+  IVs) e sincronização dos campos derivados do time. Este segundo passo
+  é necessário: nível, HP atual/máximo e os 5 atributos ficam fora da
+  área cifrada; alterá-los só na caixa deixaria os valores exibidos
+  antigos.
+- Caso executado no Bulbasaur que chegou a Viridian: nv6 → **nv10**,
+  EXP 204 → **560** (mínimo médio-lento do nv10), IVs
+  `(19,10,12,24,13,26)` → **31/31/31/31/31/31**, HP 22/22 → **32/32** e
+  atributos `(11,11,12,13,12)` → **`(17,17,18,21,18)`** na ordem Atk,
+  Def, Vel, AtkEsp, DefEsp. EVs, golpes, personalidade e natureza
+  permaneceram inalterados.
+- O estado de entrada não foi tocado: o SHA-256 de
+  `viridian.state` é `057ff2bf…dca0` antes e depois. A saída ficou fora
+  do Git como `viridian_pokemon_modificado.state` (528.448 bytes,
+  SHA-256 `613394cf…db2d`).
+- Em processo novo, a saída abriu viva em Viridian `(3,1)`, `(25,39)` e
+  as telas do próprio jogo confirmaram os valores: o time mostra Lv10 e
+  HP 32/32 (`evidencias/pokemon_modificado_time.png`); a página de
+  habilidades mostra HP 32/32, Atk 17, Def 17, AtkEsp 21, DefEsp 18,
+  Vel 18, EXP 560 e 182 para o próximo nível
+  (`evidencias/pokemon_modificado_atributos.png`). Depois a validação
+  saiu dos menus, andou até `(25,38)`, voltou e reliu a estrutura
+  íntegra, sem reversão dos valores.
+
+**NÃO PROVADO**:
+
+- A sincronização está limitada às espécies com bases conhecidas no
+  código (hoje, Bulbasaur) e o caso medido usa a sua curva médio-lenta.
+- Não foi criado setter de EVs nem foi testada edição de espécie.
+- Mudar nível/EXP diretamente não executa o evento de level-up: os
+  golpes seguem 33/45, e nenhum level-up, evolução ou batalha posterior
+  com esses valores foi testado.
+- Persistir a mudança pelo SALVAR do menu no cartucho continua sem
+  teste. Este objetivo parou na prova da modificação, como pedido.

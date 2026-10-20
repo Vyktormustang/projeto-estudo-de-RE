@@ -162,6 +162,14 @@ class Pokemon:
     def amizade(self) -> int:
         return self._subestruturas()[CRESCIMENTO][9]
 
+    def definir_experiencia(self, valor: int) -> None:
+        """Grava a EXP total na subestrutura de crescimento e recifra."""
+        if not 0 <= valor <= 0xFFFFFFFF:
+            raise ValueError("experiencia deve caber num u32")
+        subs = self._subestruturas()
+        struct.pack_into("<I", subs[CRESCIMENTO], 4, valor)
+        self._gravar(subs)
+
     # -- subestrutura 1: golpes ------------------------------------------------
     @property
     def golpes(self) -> tuple[int, ...]:
@@ -191,6 +199,18 @@ class Pokemon:
         bruto32 = struct.unpack_from("<I", self._subestruturas()[MISC], 4)[0]
         return tuple((bruto32 >> (5 * i)) & 31 for i in range(6))
 
+    def definir_ivs(self, valores) -> None:
+        """Grava os 6 IVs (0..31), preservando isEgg/abilityNum nos bits 30-31."""
+        valores = tuple(valores)
+        if len(valores) != 6 or any(not 0 <= v <= 31 for v in valores):
+            raise ValueError("sao necessarios 6 IVs entre 0 e 31")
+        subs = self._subestruturas()
+        bruto32 = struct.unpack_from("<I", subs[MISC], 4)[0] & (0b11 << 30)
+        for i, valor in enumerate(valores):
+            bruto32 |= valor << (5 * i)
+        struct.pack_into("<I", subs[MISC], 4, bruto32)
+        self._gravar(subs)
+
     # -- utilidades ---------------------------------------------------------------
     def recalcular(self, bases: tuple[int, ...]) -> tuple[int, ...]:
         """(HPMax, Atk, Def, Vel, AtkEsp, DefEsp) pelas formulas da ger. 3.
@@ -212,6 +232,32 @@ class Pokemon:
                     n = n * 90 // 100
             stats.append(n)
         return (hp_max, *stats)
+
+    def sincronizar_nivel_atributos(
+        self,
+        nivel: int,
+        bases: tuple[int, ...],
+        *,
+        curar: bool = True,
+    ) -> None:
+        """Atualiza nivel, HP e os 5 atributos gravados a partir de IVs/EVs.
+
+        Estes campos ficam fora da area cifrada (extra do time, +0x54..).
+        Com `curar=False`, preserva o dano absoluto ja sofrido.
+        """
+        if not 1 <= nivel <= 100:
+            raise ValueError("nivel deve estar entre 1 e 100")
+        if len(bases) != 6:
+            raise ValueError("sao necessarias as 6 bases da especie")
+        hp_atual_antigo, hp_max_antigo = self.hp
+        self.bruto[0x54] = nivel
+        hp_max, *atributos = self.recalcular(bases)
+        if curar:
+            hp_atual = hp_max
+        else:
+            dano = max(0, hp_max_antigo - hp_atual_antigo)
+            hp_atual = max(0, hp_max - dano)
+        struct.pack_into("<7H", self.bruto, 0x56, hp_atual, hp_max, *atributos)
 
     def serializar(self) -> bytes:
         return bytes(self.bruto)

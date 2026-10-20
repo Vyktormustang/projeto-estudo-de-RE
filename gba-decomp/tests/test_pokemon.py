@@ -79,3 +79,34 @@ def test_definir_golpe_recifra_e_preserva_o_resto():
     assert novo[:0x1C] == VENCEU[:0x1C]
     assert novo[0x1E:0x20] == VENCEU[0x1E:0x20]
     assert novo[0x50:] == VENCEU[0x50:]
+
+
+def test_definir_experiencia_e_ivs_recifra_e_preserva_o_resto():
+    mon = ler_pokemon(VENCEU)
+    antes = (mon.especie, mon.golpes, mon.pps, mon.evs, mon.nivel,
+             mon.hp, mon.atributos)
+    mon.definir_experiencia(560)
+    mon.definir_ivs((31, 31, 31, 31, 31, 31))
+    assert mon.integro()
+    relido = ler_pokemon(mon.serializar())
+    assert relido.experiencia == 560
+    assert relido.ivs == (31, 31, 31, 31, 31, 31)
+    assert (relido.especie, relido.golpes, relido.pps, relido.evs,
+            relido.nivel, relido.hp, relido.atributos) == antes
+
+
+def test_sincronizar_nivel_10_recalcula_hp_e_atributos():
+    mon = ler_pokemon(VENCEU)
+    mon.definir_experiencia(exp_minima_medio_lento(10))
+    mon.definir_ivs((31, 31, 31, 31, 31, 31))
+    mon.sincronizar_nivel_atributos(10, BASES_CONHECIDAS[mon.especie])
+    assert mon.integro()
+    assert mon.nivel == 10
+    assert mon.experiencia == 560
+    assert mon.hp == (32, 32)
+    # natureza 14: +Velocidade, -Def.Especial
+    assert mon.atributos == (17, 17, 18, 21, 18)
+    assert mon.recalcular(BASES_CONHECIDAS[mon.especie]) == (
+        mon.hp[1], *mon.atributos)
+    assert mon.golpes == (33, 45, 0, 0)
+    assert mon.evs == (0, 0, 0, 1, 0, 0)
