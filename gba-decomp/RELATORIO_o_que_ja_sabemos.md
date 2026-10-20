@@ -710,3 +710,35 @@ roda" anteriores.
 - O harness do gba-harness **não foi executado** (exige Python 3.12; o
   sandbox tem 3.11.2) — foi apenas lido. O libretro.py também não foi
   executado; deixou de ser necessário depois do teste de controle.
+
+## §18 — Overworld: do boot ao quarto, com estado validado (2026-10-20)
+
+**MEDIDO** (3 execuções com quadros e hashes idênticos;
+`ferramentas/ir_ao_overworld.py` + `validar_estado_overworld.py`):
+
+- A navegação completa é determinística: sai do título no q.1870
+  (transitório `0x0800C2D5`), q.1885 `0x0812EB11` (diálogos, 96 pulsos de
+  A no total), telas de nomear `0x0809FB71` nos q.4540 (jogador) e q.5365
+  (rival), e q.6595 `0x080565B5` estável = overworld; chegou no q.6955
+  com `pos=(6,6)`, grupo 4, mapa 1 — o quarto do jogador (PNG em
+  `evidencias/overworld_quarto.png`).
+- Na tela de nomear, **START só move o cursor ao botão OK; quem confirma
+  é o A** (pret `naming_screen.c` + medido: a 1ª versão, só com START,
+  travou até o limite).
+- **Correção sobre §§ anteriores**: o endereço do SaveBlock1 **não é
+  fixo**. No overworld, `gSaveBlock1Ptr` (`0x03005008`) vale
+  `0x0202557C` (+0x38 sobre o `0x02025544` de sessões anteriores, que
+  aqui está zerado). Ler sempre pelo ponteiro.
+- O estado salvo no overworld (528.448 B, fora do Git) carrega **vivo**
+  num processo novo: BAIXO (6,6)→(6,8), DIREITA →(9,8), START abre o
+  menu (BOLSA/SALVAR/OPÇÕES/SAIR) e B fecha com o framebuffer voltando
+  byte-idêntico (hash `890d5737`). Diferente dos estados inertes da
+  §16.3, este é ponto de partida reutilizável (e regenerável em ~1 min).
+
+**NÃO PROVADO**:
+
+- Os nomes dos três callbacks (`0x0812EB11`, `0x0809FB71`, `0x080565B5`)
+  continuam inferidos do comportamento/pret, sem desmontagem nesta ROM.
+- A causa da variação de +0x38 no buffer do SaveBlock1 não foi
+  investigada (hipótese: contextos de Quest Log) — só o efeito foi
+  medido.

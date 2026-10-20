@@ -394,3 +394,58 @@ nova: **tela se julga por PNG/framebuffer, nunca por hash de VRAM**.
 principal ("NOVO JOGO") -- nao amostramos quadro a quadro ali; e os nomes
 `CB2_InitMainMenu`/`CB2_MainMenu` para `0x0800C301`/`0x0812EB11` sao
 inferidos do pret, sem desmontagem nesta ROM ainda.
+
+## 18. Overworld alcancado: boot -> quarto (2026-10-20, sessao seguinte) (ferramentas `ir_ao_overworld.py` + `validar_estado_overworld.py`)
+
+**Resultado**: a navegação agora vai do boot ate' o **quarto do jogador**
+(em ~1 min de relogio, 6955 quadros), e o estado salvo nesse ponto foi
+**validado vivo** num processo novo. Evidencias: `evidencias/overworld_quarto.png`
+e `overworld_val_*.png`.
+
+### 18.1 Linha do tempo medida (deterministica: 3 execucoes identicas)
+
+- q.1870 sai do titulo com callback2 `0x0800C2D5` (transitorio; na §17 a
+  amostragem pegou `0x0800C301` -- amostras diferentes da mesma transicao).
+- q.1885 -> `0x0812EB11` (dialogos: paginas de CONTROLE + fala do professor
+  + escolha de sexo): avanca com pulso de A a cada 45 quadros.
+- q.4540 -> `0x0809FB71`: **tela de nomear #1** (jogador);
+  q.5365: **#2** (rival). Total na intro: 96 pulsos de A.
+- q.6595 -> `0x080565B5`, estavel por 240+ quadros => overworld (confirmado
+  pelo comportamento, ver 18.3; o nome `CB2_Overworld` do pret e' inferido,
+  sem desmontagem nesta ROM).
+
+### 18.2 START na tela de nomear NAO confirma (bug da 1a versao)
+
+No pret (`src/naming_screen.c`), `INPUT_START` chama apenas
+`MoveCursorToOKButton()`; quem confirma e' **A sobre o botao OK**. A primeira
+versao esperou a saida so' com START e queimou 357 s ate' o limite. Corrigido:
+A digita a letra, START vai ao OK, A confirma (com teto por tentativa).
+
+### 18.3 SaveBlock1 e' via ponteiro, NAO endereco fixo (corrige nota antiga)
+
+No overworld, `[0x03005008]` (`gSaveBlock1Ptr`) = **`0x0202557C`** e
+`[0x0300500C]` = `0x020245D8`: **+0x38** em relacao aos `0x02025544`/
+`0x020245A0` medidos em sessoes anteriores (lidos naquele contexto a partir
+dos mesmos ponteiros -- o buffer muda com o contexto, ex.: Quest Log).
+A `0x02025544` fixo esta' **tudo zerado** aqui. **Regra: sempre
+`ler_u32(0x03005008)` antes de tocar no SaveBlock1** (idem 0x50 0C p/ o 2).
+`ferramentas/ir_ao_overworld.py` ja' faz isso; usos antigos de endereco fixo
+devem ser revistos antes de reusar.
+Medido via ponteiro no spawn: `pos=(6,6)`, `location=(grupo 4, mapa 1,
+warp -1)` -- quarto do jogador (PNG confere).
+
+### 18.4 Estado salvo VALIDADO (o contraste com a §16.3)
+
+`salvar_estado` gerou 528.448 bytes (fora do repo). Num processo novo,
+`ferramentas/validar_estado_overworld.py`: BAIXO (6,6)->(6,8),
+DIREITA ->(9,8), START abre o menu (BOLSA/SALVAR/OPCOES/SAIR -- sem
+POKeMON/POKeDEX ainda), B fecha e o framebuffer volta **byte-identico**
+(hash `890d5737` antes e depois). Entao estados gerados *deste* jeito
+(boot continuo ate' o overworld) sao reutilizaveis; na duvida, a propria
+ferramenta refaz o caminho em ~1 min. O arquivo de estado nao vai para o
+Git (contém a RAM com a ROM embutida por referencia de execucao; e nao
+persiste entre sessoes -- regenerar quando precisar).
+
+**Nao provado**: nomes pret dos tres callbacks (`0x0812EB11`,
+`0x0809FB71`, `0x080565B5`) seguem inferidos pelo comportamento; e por que
+o buffer do SaveBlock1 varia (+0x38) nao foi investigado -- so' medido.
