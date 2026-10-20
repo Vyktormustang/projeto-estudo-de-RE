@@ -13,10 +13,13 @@ import struct
 import sys
 from pathlib import Path
 
+import pytest
+
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
-from ferramentas.da_pokebolas import cifrar_quantidade  # noqa: E402
+from ferramentas.da_pokebolas import cifrar_quantidade, decidir_slot  # noqa: E402
+from gbadecomp.emulador_console import ErroDeEmulacao  # noqa: E402
 
 CHAVE_MEDIDA = 0x0E078504
 
@@ -41,3 +44,21 @@ def test_ida_e_volta_para_todas_as_quantidades():
 def test_so_a_metade_baixa_da_chave_entra():
     for chave in (0x12345678, 0xFFFFFFFF, 0x00000000):
         assert cifrar_quantidade(7, chave) == cifrar_quantidade(7, chave & 0xFFFF)
+
+
+def test_decidir_slot_pocket_vazia_usa_primeiro_livre():
+    # 1 = MASTER BALL, quantidade 1: o caso da §23
+    assert decidir_slot([(0, 0)] * 13, 1, 1) == (0, 1)
+
+
+def test_decidir_slot_empilha_no_item_existente():
+    slots = [(4, 5), (1, 2), (0, 0)]
+    assert decidir_slot(slots, 1, 1) == (1, 3)
+    assert decidir_slot(slots, 2, 7) == (2, 7)
+
+
+def test_decidir_slot_recusa_pocket_cheia_e_estouro():
+    with pytest.raises(ErroDeEmulacao):
+        decidir_slot([(4, 5), (2, 3)], 1, 1)
+    with pytest.raises(ErroDeEmulacao):
+        decidir_slot([(1, 999), (0, 0)], 1, 1)

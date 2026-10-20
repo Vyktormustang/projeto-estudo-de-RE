@@ -23,6 +23,11 @@ mochila vazia os slots liam `00 00 04 85` e a chave era `0x0E078504`.
 Uso:
     python ferramentas/da_pokebolas.py ROM.gba ESTADO.state --pocket 2 --quantidade 99
     python ferramentas/da_pokebolas.py ROM.gba ESTADO.state --pocket 2 --slot 1
+    python ferramentas/da_pokebolas.py ROM.gba ESTADO.state --item 1 \
+        --quantidade 1 --saida NOVO.state   # persiste num estado NOVO
+
+Sem `--slot`, o slot e' escolhido com seguranca: empilha no slot que ja'
+tem o item ou usa o primeiro slot livre -- nunca sobrescreve outro item.
 
 O estado pode ser criado com `emulador_console.salvar_estado` (ver
 NOTAS_DE_TRABALHO secao 13). Sem estado, nao ha' como pular a navegacao.
@@ -81,6 +86,43 @@ def chave_de_cifra(emu) -> int:
     return emu.ler_u32(emu.ler_u32(G_SAVE_BLOCK2) + CHAVE_EM_S2)
 
 
+# Limite de pilha por slot na ger. 3.
+MAX_QTD = 999
+
+
+def ler_pocket(emu, indice: int) -> list[tuple[int, int]]:
+    """Todos os slots da pocket como (itemId, quantidade) JA decifrados."""
+    slots, capacidade = endereco_da_pocket(emu, indice)
+    chave = chave_de_cifra(emu)
+    bruto = emu.ler(slots, 4 * capacidade)
+    return [(item, cifrar_quantidade(qtd_cifrada, chave))
+            for item, qtd_cifrada in struct.iter_unpack("<HH", bruto)]
+
+
+def decidir_slot(slots: list[tuple[int, int]], item: int,
+                 quantidade: int) -> tuple[int, int]:
+    """(slot, nova_quantidade_total) para ADICIONAR `quantidade` de `item`.
+
+    Empilha no slot que ja' tem o item; senao usa o primeiro slot livre
+    (itemId == 0). Nunca sobrescreve um item diferente.
+    """
+    if quantidade < 1:
+        raise ErroDeEmulacao("quantidade a adicionar deve ser >= 1")
+    for i, (item_slot, qtd_slot) in enumerate(slots):
+        if item_slot == item:
+            total = qtd_slot + quantidade
+            if total > MAX_QTD:
+                raise ErroDeEmulacao(
+                    f"slot {i} ja' tem {qtd_slot}; +{quantidade} passa de {MAX_QTD}")
+            return i, total
+    for i, (item_slot, _) in enumerate(slots):
+        if item_slot == 0:
+            if quantidade > MAX_QTD:
+                raise ErroDeEmulacao(f"quantidade {quantidade} passa de {MAX_QTD}")
+            return i, quantidade
+    raise ErroDeEmulacao("pocket cheia: nenhum slot livre nem pilha do item")
+
+
 def dar_item(emu, indice_pocket: int, item: int, quantidade: int,
              slot: int = 0) -> dict:
     """Escreve o item na pocket e devolve o que foi lido de volta."""
@@ -111,10 +153,19 @@ def principal(argv: list[str] | None = None) -> int:
     parser.add_argument("--core", type=Path,
                         default=Path("/home/user/gba-re/emu_patch/mgba_libretro.so"))
     parser.add_argument("--pocket", type=int, default=2, choices=sorted(POCKETS))
-    parser.add_argument("--item", type=int, default=4, help="4 = POKe BOLA")
-    parser.add_argument("--quantidade", type=int, default=99)
-    parser.add_argument("--slot", type=int, default=0)
+    parser.add_argument("--item", type=int, default=4,
+                        help="1 = MASTER BALL, 4 = POKe BOLA")
+    parser.add_argument("--quantidade", type=int, default=99,
+                        help="sem --slot: quanto ADICIONAR; com --slot: total do slot")
+    parser.add_argument("--slot", type=int, default=-1,
+                        help="-1 (padrao) = empilha ou primeiro slot livre")
+    parser.add_argument("--saida", type=Path,
+                        help="salva o resultado neste estado NOVO (entrada intocada)")
     args = parser.parse_args(argv)
+
+    if args.saida is not None and args.estado.resolve() == args.saida.resolve():
+        print("saida deve ser diferente da entrada", file=sys.stderr)
+        return 1
 
     emu = EmuladorConsole(args.rom, args.core, Path("/tmp/mgba-da-itens"))
     try:
@@ -123,15 +174,40 @@ def principal(argv: list[str] | None = None) -> int:
         print(f"erro: {exc}", file=sys.stderr)
         return 1
     nome = POCKETS[args.pocket][0]
-    resultado = dar_item(emu, args.pocket, args.item, args.quantidade, args.slot)
-    print(f"pocket {args.pocket} ({nome}), slot {args.slot}")
+    antes = ler_pocket(emu, args.pocket)
+    print(f"antes: pocket {args.pocket} ({nome}) = "
+          f"{[(i, q) for i, q in antes if i != 0] or 'vazia'}")
+    if args.slot < 0:
+        try:
+            slot, total = decidir_slot(antes, args.item, args.quantidade)
+        except ErroDeEmulacao as exc:
+            print(f"erro: {exc}", file=sys.stderr)
+            emu.fechar()
+            return 1
+    else:
+        slot, total = args.slot, args.quantidade
+    resultado = dar_item(emu, args.pocket, args.item, total, slot)
+    print(f"pocket {args.pocket} ({nome}), slot {slot}")
     print(f"  endereco  = 0x{resultado['endereco']:08X}")
     print(f"  chave     = 0x{resultado['chave']:08X}")
     print(f"  gravado   = {resultado['bruto']}")
     print(f"  lido     -> item {resultado['item']}, quantidade {resultado['quantidade']}")
     ok = (resultado["item"] == args.item
-          and resultado["quantidade"] == args.quantidade)
+          and resultado["quantidade"] == total)
     print("  conferencia:", "OK" if ok else "FALHOU")
+    if ok and args.saida is not None:
+        emu.rodar(10)
+        relido = ler_pocket(emu, args.pocket)
+        if relido[slot] != (args.item, total):
+            print("a escrita nao pegou apos rodar -- nada foi salvo",
+                  file=sys.stderr)
+            emu.fechar()
+            return 2
+        print(f"depois (relido da RAM): "
+              f"{[(i, q) for i, q in relido if i != 0]}")
+        emu.salvar_estado(args.saida)
+        print(f"estado salvo em {args.saida} ({args.saida.stat().st_size} bytes)")
+    emu.fechar()
     return 0 if ok else 2
 
 

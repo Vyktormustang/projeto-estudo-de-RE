@@ -892,3 +892,33 @@ suíte completa em **116 passed**):
   com esses valores foi testado.
 - Persistir a mudança pelo SALVAR do menu no cartucho continua sem
   teste. Este objetivo parou na prova da modificação, como pedido.
+
+## §23 — Uma Master Ball na bolsa (2026-10-20)
+
+**MEDIDO** (`ferramentas/da_pokebolas.py` estendida; 3 testes puros
+novos):
+
+- A ferramenta da §13/§15 agora sabe ler a pocket inteira decifrada,
+  escolher o slot com segurança (empilha no item existente ou usa o
+  primeiro slot livre, sem sobrescrever outro item, limite 999) e salvar
+  o resultado num estado **novo** (`--saida`), recusando saída igual à
+  entrada.
+- Caso executado sobre o estado da §22: a pocket POKÉ BOLAS estava vazia
+  e recebeu **1 Master Ball (item 1)** no slot 0 — bytes `01 00 3f 45`,
+  ou seja, item 1 e quantidade `1 ^ 0x453E` (metade baixa da chave de
+  cifra `0x3CD7453E` em SaveBlock2+0xF20). A entrada ficou intocada
+  (SHA-256 `613394cf…db2d` antes e depois); a saída ficou fora do Git
+  como `viridian_masterball.state` (528.448 bytes, SHA-256
+  `5ca04ca2…5426`).
+- Em processo novo, a saída abriu viva em Viridian `(3,1)`, `(25,39)`,
+  com o Pokémon da §22 íntegro, e a tela da bolsa do próprio jogo mostra
+  **MASTER BOLA ×1** com a descrição normal do item
+  (`evidencias/masterball_bolsa.png`). Depois a validação fechou as
+  telas, andou até `(25,38)`, voltou e reliu a pocket: o item permaneceu.
+
+**NÃO PROVADO**:
+
+- Usar a Master Ball em batalha para capturar (o objetivo era apenas
+  colocá-la na bolsa; nenhuma captura foi executada).
+- Persistir pelo SALVAR do menu no cartucho continua sem teste, como
+  nas §§20–22. Este objetivo parou na prova da adição, como pedido.

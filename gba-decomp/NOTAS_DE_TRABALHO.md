@@ -659,3 +659,37 @@ setter de EVs nem editamos especie; subir o nivel na mao nao executa o
 evento de level-up do jogo (golpes continuam 33/45) e nenhum
 level-up/evolucao/batalha posterior foi testado; persistir pelo SALVAR
 do menu continua sem teste. Paramos aqui, como pedido.
+
+## 23. Uma Master Ball na bolsa (`da_pokebolas.py`, 2026-10-20)
+
+**Resultado**: objetivo unico concluido -- a pocket POKE BOLAS do estado
+da §22, que estava vazia, ganhou **1 MASTER BALL (item 1)**, provada na
+tela da propria bolsa (`evidencias/masterball_bolsa.png`: "MASTER BOLA
+x1" com a descricao do jogo).
+
+### 23.1 O que mudou na ferramenta
+
+`da_pokebolas.py` (§13/§15) so' escrevia num jogo em execucao e nao
+salvava estado. Agora: `ler_pocket()` le a pocket inteira decifrada;
+`decidir_slot()` (puro, 3 testes novos) empilha no slot que ja' tem o
+item ou usa o primeiro slot livre, sem sobrescrever outro item e com
+limite de 999; `--saida` roda 10 quadros, reli da RAM e salva um estado
+NOVO recusando saida == entrada.
+
+### 23.2 Execucao e validacao
+
+Entrada `viridian_pokemon_modificado.state` (sha256 `613394cf...db2d`
+antes e depois -- intocada). A pocket 2 estava vazia; gravado no slot 0
+(`0x020259CC`): bytes `01 00 3f 45` -- item 1, quantidade `1 ^ 0x453E`
+(metade baixa da chave `0x3CD7453E` em SaveBlock2+0xF20). Saida fora do
+Git: `/home/user/gba-re/testes/viridian_masterball.state` (528448 bytes;
+sha256 `5ca04ca21d92752fe96b8c261bd54730e9d2069f83dea8b85f4d17fa76155426`).
+
+Num processo novo: carrega em Viridian `(3,1)`, `(25,39)`; o Pokemon da
+§22 segue integro (nv10/EXP 560/IVs 31); a pocket decifra `[(1, 1)]`;
+START -> BOLSA -> pocket POKE BOLAS mostra MASTER BOLA x1; depois fecha
+as telas, anda `(25,39)->(25,38)`, volta, e item e Pokemon permanecem.
+
+**Nao provado**: usar a Master Ball numa batalha/captura (nao executado
+-- o objetivo era so' coloca-la na bolsa); persistir pelo SALVAR do menu
+continua sem teste, como nas §20-22. Paramos aqui, como pedido.
