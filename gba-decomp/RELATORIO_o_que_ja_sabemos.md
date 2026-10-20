@@ -742,3 +742,38 @@ roda" anteriores.
 - A causa da variação de +0x38 no buffer do SaveBlock1 não foi
   investigada (hipótese: contextos de Quest Log) — só o efeito foi
   medido.
+
+## §19 — Do quarto ao inicial: casa, Pallet, laboratório, batalha (2026-10-20)
+
+**MEDIDO** (`ferramentas/ir_ao_inicial.py`, execução completa do boot em
+199 s; evidências `inicial_*.png`):
+
+- Movimento confiável tile a tile: segurar a direção até `pos` mudar
+  (segurar 20q anda 2 tiles); bloqueio por NPC resolve esperando.
+  Warps têm **atraso** (a escada só troca o mapa no passo seguinte) e a
+  **porta da casa só dispara descendo a partir do tapete** — andar na
+  horizontal sobre ele não sai.
+- Rota validada: escada (10,2) → porta (4,8)→sul → Pallet (6,8) →
+  frente das casas até x=11 → (11,2) → (12,2) → gatilho **(12,1)** → o
+  Oak escolta ao lab (4,3) → diálogo → bola em (8,4) de (8,5) → apelido
+  na tela `0x0809FB71` → gatilhos (5..7,8) → batalha (callback2
+  `0x08011101`) → fora do lab em Pallet (16,14). As coordenadas
+  coincidem com os `map.json` do pret.
+- **O time durante o jogo não está no SaveBlock1**: SB1+0x34 ficou 0 o
+  tempo todo, com o menu POKéMON funcionando. O endereço real medido:
+  contagem em `0x02024029`, estrutura do 1º Pokémon em `0x02024284`
+  (apelido@+8, nível@+84, HP@+86). As bases dos SaveBlocks variaram
+  juntas (SB1−SB2 sempre `0xFA4`; SB1 medido entre `02025538` e
+  `02025580`).
+- Desfecho da batalha com A repetido varia com o RNG: uma execução
+  terminou nv5 19/19, a do boot **nv6 22/22** (subiu de nível ⇒ venceu
+  essa). Nas duas, o progresso continuou e o time saiu com HP cheio.
+
+**NÃO PROVADO**:
+
+- Quem venceu a 1ª execução da batalha do rival (não registramos o
+  desfecho frame a frame).
+- Quando os campos SB1+0x34/+0x38 (party no SaveBlock1 do pret) são
+  preenchidos — hipótese: ao salvar no cartucho.
+- A espécie lida da estrutura (dados de caixa são cifrados; a
+  confirmação do Bulbasaur é pela foto da tela do time).

@@ -449,3 +449,62 @@ persiste entre sessoes -- regenerar quando precisar).
 **Nao provado**: nomes pret dos tres callbacks (`0x0812EB11`,
 `0x0809FB71`, `0x080565B5`) seguem inferidos pelo comportamento; e por que
 o buffer do SaveBlock1 varia (+0x38) nao foi investigado -- so' medido.
+
+## 19. Do quarto ao inicial (ferramenta `ir_ao_inicial.py`, 2026-10-20)
+
+**Resultado**: boot -> inicial -> batalha do rival -> fora do lab numa
+ferramenta so' (199 s na execucao `--do-boot`); tambem roda do estado do
+quarto. Evidencias `evidencias/inicial_*.png` (batalha, time com o
+Bulbasaur "A" nv6 22/22 carregado de um estado salvo).
+
+### 19.1 Movimento tile a tile e as armadilhas de warp (tudo medido)
+
+Primitiva que funciona: segurar a direcao **ate' `pos` mudar** (amostra a
+cada 2 quadros), soltar -- segurar 20 quadros anda 2 tiles. Bloqueio pode
+ser NPC andando (a moca da placa em Pallet): esperar 50 q e repetir.
+- **Warp tem atraso**: pisar na escada (10,2) do quarto so' troca o mapa
+  durante o **passo seguinte** (a 1a versao leu o mapa cedo demais e
+  achou que nada tinha acontecido);
+- **a porta da casa so' dispara descendo a partir do tapete** (4,8)->sul;
+  andar na horizontal pela fileira 8 nao sai (conferido por PNG em cima
+  do tapete sem warp). Sair da casa repoe o jogador 1 tile ao sul da
+  porta ((6,7) -> (6,8));
+- rota da cerca: a fileira y=10 ao sul da casa bate na cerca/placa --
+  o caminho e' pela frente das casas (y=8) ate' x=11, subir ate' (11,2),
+  andar para (12,2) e subir ao gatilho **(12,1)**;
+- coordenadas do pret conferidas na pratica: escada (10,2), bolas do lab
+  em (8,4)/(9,4)/(10,4), gatilhos de saida do lab (5..7,8), porta do lab
+  em Pallet (16,13). Aproximar-se do Oak no lab abre o dialogo da
+  escolha **antes** de poder andar ate' as bolas (script move o jogador
+  para (6,4) -- o "passo para cima" misterioso da 1a tentativa).
+
+### 19.2 Onde o time mora DE VERDADE durante o jogo
+
+A 1a versao leu `partyCount` em SB1+0x34 (offset do pret) e viu 0 sempre,
+mesmo depois da escolha -- o menu POKeMON e a tela do time provavam o
+contrario. Varredura por assinatura (apelido "A"=BB FF... em +8, OT "A"
+em +20, nv/HP plausiveis) achou a estrutura viva em **`0x02024284`** e o
+byte de contagem em **`0x02024029`** (0->1 isolado no diff
+antes/depois; o flip foi reconfirmado na execucao unificada). Ou seja:
+durante o jogo valem os simbolos soltos `gPlayerParty[Count]`; os campos
++0x34/+0x38 do SaveBlock1 ficaram zerados o tempo todo (devem ser
+preenchidos ao salvar no cartucho -- NAO provado).
+Bases do SaveBlock medidas nesta sessao: SB1ptr em {02025538, 02025544,
+0202557C, 02025580}, com SB1-SB2 sempre `0xFA4` -- os ponteiros se movem
+juntos; offsets relativos valem, endereco absoluto nao (regra da §18.3).
+
+### 19.3 Batalha do rival por A
+
+`callback2` na batalha: `0x080565B5` -> `0x080565A9` -> `0x08010509` ->
+**`0x08011101`** (estavel em batalha) -> volta a `0x080565B5`. Com A a
+cada 60 q (LUTAR -> 1o golpe), a execucao em etapas terminou nv5 19/19 e
+a unificada do boot **nv6 22/22** (subiu = venceu ao menos esta). O
+desfecho varia com o RNG; o progresso continuou nas duas -- nao
+registramos frame a frame quem venceu a 1a.
+
+**Nao provado**: o apelido do Pokemon usa o mesmo `callback2 0x0809FB71`
+da intro (provado), mas se e' a mesma FUNCAO ou duas com o mesmo
+comportamento, nao desmontamos; especie do inicial nao foi lida da
+estrutura (os dados da caixa sao cifrados) -- foi confirmada pela foto
+do time; e o papel dos campos +0x34/+0x38 no salvamento real segue
+hipotese.
