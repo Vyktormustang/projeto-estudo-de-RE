@@ -508,3 +508,40 @@ comportamento, nao desmontamos; especie do inicial nao foi lida da
 estrutura (os dados da caixa sao cifrados) -- foi confirmada pela foto
 do time; e o papel dos campos +0x34/+0x38 no salvamento real segue
 hipotese.
+
+## 20. Caixa cifrada do Pokemon: leitura E escrita provadas (`gbadecomp/pokemon.py`, 2026-10-20)
+
+Fecha o "nao provado" de especie da §19: os 48 bytes seguros decifram com
+XOR `personalidade ^ otId` por u32, subestruturas permutadas por
+`personalidade % 24` (tabela do pret `GetSubstruct`, copiada em
+`pokemon.ORDEM`), checksum = soma dos 24 u16 decifrados. Biblioteca
+`gbadecomp/pokemon.py` + `tests/test_pokemon.py` (6 testes, sem emulador,
+sobre os bytes reais) + ferramentas `mostrar_time.py` e `dar_golpe.py`.
+
+### 20.1 Prova cruzada em dois especimes (o mesmo Bulbasaur, 2 execucoes)
+
+Nos dois: checksum bate, especie=1, golpes=(33,45,0,0) PP (35,40) e os
+atributos gravados pelo jogo **recomputam exatamente** dos IVs decifrados
+(formula da ger. 3, natureza = personalidade % 25). E os dados contam a
+historia que a §19.3 nao sabia: a execucao em etapas **perdeu** a batalha
+do rival (EXP travado em 135 = minimo do nv5 "medio lento", EVs todos 0,
+amizade 69), e a do boot **venceu** (EXP 204 = 135+69, EV de Vel=1 --
+rendimento do Charmander -- nv6, amizade 76). `otId` identico nas duas
+(0x10BCD3DB): o caminho deterministico da intro produz o mesmo treinador.
+
+### 20.2 Escrita segura provada em jogo
+
+`dar_golpe.py` pos o golpe 73 no slot vazio (posicao 3) com PP 10:
+decifra -> altera -> recifra -> checksum novo -> escreve 100 bytes ->
+salva estado NOVO (o de entrada intocado). Num processo novo, o time
+mostra o Bulbasaur normal (nada de Bad Egg) e a pagina GOLPES do resumo
+lista o terceiro golpe -- evidencias `golpe_time.png`/`golpe_golpes.png`
+("SEMENTE SUGA?" na traducao do hack, PP10/10, junto de INVESTIDA e
+ROSNAR). Serializar sem editar e' byte-identico ao original (teste).
+
+**Nao provado**: editar especie/IVs/nivel (o jogo so' recalcula atributos
+em eventos proprios -- nao testamos o que acontece ate' la'); persistir
+pelo SALVAR do menu (nao executado); o mesmo formato nas caixas do PC
+(a struct de caixa e' a mesma no pret, mas nao lemos nenhuma caixa
+ainda); e o significado do u16 em +0x1E ("unknown" no pret, 0 nos dois
+especimes).

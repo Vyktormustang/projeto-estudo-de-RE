@@ -777,3 +777,33 @@ roda" anteriores.
   preenchidos — hipótese: ao salvar no cartucho.
 - A espécie lida da estrutura (dados de caixa são cifrados; a
   confirmação do Bulbasaur é pela foto da tela do time).
+
+## §20 — Caixa cifrada do Pokémon: leitura e escrita (2026-10-20)
+
+**MEDIDO** (`gbadecomp/pokemon.py`, 6 testes sem emulador sobre bytes
+reais; ferramentas `mostrar_time.py`/`dar_golpe.py`):
+
+- Os 48 bytes seguros decifram com XOR `personalidade ^ otId` (por u32),
+  subestruturas permutadas por `personalidade % 24`, e o checksum é a
+  soma dos 24 u16 decifrados. Nos dois espécimes (o mesmo Bulbasaur em
+  duas execuções): checksum bate, espécie=1, golpes 33/45, e os
+  atributos gravados pelo jogo **recomputam exatamente** a partir dos
+  IVs decifrados + natureza (`personalidade % 25`) — a decifragem está
+  certa, não "parece certa".
+- Os dados resolvem a dúvida da §19: a execução em etapas **perdeu** a
+  batalha do rival (EXP 135 = mínimo do nv5, EVs zerados) e a do boot
+  **venceu** (EXP 204, EV de Velocidade=1, nv6). O `otId` saiu idêntico
+  nas duas (0x10BCD3DB).
+- **Escrita funciona dentro do jogo**: adicionado o golpe 73 ao slot
+  vazio (recifrar + refazer o checksum), o estado salvo recarrega com o
+  Pokémon normal (sem Bad Egg) e a página GOLPES mostra o novo golpe
+  com PP 10/10 (evidências `golpe_time.png`/`golpe_golpes.png`).
+  Serializar sem editar é byte-idêntico ao original.
+
+**NÃO PROVADO**:
+
+- Editar espécie/IVs/nível (os atributos só são recalculados pelo jogo
+  em eventos dele; o comportamento nesse meio-tempo não foi testado).
+- Persistir a edição salvando pelo menu do jogo (não executado) e o
+  formato nas caixas do PC (nenhuma caixa foi lida ainda).
+- O significado do u16 em +0x1E (0 nos dois espécimes; "unknown" no pret).
