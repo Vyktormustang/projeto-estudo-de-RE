@@ -99,12 +99,21 @@ Separação importante: `0x0807194C`, chamado diretamente pelo loop, lê o estad
 tasks. `0x0805486C` atualiza contadores de tempo. Não inferir os nomes funcionais
 exatos das outras rotinas de `0x08078B9C` sem novas evidências.
 
-Relatórios reproduzíveis: `reports/ciclo_01_loop_principal_e_tasks.md` e
-`reports/ciclo_02_menu_pausa_e_listmenu.md`. O ciclo 02 confirmou que o handler
-do menu nativo de pausa em `0x0806F280` lê os botões diretamente, navega por
-`0x020370F4/0x020370F6` e busca callbacks em `0x083A7344`; não chama
-`ListMenu_ProcessInput` (`0x08107078`). Um fluxo ListMenu distinto foi localizado
-em `0x08046AB8` (lista de três linhas, IDs 0/1/5), sem elo provado com o menu de
-pausa. Evidência dos dois ciclos: disassembly estático, sem PC trace dinâmico
-novo. **Próxima ação:** localizar o ponto que despacha o ponteiro de menu
-instalado em `0x020370F0` e seguir uma opção até a invocação do callback de ação.
+Relatórios reproduzíveis: `reports/ciclo_01_loop_principal_e_tasks.md`,
+`reports/ciclo_02_menu_pausa_e_listmenu.md` e
+`reports/ciclo_03_menu_pausa_ate_bolsa.md`. O handler de pausa em `0x0806F280`
+não chama `ListMenu_ProcessInput`; um fluxo ListMenu separado foi achado em
+`0x08046AB8` (3 itens, IDs 0/1/5), sem elo provado com a pausa.
+
+**Ciclo 03 fechou estaticamente um caminho do menu até a Bolsa:** `0x0806F188`
+cria a task de desenho e registra o follow-up; `0x0806F168` a troca para
+`0x0806F1F0`; essa task chama o callback em `0x020370F0` por `0x081E3BA8`.
+A escolha do item ID 2 obtém `0x0806F481` da entrada `0x083A7354`; o callback
+espera o fade, instala `0x08126EB0` com `SetMainCallback2` e retorna 1 para
+encerrar a task. Nomes convencionais foram cruzados com o fonte upstream
+`pret/pokefirered/src/start_menu.c` (blob `88cc377c…`); instruções e ponteiros
+foram conferidos na ROM-base. Não houve PC trace dinâmico novo.
+
+**Próxima ação:** seguir `0x08126EB0` até a leitura de input da Bolsa e documentar
+como B retorna ao overworld com o menu nativo reaberto; depois, validar em
+emulador se o setup atual permitir.

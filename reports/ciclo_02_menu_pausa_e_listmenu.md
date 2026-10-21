@@ -110,3 +110,11 @@ Seguir o despacho indireto que chama `0x0806F280` e fechar um único caminho de
 seleção (por exemplo, `Bolsa`): desde o item selecionado, passando pelo callback
 armazenado, até o callback de ação. Depois, validar esse trajeto com trace de PC
 no emulador, se o ambiente atual permitir.
+
+## Aditivo — fechamento no ciclo 03
+
+O ponto de despacho e a execução do callback foram fechados estaticamente no
+`reports/ciclo_03_menu_pausa_ate_bolsa.md`: `0x0806F1F0` chama o ponteiro em
+`0x020370F0` por `0x081E3BA8`; para a opção Bolsa, o callback `0x0806F481`
+instala `0x08126EB0` via `SetMainCallback2` e retorna sucesso. A validação
+pendente é dinâmica, não mais a localização estática do caminho.
