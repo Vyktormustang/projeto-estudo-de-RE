@@ -167,11 +167,28 @@ locais. No mGBA, START → três DOWN → A → dois B retornaram à pausa sem s
 capturas em `reports/ciclo_06_pergunta_salvar_sim_nao.png` e
 `reports/ciclo_06_cancelamento_volta_pausa.png`. Validação visual, sem PC trace.
 
+**Ciclo 07 — Opções troca callback2 e retorna pelo callback salvo:** o registro
+ID 5 (`0x083A736C`) contém `0x0806F4FD`. A rotina local `0x0806F4FC` instala
+`0x08088389` como callback2, grava `0x080568A9` em `gMain.savedCallback`
+(`0x030030F8`) e encerra a task da pausa. A inicialização em `0x08088388`
+prepara o menu; `0x08088454` monta seus estados e a task de input usa
+`0x08088780`. `0x080888C0` retorna 1 em A ou B; a task faz fade-out e chega a
+`0x08088B00`, que restaura `SetMainCallback2(*(u32 *)0x030030F8)`, salva os
+valores atuais em RAM, libera recursos e termina. O callback `0x080568A9`
+reconstrói a pausa pelo caminho do ciclo 04. No mGBA, START → quatro DOWN → A
+→ B abriu Opções e voltou à pausa com Opções selecionado. Capturas:
+`reports/ciclo_07_opcoes_abertas.png` e
+`reports/ciclo_07_retorno_pausa.png`. Nomes C cruzados com upstream; blobs,
+limites da validação e detalhes locais em
+`reports/ciclo_07_opcoes_e_retorno_a_pausa.md`. Validação visual apenas, sem
+PC trace nem hardware real.
+
 Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
 `reports/ciclo_02_menu_pausa_e_listmenu.md`,
 `reports/ciclo_03_menu_pausa_ate_bolsa.md`,
 `reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md`,
-`reports/ciclo_05_montagem_e_desenho_menu_pausa.md` e
-`reports/ciclo_06_callback_salvar_e_cancelamento.md`. A análise estática cobre
-a rota da Bolsa, a montagem/desenho do menu e o cancelamento do fluxo Salvar;
-PC trace e hardware real ainda não foram validados.
+`reports/ciclo_05_montagem_e_desenho_menu_pausa.md`,
+`reports/ciclo_06_callback_salvar_e_cancelamento.md` e
+`reports/ciclo_07_opcoes_e_retorno_a_pausa.md`. A análise estática cobre a rota
+da Bolsa, a montagem/desenho do menu, o cancelamento do fluxo Salvar e a entrada
+em Opções/retorno à pausa; PC trace e hardware real ainda não foram validados.
