@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import struct
+import unicodedata
 from pathlib import Path
 
 ROM_BASE = 0x08000000
@@ -26,6 +27,29 @@ ASSET_BASE = 0x08730000
 
 def off(va: int) -> int:
     return va - ROM_BASE
+
+
+def species_name(rom: bytes, species_id: int) -> str:
+    raw = rom[off(SPECIES_NAMES + species_id * 11):off(SPECIES_NAMES + (species_id + 1) * 11)]
+    chars = []
+    for code in raw:
+        if code == 0xFF:
+            break
+        if code == 0:
+            chars.append(" ")
+        elif 0xA1 <= code <= 0xAA:
+            chars.append(str(code - 0xA1))
+        elif 0xBB <= code <= 0xD4:
+            chars.append(chr(ord("A") + code - 0xBB))
+        else:
+            chars.append({0xAB: "!", 0xAC: "?", 0xAD: ".", 0xAE: "-",
+                          0xB4: "'", 0xB5: "♂", 0xB6: "♀", 0xB8: ",", 0xBA: "/"}.get(code, ""))
+    return "".join(chars).strip()
+
+
+def species_sort_key(name: str) -> str:
+    normalized = unicodedata.normalize("NFKD", name).casefold()
+    return "".join(char for char in normalized if char.isalnum())
 
 
 def decompress_lz77(blob: bytes) -> bytes:
@@ -59,7 +83,7 @@ def decompress_lz77(blob: bytes) -> bytes:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("rom", type=Path, nargs="?", default=Path("rom_mod/ANY_ITEM_SELECTOR_v1.3.gba"))
+    ap.add_argument("rom", type=Path, nargs="?", default=Path("rom_mod/ANY_ITEM_SELECTOR_v1.4.gba"))
     args = ap.parse_args()
     rom = args.rom.read_bytes()
     if len(rom) != 16 * 1024 * 1024:
@@ -120,9 +144,12 @@ def main() -> int:
     entries = [struct.unpack_from("<Ii", rom, off(SPECIES_LIST + i * 8)) for i in range(1, 388)]
     ids = [record_id for _, record_id in entries]
     expected_ids = [*range(1, 252), 252, *range(277, 412)]
-    if ids != expected_ids:
+    if len(ids) != 387 or set(ids) != set(expected_ids):
         raise SystemExit("selector species list is not 386 originals plus Eternatus")
-    print(f"PASS: {args.rom} contains Eternatus (internal species {SPECIES}), 387 selectable species, valid battle assets and learnset")
+    sort_keys = [species_sort_key(species_name(rom, species_id)) for species_id in ids]
+    if sort_keys != sorted(sort_keys):
+        raise SystemExit("selector species names are not in alphabetical order")
+    print(f"PASS: {args.rom} contains Eternatus (internal species {SPECIES}), 387 alphabetized species, valid battle assets and learnset")
     return 0
 
 

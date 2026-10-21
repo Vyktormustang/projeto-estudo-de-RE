@@ -1,6 +1,6 @@
 # Eternatus battle assets (FireRed BR)
 
-These assets replace only internal species slot 252 (the first legacy `OLD_UNOWN_*` placeholder). The other placeholder slots remain unchanged.
+These assets replace only internal species slot 252 (the first legacy `OLD_UNOWN_*` placeholder). The other placeholder slots remain unchanged. The `MODS > POKEMON` selector sorts all 387 visible names alphabetically.
 
 - `front.4bpp`, `back.4bpp`: 64×64 GBA 4bpp tile graphics, 2048 bytes each.
 - `normal.pal`, `shiny.pal`: 16-color BGR555 palettes, including transparent index 0.

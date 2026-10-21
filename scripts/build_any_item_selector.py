@@ -10,13 +10,14 @@ import argparse
 import csv
 import hashlib
 import struct
+import unicodedata
 from pathlib import Path
 
 from keystone import Ks, KS_ARCH_ARM, KS_MODE_THUMB, KS_MODE_LITTLE_ENDIAN
 
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_BASE = ROOT / "rom/Pokemon - Fire Red (BR).gba"
-DEFAULT_OUT = ROOT / "rom_mod/ANY_ITEM_SELECTOR_v1.3.gba"
+DEFAULT_OUT = ROOT / "rom_mod/ANY_ITEM_SELECTOR_v1.4.gba"
 
 ROM_BASE = 0x08000000
 BRIDGE_VA = 0x08456734
@@ -109,11 +110,45 @@ def species_ids() -> list[int]:
     return ids
 
 
-def species_records(label: int) -> bytes:
+def decode_species_name(rom: bytes | bytearray, species_id: int) -> str:
+    """Decode the visible name bytes used by the ROM's 11-byte species slots."""
+    if species_id == ETERNATUS_SPECIES_ID:
+        return "ETERNATUS"  # the base ROM still labels slot 252 as OLD_UNOWN
+    start = off(SPECIES_NAMES_VA + species_id * 11)
+    chars = []
+    for code in rom[start:start + 11]:
+        if code == 0xFF:
+            break
+        if code == 0:
+            chars.append(" ")
+        elif 0xA1 <= code <= 0xAA:
+            chars.append(str(code - 0xA1))
+        elif 0xBB <= code <= 0xD4:
+            chars.append(chr(ord("A") + code - 0xBB))
+        else:
+            chars.append({
+                0xAB: "!", 0xAC: "?", 0xAD: ".", 0xAE: "-",
+                0xB4: "'", 0xB5: "♂", 0xB6: "♀", 0xB8: ",", 0xBA: "/",
+            }.get(code, ""))
+    return "".join(chars).strip()
+
+
+def species_sort_key(name: str) -> str:
+    # Ignore spaces/punctuation/sex symbols for natural A-Z ordering; retain
+    # digits (e.g. Porygon2) and normalize accents if a localized ROM uses any.
+    normalized = unicodedata.normalize("NFKD", name).casefold()
+    return "".join(char for char in normalized if char.isalnum())
+
+
+def species_records(label: int, rom: bytes | bytearray) -> bytes:
+    ordered = sorted(
+        species_ids(),
+        key=lambda species_id: (species_sort_key(decode_species_name(rom, species_id)), species_id),
+    )
     records = [list_item(label, -3)]
     records.extend(
         list_item(SPECIES_NAMES_VA + species_id * 11, species_id)
-        for species_id in species_ids()
+        for species_id in ordered
     )
     return b"".join(records)
 
@@ -245,7 +280,7 @@ def menu_template(items: int, total: int, max_showed: int = 6) -> bytes:
     )
 
 
-def make_data(desc_pointers: tuple[int, ...]) -> tuple[bytes, bytes, dict[str, int]]:
+def make_data(desc_pointers: tuple[int, ...], rom: bytes | bytearray) -> tuple[bytes, bytes, dict[str, int]]:
     p = DATA_VA
     data = bytearray()
     symbols: dict[str, int] = {}
@@ -342,7 +377,7 @@ def make_data(desc_pointers: tuple[int, ...]) -> tuple[bytes, bytes, dict[str, i
         "template_species_full": template_species_full_va,
         "window": window_va,
     })
-    species_data = species_records(labels["label_species"])
+    species_data = species_records(labels["label_species"], rom)
     assert DATA_VA + len(data) < SPECIES_TASK_VA
     assert SPECIES_LIST_VA + len(species_data) < 0x08722000
     return bytes(data), species_data, symbols
@@ -924,7 +959,7 @@ def build(base: Path, out: Path) -> None:
     desc_pointers = struct.unpack("<9I", desc_bytes)
     if any(not ROM_BASE <= ptr < ROM_BASE + len(rom) for ptr in desc_pointers):
         raise SystemExit("native description pointer table contains out-of-ROM entries")
-    data, species_data, symbols = make_data(desc_pointers)
+    data, species_data, symbols = make_data(desc_pointers, rom)
     eternatus_assets, asset_symbols = make_eternatus_assets()
     if len(species_data) != (387 + 1) * 8:
         raise SystemExit(f"unexpected species selector record count: {len(species_data) // 8 - 1}")

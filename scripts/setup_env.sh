@@ -14,8 +14,8 @@ fi
 
 PYTHON="${VENV}/bin/python"
 echo "[setup_env] Python: $(${PYTHON} --version 2>&1)"
-echo "[setup_env] Instalando Capstone, CMake e Pillow no ambiente virtual..."
-"${PYTHON}" -m pip install --quiet capstone cmake pillow
+echo "[setup_env] Instalando Capstone, CMake, Keystone e Pillow no ambiente virtual..."
+"${PYTHON}" -m pip install --quiet capstone cmake keystone-engine pillow
 "${PYTHON}" - <<'PY'
 import capstone
 print("[setup_env] OK — capstone", capstone.__version__)
