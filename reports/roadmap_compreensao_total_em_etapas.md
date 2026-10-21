@@ -102,8 +102,8 @@ revelar novos domínios):
 11. demais módulos identificados no inventário global, sem tratá-los como fora de
     escopo por não aparecerem nos exemplos.
 
-**Estado:** pausa parcialmente coberta; motor de bytecode e handlers NPC iniciados
-nos ciclos 11–13; demais passes pendentes.
+**Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
+consumidores de mapa iniciados nos ciclos 11–15; demais domínios e passes pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -112,13 +112,13 @@ funções isoladas: gatilho → script → comandos → atores/dados → mudanç
 save → transição/retorno. Cutscenes e adição/remoção de NPCs são exemplos úteis de
 rastro, ao lado de batalhas, itens, warps e outros fluxos que o inventário revelar.
 
-**Estado:** ciclos 12–14 ligaram header, tabela de tipos, despachantes de scripts e
-o consumidor principal de eventos de coordenada em uma amostra. O rastro local
-confirma processamento de entrada → prioridade de eventos de coordenada → varredura
-por posição/elevação → condição/execução → instalação de script; foi também separada
-a rota de ativação de botão de força por pedregulho. O bytecode dos scripts e seus
-efeitos ainda faltam. Esses rastros são instrumentos para compreender junções, não
-substitutos dos passes abrangentes por sistema.
+**Estado:** ciclos 12–15 ligaram header, tabela de tipos, despachantes de scripts,
+scanner de eventos de coordenada e uma cena até seus efeitos locais sobre atores,
+vars/flags e warp. O rastro cobre entrada → prioridade do gatilho → condição →
+bytecode → movimentos, diálogo, instanciação de NPC e atualização de estado. Também
+foi separada a rota de botão de força por pedregulho. Ainda faltam outros eventos,
+subsistemas e validação dinâmica; estes rastros são amostras, não substitutos dos
+passes abrangentes por sistema.
 
 ### Etapa 6 — Validação e auditoria de cobertura
 
@@ -148,10 +148,14 @@ substitutos dos passes abrangentes por sistema.
   coordenada e sua chamada prioritária no processamento de campo após passo; separou
   a rota de botão de força por pedregulho. Análise estática, sem validação dinâmica.
   Relatório: `reports/ciclo_14_coord_event_scanner_field_loop.md`.
-- **Próximo:** seguir um script de coordenada local por bytecode até seus efeitos
-  sobre atores/flags/variáveis e o controle de campo; em paralelo, auditar
-  inventário/callgraph para manter a cobertura dos demais sistemas e regiões em
-  movimento.
+- **Ciclo 15:** seguiu os dois gatilhos Oak locais até um script compartilhado,
+  diálogos, caminhos alternativos de movimento, spawn de template ID 3, mudanças de
+  vars/flags e warp; nomes de cena separados como cruzamento upstream. Estático.
+  Relatório: `reports/ciclo_15_pallet_oak_coord_cutscene_trace.md`.
+- **Próximo:** fechar uma segunda amostra de interação no mesmo mapa (evento de
+  coordenada `0x0816587B` e consumidores de eventos de fundo) e, em seguida, revisar
+  o ledger para selecionar um domínio fora de mapas/scripts; inventário e callgraph
+  permanecem em auditoria transversal.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
