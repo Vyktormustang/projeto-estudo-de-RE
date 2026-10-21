@@ -79,11 +79,11 @@ conferência local.
 **Estado:** parcial. Ciclos 12–13 confirmaram o lookup de grupos,
 `MapHeader → MapEvents`, layout, arrays de evento e tabela/dispatch de scripts de
 header em uma amostra local. `scripts/inspect_map_event_graph.py` permite repetir a
-extração por índices. Ciclo 17 iniciou os dados de Pokémon: accessors de equipe e
-BoxMon, offsets, cifragem/checksum e fronteira entre campos simples e subblocos,
-conferidos localmente. Ainda faltam outros mapas, consumidores de warps/coordenadas/
-fundo, carregadores completos, tabela local de espécies/moves e os demais
-formatos/catálogos.
+extração por índices. Ciclos 17–18 iniciaram os dados de Pokémon: accessors de equipe
+e BoxMon, conversão para equipe, cálculo de stats e localização local de uma tabela
+base de espécies e da tabela de experiência. Ainda faltam determinar os limites e a
+extensão das tabelas, outros mapas, consumidores de warps/coordenadas/fundo,
+carregadores completos, golpes e demais formatos/catálogos.
 
 ### Etapa 4 — Passes sistemáticos por subsistema
 
@@ -106,9 +106,10 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclo 17 começou o domínio de
-Pokémon/equipe/BoxMon, ainda sem rastrear clientes até party/PC/batalha nem persistência.
-Demais domínios e passes continuam pendentes.
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–18 começaram o domínio de
+Pokémon: BoxMon→equipe, cálculo de stats, base local de dados de espécies e curvas
+de experiência. Clientes até PC/batalha, persistência e demais domínios continuam
+pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -165,10 +166,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   campos foram separados como cruzamento upstream. Estático, sem Ghidra/REA
   disponíveis na sessão e sem validação dinâmica. Relatório:
   `reports/ciclo_17_boxmon_party_acesso_dados_pokemon.md`.
-- **Próximo:** seguir callsites locais dos accessors até um consumidor de equipe ou
-  armazenamento e localizar/conferir o catálogo de espécies/moves na ROM. Em
-  paralelo, manter warp/conexões, outros mapas e os demais subsistemas como lacunas
-  explícitas; o início desse domínio não representa cobertura de party/PC/batalhas.
+- **Ciclo 18:** seguiu `BoxMonToMon`-like → cálculo local de stats → tabelas em
+  `0x08254784` (base de espécies, stride 0x1C) e `0x08253AE4` (experiência). Uma
+  amostra ID 1, os offsets de base stats/growth rate e a curva selecionada foram
+  conferidos em bytes locais. Limites da tabela, outros catálogos e runtime pendentes.
+  Relatório: `reports/ciclo_18_tabela_especies_e_calculo_stats.md`.
+- **Próximo:** determinar extensão/limites da tabela de espécies e seguir consumidores
+  locais de tipos, habilidades e learnsets; depois mapear golpes e encontros selvagens.
+  Em paralelo, manter warp/conexões, outros mapas e os demais subsistemas como lacunas
+  explícitas; esses primeiros rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
