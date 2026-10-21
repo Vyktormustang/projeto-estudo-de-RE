@@ -114,6 +114,34 @@ encerrar a task. Nomes convencionais foram cruzados com o fonte upstream
 `pret/pokefirered/src/start_menu.c` (blob `88cc377c…`); instruções e ponteiros
 foram conferidos na ROM-base. Não houve PC trace dinâmico novo.
 
-**Próxima ação:** seguir `0x08126EB0` até a leitura de input da Bolsa e documentar
-como B retorna ao overworld com o menu nativo reaberto; depois, validar em
-emulador se o setup atual permitir.
+**Ciclo 04 fechado: input da Bolsa → retorno por B ao menu de pausa.**
+`0x08126EB0` prepara a chamada local a `0x0811EA44`, passando o callback de task
+Thumb `0x0811FB29` e o callback de retorno Thumb `0x080568A9`; a inicialização
+registra `0x0811EBD1` como callback2 e cria uma task com o handler recebido. A
+rotina local `0x0811FB28` corresponde funcionalmente ao handler de input da
+Bolsa (nome upstream: `Task_BagMenu_HandleInput`). Seu helper `0x0811FEFC`
+normaliza B para o código 2; o branch em `0x0811FB28` leva a `0x0811FD88`, que
+para a localização de campo prepara a saída e troca a função da task via
+`0x0811FA78` para `0x0811FAB5`. Depois do fade, instala o callback de retorno
+`0x080568A9`, limpa recursos e destrói a task.
+
+`0x080568A8` chama `0x080567DC`, após gravar `0x0807E3BD` em `0x03005024`.
+`0x0807E3BC` chama `0x0806F1D4`, que zera o estado de desenho e grava
+`0x0806F1B9` em `0x03005024`. Esse callback desenha a pausa via `0x0806F01C`,
+inicia fade-in por `0x0807E3A0`; a task de espera `0x0807E378`, ao final,
+cria a task de input `0x0806F281` com prioridade `0x50`. Nomes de funções são
+cruzamentos com os blobs upstream anotados em
+`reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md`; todos os ponteiros,
+branches e chamadas acima foram confirmados no disassembly local da ROM.
+
+**Validação dinâmica:** no driver libretro do repositório com mGBA 0.10.5,
+restaurei `google_drive/viridian_masterball.state`, abri pausa com START, abri
+Bolsa com DOWN+A e pressionei B. O frame final mostra a pausa reaberta.
+Capturas: `reports/ciclo_04_bolsa_aberta.png` e
+`reports/ciclo_04_b_bolsa_retorno_pause.png`. Isso é validação visual, não PC
+trace; o driver não implementa breakpoint/trace e não houve teste em hardware
+real.
+
+Relatórios da trilha até agora: ciclos 01–04 em `reports/ciclo_01_...md` a
+`reports/ciclo_04_...md`. A análise da rota pedida está fechada; PC trace e
+hardware real permanecem fora da validação atual.
