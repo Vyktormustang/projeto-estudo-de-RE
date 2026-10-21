@@ -142,6 +142,23 @@ Capturas: `reports/ciclo_04_bolsa_aberta.png` e
 trace; o driver não implementa breakpoint/trace e não houve teste em hardware
 real.
 
-Relatórios da trilha até agora: ciclos 01–04 em `reports/ciclo_01_...md` a
-`reports/ciclo_04_...md`. A análise da rota pedida está fechada; PC trace e
-hardware real permanecem fora da validação atual.
+**Ciclo 05 fechou montagem e desenho do menu:** `0x0806ED54` escolhe o builder
+conforme Link/Union Room/Safari/campo; o caminho normal em `0x0806EDB0`
+condiciona IDs 0 e 1 às flags `0x829` e `0x828`, depois acrescenta IDs 2–6.
+Safari usa `7,0,1,2,3,5,6`; Link `1,2,8,5,6`; Union Room `1,2,3,5,6`. A
+contagem fica em `0x020370F5`, a ordem começa em `0x020370F6` (nove bytes antes
+do estado de desenho em `0x020370FF`) e o cursor fica em `0x020370F4`.
+`0x0806FEC8` acrescenta um ID e incrementa a contagem sem checagem local de
+capacidade. O registro em `0x083A7344`, stride 8, fornece ponteiro de texto em
+`+0` e callback em `+4`; a rotina de desenho `0x0806EF44` e o handler
+`0x0806F280` consomem o mesmo ID/ordem. Nomes e enumerações foram cruzados com
+o blob upstream `start_menu.c` `88cc377c…`; endereços e dados são evidência da
+ROM. Detalhes em `reports/ciclo_05_montagem_e_desenho_menu_pausa.md`.
+
+Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
+`reports/ciclo_02_menu_pausa_e_listmenu.md`,
+`reports/ciclo_03_menu_pausa_ate_bolsa.md`,
+`reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md` e
+`reports/ciclo_05_montagem_e_desenho_menu_pausa.md`. A trilha está fechada para
+a rota pedida e a construção/desenho do menu; PC trace e hardware real ainda
+não foram validados.
