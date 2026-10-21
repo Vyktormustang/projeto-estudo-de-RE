@@ -206,6 +206,16 @@ pausa. Capturas em `reports/ciclo_09_pokemon_party_aberto.png` e
 `reports/ciclo_09_pokemon_e_retorno_da_equipe.md`. A seleção de Pokémon por A e
 os submenus de ação não foram cobertos.
 
+**Ciclo 10 — Salvar com SIM conclui e fecha a pausa:** o resultado 1 em
+`0x0806F5C8` segue para `0x0806F604`, limpa o diálogo, restaura o contexto,
+desbloqueia os controles e retorna 1, encerrando a task. A validação mGBA
+mostrou SIM selecionado, a mensagem `A salvou o jogo.` e depois o campo sem
+pausa. Não passei `--save-file`; o `.sav` original não foi carregado ou gravado
+pelo driver. Capturas e detalhes em `reports/ciclo_10_sim_selecionado.png`,
+`reports/ciclo_10_jogo_salvo.png`, `reports/ciclo_10_retorno_campo.png` e
+`reports/ciclo_10_salvar_sim_e_retorno_ao_campo.md`. O sucesso foi visualmente
+observado no emulador, sem PC trace e sem validação de persistência/hardware.
+
 Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
 `reports/ciclo_02_menu_pausa_e_listmenu.md`,
 `reports/ciclo_03_menu_pausa_ate_bolsa.md`,
@@ -213,8 +223,10 @@ Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
 `reports/ciclo_05_montagem_e_desenho_menu_pausa.md`,
 `reports/ciclo_06_callback_salvar_e_cancelamento.md`,
 `reports/ciclo_07_opcoes_e_retorno_a_pausa.md`,
-`reports/ciclo_08_sair_e_fechamento_da_pausa.md` e
-`reports/ciclo_09_pokemon_e_retorno_da_equipe.md`. A análise estática cobre a
-rota da Bolsa, a montagem/desenho do menu, o cancelamento de Salvar, Opções,
-Sair e o cancelamento B do menu da equipe. O ramo de confirmação positiva de
-Salvar, PC trace e hardware real ainda não foram validados.
+`reports/ciclo_08_sair_e_fechamento_da_pausa.md`,
+`reports/ciclo_09_pokemon_e_retorno_da_equipe.md` e
+`reports/ciclo_10_salvar_sim_e_retorno_ao_campo.md`. O escopo prioritário da
+pausa está fechado: montagem/desenho, Bolsa/retorno, Salvar (cancelamento e
+sucesso), Opções/retorno, Sair/fechamento e Pokémon/retorno B. Permanecem fora
+os submenus acionados por A dentro da equipe, a rota Player, variantes contextuais
+não testadas, PC trace e hardware real.
