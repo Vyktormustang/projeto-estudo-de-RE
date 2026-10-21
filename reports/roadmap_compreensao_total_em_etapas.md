@@ -76,8 +76,11 @@ Para cada formato: evidência de bytes local, estrutura proposta, referências q
 consomem e uma amostra validada. Não assumir que um layout upstream é idêntico sem
 conferência local.
 
-**Estado:** parcial; vários inventários/experimentos existem, mas falta uma auditoria
-unificada e ligação aos carregadores.
+**Estado:** parcial. O ciclo 12 confirmou localmente um mapa: lookup de grupos,
+`MapHeader → MapEvents`, layout, array de templates, coordenadas e ponteiros; foi
+criado `scripts/inspect_map_event_graph.py` para repetir a extração por índices.
+Ainda faltam outros mapas, consumidores das demais classes de evento e os outros
+formatos/catálogos listados.
 
 ### Etapa 4 — Passes sistemáticos por subsistema
 
@@ -109,8 +112,10 @@ funções isoladas: gatilho → script → comandos → atores/dados → mudanç
 save → transição/retorno. Cutscenes e adição/remoção de NPCs são exemplos úteis de
 rastro, ao lado de batalhas, itens, warps e outros fluxos que o inventário revelar.
 
-**Estado:** ciclo 11 mapeou handlers locais de alguns comandos, mas ainda não há um
-rastro local completo de cutscene nem ligação local a um template de mapa.
+**Estado:** ciclo 11 mapeou handlers locais; ciclo 12 encontrou localmente eventos
+de coordenada que apontam para scripts, mas os consumidores e o fluxo integral ainda
+não foram rastreados. Esses rastros são instrumentos de compreensão das junções,
+não substitutos dos passes abrangentes por sistema.
 
 ### Etapa 6 — Validação e auditoria de cobertura
 
@@ -130,9 +135,13 @@ rastro local completo de cutscene nem ligação local a um template de mapa.
 - **Ciclo 11:** tabela local de comandos de script e handlers de NPC para spawn,
   remoção, movimento e visibilidade; análise estática. Relatório:
   `reports/ciclo_11_script_commands_npc_spawn_remove.md`.
-- **Próximo:** continuar pelos dados de mapa e carregadores, confirmar como eventos,
-  templates e scripts se relacionam na ROM local; depois expandir para outros
-  subsistemas conforme o inventário, sem limitar a investigação a cutscenes/NPCs.
+- **Ciclo 12:** lookup local de mapa, `MapHeader`, `MapEvents` e templates do grupo
+  3/mapa 0; parser reutilizável em `scripts/inspect_map_event_graph.py`. Um registro
+  local difere da amostra upstream; diferença preservada como questão em aberto.
+  Relatório: `reports/ciclo_12_map_headers_events_obj_templates.md`.
+- **Próximo:** ampliar a auditoria de mapas/eventos e carregadores; em paralelo,
+  revisar inventário/callgraph global para decidir recortes dos próximos sistemas.
+  Cutscenes/NPCs seguem como exemplos úteis, não como limite do escopo.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
