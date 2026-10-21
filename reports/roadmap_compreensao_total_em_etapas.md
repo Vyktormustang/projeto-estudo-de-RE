@@ -112,10 +112,13 @@ funções isoladas: gatilho → script → comandos → atores/dados → mudanç
 save → transição/retorno. Cutscenes e adição/remoção de NPCs são exemplos úteis de
 rastro, ao lado de batalhas, itens, warps e outros fluxos que o inventário revelar.
 
-**Estado:** ciclos 12–13 ligaram header, tabela de tipos e despachantes de scripts
-em uma amostra; eventos de coordenada já têm registros locais identificados, mas seu
-consumidor e o fluxo integral ainda faltam. Esses rastros são instrumentos para
-compreender junções, não substitutos dos passes abrangentes por sistema.
+**Estado:** ciclos 12–14 ligaram header, tabela de tipos, despachantes de scripts e
+o consumidor principal de eventos de coordenada em uma amostra. O rastro local
+confirma processamento de entrada → prioridade de eventos de coordenada → varredura
+por posição/elevação → condição/execução → instalação de script; foi também separada
+a rota de ativação de botão de força por pedregulho. O bytecode dos scripts e seus
+efeitos ainda faltam. Esses rastros são instrumentos para compreender junções, não
+substitutos dos passes abrangentes por sistema.
 
 ### Etapa 6 — Validação e auditoria de cobertura
 
@@ -141,9 +144,14 @@ compreender junções, não substitutos dos passes abrangentes por sistema.
   Relatório: `reports/ciclo_12_map_headers_events_obj_templates.md`.
 - **Ciclo 13:** parser local de `MapHeader.mapScripts`, despachantes de tipos e
   tabela condicional de frame/warp; relatório `reports/ciclo_13_map_script_dispatch_local.md`.
-- **Próximo:** localizar o consumidor local de eventos de coordenada e sua relação
-  com o loop de campo; em paralelo, auditar inventário/callgraph para manter a
-  cobertura dos demais sistemas e regiões em movimento.
+- **Ciclo 14:** confirmou na ROM local o scanner/condicionador de eventos de
+  coordenada e sua chamada prioritária no processamento de campo após passo; separou
+  a rota de botão de força por pedregulho. Análise estática, sem validação dinâmica.
+  Relatório: `reports/ciclo_14_coord_event_scanner_field_loop.md`.
+- **Próximo:** seguir um script de coordenada local por bytecode até seus efeitos
+  sobre atores/flags/variáveis e o controle de campo; em paralelo, auditar
+  inventário/callgraph para manter a cobertura dos demais sistemas e regiões em
+  movimento.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
