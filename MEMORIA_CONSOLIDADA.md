@@ -155,10 +155,23 @@ capacidade. O registro em `0x083A7344`, stride 8, fornece ponteiro de texto em
 o blob upstream `start_menu.c` `88cc377c…`; endereços e dados são evidência da
 ROM. Detalhes em `reports/ciclo_05_montagem_e_desenho_menu_pausa.md`.
 
+**Ciclo 06 — Salvar usa caminho diferente da Bolsa:** o registro ID 4 aponta
+para `0x0806F4E9`. Esse callback grava `0x0806F5A5` em `0x020370F0` e retorna 0;
+`0x0806F5A4` prepara o contexto de salvamento, grava `0x0806F5C9` e também
+retorna 0. `0x0806F5C8` executa o runner de diálogo em `0x0806F648`. No caso
+CANCEL (resultado 2), limpa a janela, redesenha a pausa por `0x0806F14C`,
+restaura o contexto e reinstala o handler `0x0806F281`, sem destruir a task.
+Isso difere da Bolsa, que troca callback2 e reconstrói a pausa ao retornar.
+Nomes cruzados com `start_menu.c` (blob `88cc377c…`); chamadas e branches são
+locais. No mGBA, START → três DOWN → A → dois B retornaram à pausa sem salvar;
+capturas em `reports/ciclo_06_pergunta_salvar_sim_nao.png` e
+`reports/ciclo_06_cancelamento_volta_pausa.png`. Validação visual, sem PC trace.
+
 Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
 `reports/ciclo_02_menu_pausa_e_listmenu.md`,
 `reports/ciclo_03_menu_pausa_ate_bolsa.md`,
-`reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md` e
-`reports/ciclo_05_montagem_e_desenho_menu_pausa.md`. A trilha está fechada para
-a rota pedida e a construção/desenho do menu; PC trace e hardware real ainda
-não foram validados.
+`reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md`,
+`reports/ciclo_05_montagem_e_desenho_menu_pausa.md` e
+`reports/ciclo_06_callback_salvar_e_cancelamento.md`. A análise estática cobre
+a rota da Bolsa, a montagem/desenho do menu e o cancelamento do fluxo Salvar;
+PC trace e hardware real ainda não foram validados.
