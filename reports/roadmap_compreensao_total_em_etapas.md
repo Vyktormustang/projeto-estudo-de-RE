@@ -79,8 +79,11 @@ conferência local.
 **Estado:** parcial. Ciclos 12–13 confirmaram o lookup de grupos,
 `MapHeader → MapEvents`, layout, arrays de evento e tabela/dispatch de scripts de
 header em uma amostra local. `scripts/inspect_map_event_graph.py` permite repetir a
-extração por índices. Ainda faltam outros mapas, consumidores de warps/coordenadas/
-fundo, carregadores completos e os demais formatos/catálogos.
+extração por índices. Ciclo 17 iniciou os dados de Pokémon: accessors de equipe e
+BoxMon, offsets, cifragem/checksum e fronteira entre campos simples e subblocos,
+conferidos localmente. Ainda faltam outros mapas, consumidores de warps/coordenadas/
+fundo, carregadores completos, tabela local de espécies/moves e os demais
+formatos/catálogos.
 
 ### Etapa 4 — Passes sistemáticos por subsistema
 
@@ -103,7 +106,9 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16; demais domínios e passes pendentes.
+consumidores de mapa iniciados nos ciclos 11–16. Ciclo 17 começou o domínio de
+Pokémon/equipe/BoxMon, ainda sem rastrear clientes até party/PC/batalha nem persistência.
+Demais domínios e passes continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -154,9 +159,16 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   interação/placa e a cadeia tag 3 → estado de object event → coord event
   `0x0816587B`; decodificou mensagens locais e separou nomes upstream. Estático.
   Relatório: `reports/ciclo_16_eventos_bg_signlady_interacao.md`.
-- **Próximo:** revisar inventário/callgraph e iniciar um passe fora de mapas/scripts
-  (ex.: batalha, equipe/PC, dados de Pokémon ou save), mantendo warp/conexões e
-  amostras de outros mapas como lacunas explícitas.
+- **Ciclo 17:** iniciou a camada de dados de Pokémon fora de mapas/scripts. Na ROM
+  local, confirmou os dois accessors de equipe com 34 casos, os helpers BoxMon com
+  tabelas de 84 GET/81 SET, offsets e os caminhos de cifragem/checksum; nomes de
+  campos foram separados como cruzamento upstream. Estático, sem Ghidra/REA
+  disponíveis na sessão e sem validação dinâmica. Relatório:
+  `reports/ciclo_17_boxmon_party_acesso_dados_pokemon.md`.
+- **Próximo:** seguir callsites locais dos accessors até um consumidor de equipe ou
+  armazenamento e localizar/conferir o catálogo de espécies/moves na ROM. Em
+  paralelo, manter warp/conexões, outros mapas e os demais subsistemas como lacunas
+  explícitas; o início desse domínio não representa cobertura de party/PC/batalhas.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
