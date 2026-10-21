@@ -183,12 +183,24 @@ limites da validação e detalhes locais em
 `reports/ciclo_07_opcoes_e_retorno_a_pausa.md`. Validação visual apenas, sem
 PC trace nem hardware real.
 
+**Ciclo 08 — Sair fecha a pausa no campo:** o registro ID 6 (`0x083A7374`)
+contém `0x0806F541`. A rotina local `0x0806F540` executa as limpezas auxiliares,
+chama `0x0806FEA0` para fechar a janela e liberar os controles do campo e retorna
+1, encerrando a task de input. Não troca callback2 nem restaura um callback
+salvo; o campo permanece ativo sem reabrir a pausa. No mGBA, START → cinco DOWN
+→ A fechou a pausa visualmente. Capturas e cruzamento de nomes em
+`reports/ciclo_08_sair_selecionado.png`,
+`reports/ciclo_08_sair_fecha_pausa.png` e
+`reports/ciclo_08_sair_e_fechamento_da_pausa.md`. Validação visual, sem PC trace
+nem hardware real.
+
 Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
 `reports/ciclo_02_menu_pausa_e_listmenu.md`,
 `reports/ciclo_03_menu_pausa_ate_bolsa.md`,
 `reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md`,
 `reports/ciclo_05_montagem_e_desenho_menu_pausa.md`,
-`reports/ciclo_06_callback_salvar_e_cancelamento.md` e
-`reports/ciclo_07_opcoes_e_retorno_a_pausa.md`. A análise estática cobre a rota
-da Bolsa, a montagem/desenho do menu, o cancelamento do fluxo Salvar e a entrada
-em Opções/retorno à pausa; PC trace e hardware real ainda não foram validados.
+`reports/ciclo_06_callback_salvar_e_cancelamento.md`,
+`reports/ciclo_07_opcoes_e_retorno_a_pausa.md` e
+`reports/ciclo_08_sair_e_fechamento_da_pausa.md`. A análise estática cobre a
+rota da Bolsa, a montagem/desenho do menu, o cancelamento de Salvar, Opções e
+Sair; PC trace e hardware real ainda não foram validados.
