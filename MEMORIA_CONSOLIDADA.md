@@ -99,8 +99,12 @@ Separação importante: `0x0807194C`, chamado diretamente pelo loop, lê o estad
 tasks. `0x0805486C` atualiza contadores de tempo. Não inferir os nomes funcionais
 exatos das outras rotinas de `0x08078B9C` sem novas evidências.
 
-Relatório reproduzível: `reports/ciclo_01_loop_principal_e_tasks.md`. Evidência
-deste ciclo é disassembly estático da ROM com o hash acima; não houve PC trace
-dinâmico novo. **Próxima ação:** ligar a criação do `ListMenu` do menu de pausa
-à task/callback que lê a navegação e escolhe a ação da tabela já referenciada em
-`0x083A7344`, sem alargar a análise a código não necessário.
+Relatórios reproduzíveis: `reports/ciclo_01_loop_principal_e_tasks.md` e
+`reports/ciclo_02_menu_pausa_e_listmenu.md`. O ciclo 02 confirmou que o handler
+do menu nativo de pausa em `0x0806F280` lê os botões diretamente, navega por
+`0x020370F4/0x020370F6` e busca callbacks em `0x083A7344`; não chama
+`ListMenu_ProcessInput` (`0x08107078`). Um fluxo ListMenu distinto foi localizado
+em `0x08046AB8` (lista de três linhas, IDs 0/1/5), sem elo provado com o menu de
+pausa. Evidência dos dois ciclos: disassembly estático, sem PC trace dinâmico
+novo. **Próxima ação:** localizar o ponto que despacha o ponteiro de menu
+instalado em `0x020370F0` e seguir uma opção até a invocação do callback de ação.
