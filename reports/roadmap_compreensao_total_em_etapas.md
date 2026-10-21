@@ -103,7 +103,7 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–15; demais domínios e passes pendentes.
+consumidores de mapa iniciados nos ciclos 11–16; demais domínios e passes pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -112,13 +112,11 @@ funções isoladas: gatilho → script → comandos → atores/dados → mudanç
 save → transição/retorno. Cutscenes e adição/remoção de NPCs são exemplos úteis de
 rastro, ao lado de batalhas, itens, warps e outros fluxos que o inventário revelar.
 
-**Estado:** ciclos 12–15 ligaram header, tabela de tipos, despachantes de scripts,
-scanner de eventos de coordenada e uma cena até seus efeitos locais sobre atores,
-vars/flags e warp. O rastro cobre entrada → prioridade do gatilho → condição →
-bytecode → movimentos, diálogo, instanciação de NPC e atualização de estado. Também
-foi separada a rota de botão de força por pedregulho. Ainda faltam outros eventos,
-subsistemas e validação dinâmica; estes rastros são amostras, não substitutos dos
-passes abrangentes por sistema.
+**Estado:** ciclos 12–16 ligaram header, despachantes, eventos de coordenada e de
+fundo, interações por campo e duas cenas aos efeitos locais sobre atores, texto,
+vars/flags e warp. A rota de botão de força por pedregulho também foi separada.
+Ainda faltam warps em profundidade, outros mapas, subsistemas e validação dinâmica;
+esses rastros são amostras, não substitutos dos passes abrangentes por sistema.
 
 ### Etapa 6 — Validação e auditoria de cobertura
 
@@ -152,10 +150,13 @@ passes abrangentes por sistema.
   diálogos, caminhos alternativos de movimento, spawn de template ID 3, mudanças de
   vars/flags e warp; nomes de cena separados como cruzamento upstream. Estático.
   Relatório: `reports/ciclo_15_pallet_oak_coord_cutscene_trace.md`.
-- **Próximo:** fechar uma segunda amostra de interação no mesmo mapa (evento de
-  coordenada `0x0816587B` e consumidores de eventos de fundo) e, em seguida, revisar
-  o ledger para selecionar um domínio fora de mapas/scripts; inventário e callgraph
-  permanecem em auditoria transversal.
+- **Ciclo 16:** caracterizou localmente o scanner de BgEvents, os caminhos de
+  interação/placa e a cadeia tag 3 → estado de object event → coord event
+  `0x0816587B`; decodificou mensagens locais e separou nomes upstream. Estático.
+  Relatório: `reports/ciclo_16_eventos_bg_signlady_interacao.md`.
+- **Próximo:** revisar inventário/callgraph e iniciar um passe fora de mapas/scripts
+  (ex.: batalha, equipe/PC, dados de Pokémon ou save), mantendo warp/conexões e
+  amostras de outros mapas como lacunas explícitas.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
