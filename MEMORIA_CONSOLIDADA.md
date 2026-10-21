@@ -194,13 +194,27 @@ salvo; o campo permanece ativo sem reabrir a pausa. No mGBA, START → cinco DOW
 `reports/ciclo_08_sair_e_fechamento_da_pausa.md`. Validação visual, sem PC trace
 nem hardware real.
 
+**Ciclo 09 — Pokémon → menu da equipe → retorno B:** o registro ID 0
+(`0x083A7344`) contém `0x0806F411`. Esse callback instala `0x0810275D` como
+callback2; `0x0810275C` prepara o menu da equipe e instala o callback de execução
+`0x081024D5`. A task em `0x0810287C` lê B pela máscara `0x0002` e avança para o
+estado de fechamento. `0x081028FC` limpa recursos, instala o callback de saída
+`0x08102859` e encerra a task; depois da etapa controlada por `0x08102798`, o
+callback instala `0x080568A9`. No mGBA, START → A → B abriu a equipe e voltou à
+pausa. Capturas em `reports/ciclo_09_pokemon_party_aberto.png` e
+`reports/ciclo_09_b_volta_pausa_pokemon.png`; detalhes e limites em
+`reports/ciclo_09_pokemon_e_retorno_da_equipe.md`. A seleção de Pokémon por A e
+os submenus de ação não foram cobertos.
+
 Relatórios da trilha: `reports/ciclo_01_loop_principal_e_tasks.md`,
 `reports/ciclo_02_menu_pausa_e_listmenu.md`,
 `reports/ciclo_03_menu_pausa_ate_bolsa.md`,
 `reports/ciclo_04_bolsa_e_retorno_ao_menu_de_pausa.md`,
 `reports/ciclo_05_montagem_e_desenho_menu_pausa.md`,
 `reports/ciclo_06_callback_salvar_e_cancelamento.md`,
-`reports/ciclo_07_opcoes_e_retorno_a_pausa.md` e
-`reports/ciclo_08_sair_e_fechamento_da_pausa.md`. A análise estática cobre a
-rota da Bolsa, a montagem/desenho do menu, o cancelamento de Salvar, Opções e
-Sair; PC trace e hardware real ainda não foram validados.
+`reports/ciclo_07_opcoes_e_retorno_a_pausa.md`,
+`reports/ciclo_08_sair_e_fechamento_da_pausa.md` e
+`reports/ciclo_09_pokemon_e_retorno_da_equipe.md`. A análise estática cobre a
+rota da Bolsa, a montagem/desenho do menu, o cancelamento de Salvar, Opções,
+Sair e o cancelamento B do menu da equipe. O ramo de confirmação positiva de
+Salvar, PC trace e hardware real ainda não foram validados.
