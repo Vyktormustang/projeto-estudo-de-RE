@@ -96,7 +96,7 @@ binário local.
 ## Limites e próximo passo
 
 Análise estática apenas; nenhum script de NPC foi executado dinamicamente neste
-ciclo. Próximo passo de alto valor: mapear localmente `MapHeader → MapEvents →
-ObjectEventTemplate` e um script de mapa, então provar como inserir um NPC novo e
-como um gatilho de mapa chama uma cena. Uma cutscene específica ainda não foi
-indicada pelo usuário; quando houver uma, priorizá-la no mesmo modelo de rastreio.
+ciclo. Próximo passo: mapear localmente `MapHeader → MapEvents → ObjectEventTemplate`
+e os scripts associados. Um rastro de cutscene ou de NPC pode servir como teste
+ponta a ponta desse modelo, mas é somente uma amostra: a investigação continua pelos
+demais sistemas e regiões da ROM, conforme o roteiro de cobertura total.
