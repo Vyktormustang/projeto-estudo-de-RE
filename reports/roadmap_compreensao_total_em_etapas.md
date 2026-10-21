@@ -76,11 +76,11 @@ Para cada formato: evidência de bytes local, estrutura proposta, referências q
 consomem e uma amostra validada. Não assumir que um layout upstream é idêntico sem
 conferência local.
 
-**Estado:** parcial. O ciclo 12 confirmou localmente um mapa: lookup de grupos,
-`MapHeader → MapEvents`, layout, array de templates, coordenadas e ponteiros; foi
-criado `scripts/inspect_map_event_graph.py` para repetir a extração por índices.
-Ainda faltam outros mapas, consumidores das demais classes de evento e os outros
-formatos/catálogos listados.
+**Estado:** parcial. Ciclos 12–13 confirmaram o lookup de grupos,
+`MapHeader → MapEvents`, layout, arrays de evento e tabela/dispatch de scripts de
+header em uma amostra local. `scripts/inspect_map_event_graph.py` permite repetir a
+extração por índices. Ainda faltam outros mapas, consumidores de warps/coordenadas/
+fundo, carregadores completos e os demais formatos/catálogos.
 
 ### Etapa 4 — Passes sistemáticos por subsistema
 
@@ -102,8 +102,8 @@ revelar novos domínios):
 11. demais módulos identificados no inventário global, sem tratá-los como fora de
     escopo por não aparecerem nos exemplos.
 
-**Estado:** pausa parcialmente coberta; scripts/NPC iniciados no ciclo 11; demais
-passes pendentes.
+**Estado:** pausa parcialmente coberta; motor de bytecode e handlers NPC iniciados
+nos ciclos 11–13; demais passes pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -112,10 +112,10 @@ funções isoladas: gatilho → script → comandos → atores/dados → mudanç
 save → transição/retorno. Cutscenes e adição/remoção de NPCs são exemplos úteis de
 rastro, ao lado de batalhas, itens, warps e outros fluxos que o inventário revelar.
 
-**Estado:** ciclo 11 mapeou handlers locais; ciclo 12 encontrou localmente eventos
-de coordenada que apontam para scripts, mas os consumidores e o fluxo integral ainda
-não foram rastreados. Esses rastros são instrumentos de compreensão das junções,
-não substitutos dos passes abrangentes por sistema.
+**Estado:** ciclos 12–13 ligaram header, tabela de tipos e despachantes de scripts
+em uma amostra; eventos de coordenada já têm registros locais identificados, mas seu
+consumidor e o fluxo integral ainda faltam. Esses rastros são instrumentos para
+compreender junções, não substitutos dos passes abrangentes por sistema.
 
 ### Etapa 6 — Validação e auditoria de cobertura
 
@@ -139,9 +139,11 @@ não substitutos dos passes abrangentes por sistema.
   3/mapa 0; parser reutilizável em `scripts/inspect_map_event_graph.py`. Um registro
   local difere da amostra upstream; diferença preservada como questão em aberto.
   Relatório: `reports/ciclo_12_map_headers_events_obj_templates.md`.
-- **Próximo:** ampliar a auditoria de mapas/eventos e carregadores; em paralelo,
-  revisar inventário/callgraph global para decidir recortes dos próximos sistemas.
-  Cutscenes/NPCs seguem como exemplos úteis, não como limite do escopo.
+- **Ciclo 13:** parser local de `MapHeader.mapScripts`, despachantes de tipos e
+  tabela condicional de frame/warp; relatório `reports/ciclo_13_map_script_dispatch_local.md`.
+- **Próximo:** localizar o consumidor local de eventos de coordenada e sua relação
+  com o loop de campo; em paralelo, auditar inventário/callgraph para manter a
+  cobertura dos demais sistemas e regiões em movimento.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,

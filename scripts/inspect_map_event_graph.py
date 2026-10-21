@@ -70,6 +70,35 @@ def inspect(rom: Rom, group_table: int, group: int, map_num: int) -> dict[str, A
     connections = pointer(rom, header + 12)
     header_fields = rom.bytes(header + 16, 12)
 
+    map_script_table: list[dict[str, Any]] = []
+    if map_scripts:
+        cursor = map_scripts
+        for _ in range(64):
+            tag = rom.u8(cursor)
+            if tag == 0:
+                break
+            target = rom.u32(cursor + 1)
+            row: dict[str, Any] = {"tag": tag, "target": rom.addr(target)}
+            # Local handlers for tags 2 and 4 treat the target as a table of
+            # (u16 var, u16 value, u32 script) rows terminated by var == 0.
+            if tag in (2, 4):
+                conditional_rows = []
+                table_cursor = target
+                for _ in range(256):
+                    var = rom.u16(table_cursor)
+                    if var == 0:
+                        break
+                    conditional_rows.append({
+                        "var": f"0x{var:04X}",
+                        "value": f"0x{rom.u16(table_cursor + 2):04X}",
+                        "script": rom.addr(rom.u32(table_cursor + 4)),
+                    })
+                    table_cursor += 8
+                row["conditional_rows"] = conditional_rows
+                row["terminator_address"] = rom.addr(table_cursor)
+            map_script_table.append(row)
+            cursor += 5
+
     layout_fields = None
     if layout:
         layout_fields = {
@@ -165,6 +194,7 @@ def inspect(rom: Rom, group_table: int, group: int, map_num: int) -> dict[str, A
             "map_scripts": rom.addr(map_scripts), "connections": rom.addr(connections),
             "tail_0x10_to_0x1B_hex": header_fields.hex(),
         },
+        "map_script_table": map_script_table,
         "layout": layout_fields,
         "map_events": {
             "counts": {
