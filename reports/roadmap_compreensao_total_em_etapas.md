@@ -289,11 +289,18 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_team_cleanup_commands.py`; relatório:
   `reports/ciclo_36_checkteams_cleanup_multihit_local.md`. Estático e parcial; issue
   Linear `VYK-15`.
-- **Próximo:** seguir a sequência da tabela local a partir de `0x27`–`0x29` e
-  completar estados intermediários de `0x23`, além de expandir chamadas/consumidores
-  de batalha. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
-  desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento
-  e demais domínios. Estes rastros não representam cobertura global.
+- **Ciclo 37:** seguiu localmente `0x27`–`0x29` (`0x08022609`, `0x08022651`,
+  `0x08022671`): decremento condicional com cursor/destino inline, salto por ponteiro
+  u32 e seis comparações de byte com endereços indiretos e destino condicional. Os
+  nomes upstream estão separados da prova local. Script:
+  `scripts/inspect_battle_jump_byte_commands.py`; relatório:
+  `reports/ciclo_37_decrement_goto_jumpifbyte_local.md`. Estático e parcial; issue
+  Linear `VYK-16`.
+- **Próximo:** seguir a sequência local a partir de `0x2A`–`0x2C` e completar estados
+  intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
+  paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
+  manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
+  domínios. Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
