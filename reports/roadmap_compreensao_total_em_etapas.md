@@ -364,13 +364,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   candidatas de 412 espécies, 355 moves, 412 ponteiros de learnsets e 112 registros de
   typecalc foram revalidadas; auditoria preliminar identificou três consumidores de learnsets
   adicionais com cap de 20 entradas, limites numéricos de moves/tipos e três leitores typechart
-  adicionais. Um handler dispatchado pelo opcode `0xA6` tem LCG de período matemático completo e
-  permite o índice 112: lê o registro seguinte, mas o rejeita pelo `+2 = 0xCC`; consequência
-  runtime ainda não testada. Relatórios:
+  adicionais. Entradas candidatas de scripts de efeito agora confirmam bytes `0x4A` e `0xA6`
+  em limites de comando compatíveis com os macros upstream; registros candidatos de move
+  apontam para ambas. No `0xA6`, o LCG local admite índice 112 e lê o registro seguinte, mas o
+  rejeita por `+2 = 0xCC`; consequência runtime ainda não testada. Relatórios/verificadores:
   `reports/auditoria_fase1_consumidores_learnsets.md`,
-  `reports/auditoria_fase1_limites_moves_tipos.md` e
-  `reports/auditoria_fase1_consumidor_typechart_secundario.md`. Isso não autoriza expansão.
-  Issue Linear `VYK-27`.
+  `reports/auditoria_fase1_limites_moves_tipos.md`,
+  `reports/auditoria_fase1_consumidor_typechart_secundario.md`,
+  `scripts/inspect_typechart_bounds.py` e `scripts/inspect_typechart_script_references.py`.
+  Isso não autoriza expansão. Issue Linear `VYK-27`.
 - **Trilha de RE de opcodes pausada no backlog:** `VYK-26`, handlers locais `0x45`–`0x47`.
   Retomar depois ou em paralelo quando priorizado; estados intermediários de `0x23`,
   caminhos de dano/callers/consumidores e demais domínios continuam desconhecidos.

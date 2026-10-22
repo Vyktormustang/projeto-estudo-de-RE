@@ -87,7 +87,7 @@ def main() -> int:
         f"typechart: 112 registros; índice 112 lê 0x{TYPE_CHART_VA + 112 * 3:08X} "
         f"({data[offset(TYPE_CHART_VA + 112 * 3, 3, data):offset(TYPE_CHART_VA + 112 * 3, 3, data) + 3].hex(' ')})"
     )
-    print("Verificação estática; script emitido/execução do handler não foram demonstrados.")
+    print("Este verificador cobre somente handler/limites; verificação de bytecode e execução estão separadas.")
     return 0
 
 

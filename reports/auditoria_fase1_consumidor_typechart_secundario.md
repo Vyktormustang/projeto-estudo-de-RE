@@ -1,12 +1,13 @@
 # Fase 1 — leitores adicionais da tabela local de effectiveness
 
-**Estado:** seguidos estaticamente três fluxos locais fora do handler typecalc do ciclo 25: uma rotina que consome tipos da espécie, um fluxo de batalha que consulta move/estrutura e effectiveness, e um leitor chamado duas vezes por uma rotina superior. A tabela local de comandos de batalha encaminha os opcodes `0x4A` e `0xA6` a duas dessas rotinas. O handler `0x08029DAC` admite numericamente o índice 112 para uma tabela observada com índices 0–111; o RNG local tem ciclo matemático completo, mas a sequência de jogo não foi executada. Registramos uma leitura além do limite candidato, com rejeição imediata pelo próximo teste, não um bug/efeito de jogo confirmado. Nenhuma ROM/save foi modificada.
+**Estado:** seguidos estaticamente três fluxos locais fora do handler typecalc do ciclo 25: uma rotina que consome tipos da espécie, um fluxo de batalha que consulta move/estrutura e effectiveness, e um leitor chamado duas vezes por uma rotina superior. Além dos handlers na tabela local de comandos, foram encontradas entradas de scripts de efeito que contêm `0x4A` e `0xA6` em limites compatíveis com os comandos. Um registro candidato de move local seleciona cada entrada de efeito, mas nenhuma batalha foi executada. O handler `0x08029DAC` admite numericamente o índice 112 para uma tabela observada com índices 0–111; o RNG local tem ciclo matemático completo, mas a sequência de jogo não foi executada. Registramos leitura além do limite candidato seguida de rejeição, não um bug/efeito de jogo confirmado. Nenhuma ROM/save foi modificada.
 
 ## Proveniência e método
 
 - ROM BR local, somente leitura, 16 MiB; SHA-256 `6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae`.
 - Desmontagem Thumb com Capstone 5.0.7 temporário (`/tmp/capstone-py`); as palavras-base, pools, sequências e callsites citados foram conferidos contra bytes locais.
 - Tabela/handler já revalidados por `scripts/inspect_typecalc_path.py` e `scripts/inspect_expansion_numeric_domains.py`. REA/Ghidra e emulação não foram usados.
+- Cross-reference de nomes e tamanhos de macros: `pret/pokefirered`, commit `ce6406d8c2eaf46d543c8a2606de0c3cb1951982`; `asm/macros/battle_script.inc` SHA-256 `cd13b8392cf0cf2e7f56e18861e6269a1461c32271c75674a193ac3d39c241c4`. Não é evidência local nem prova de proveniência/equivalência integral.
 - Identificadores de tipo/ability e propósitos de jogo não são atribuídos aos códigos numéricos locais.
 
 ## Endereços no dispatch local de comandos
@@ -16,7 +17,17 @@ O ciclo 25 havia localizado a tabela local de ponteiros de handlers em `0x082501
 - índice/opcode `0x4A` (`74`): word em `0x08250244` é `0x08023C39`, ponteiro Thumb para código em `0x08023C38`;
 - índice/opcode `0xA6` (`166`): word em `0x082503B4` é `0x08029DAD`, ponteiro Thumb para código em `0x08029DAC`.
 
-Isso estabelece a associação local tabela→handler. Ainda não localizei um script específico contendo esses opcodes em posição de comando nem confirmei a execução de qualquer um deles em jogo.
+Isso estabelece a associação local tabela→handler, mas, isoladamente, não prova emissão por bytecode.
+
+## Referências locais em scripts de efeito
+
+A inspeção agora seguiu duas cadeias da ROM BR. O dispatch de moves local já documentado em `reports/ciclo_21_catalogo_moves_dispatch_efeitos.md` usa o byte `+0` do registro para selecionar uma word em `0x081D65A8` e grava o destino no cursor de script `0x02023D74`. Os registros candidatos de índices 68 e 176 têm, respectivamente, byte `+0` igual a `0x59` e `0x5D`; as entradas correspondentes da tabela local apontam para `0x081D7433` e `0x081D74D6`.
+
+- Em `0x081D7433`, os bytes locais são `00 A1 F0 7D 1D 08 01 5E 69 1D 08 00 00 02 03 4A`. O `0x4A` está no deslocamento `+15` da entrada candidata. O parse upstream fixado dá tamanhos de 1 byte para `attackcanceler`, 5 para `counterdamagecalculator`, 7 para `accuracycheck`, e 1 cada para `attackstring` e `ppreduce`; esse alinhamento coloca `0x4A` no início do próximo comando.
+- Em `0x081D74D6`, os bytes locais são `00 02 03 A6 F2 7D 1D 08 09 0A`. O `0xA6` aparece no deslocamento `+3`, após três opcodes locais cujos handlers são `0x00`, `0x02` e `0x03`; o word seguinte aponta para `0x081D7DF2`.
+- A tabela local encaminha `0x4A` a `0x08023C38` e `0xA6` a `0x08029DAC`. As palavras `+0` dos registros e os destinos de script são fatos locais. O vínculo entre limites de comandos e os nomes acima é **cross-reference separado**, fixado em `pret/pokefirered` commit `ce6406d8c2eaf46d543c8a2606de0c3cb1951982`; não substitui análise local nem prova execução.
+
+Essas ocorrências resolvem a lacuna anterior de ausência de exemplos de bytecode, mas não demonstram que os registros candidatos de move sejam selecionados em uma batalha, que os scripts completem o fluxo ou que o caso de índice 112 ocorra. Verificador: `scripts/inspect_typechart_script_references.py`.
 
 ## Leitor local `0x08039DB4` e caller `0x08039E3C`
 
@@ -58,9 +69,10 @@ A mesma rotina contém um segundo scan em `0x08029F0A`: incrementa o deslocament
 
 ```bash
 python scripts/inspect_typechart_bounds.py
+python scripts/inspect_typechart_script_references.py
 ```
 
-O verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. Ele não procura scripts que emitam os opcodes, nem prova o estado RNG de uma partida ou substitui execução dinâmica.
+O primeiro verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. O segundo confirma os dois bytes `+0` de registros candidatos, os destinos da tabela de scripts, as sequências de bytes e os handlers locais. O alinhamento dos comandos que precedem `0x4A` usa tamanhos do macro upstream fixado; nenhum dos verificadores prova seleção em batalha, estado RNG real ou execução dinâmica.
 
 ## Fechamento das ocorrências candidatas e lacunas
 
@@ -68,6 +80,6 @@ O scanner encontra nove palavras brutas coincidentes com `0x0824F050`. O ciclo 2
 
 ## Próximo passo
 
-1. Localizar/decodificar scripts que usem os opcodes `0x4A` e `0xA6`; a presença dos handlers na tabela não prova uso por um script específico.
-2. Verificar em contexto isolado o candidato de índice 112 e o ramo que rejeita `+2 = 0xCC`; não editar ROM/save-base nem converter leitura estática em bug confirmado sem teste.
+1. Enumerar mais referências a `0x4A`/`0xA6` em scripts e rastrear a seleção/call path dos registros candidatos 68 e 176, sem tratar os dois exemplos como cobertura de todas as batalhas.
+2. Se o gate de escopo permitir, verificar em contexto isolado o candidato de índice 112 e o ramo que rejeita `+2 = 0xCC`; não editar ROM/save-base nem converter leitura estática em bug confirmado sem teste.
 3. Continuar inventário de UI, nomes, ícones e outros consumidores de tipos; este relatório não demonstra suporte geral a novos códigos de tipo.
