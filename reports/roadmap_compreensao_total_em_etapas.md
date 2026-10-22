@@ -109,12 +109,12 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–25 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–26 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
 e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
-fluxo local de acerto/falha, recortes de dano e `typecalc`/efetividade. PC/armazenamento,
-fórmula completa de dano, demais consumidores, persistência e outros domínios continuam
-pendentes.
+fluxo local de acerto/falha, recortes de dano, `typecalc`/efetividade e um ramo de
+ajuste pós-cálculo de dano. PC/armazenamento, fórmula completa de dano, demais
+consumidores, persistência e outros domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -218,12 +218,17 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   de modulação `0x0801E771` e ramos locais de habilidades; nomes semânticos foram
   cruzados separadamente com upstream. Script: `scripts/inspect_typecalc_path.py`;
   relatório: `reports/ciclo_25_typecalc_tipo_efetividade_local.md`. Estático e parcial.
-- **Próximo:** inspecionar o handler `0x07` em `0x0801F105` (ajuste normal de dano
-  no cruzamento upstream), depois os comandos locais `0x09`/`0x0A` de animação e
-  `0x0B`/`0x0C` de atualização de HP; registrar desvios e lacunas, sem presumir uma
-  cadeia completa. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
-  desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/
-  armazenamento e demais domínios. Estes rastros não representam cobertura global.
+- **Ciclo 26:** seguiu opcode `0x07` ao handler local `0x0801F105`, observando o
+  fator percentual do dano, consultas a item/estado do defensor e um ramo de limite
+  HP−1. Nomes de efeito/item foram cruzados separadamente com upstream. Script:
+  `scripts/inspect_adjustnormaldamage.py`; relatório:
+  `reports/ciclo_26_adjustnormaldamage_limites_item_estado.md`. Estático e parcial;
+  acompanhado no Linear pela issue `VYK-5` do projeto Pokémon FireRed BR.
+- **Próximo:** inspecionar os handlers locais `0x09`/`0x0A` de animação e `0x0B`/`0x0C`
+  de atualização de HP; registrar desvios e lacunas, sem presumir uma cadeia completa.
+  Em paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
+  manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
+  domínios. Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
