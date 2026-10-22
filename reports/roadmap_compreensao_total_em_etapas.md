@@ -334,7 +334,14 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_pause_healthbar_commands.py`; relatório:
   `reports/ciclo_43_pause_wait_healthbar_local.md`. Estático e parcial; issue Linear
   `VYK-22`.
-- **Próximo:** seguir a sequência local a partir de `0x3C`–`0x3E` e completar estados
+- **Ciclo 44:** seguiu localmente `0x3C`–`0x3E` (`0x08022CC0`, `0x08022CCC`,
+  `0x08022CEC`): retorno via stack local com decremento de contador, e dois handlers
+  que limpam/gravam bytes de estado distintos. Os nomes upstream (`Cmd_return`,
+  `Cmd_end`, `Cmd_end2`) e a interpretação dos campos estão separados da prova local.
+  O helper de retorno não verifica localmente contador zero; alcançabilidade não
+  estabelecida. Script: `scripts/inspect_battle_return_end_commands.py`; relatório:
+  `reports/ciclo_44_return_end_local.md`. Estático e parcial; issue Linear `VYK-23`.
+- **Próximo:** seguir a sequência local a partir de `0x3F` em diante e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
