@@ -362,7 +362,9 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `reports/plano_expansao_pokemon_geracoes.md`: congelar corte/escopo e auditar somente
   leitura tabelas, consumidores, limites, save/party/PC, espaço e assets. As tabelas locais
   candidatas de 412 espécies, 355 moves, 412 ponteiros de learnsets e 112 registros de
-  typecalc foram revalidadas; isso não autoriza expansão. Issue Linear `VYK-27`.
+  typecalc foram revalidadas; auditoria preliminar ainda identificou três consumidores adicionais
+  de learnsets com limite local de 20 entradas (`reports/auditoria_fase1_consumidores_learnsets.md`).
+  Isso não autoriza expansão. Issue Linear `VYK-27`.
 - **Trilha de RE de opcodes pausada no backlog:** `VYK-26`, handlers locais `0x45`–`0x47`.
   Retomar depois ou em paralelo quando priorizado; estados intermediários de `0x23`,
   caminhos de dano/callers/consumidores e demais domínios continuam desconhecidos.
