@@ -327,7 +327,14 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   local. Script: `scripts/inspect_battle_bic_commands.py`; relatório:
   `reports/ciclo_42_bicbyte_bichalfword_bicword_local.md`. Estático e parcial; issue
   Linear `VYK-21`.
-- **Próximo:** seguir a sequência local a partir de `0x39`–`0x3B` e completar estados
+- **Ciclo 43:** seguiu localmente `0x39`–`0x3B` (`0x08022C09`, `0x08022C49`,
+  `0x08022C69`): contador com espera/limite, espera por word de controle e seleção de
+  battler com chamadas locais para packet/controller helpers. A rota de `0x0800D9EC`
+  continua parcial. Nomes upstream separados da evidência local. Script:
+  `scripts/inspect_battle_pause_healthbar_commands.py`; relatório:
+  `reports/ciclo_43_pause_wait_healthbar_local.md`. Estático e parcial; issue Linear
+  `VYK-22`.
+- **Próximo:** seguir a sequência local a partir de `0x3C`–`0x3E` e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
