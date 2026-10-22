@@ -51,6 +51,9 @@ def main() -> int:
     signatures = [
         (0x080223F8, "f0 b5 47 46 80 b4 00 26 4c 48 00 68 00 28 00 d0 bf e0", "opcode 0x24: prólogo e saída sem avanço quando word != 0"),
         (0x0802240A, "00 25 64 20 29 1c 41 43 49 48 0c 18 20 1c 0b 21", "opcode 0x24: loop de seis registros, stride 0x64 e seletor inicial"),
+        (0x0802241A, "1d f0 e5 fb", "opcode 0x24: chamada ao helper local 0x0803FBE8"),
+        (0x08022422, "20 1c 2d 21 1d f0 df fb", "opcode 0x24: seletor 0x2D e segunda chamada ao helper"),
+        (0x08022430, "39 21 1d f0 d9 fb", "opcode 0x24: seletor 0x39 e terceira chamada ao helper"),
         (0x08022442, "00 2e 04 d1 3d 48 01 78 02 22 11 43 01 70", "opcode 0x24: bit 0x02 no byte de resultado se soma zero"),
         (0x0802248A, "2c 4a 00 2e 03 d1 10 78 01 21 08 43 10 70 10 78 00 28", "opcode 0x24: base segunda varredura e bit 0x01"),
         (0x080224AC, "00 23 00 25 25 48 01 78 84 46 25 4f 8b 42 13 da", "opcode 0x24: contagem e base dos dados consultados"),
