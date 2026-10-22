@@ -187,11 +187,18 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   como learnsets depende do cruzamento upstream, separado da evidência local. Script:
   `scripts/inspect_level_up_learnsets.py`; relatório:
   `reports/ciclo_20_learnsets_indices_consumidor_moves.md`.
-- **Próximo:** mapear limites/stride e campos do catálogo local de moves; localizar o
-  dispatch de efeitos e seguir exemplos de move até handlers de batalha. Continuar a
-  auditoria dos demais consumidores de espécie e dos fluxos de batalha/creche/evolução.
-  Em paralelo, manter warp/conexões, outros mapas e demais subsistemas como lacunas;
-  estes rastros não representam cobertura global.
+- **Ciclo 21:** caracterizou a região candidata de 355 registros em `0x08250C04`
+  (stride 12), leituras locais em `+0`, `+1`, `+4`, `+6`, `+8` e uma rotina local
+  que indexa `0x081D65A8` pelo byte `+0` e grava o ponteiro selecionado em RAM.
+  Foram observados 214 ponteiros candidatos de efeitos; o máximo local do byte `+0`
+  é 213. Script: `scripts/inspect_move_catalog.py`; relatório:
+  `reports/ciclo_21_catalogo_moves_dispatch_efeitos.md`. Estático: não seguiu handlers
+  individuais nem valida comportamento dinâmico.
+- **Próximo:** seguir alguns destinos do dispatch de efeitos até comandos de script e
+  handlers locais; investigar os offsets do registro ainda não caracterizados e outros
+  consumidores/validações de IDs. Continuar em paralelo a auditoria de espécie e fluxos
+  de batalha/creche/evolução. Manter warp/conexões, outros mapas e demais subsistemas
+  como lacunas; estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
