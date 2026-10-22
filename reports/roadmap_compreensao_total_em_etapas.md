@@ -269,11 +269,17 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_status_jump_commands.py`; relatório:
   `reports/ciclo_33_handlers_status_jump_local.md`. Estático e parcial; issue Linear
   `VYK-12`.
-- **Próximo:** continuar pela tabela local com `0x1E` (`0x08021731`), `0x1F`
-  (`0x08021819`) e `0x20` (`0x08021891`), além de expandir chamadas/consumidores de
-  batalha. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
-  desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento
-  e demais domínios. Estes rastros não representam cobertura global.
+- **Ciclo 34:** seguiu `0x1E`–`0x20` (`0x08021731`, `0x08021819`, `0x08021891`):
+  consultas/comparação local, máscara de lado, seis comparadores, operands inline e
+  redirecionamentos do cursor. Nomes upstream separados. Script:
+  `scripts/inspect_battle_condition_commands.py`; relatório:
+  `reports/ciclo_34_condicoes_ability_side_stat_local.md`. Estático e parcial; issue
+  Linear `VYK-13`.
+- **Próximo:** seguir pela tabela local `0x21` (`0x08021989`), `0x22` (`0x08021A0D`)
+  e `0x23` (`0x08021A69`), além de expandir chamadas/consumidores de batalha. Em
+  paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
+  manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
+  domínios. Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
