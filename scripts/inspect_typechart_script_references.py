@@ -256,6 +256,22 @@ def main() -> int:
     ):
         raise SystemExit("ponteiros da transição para o callback 0x080155C8 divergentes")
 
+    # Local writers confirm that the guard byte at 0x02023E8A is stateful.
+    for va, sequence, pool_va, label in (
+        (0x08016886, "06 49 04 20 08 70", 0x080168A0, "write 4 to guard byte"),
+        (0x080169D2, "04 49 06 20 08 70", 0x080169E4, "write 6 to guard byte"),
+        (0x08016C7C, "06 49 04 20 08 70", 0x08016C98, "second write 4 to guard byte"),
+    ):
+        expect(data, va, sequence, label)
+        if read_u32(data, pool_va) != 0x02023E8A:
+            raise SystemExit(f"literal da {label} diverge")
+    expect(data, 0x08015686, "0b 4c", "carregamento do guard byte no primeiro clear")
+    expect(data, 0x0801569C, "21 78 7f 20 08 40 20 70", "clear bit 7 do guard byte")
+    expect(data, 0x080157A4, "0a 4c", "carregamento do guard byte no segundo clear")
+    expect(data, 0x080157BA, "21 78 7f 20 08 40 20 70", "segundo clear bit 7 do guard byte")
+    if read_u32(data, 0x080156B4) != 0x02023E8A or read_u32(data, 0x080157D0) != 0x02023E8A:
+        raise SystemExit("literais do guard byte nos clears divergentes")
+
     # A local function-pointer table selects the containing Thumb function.
     expect(
         data, 0x080155C8,
@@ -327,8 +343,9 @@ def main() -> int:
     )
     print(
         "tabela 0x08250038 slot 0→0x08015CA0; 0x080155C8 sobrescreve índice com "
-        "0x0C se 0x02023E8A != 0; runtime/condições não testados"
+        "0x0C se 0x02023E8A != 0; código local escreve 4/6 nessa guarda"
     )
+    print("semântica, predicados combinados e runtime não testados")
     print("bloco 0x0801632C no callback slot 0: 7 branches locais convergem")
     for move_id, occurrences in learnset_hits.items():
         indices = sorted({index for index, _level in occurrences})
