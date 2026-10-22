@@ -109,12 +109,13 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–27 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–28 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
 e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
 fluxo local de acerto/falha, recortes de dano, `typecalc`/efetividade, ajuste de dano,
-animação e caminhos de atualização de HP. PC/armazenamento, fórmula completa de dano,
-demais consumidores, persistência e outros domínios continuam pendentes.
+animação, caminhos de atualização de HP e seleção de sons/mensagens de resultado.
+PC/armazenamento, fórmula completa de dano, demais consumidores, persistência e outros
+domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -230,9 +231,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_anim_hp_updates.py`; relatório:
   `reports/ciclo_27_animacao_atualizacao_hp_local.md`. Estático e parcial; issue
   Linear `VYK-6`.
-- **Próximo:** seguir o opcode `0x0E` no script amostrado (`0x081D6936`, handler
-  local `0x0801FAD1`) e o fluxo adjacente de mensagens/resultados; registrar
-  consumidores e lacunas. Issue Linear `VYK-7`. Em paralelo, investigar caminhos de
+- **Ciclo 28:** seguiu opcode `0x0E` em `0x081D6936` até `0x0801FAD1` e rastreou
+  ramos representativos do handler local `0x0F` (`0x0801FBA1`), incluindo IDs crus,
+  chamadas, flags e redirecionamentos de cursor. A tabela de mensagens e ramos não
+  estão totalmente decodificados. Script: `scripts/inspect_result_sound_messages.py`;
+  relatório: `reports/ciclo_28_efetividade_resultmessage_local.md`. Estático e parcial;
+  issue Linear `VYK-7`.
+- **Próximo:** issue Linear `VYK-8`: inspecionar os opcodes locais `0x10`–`0x12`
+  (`0x10→0x0801FD51`, `0x11→0x0801FD91`, `0x12→0x0801FDD5`) e seguir os dados e
+  esperas de texto que a ROM confirmar. Em paralelo, investigar caminhos de
   dano/callers/consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
   creche/evolução, PC/armazenamento e demais domínios. Estes rastros não representam
   cobertura global.
