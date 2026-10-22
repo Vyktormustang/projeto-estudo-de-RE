@@ -302,7 +302,14 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   da evidência local. Script: `scripts/inspect_battle_wide_array_commands.py`;
   relatório: `reports/ciclo_38_jumpifwide_and_array_local.md`. Estático e parcial; issue
   Linear `VYK-17`.
-- **Próximo:** seguir a sequência local a partir de `0x2D`–`0x2F` e completar estados
+- **Ciclo 39:** seguiu localmente `0x2D`–`0x2F` (`0x080228F5`, `0x08022979`,
+  `0x080229A1`): comparação de regiões byte a byte com salto por desigualdade; escrita
+  de byte via endereço inline; adição byte com armazenamento truncado a 8 bits. Nomes
+  upstream separados da evidência local. Script:
+  `scripts/inspect_battle_byte_array_mutations.py`; relatório:
+  `reports/ciclo_39_jump_arraynotequal_set_addbyte_local.md`. Estático e parcial; issue
+  Linear `VYK-18`.
+- **Próximo:** seguir a sequência local a partir de `0x30`–`0x32` e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
