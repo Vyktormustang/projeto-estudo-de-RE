@@ -109,11 +109,11 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–22 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–23 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
-e moves, ponteiros/listas de moves por nível, dispatch de efeitos e alguns scripts/
-handlers de comandos de batalha. PC/armazenamento, fluxos completos de combate, demais
-consumidores, persistência e outros domínios continuam pendentes.
+e moves, ponteiros/listas de moves por nível, dispatch de efeitos, bytecodes e handlers
+amostrados, e um caminho local de acerto/falha. PC/armazenamento, fluxo completo de
+dano/combate, demais consumidores, persistência e outros domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -201,10 +201,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   locais. Script: `scripts/inspect_battle_effect_scripts.py`; relatório:
   `reports/ciclo_22_scripts_efeitos_comandos_handlers_batalha.md`. Estático, sem
   executar batalha nem percorrer todos os handlers.
-- **Próximo:** seguir handlers nativos selecionados até alterações completas de estado,
-  dano, texto e animação; rastrear retorno/cursor e validar em emulação se possível.
-  Investigar offsets de move e consumidores ainda desconhecidos, e continuar a
-  auditoria ampla de espécie, creche/evolução, PC/armazenamento e outros domínios.
+- **Ciclo 23:** seguiu o comando local `0x01` do script de efeito 0 ao handler
+  `0x0801DDC5`, à leitura de `ID×12` no catálogo, ao teste de acerto e ao helper que
+  seleciona o avanço do cursor ou o destino de falha `0x081D695E`. Cruzamento semântico
+  foi separado da evidência local. Script: `scripts/inspect_accuracy_path.py`;
+  relatório: `reports/ciclo_23_accuracycheck_fluxo_acerto_falha.md`. Estático e parcial.
+- **Próximo:** seguir o handler local do opcode `0x05` (`0x0801E59D`) no cálculo de
+  dano; depois rastrear os comandos de tipo, animação e atualização de HP e seus
+  retornos. Em paralelo, investigar offsets/consumidores ainda desconhecidos e manter
+  a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais domínios.
   Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
