@@ -1,6 +1,6 @@
 # Roteiro — compreensão abrangente da ROM em etapas
 
-**Estado atualizado:** 2026-10-21
+**Estado atualizado:** 2026-10-22
 **ROM-base:** `google_drive/Pokemon - Fire Red (BR).gba`
 **SHA-256:** `6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae`
 
@@ -79,11 +79,14 @@ conferência local.
 **Estado:** parcial. Ciclos 12–13 confirmaram o lookup de grupos,
 `MapHeader → MapEvents`, layout, arrays de evento e tabela/dispatch de scripts de
 header em uma amostra local. `scripts/inspect_map_event_graph.py` permite repetir a
-extração por índices. Ciclos 17–18 iniciaram os dados de Pokémon: accessors de equipe
-e BoxMon, conversão para equipe, cálculo de stats e localização local de uma tabela
-base de espécies e da tabela de experiência. Ainda faltam determinar os limites e a
-extensão das tabelas, outros mapas, consumidores de warps/coordenadas/fundo,
-carregadores completos, golpes e demais formatos/catálogos.
+extração por índices. Ciclos 17–20 iniciaram os dados de Pokémon: accessors de equipe
+e BoxMon, conversão para equipe, cálculo de stats, região candidata de 412 registros
+de espécie e consumidores locais de campos em +6/+7 e +0x16/+0x17. O ciclo 20 localizou
+uma tabela de 412 ponteiros em `0x0825D7B4`, validou 411 destinos únicos terminados em
+`0xFFFF` e rastreou consumidores por espécie/nível até uma leitura de PP em registro
+de move com stride 12. Os limites do catálogo de moves e os handlers ainda faltam.
+Permanecem pendentes encontros e os demais consumidores/catálogos; também outros mapas,
+consumidores de warps/coordenadas/fundo e carregadores completos.
 
 ### Etapa 4 — Passes sistemáticos por subsistema
 
@@ -106,10 +109,11 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–18 começaram o domínio de
-Pokémon: BoxMon→equipe, cálculo de stats, base local de dados de espécies e curvas
-de experiência. Clientes até PC/batalha, persistência e demais domínios continuam
-pendentes.
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–20 avançaram no domínio de
+Pokémon: BoxMon→equipe, cálculo de stats, região de espécie candidata a 412 registros,
+leitura local de tipos/habilidade, ponteiros/listas de moves por nível e acesso ao
+registro de move. PC/batalha, catálogo/handlers completos, persistência e demais
+domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -169,12 +173,25 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
 - **Ciclo 18:** seguiu `BoxMonToMon`-like → cálculo local de stats → tabelas em
   `0x08254784` (base de espécies, stride 0x1C) e `0x08253AE4` (experiência). Uma
   amostra ID 1, os offsets de base stats/growth rate e a curva selecionada foram
-  conferidos em bytes locais. Limites da tabela, outros catálogos e runtime pendentes.
-  Relatório: `reports/ciclo_18_tabela_especies_e_calculo_stats.md`.
-- **Próximo:** determinar extensão/limites da tabela de espécies e seguir consumidores
-  locais de tipos, habilidades e learnsets; depois mapear golpes e encontros selvagens.
-  Em paralelo, manter warp/conexões, outros mapas e os demais subsistemas como lacunas
-  explícitas; esses primeiros rastros não representam cobertura global.
+  conferidos em bytes locais. Relatório: `reports/ciclo_18_tabela_especies_e_calculo_stats.md`.
+- **Ciclo 19:** encontrou evidência para 412 strides de `0x1C` em `0x08254784`,
+  zeros em `+0x1A..+0x1B` nos índices 1–411, e uma quebra de padrão em `0x08257494`;
+  decodificou consumidores locais dos offsets `+6/+7` e `+0x16/+0x17`. Words u16 e
+  `0xFFFF` após a região são compatíveis com learnsets, mas o xref/agrupamento por
+  espécie segue não provado localmente. Script: `scripts/inspect_species_table.py`;
+  relatório: `reports/ciclo_19_limite_dados_especies_tipos_habilidades.md`.
+- **Ciclo 20:** localizou em `0x0825D7B4` uma tabela local de 412 ponteiros e 411
+  destinos únicos para listas u16 terminadas em `0xFFFF`; rastreou consumidores em
+  `0x0803E9E0` e `0x0803EA88`, comparações por nível/máscara e escrita de move com
+  leitura de PP em registros de stride 12 a partir de `0x08250C04`. A interpretação
+  como learnsets depende do cruzamento upstream, separado da evidência local. Script:
+  `scripts/inspect_level_up_learnsets.py`; relatório:
+  `reports/ciclo_20_learnsets_indices_consumidor_moves.md`.
+- **Próximo:** mapear limites/stride e campos do catálogo local de moves; localizar o
+  dispatch de efeitos e seguir exemplos de move até handlers de batalha. Continuar a
+  auditoria dos demais consumidores de espécie e dos fluxos de batalha/creche/evolução.
+  Em paralelo, manter warp/conexões, outros mapas e demais subsistemas como lacunas;
+  estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
