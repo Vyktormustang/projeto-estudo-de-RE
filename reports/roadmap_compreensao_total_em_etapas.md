@@ -224,11 +224,12 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_adjustnormaldamage.py`; relatório:
   `reports/ciclo_26_adjustnormaldamage_limites_item_estado.md`. Estático e parcial;
   acompanhado no Linear pela issue `VYK-5` do projeto Pokémon FireRed BR.
-- **Próximo:** inspecionar os handlers locais `0x09`/`0x0A` de animação e `0x0B`/`0x0C`
-  de atualização de HP; registrar desvios e lacunas, sem presumir uma cadeia completa.
-  Em paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
-  manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
-  domínios. Estes rastros não representam cobertura global.
+- **Próximo:** issue `VYK-6` no projeto Linear Pokémon FireRed BR: inspecionar os
+  handlers locais `0x09`/`0x0A` de animação e `0x0B`/`0x0C` de atualização de HP;
+  registrar desvios e lacunas, sem presumir uma cadeia completa. Em paralelo,
+  investigar caminhos de dano/callers/consumidores ainda desconhecidos e manter a
+  auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais domínios.
+  Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
