@@ -109,11 +109,11 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–20 avançaram no domínio de
-Pokémon: BoxMon→equipe, cálculo de stats, região de espécie candidata a 412 registros,
-leitura local de tipos/habilidade, ponteiros/listas de moves por nível e acesso ao
-registro de move. PC/batalha, catálogo/handlers completos, persistência e demais
-domínios continuam pendentes.
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–22 avançaram no domínio de
+Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
+e moves, ponteiros/listas de moves por nível, dispatch de efeitos e alguns scripts/
+handlers de comandos de batalha. PC/armazenamento, fluxos completos de combate, demais
+consumidores, persistência e outros domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -194,11 +194,18 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   é 213. Script: `scripts/inspect_move_catalog.py`; relatório:
   `reports/ciclo_21_catalogo_moves_dispatch_efeitos.md`. Estático: não seguiu handlers
   individuais nem valida comportamento dinâmico.
-- **Próximo:** seguir alguns destinos do dispatch de efeitos até comandos de script e
-  handlers locais; investigar os offsets do registro ainda não caracterizados e outros
-  consumidores/validações de IDs. Continuar em paralelo a auditoria de espécie e fluxos
-  de batalha/creche/evolução. Manter warp/conexões, outros mapas e demais subsistemas
-  como lacunas; estes rastros não representam cobertura global.
+- **Ciclo 22:** seguiu os índices 0 e 125 da tabela de efeitos até bytecodes locais,
+  confirmou o dispatcher por opcode em `0x08015A0C`, uma sequência candidata de 248
+  ponteiros em `0x0825011C` e handlers para opcodes amostrados (`0x28`, `0x2A`,
+  `0x2E`, `0x35`). Cruzamento semântico upstream foi separado dos bytes/handlers
+  locais. Script: `scripts/inspect_battle_effect_scripts.py`; relatório:
+  `reports/ciclo_22_scripts_efeitos_comandos_handlers_batalha.md`. Estático, sem
+  executar batalha nem percorrer todos os handlers.
+- **Próximo:** seguir handlers nativos selecionados até alterações completas de estado,
+  dano, texto e animação; rastrear retorno/cursor e validar em emulação se possível.
+  Investigar offsets de move e consumidores ainda desconhecidos, e continuar a
+  auditoria ampla de espécie, creche/evolução, PC/armazenamento e outros domínios.
+  Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
