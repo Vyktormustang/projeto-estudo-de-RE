@@ -109,11 +109,11 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–23 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–24 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
-e moves, ponteiros/listas de moves por nível, dispatch de efeitos, bytecodes e handlers
-amostrados, e um caminho local de acerto/falha. PC/armazenamento, fluxo completo de
-dano/combate, demais consumidores, persistência e outros domínios continuam pendentes.
+e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
+fluxo local de acerto/falha e um recorte do cálculo de dano. PC/armazenamento, fórmula
+completa de dano, demais consumidores, persistência e outros domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -206,11 +206,17 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   seleciona o avanço do cursor ou o destino de falha `0x081D695E`. Cruzamento semântico
   foi separado da evidência local. Script: `scripts/inspect_accuracy_path.py`;
   relatório: `reports/ciclo_23_accuracycheck_fluxo_acerto_falha.md`. Estático e parcial.
-- **Próximo:** seguir o handler local do opcode `0x05` (`0x0801E59D`) no cálculo de
-  dano; depois rastrear os comandos de tipo, animação e atualização de HP e seus
-  retornos. Em paralelo, investigar offsets/consumidores ainda desconhecidos e manter
-  a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais domínios.
-  Estes rastros não representam cobertura global.
+- **Ciclo 24:** seguiu opcode `0x05` em `0x081D6931` até o handler `0x0801E59D`,
+  a chamada local `0x0803ECEC` e alguns ajustes/armazenamentos de dano; caracterizou
+  entradas e leituras iniciais do helper, sem fechar sua fórmula. Script:
+  `scripts/inspect_damagecalc_path.py`; relatório:
+  `reports/ciclo_24_damagecalc_base_damage_local.md`. Cruzamento upstream separado,
+  análise estática e parcial.
+- **Próximo:** analisar o handler local `0x0801E849` (opcode `0x06`) e como ele
+  atualiza dano/flags; depois seguir comandos de animação e atualização de HP, além
+  dos retornos. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
+  desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/
+  armazenamento e demais domínios. Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
