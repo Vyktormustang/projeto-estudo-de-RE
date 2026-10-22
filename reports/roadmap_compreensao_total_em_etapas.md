@@ -249,12 +249,18 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_table_text_commands.py`; relatório:
   `reports/ciclo_30_tabelas_texto_selecao_local.md`. Estático e parcial; issue Linear
   `VYK-9`.
-- **Próximo:** issue Linear `VYK-10`: inspecionar os handlers locais `0x15`–`0x17`
-  (`0x08021125`, `0x08021211`, `0x08021221`) e seus efeitos nos dados/estado de batalha,
-  registrando evidência e lacunas. Em paralelo, investigar caminhos de dano/callers/
-  consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
-  creche/evolução, PC/armazenamento e demais domínios. Estes rastros não representam
-  cobertura global.
+- **Ciclo 31:** seguiu os handlers locais `0x15`–`0x17` (`0x08021125`, `0x08021211`,
+  `0x08021221`): seleção de chance condicional, chamadas ao helper compartilhado,
+  comparação aleatória e caminho alternativo do cursor `+1`. Nomes e semântica de
+  efeitos foram cruzados separadamente com upstream. Script:
+  `scripts/inspect_battle_effect_chance_commands.py`; relatório:
+  `reports/ciclo_31_efeitos_opcodes_batalha_local.md`. Estático e parcial; issue Linear
+  `VYK-10`.
+- **Próximo:** continuar pela tabela local com os handlers `0x18`–`0x1A` e expandir
+  o rastreio de chamadas/consumidores dos efeitos de batalha. Em paralelo, investigar
+  caminhos de dano/callers/consumidores ainda desconhecidos e manter a auditoria ampla
+  de espécie, creche/evolução, PC/armazenamento e demais domínios. Estes rastros não
+  representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
