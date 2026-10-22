@@ -22,6 +22,11 @@ MOVE_COUNT_CANDIDATE = 355
 MOVE_STRIDE = 12
 EFFECT_SCRIPT_TABLE_VA = 0x081D65A8
 COMMAND_TABLE_VA = 0x0825011C
+CALLBACK_TABLE_VA = 0x08250038
+CALLBACK_COUNT_CANDIDATE = 23
+CALLBACK_DISPATCH_VA = 0x080155E4
+CALLBACK_ENTRY0_VA = 0x08015CA0
+TRAMPOLINE_VA = 0x081E3BA8
 LEARNSET_POINTER_TABLE_VA = 0x0825D7B4
 LEARNSET_POINTER_COUNT = 412
 LEARNSET_DATA_START_VA = 0x08257494
@@ -53,8 +58,25 @@ def offset(va: int, size: int, data: bytes) -> int:
     return pos
 
 
+def read_u16(data: bytes, va: int) -> int:
+    return struct.unpack_from("<H", data, offset(va, 2, data))[0]
+
+
 def read_u32(data: bytes, va: int) -> int:
     return struct.unpack_from("<I", data, offset(va, 4, data))[0]
+
+
+def sign_extend(value: int, bits: int) -> int:
+    sign = 1 << (bits - 1)
+    return (value & (sign - 1)) - (value & sign)
+
+
+def thumb_short_branch_target(va: int, insn: int) -> int | None:
+    if insn & 0xF800 == 0xE000:  # B imm11
+        return va + 4 + (sign_extend(insn & 0x07FF, 11) << 1)
+    if insn & 0xF000 == 0xD000 and ((insn >> 8) & 0xF) <= 0xD:  # B<cond> imm8
+        return va + 4 + (sign_extend(insn & 0x00FF, 8) << 1)
+    return None
 
 
 def expect(data: bytes, va: int, hex_bytes: str, label: str) -> None:
@@ -183,6 +205,64 @@ def main() -> int:
                 f"esperado 0x{expected:08X}"
             )
 
+    # A local function-pointer table selects the containing Thumb function.
+    expect(
+        data, 0x080155C8,
+        "70 b5 14 4e 30 78 14 4a 00 28 01 d0 0c 20 10 70",
+        "leitura e condicional de inicialização do índice callback",
+    )
+    expect(
+        data, CALLBACK_DISPATCH_VA,
+        "11 49 10 78 80 00 40 18 00 68 ce f1 db fa",
+        "dispatch indireto da tabela de callbacks",
+    )
+    if (
+        read_u32(data, 0x0801561C) != 0x02023E8A
+        or read_u32(data, 0x08015620) != 0x02023BE3
+        or read_u32(data, 0x0801562C) != CALLBACK_TABLE_VA
+    ):
+        raise SystemExit("ponteiros do índice/condição/base da tabela de callbacks divergentes")
+    callback_off = offset(CALLBACK_TABLE_VA, CALLBACK_COUNT_CANDIDATE * 4 + 4, data)
+    callbacks = list(struct.unpack_from(f"<{CALLBACK_COUNT_CANDIDATE}I", data, callback_off))
+    rom_end = ROM_BASE + len(data)
+    if callbacks[0] != 0x08015CA1 or not all(
+        ROM_BASE <= (p & ~1) < rom_end for p in callbacks
+    ):
+        raise SystemExit("slot 0 ou ponteiros da tabela callback candidata divergentes")
+    next_callback_word = struct.unpack_from(
+        "<I", data, callback_off + CALLBACK_COUNT_CANDIDATE * 4
+    )[0]
+    if ROM_BASE <= (next_callback_word & ~1) < rom_end:
+        raise SystemExit("word seguinte à tabela callback também parece ponteiro")
+    expect(
+        data, CALLBACK_ENTRY0_VA, "f0 b5 57 46 4e 46 45 46 e0 b4 82 b0",
+        "prólogo do callback slot 0",
+    )
+    expect(
+        data, 0x08016350, "38 bc 98 46 a1 46 aa 46 f0 bc 01 bc 00 47",
+        "epílogo do callback slot 0",
+    )
+    expect(data, TRAMPOLINE_VA, "00 47", "trampoline local BX r0")
+
+    # These short direct branches converge on a basic block, not a function
+    # entry. Verify the local instruction halfwords and their decoded targets.
+    branch_sites = {
+        0x08015FA8: 0xE1C0,
+        0x08016158: 0xE0E8,
+        0x080161E2: 0xE0A3,
+        0x08016272: 0xD05B,
+        0x0801628A: 0xD04F,
+        0x080162C2: 0xD033,
+        0x08016316: 0xD009,
+    }
+    for va, expected_insn in branch_sites.items():
+        insn = read_u16(data, va)
+        target = thumb_short_branch_target(va, insn)
+        if insn != expected_insn or target != 0x0801632C:
+            raise SystemExit(
+                f"branch local em 0x{va:08X}: insn=0x{insn:04X}, target={target!r}"
+            )
+
     learnset_hits = scan_learnset_references(data, set(MOVE_EFFECTS))
 
     print(f"ROM SHA-256: {digest}")
@@ -190,6 +270,11 @@ def main() -> int:
     print("0xA6 local em entrada 0x5D (+3); operand aponta para 0x081D7DF2")
     print("registros candidatos +0: 68→0x59, 176→0x5D, 205/301→0x75, 243→0x90, 280→0xBA")
     print("dispatch local: 0x4A→0x08023C38; 0xA6→0x08029DAC")
+    print(
+        "callback table 0x08250038: slot 0→0x08015CA0; índice 0x02023BE3 "
+        "seleciona o ponteiro chamado via BX r0; condição em 0x02023E8A verificada"
+    )
+    print("bloco 0x0801632C no callback slot 0: 7 branches locais convergem; origem do índice/caller externo não testados")
     for move_id, occurrences in learnset_hits.items():
         indices = sorted({index for index, _level in occurrences})
         print(f"learnset local: ID numérico {move_id} aparece {len(occurrences)} vez(es), tabela indices {indices}")

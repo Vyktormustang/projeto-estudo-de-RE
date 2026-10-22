@@ -44,7 +44,9 @@ O ID 205 ocorre duas vezes na lista apontada pelo índice 314; por isso 16 ocorr
 
 A tabela local encaminha `0x4A` a `0x08023C38` e `0xA6` a `0x08029DAC`. Os registros, destinos e bytes acima são fatos locais. O comprimento dos comandos usado para identificar os limites em `0x59`, `0x75`, `0x90` e `0xBA` é **cross-reference separado**: `asm/macros/battle_script.inc` no commit upstream `ce6406d8c2eaf46d543c8a2606de0c3cb1951982`. Nesse upstream, os quatro macros `typecalc2` aparecem nas entradas 89/117/144/186, e `settypetorandomresistance` na 93; `data/battle_scripts_1.s` SHA-256 `27e9c39f3147b05e5ba2ed36ca0c89fcdc9b26718778083bd362c582de800034`. Esses nomes/ocorrências upstream orientam o parse, mas não provam proveniência ou execução da ROM local.
 
-O rastreio do caller do dispatcher local de moves `0x0801632C` continua incompleto: uma busca exata no artefato de callsites BL diretos gerado anteriormente no workspace (não versionado) não encontrou esse alvo. A busca por words literais `0x0801632C/0x0801632D` na ROM também não encontrou ponteiros. O resultado negativo de callsites não é reproduzível a partir do checkout sem regenerar o artefato e não exclui chamadas indiretas, gaps de cobertura ou erro de atribuição no sweep.
+O caminho de dispatch indireto foi parcialmente reconstruído localmente. Uma tabela candidata de 23 ponteiros em `0x08250038` tem no slot 0 o ponteiro Thumb `0x08015CA1`. O código local em `0x080155C8–0x08015660` indexa essa tabela pelo byte em RAM `0x02023BE3` e passa o ponteiro escolhido ao trampoline `0x081E3BA8` (`BX r0`). Antes do lookup, lê também o byte `0x02023E8A`; se não for zero, grava `0x0C` em `0x02023BE3`, e se for zero deixa o índice anterior intacto. Portanto, o slot 0 só é selecionado se o valor preservado for zero e esse dispatch ocorrer; isso não foi confirmado em runtime.
+
+Esse código tem prólogo local em `0x08015CA0`, retorno observado em `0x0801635C` e contém o bloco básico de lookup em `0x0801632C`. Sete branches locais (`0x08015FA8`, `0x08016158`, `0x080161E2`, `0x08016272`, `0x0801628A`, `0x080162C2`, `0x08016316`) convergem no bloco; instruções/destinos, slot da tabela e trampoline são conferidos pelo verificador. A origem de um valor zero já presente no índice, a chamada/execução real desse dispatch e o call path externo do código em `0x080155C8` continuam sem prova dinâmica. A antiga busca por BL direto ao bloco não era um teste de caller adequado, pois `0x0801632C` é interno à função apontada pelo slot 0.
 
 As cinco cadeias locais resolvem a lacuna anterior de ausência de exemplos de bytecode; não demonstram que os registros candidatos sejam selecionados em batalha, nem que os scripts completem os fluxos ou que o caso de índice 112 ocorra. A amostra corresponde aos quatro usos de `typecalc2` e ao uso de `settypetorandomresistance` no cross-reference upstream, mas **não é um scanner exaustivo de todos os bytecodes locais**. Verificador: `scripts/inspect_typechart_script_references.py`.
 
@@ -91,7 +93,7 @@ python scripts/inspect_typechart_bounds.py
 python scripts/inspect_typechart_script_references.py
 ```
 
-O primeiro verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. O segundo confirma seis bytes `+0` de registros candidatos, cinco destinos da tabela de scripts, as sequências de bytes, os handlers locais e as ocorrências dos seis IDs numéricos nas listas locais de learnsets. O alinhamento dos comandos usa tamanhos do macro upstream fixado; nenhum dos verificadores prova seleção em batalha, estado RNG real ou execução dinâmica.
+O primeiro verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. O segundo confirma seis bytes `+0` de registros candidatos, cinco destinos da tabela de scripts, as sequências de bytes, os handlers locais, o callback slot 0 e seu trampoline, sete branches para o bloco `0x0801632C` e as ocorrências dos seis IDs numéricos nas listas locais de learnsets. O alinhamento dos comandos usa tamanhos do macro upstream fixado; nenhum dos verificadores prova seleção em batalha, estado RNG real ou execução dinâmica.
 
 ## Fechamento das ocorrências candidatas e lacunas
 
@@ -99,6 +101,6 @@ O scanner encontra nove palavras brutas coincidentes com `0x0824F050`. O ciclo 2
 
 ## Próximo passo
 
-1. Enumerar mais referências a `0x4A`/`0xA6` em scripts e rastrear a seleção/call path dos registros candidatos 68 e 176, sem tratar os dois exemplos como cobertura de todas as batalhas.
+1. Enumerar mais referências em bytecodes locais e rastrear a origem do índice `0x02023BE3`, a chamada externa do dispatch `0x080155C8` e o caminho de seleção dos registros candidatos, sem tratar os exemplos atuais como cobertura total.
 2. Se o gate de escopo permitir, verificar em contexto isolado o candidato de índice 112 e o ramo que rejeita `+2 = 0xCC`; não editar ROM/save-base nem converter leitura estática em bug confirmado sem teste.
 3. Continuar inventário de UI, nomes, ícones e outros consumidores de tipos; este relatório não demonstra suporte geral a novos códigos de tipo.

@@ -38,7 +38,7 @@ Não foi demonstrado que essa lista esgote os consumidores. Os offsets `+2`, `+3
 
 ## Dispatch local por byte `+0`
 
-A rotina Thumb local em `0x0801632C` contém uma cadeia direta que pode ser reconstituída sem nomes do upstream:
+O bloco Thumb local em `0x0801632C` contém uma cadeia direta que pode ser reconstituída sem nomes do upstream. Sete branches locais convergem nele (`0x08015FA8`, `0x08016158`, `0x080161E2`, `0x08016272`, `0x0801628A`, `0x080162C2`, `0x08016316`). O bloco está dentro do código apontado pelo slot 0 (`0x08015CA1`) de uma tabela candidata de 23 callbacks em `0x08250038`; o dispatch em `0x080155C8` indexa essa tabela pelo byte `0x02023BE3` e executa o ponteiro via trampoline `0x081E3BA8`. A execução em runtime, a razão de selecionar o índice 0 e o caller externo do dispatcher continuam desconhecidos.
 
 1. carrega o ID corrente de move do endereço RAM `0x02023D4A`;
 2. calcula `ID × 12` e soma a base de registros `0x08250C04`;
@@ -73,7 +73,7 @@ O script verifica o hash, os 355 registros candidatos, zeros de `+9..+11`, bytes
 
 1. Seguir exemplos de ponteiros de efeito em `0x081D65A8` até os comandos de script e handlers locais, começando por efeitos comuns e por índice 125; distinguir opcode/script de handler nativo.
 2. Caracterizar leituras dos offsets ainda não cobertos e procurar outros consumidores do catálogo e caminhos que validem IDs.
-3. Identificar a função/chamadores locais do dispatcher e ligar a seleção de efeito a fluxo de batalha mais amplo.
+3. Rastrear a origem do byte de seleção `0x02023BE3`, o caller externo do dispatch em `0x080155C8` e a condição de entrada no slot 0; então ligar a seleção de efeito a um fluxo de batalha mais amplo.
 4. Em paralelo, manter como trabalho amplo PC/armazenamento, evolução/creche, batalha/IA/captura, encontros, itens, mapas, persistência e demais regiões não inventariadas.
 
 Este é um avanço em uma fatia de dados/consumidores, não conclusão sobre o motor de batalha nem sobre a ROM inteira.
