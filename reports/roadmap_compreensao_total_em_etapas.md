@@ -341,7 +341,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   O helper de retorno não verifica localmente contador zero; alcançabilidade não
   estabelecida. Script: `scripts/inspect_battle_return_end_commands.py`; relatório:
   `reports/ciclo_44_return_end_local.md`. Estático e parcial; issue Linear `VYK-23`.
-- **Próximo:** seguir a sequência local a partir de `0x3F` em diante e completar estados
+- **Ciclo 45:** seguiu localmente `0x3F`–`0x41` (`0x08022D04`, `0x0801DBA0`,
+  `0x08022D40`): restauração de script e seleção de callback por stack; condição baseada
+  em byte de registro e bit de flag de tabela, com salto inline; e push do cursor de
+  retorno seguido de destino inline. Nomes upstream (`Cmd_end3`,
+  `Cmd_jumpifaffectedbyprotect`, `Cmd_call`) e interpretação permanecem cross-reference.
+  Limites dos stacks não foram estabelecidos. Script:
+  `scripts/inspect_battle_end3_protect_call_commands.py`; relatório:
+  `reports/ciclo_45_end3_protect_call_local.md`. Estático e parcial; issue Linear `VYK-24`.
+- **Próximo:** seguir a sequência local a partir de `0x42` em diante e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
