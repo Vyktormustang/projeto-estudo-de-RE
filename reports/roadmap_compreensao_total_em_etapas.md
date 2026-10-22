@@ -109,11 +109,11 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–28 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–29 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
 e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
 fluxo local de acerto/falha, recortes de dano, `typecalc`/efetividade, ajuste de dano,
-animação, caminhos de atualização de HP e seleção de sons/mensagens de resultado.
+animação, caminhos de atualização de HP, seleção de sons/mensagens e comandos de texto.
 PC/armazenamento, fórmula completa de dano, demais consumidores, persistência e outros
 domínios continuam pendentes.
 
@@ -237,10 +237,16 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   estão totalmente decodificados. Script: `scripts/inspect_result_sound_messages.py`;
   relatório: `reports/ciclo_28_efetividade_resultmessage_local.md`. Estático e parcial;
   issue Linear `VYK-7`.
-- **Próximo:** issue Linear `VYK-8`: inspecionar os opcodes locais `0x10`–`0x12`
-  (`0x10→0x0801FD51`, `0x11→0x0801FD91`, `0x12→0x0801FDD5`) e seguir os dados e
-  esperas de texto que a ROM confirmar. Em paralelo, investigar caminhos de
-  dano/callers/consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
+- **Ciclo 29:** seguiu os handlers locais `0x10`–`0x12` (`0x0801FD51`, `0x0801FD91`,
+  `0x0801FDD5`), confirmando operands u16, calls, flag de exibição, espera e cursor
+  `+3`; os nomes foram cruzados separadamente com upstream. Script:
+  `scripts/inspect_battle_text_commands.py`; relatório:
+  `reports/ciclo_29_comandos_texto_batalha_local.md`. Estático e parcial; issue Linear
+  `VYK-8`.
+- **Próximo:** acompanhar no Linear pela issue `VYK-9` os opcodes locais `0x13`/`0x14`
+  (`0x0801FE31`/`0x0801FE85`) e seus dados de tabela/seleção, mantendo separados bytes,
+  inferência e semântica upstream. Em paralelo, investigar caminhos de dano/callers/
+  consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
   creche/evolução, PC/armazenamento e demais domínios. Estes rastros não representam
   cobertura global.
 
