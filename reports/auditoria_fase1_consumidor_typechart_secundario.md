@@ -21,13 +21,32 @@ Isso estabelece a associação local tabela→handler, mas, isoladamente, não p
 
 ## Referências locais em scripts de efeito
 
-A inspeção agora seguiu duas cadeias da ROM BR. O dispatch de moves local já documentado em `reports/ciclo_21_catalogo_moves_dispatch_efeitos.md` usa o byte `+0` do registro para selecionar uma word em `0x081D65A8` e grava o destino no cursor de script `0x02023D74`. Os registros candidatos de índices 68 e 176 têm, respectivamente, byte `+0` igual a `0x59` e `0x5D`; as entradas correspondentes da tabela local apontam para `0x081D7433` e `0x081D74D6`.
+A inspeção seguiu cinco cadeias de dados locais. O dispatch de moves documentado em `reports/ciclo_21_catalogo_moves_dispatch_efeitos.md` usa o byte `+0` do registro para selecionar uma word em `0x081D65A8` e grava o destino no cursor `0x02023D74`. Os registros candidatos de índices 68, 176, 205, 301, 243 e 280 têm byte `+0` igual a `0x59`, `0x5D`, `0x75`, `0x75`, `0x90` e `0xBA`; as entradas correspondentes da tabela local apontam para `0x081D7433`, `0x081D74D6`, `0x081D78A0`, `0x081D78A0`, `0x081D7A89` e `0x081D81B9`.
 
-- Em `0x081D7433`, os bytes locais são `00 A1 F0 7D 1D 08 01 5E 69 1D 08 00 00 02 03 4A`. O `0x4A` está no deslocamento `+15` da entrada candidata. O parse upstream fixado dá tamanhos de 1 byte para `attackcanceler`, 5 para `counterdamagecalculator`, 7 para `accuracycheck`, e 1 cada para `attackstring` e `ppreduce`; esse alinhamento coloca `0x4A` no início do próximo comando.
-- Em `0x081D74D6`, os bytes locais são `00 02 03 A6 F2 7D 1D 08 09 0A`. O `0xA6` aparece no deslocamento `+3`, após três opcodes locais cujos handlers são `0x00`, `0x02` e `0x03`; o word seguinte aponta para `0x081D7DF2`.
-- A tabela local encaminha `0x4A` a `0x08023C38` e `0xA6` a `0x08029DAC`. As palavras `+0` dos registros e os destinos de script são fatos locais. O vínculo entre limites de comandos e os nomes acima é **cross-reference separado**, fixado em `pret/pokefirered` commit `ce6406d8c2eaf46d543c8a2606de0c3cb1951982`; não substitui análise local nem prova execução.
+- Entrada `0x59`, ponteiro `0x081D7433`: bytes `00 A1 F0 7D 1D 08 01 5E 69 1D 08 00 00 02 03 4A`; `0x4A` em `+15`.
+- Entrada `0x75`, ponteiro `0x081D78A0`: bytes iniciais `00 02 1D 01 00 10 00 00 AD 78 1D 08 03 01 B4 78 1D 08 00 00 4A`; `0x4A` em `+20`.
+- Entrada `0x90`, ponteiro `0x081D7A89`: bytes `00 A2 F0 7D 1D 08 01 5E 69 1D 08 00 00 02 03 4A`; `0x4A` em `+15`.
+- Entrada `0xBA`, ponteiro `0x081D81B9`: o fluxo local chega a `0x4A` em `+51`, após a sequência de comandos/operandos validada pelo macro-layout upstream.
+- Entrada `0x5D`, ponteiro `0x081D74D6`: bytes `00 02 03 A6 F2 7D 1D 08 09 0A`; `0xA6` em `+3` e o word de operando aponta para `0x081D7DF2`.
 
-Essas ocorrências resolvem a lacuna anterior de ausência de exemplos de bytecode, mas não demonstram que os registros candidatos de move sejam selecionados em uma batalha, que os scripts completem o fluxo ou que o caso de índice 112 ocorra. Verificador: `scripts/inspect_typechart_script_references.py`.
+Como verificação adicional de uso dos valores numéricos dos registros, a tabela local candidata de learnsets (`0x0825D7B4`, 412 ponteiros) contém os mesmos IDs numéricos nos campos `word & 0x01FF`. Resultado da leitura local (índices da tabela de learnsets, sem atribuir nomes a espécies):
+
+| ID numérico | Ocorrências nas listas | Índices de tabela com ocorrência |
+|---:|---:|---|
+| 68 | 9 | 107, 202, 214, 237, 307, 360, 364, 365, 366 |
+| 176 | 2 | 137, 233 |
+| 205 | 16 | 39, 74, 75, 76, 100, 101, 143, 183, 184, 206, 231, 232, 241, 313, 314 |
+| 301 | 3 | 341, 342, 343 |
+| 243 | 6 | 100, 101, 202, 222, 245, 360 |
+| 280 | 3 | 106, 127, 214 |
+
+O ID 205 ocorre duas vezes na lista apontada pelo índice 314; por isso 16 ocorrências aparecem em 15 índices. Essa interseção dá suporte local para que os índices de registro sejam valores usados em listas de aprendizado, mas não prova que um jogador escolha esses moves ou que a batalha alcance os scripts.
+
+A tabela local encaminha `0x4A` a `0x08023C38` e `0xA6` a `0x08029DAC`. Os registros, destinos e bytes acima são fatos locais. O comprimento dos comandos usado para identificar os limites em `0x59`, `0x75`, `0x90` e `0xBA` é **cross-reference separado**: `asm/macros/battle_script.inc` no commit upstream `ce6406d8c2eaf46d543c8a2606de0c3cb1951982`. Nesse upstream, os quatro macros `typecalc2` aparecem nas entradas 89/117/144/186, e `settypetorandomresistance` na 93; `data/battle_scripts_1.s` SHA-256 `27e9c39f3147b05e5ba2ed36ca0c89fcdc9b26718778083bd362c582de800034`. Esses nomes/ocorrências upstream orientam o parse, mas não provam proveniência ou execução da ROM local.
+
+O rastreio do caller do dispatcher local de moves `0x0801632C` continua incompleto: uma busca exata no artefato de callsites BL diretos gerado anteriormente no workspace (não versionado) não encontrou esse alvo. A busca por words literais `0x0801632C/0x0801632D` na ROM também não encontrou ponteiros. O resultado negativo de callsites não é reproduzível a partir do checkout sem regenerar o artefato e não exclui chamadas indiretas, gaps de cobertura ou erro de atribuição no sweep.
+
+As cinco cadeias locais resolvem a lacuna anterior de ausência de exemplos de bytecode; não demonstram que os registros candidatos sejam selecionados em batalha, nem que os scripts completem os fluxos ou que o caso de índice 112 ocorra. A amostra corresponde aos quatro usos de `typecalc2` e ao uso de `settypetorandomresistance` no cross-reference upstream, mas **não é um scanner exaustivo de todos os bytecodes locais**. Verificador: `scripts/inspect_typechart_script_references.py`.
 
 ## Leitor local `0x08039DB4` e caller `0x08039E3C`
 
@@ -63,7 +82,7 @@ Pelos parâmetros do LCG módulo `2^32` (`c` ímpar e `a ≡ 1 mod 4`), o estado
 
 A tabela delimitada localmente tem 112 registros, índices 0–111, intervalo `[0x0824F050, 0x0824F1A0)`. O teste admite 112, e `base + 3 × 112 = 0x0824F1A0`, logo após o intervalo; os três bytes locais ali são `C8 C9 CC`. Se o primeiro byte passar na comparação, o código lê `+2` e o compara com 5; `0xCC` segue o ramo de rejeição (`bhi`) antes do caminho que usa uma linha válida. Portanto, a evidência sustenta uma **leitura estática de três bytes além do limite candidato e rejeição desse candidato**, não corrupção, crash ou efeito de jogo comprovado. A frequência/impacto desse retry não foi testada dinamicamente.
 
-A mesma rotina contém um segundo scan em `0x08029F0A`: incrementa o deslocamento em 3 e compara com literal `0x14F` (335), cobrindo offsets 0–333, isto é, índices 0–111. Esse limite é coerente com a tabela. A word em `0x08029F90` fornece a base nos loads `0x08029EAC` e `0x08029F0A`. A entrada `0xA6 → 0x08029DAC` na tabela local de comandos foi confirmada; ainda não localizamos um script específico que emita esse opcode.
+A mesma rotina contém um segundo scan em `0x08029F0A`: incrementa o deslocamento em 3 e compara com literal `0x14F` (335), cobrindo offsets 0–333, isto é, índices 0–111. Esse limite é coerente com a tabela. A word em `0x08029F90` fornece a base nos loads `0x08029EAC` e `0x08029F0A`. Além da entrada `0xA6 → 0x08029DAC` no dispatch local, o bytecode local da entrada `0x5D` contém `0xA6`; a emissão por script foi confirmada estaticamente, mas execução não.
 
 ## Verificação reproduzível
 
@@ -72,7 +91,7 @@ python scripts/inspect_typechart_bounds.py
 python scripts/inspect_typechart_script_references.py
 ```
 
-O primeiro verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. O segundo confirma os dois bytes `+0` de registros candidatos, os destinos da tabela de scripts, as sequências de bytes e os handlers locais. O alinhamento dos comandos que precedem `0x4A` usa tamanhos do macro upstream fixado; nenhum dos verificadores prova seleção em batalha, estado RNG real ou execução dinâmica.
+O primeiro verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. O segundo confirma seis bytes `+0` de registros candidatos, cinco destinos da tabela de scripts, as sequências de bytes, os handlers locais e as ocorrências dos seis IDs numéricos nas listas locais de learnsets. O alinhamento dos comandos usa tamanhos do macro upstream fixado; nenhum dos verificadores prova seleção em batalha, estado RNG real ou execução dinâmica.
 
 ## Fechamento das ocorrências candidatas e lacunas
 

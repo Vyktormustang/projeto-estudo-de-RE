@@ -364,10 +364,12 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   candidatas de 412 espécies, 355 moves, 412 ponteiros de learnsets e 112 registros de
   typecalc foram revalidadas; auditoria preliminar identificou três consumidores de learnsets
   adicionais com cap de 20 entradas, limites numéricos de moves/tipos e três leitores typechart
-  adicionais. Entradas candidatas de scripts de efeito agora confirmam bytes `0x4A` e `0xA6`
-  em limites de comando compatíveis com os macros upstream; registros candidatos de move
-  apontam para ambas. No `0xA6`, o LCG local admite índice 112 e lê o registro seguinte, mas o
-  rejeita por `+2 = 0xCC`; consequência runtime ainda não testada. Relatórios/verificadores:
+  adicionais. Quatro entradas candidatas de scripts de efeito contêm `0x4A` e uma contém
+  `0xA6`, em limites compatíveis com os macros upstream; seis registros candidatos de move
+  apontam para essas entradas, e os mesmos valores numéricos aparecem em listas candidatas de
+  learnsets. No `0xA6`, o LCG local admite índice 112 e lê o registro seguinte,
+  mas o rejeita por `+2 = 0xCC`; consequência runtime ainda não testada. Caller do dispatcher
+  de efeito e seleção em batalha permanecem sem confirmação. Relatórios/verificadores:
   `reports/auditoria_fase1_consumidores_learnsets.md`,
   `reports/auditoria_fase1_limites_moves_tipos.md`,
   `reports/auditoria_fase1_consumidor_typechart_secundario.md`,
