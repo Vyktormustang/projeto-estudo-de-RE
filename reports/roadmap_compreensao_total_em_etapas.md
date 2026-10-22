@@ -364,7 +364,8 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   candidatas de 412 espécies, 355 moves, 412 ponteiros de learnsets e 112 registros de
   typecalc foram revalidadas; auditoria preliminar ainda identificou três consumidores adicionais
   de learnsets com limite local de 20 entradas, limites numéricos de moves/tipos e um leitor
-  adicional de typechart ainda sem caller rastreado (`reports/auditoria_fase1_consumidores_learnsets.md`,
+  três leitores typechart adicionais, incluindo risco estático de índice one-past ainda sem
+  validação dinâmica (`reports/auditoria_fase1_consumidores_learnsets.md`,
   `reports/auditoria_fase1_limites_moves_tipos.md`, `reports/auditoria_fase1_consumidor_typechart_secundario.md`).
   Isso não autoriza expansão. Issue Linear `VYK-27`.
 - **Trilha de RE de opcodes pausada no backlog:** `VYK-26`, handlers locais `0x45`–`0x47`.
