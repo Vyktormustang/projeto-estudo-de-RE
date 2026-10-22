@@ -309,7 +309,13 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_byte_array_mutations.py`; relatório:
   `reports/ciclo_39_jump_arraynotequal_set_addbyte_local.md`. Estático e parcial; issue
   Linear `VYK-18`.
-- **Próximo:** seguir a sequência local a partir de `0x30`–`0x32` e completar estados
+- **Ciclo 40:** seguiu localmente `0x30`–`0x32` (`0x080229CD`, `0x080229F9`,
+  `0x08022A4D`): subtração byte com truncamento, cópia linear de bytes e cópia com
+  índice-base indireto. Nomes upstream separados da evidência local. Script:
+  `scripts/inspect_battle_copy_mutation_commands.py`; relatório:
+  `reports/ciclo_40_subbyte_copyarray_copyindexed_local.md`. Estático e parcial; issue
+  Linear `VYK-19`.
+- **Próximo:** seguir a sequência local a partir de `0x33`–`0x35` e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
