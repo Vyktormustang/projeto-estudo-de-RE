@@ -34,6 +34,27 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
 - **Consequência para o roadmap:** a Fase 2 (Ghidra) segue bloqueada **apenas**
   por esse JDK; Ghidra e integração já estão instalados e validados.
 
+### 0.6 Importador da ROM no Ghidra (pronto, aguardando JDK para rodar)
+
+- **Comando único:** `bash scripts/ghidra_import_gba.sh rom/sua_rom.gba`
+  (guia: `docs/GHIDRA_IMPORT.md`).
+- Importa com `-processor ARM:LE:32:v4t` (ARMv4T, o certo para GBA; a lane raw
+  do REA usa `ARM:LE:32:v7` fixo e não alterna para Thumb), `BinaryLoader` em
+  `0x08000000`.
+- Pré-script `scripts/ghidra_scripts/GbaPrepareProgram.java` cria EWRAM/IWRAM/IO/
+  PALETTE/VRAM/OAM, valida o cabeçalho do cartucho, cria rótulos
+  (`gBagSlots_slot0` em `0x020258B8`, `SetGpuReg` em `0x08000A38`, `REG_KEYINPUT`
+  em `0x04000130`, `gKeysMirror_HIPOTESE` em `0x03003118`) e semeia entrada
+  ARM (CONFIRMADO) + Thumb (HIPÓTESE via `ldr` literal).
+- Pós-script grava `reports/ghidra/gba_prepare_{pre,post}.json`; o orquestrador
+  faz **cross-check** do cabeçalho entre `scripts/gba_rom_header.py` (Python) e
+  o Ghidra (11 campos + checagem de `v4t`).
+- **Teste sem a ROM:** `bash scripts/ghidra_import_gba.sh --self-test` gerou uma
+  ROM sintética de 32 KB com cabeçalho válido e roda o pipeline inteiro.
+- **Status:** validado até onde o sandbox permite (sintaxe, ShellCheck,
+  tree-sitter no Java, APIs conferidas no fonte oficial 12.1.4 e opções no
+  README da instalação). Execução real fica no CI e na máquina do usuário.
+
 ## 1. O que NÃO refazer (causas-raiz já provadas)
 - **BL Thumb alcança só ±4 MB.** Hookar `0x08000B08 → 0x08EB0C00` (~15,4 MB) é
   impossível por BL e trava a tela de copyright. Resolvido por **veneer** em

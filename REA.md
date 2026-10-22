@@ -65,3 +65,15 @@ oficial) e o instalador do repositório usa **somente URLs oficiais + SHA-256**.
 2. `bash scripts/re_tools_check.sh` → esperado `RESULTADO: stack RE pronto`.
 3. `bash scripts/rea_ghidra_smoke.sh` → esperado exit 0 + JSONs em `reports/re_tools/`.
 4. Depois disso a Fase 2 (refinação de nomes no Ghidra) deixa de estar bloqueada.
+
+## Importar a ROM no Ghidra (ARMv4T)
+
+```bash
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba   # guia: docs/GHIDRA_IMPORT.md
+bash scripts/ghidra_import_gba.sh --self-test       # sem ROM: usa ROM sintética de 32 KB
+```
+
+Usa `-processor ARM:LE:32:v4t` (não a lane raw do REA, que fixa ARMv7), cria o
+mapa de memória do GBA, valida o cabeçalho do cartucho, rotula
+`gBagSlots_slot0`/`SetGpuReg`/`REG_KEYINPUT` e semeia entradas ARM (CONFIRMADO)
+e Thumb (HIPÓTESE). Evidências em `reports/ghidra/` (ignorado pelo git).

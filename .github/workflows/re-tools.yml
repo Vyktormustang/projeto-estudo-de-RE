@@ -17,6 +17,9 @@ on:
       - "scripts/re_tools_check.sh"
       - "scripts/rea_ghidra_smoke.sh"
       - "scripts/make_synthetic_arm_image.py"
+      - "scripts/ghidra_import_gba.sh"
+      - "scripts/ghidra_scripts/GbaPrepareProgram.java"
+      - "scripts/gba_rom_header.py"
       - ".github/workflows/re-tools.yml"
 
 permissions:
@@ -49,8 +52,14 @@ jobs:
       - name: Diagnóstico (rea doctor + binários)
         run: bash scripts/re_tools_check.sh
 
-      - name: Smoke test (imagem ARM sintética, sem a ROM)
+      - name: Smoke test REA -> Ghidra (imagem ARM sintética, sem a ROM)
         run: bash scripts/rea_ghidra_smoke.sh
+
+      - name: Importador GBA no Ghidra (ROM sintética de 32 KB, sem a ROM)
+        run: bash scripts/ghidra_import_gba.sh --self-test
+
+      - name: Verificação independente do cabeçalho
+        run: python3 scripts/gba_rom_header.py --self-test
 
       - name: Guardar evidências
         if: always()

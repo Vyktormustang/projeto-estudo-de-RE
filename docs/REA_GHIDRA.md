@@ -217,19 +217,26 @@ Para análise completa e fiel da ROM, use o Ghidra diretamente (abaixo).
 Pela GUI: `File > Import File…` → selecione a ROM → *Language* `ARM:LE:32:v4t`
 → *Options* do `BinaryLoader`: base `0x08000000` → OK → analisar.
 
-Por linha de comando (Ghidra 12.1.4):
+Por linha de comando, use o importador do projeto — ele monta o comando acima
+**mais** o mapa de memória do GBA, os rótulos e as seeds ARM/Thumb:
 
 ```bash
-"$GHIDRA_INSTALL_DIR/support/analyzeHeadless" /tmp/ghidra_proj gba_pokefirered \
-    -import rom/sua_rom.gba \
-    -processor "ARM:LE:32:v4t" \
-    -loader BinaryLoader -loader-baseAddr 0x08000000 \
-    -analysisTimeoutPerFile 1800
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba
+# equivalência (gerada por --dry-run):
+#   analyzeHeadless <dir-projetos> gba_<sha8> -import rom/sua_rom.gba \
+#     -processor ARM:LE:32:v4t \
+#     -loader BinaryLoader -loader-baseAddr 0x08000000 -loader-blockName GBA_ROM \
+#     -scriptPath scripts/ghidra_scripts \
+#     -preScript GbaPrepareProgram.java pre reports/ghidra \
+#     -postScript GbaPrepareProgram.java post reports/ghidra \
+#     -overwrite -analysisTimeoutPerFile 1800 -max-cpu N \
+#     -log reports/ghidra/analyzeHeadless.log -scriptlog reports/ghidra/ghidra_scripts.log
 ```
 
-> Esta receita de `analyzeHeadless` **não foi executada neste ambiente** (o JDK
-> não pôde ser instalado aqui — ver §7). Trate os nomes de opção como
-> *PROVÁVEL*: rode `analyzeHeadless -help` na sua máquina para conferir.
+Todas essas opções foram conferidas no `support/analyzeHeadlessREADME.md` da
+instalação local (inclusive o Exemplo 18 com `BinaryLoader` +
+`-loader-baseAddr`) e no código-fonte oficial da tag `Ghidra_12.1.4_build`.
+Detalhes, evidências e limites: **[`docs/GHIDRA_IMPORT.md`](GHIDRA_IMPORT.md)**.
 
 ### 5.3 Mapa de memória do GBA (referência GBATEK)
 
@@ -268,6 +275,9 @@ O smoke test usa esse mesmo `0x020258B8` como literal carregado por `ldr`.
 | `scripts/re_tools_check.sh` | diagnóstico + resumo do `rea doctor` (exit 0/1) |
 | `scripts/make_synthetic_arm_image.py` | gera a imagem ARM32 sintética + `--self-test` (Capstone) |
 | `scripts/rea_ghidra_smoke.sh` | teste ponta-a-ponta REA + Ghidra sobre a imagem sintética |
+| `scripts/ghidra_import_gba.sh` | importa a ROM no Ghidra (ARMv4T + mapa do GBA + seeds) e valida |
+| `scripts/ghidra_scripts/GbaPrepareProgram.java` | pre/post-script do import (blocos, cabeçalho, rótulos, seeds) |
+| `scripts/gba_rom_header.py` | leitor de cabeçalho independente + `--compare` com o Ghidra |
 | `reports/re_tools/` | evidências geradas pelo smoke test (JSON, sha256) |
 | `.github/workflows/re-tools.yml` | CI manual (`workflow_dispatch`) que roda setup + check + smoke com internet normal |
 
