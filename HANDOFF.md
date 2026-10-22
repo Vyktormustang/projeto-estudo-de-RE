@@ -14,6 +14,26 @@ Objetivo atual: **mod menu = combo de botões preenche a mochila**. Hook v3 mont
 (`rom_mod/BAG_MOD_v3.gba`) e estável no jogo, mas o **combo ainda não dispara** — o
 bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo).
 
+## 0.5 Ferramentas de RE (REA + Ghidra) — preparadas em 2026-10-22
+
+- **Instalador:** `bash scripts/setup_re_tools.sh` — REA 6.7.0 (`rea-agents`) +
+  Temurin **JDK 21.0.13+9** + **Ghidra 12.1.4** PUBLIC, tudo fora do repo
+  (`~/.local/opt/re-tools`), com SHA-256 oficial e modo offline
+  (`--ghidra-zip`, `--jdk-tarball`, `--jdk-home`, `--ghidra-dir`).
+- **Ambiente:** `source scripts/re_env.sh` (exporta `JAVA_HOME`,
+  `GHIDRA_INSTALL_DIR` e `PATH`).
+- **Verificação:** `bash scripts/re_tools_check.sh` (exit 0 = pronto) e
+  `bash scripts/rea_ghidra_smoke.sh` (imagem ARM **sintética** em `0x08000000`,
+  sem a ROM; evidências em `reports/re_tools/`).
+- **Guia + estado detalhado:** `docs/REA_GHIDRA.md`; notas: `REA.md`.
+- **Estado no sandbox de preparação:** REA e Ghidra **OK** (doctor aprova
+  versão/headless/decompilador nativo); **JDK 21 ausente** → o REA responde
+  `provider_ghidra_available=false` com `runtime_missing`. Motivo: a CDN de
+  assets do GitHub está bloqueada nesse sandbox. O smoke test só fecha depois de
+  rodar o setup numa máquina com internet normal (ou `--jdk-home`).
+- **Consequência para o roadmap:** a Fase 2 (Ghidra) segue bloqueada **apenas**
+  por esse JDK; Ghidra e integração já estão instalados e validados.
+
 ## 1. O que NÃO refazer (causas-raiz já provadas)
 - **BL Thumb alcança só ±4 MB.** Hookar `0x08000B08 → 0x08EB0C00` (~15,4 MB) é
   impossível por BL e trava a tela de copyright. Resolvido por **veneer** em

@@ -1,0 +1,62 @@
+name: CI - RE tools (REA + Ghidra)
+
+# Valida o mesmo caminho que o usuário roda localmente:
+#   scripts/setup_re_tools.sh -> re_tools_check.sh -> rea_ghidra_smoke.sh
+#
+# É o único lugar onde o download oficial do JDK/Ghidra pode ser exercitado de
+# ponta a ponta (o sandbox de desenvolvimento tinha a CDN de releases bloqueada).
+#
+# Dispare manualmente em: Actions -> "CI - RE tools" -> Run workflow.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "scripts/setup_re_tools.sh"
+      - "scripts/re_env.sh"
+      - "scripts/re_tools_check.sh"
+      - "scripts/rea_ghidra_smoke.sh"
+      - "scripts/make_synthetic_arm_image.py"
+      - ".github/workflows/re-tools.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    name: Instalar e verificar REA + Ghidra
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Show runner info
+        run: |
+          uname -a
+          node --version
+          npm --version
+          python3 --version
+
+      - name: Install REA + JDK 21 + Ghidra 12.1.4
+        run: bash scripts/setup_re_tools.sh --strict
+
+      - name: Diagnóstico (rea doctor + binários)
+        run: bash scripts/re_tools_check.sh
+
+      - name: Smoke test (imagem ARM sintética, sem a ROM)
+        run: bash scripts/rea_ghidra_smoke.sh
+
+      - name: Guardar evidências
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: re-tools-evidence
+          path: reports/re_tools/
+          if-no-files-found: ignore
+          retention-days: 14
