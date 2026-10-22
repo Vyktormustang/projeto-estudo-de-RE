@@ -250,11 +250,17 @@ def main() -> int:
     if read_u32(data, 0x08015324) != CALLBACK_RUNNER_SLOT_VA or read_u32(data, 0x08015328) != (CALLBACK_SETUP_VA | 1):
         raise SystemExit("segundo par de ponteiros do callback 0x080154A0 divergente")
     expect(data, 0x08015562, "0f 49 00 20 08 70", "zera temporariamente o índice callback")
-    expect(data, 0x08015568, "0e 49 0f 48 00 23 00 78 08 70", "copia byte de 0x02023BDA sobre o índice")
+    expect(data, 0x08015568, "0e 49 0f 48 00 23 00 78 08 70", "copia [0x02023BDA] sobre o índice")
+    expect(
+        data, 0x080150D0,
+        "0d 4f 0e 4e 42 46 0e 4d d9 19 10 78 80 19 00 78 08 70",
+        "acesso indexado ao buffer local com base 0x02023BDA",
+    )
     expect(data, 0x0801557E, "0d 49 0d 48 08 60", "troca o callback para 0x080155C8")
     if (
         read_u32(data, 0x080155A4) != 0x02023BE3
         or read_u32(data, 0x080155A8) != 0x02023BDA
+        or read_u32(data, 0x08015108) != 0x02023BDA
         or read_u32(data, 0x080155B4) != CALLBACK_RUNNER_SLOT_VA
         or read_u32(data, 0x080155B8) != (0x080155C8 | 1)
     ):
@@ -372,7 +378,7 @@ def main() -> int:
     print("dispatch local: 0x4A→0x08023C38; 0xA6→0x08029DAC")
     print(
         "rota estática: 0x030030F0→runner 0x080123E4→callback 0x03004F84; "
-        "0x08015562 zera 0x02023BE3, mas 0x08015568 copia 0x02023BDA sobre ele"
+        "0x08015562 zera 0x02023BE3, mas 0x08015568 copia [0x02023BDA] sobre ele"
     )
     print(
         "tabela primária candidata 0x08250038 (14 slots): slot 0→0x08015CA0; "
