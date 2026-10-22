@@ -263,8 +263,14 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_faint_status_commands.py`; relatório:
   `reports/ciclo_32_transicoes_status_e_faint_local.md`. Estático e parcial; issue
   Linear `VYK-11`.
-- **Próximo:** continuar pela tabela local com `0x1B` (`0x080215DD`), `0x1C`
-  (`0x08021641`) e `0x1D` (`0x080216B9`), além de expandir chamadas/consumidores de
+- **Ciclo 33:** seguiu `0x1B`–`0x1D` (`0x080215DD`, `0x08021641`, `0x080216B9`):
+  zero condicional de word e chamadas; operands inline u32; teste de máscara/HP; e cursor
+  `+2`, `+10` ou destino inline. Nomes upstream estão separados. Script:
+  `scripts/inspect_battle_status_jump_commands.py`; relatório:
+  `reports/ciclo_33_handlers_status_jump_local.md`. Estático e parcial; issue Linear
+  `VYK-12`.
+- **Próximo:** continuar pela tabela local com `0x1E` (`0x08021731`), `0x1F`
+  (`0x08021819`) e `0x20` (`0x08021891`), além de expandir chamadas/consumidores de
   batalha. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
   desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento
   e demais domínios. Estes rastros não representam cobertura global.
