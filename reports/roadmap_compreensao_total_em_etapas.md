@@ -369,8 +369,8 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   apontam para essas entradas, e os mesmos valores numéricos aparecem em listas candidatas de
   learnsets. No `0xA6`, o LCG local admite índice 112 e lê o registro seguinte,
   mas o rejeita por `+2 = 0xCC`; consequência runtime ainda não testada. A rota estática
-  callback table → slot 0 → bloco de lookup foi seguida; origem do índice, caller externo
-  e seleção/execução em batalha permanecem sem confirmação. Relatórios/verificadores:
+  main callback → runner → callbacks `0x080154A0`/`0x080155C8` → slot 0 → bloco de lookup
+  foi seguida; predicados/estado e seleção/execução em batalha permanecem sem confirmação. Relatórios/verificadores:
   `reports/auditoria_fase1_consumidores_learnsets.md`,
   `reports/auditoria_fase1_limites_moves_tipos.md`,
   `reports/auditoria_fase1_consumidor_typechart_secundario.md`,

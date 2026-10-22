@@ -27,6 +27,11 @@ CALLBACK_COUNT_CANDIDATE = 23
 CALLBACK_DISPATCH_VA = 0x080155E4
 CALLBACK_ENTRY0_VA = 0x08015CA0
 TRAMPOLINE_VA = 0x081E3BA8
+MAIN_CALLBACK_DISPATCH_VA = 0x08000524
+MAIN_CALLBACK_SLOT_VA = 0x030030F0
+CALLBACK_RUNNER_VA = 0x080123E4
+CALLBACK_RUNNER_SLOT_VA = 0x03004F84
+CALLBACK_SETUP_VA = 0x080154A0
 LEARNSET_POINTER_TABLE_VA = 0x0825D7B4
 LEARNSET_POINTER_COUNT = 412
 LEARNSET_DATA_START_VA = 0x08257494
@@ -205,6 +210,52 @@ def main() -> int:
                 f"esperado 0x{expected:08X}"
             )
 
+    # Local callback path: main loop -> runner -> slot 154A0 -> slot 155C8.
+    expect(
+        data, MAIN_CALLBACK_DISPATCH_VA,
+        "06 4c 20 68 00 28 01 d0 e3 f1 3c fb 60 68 00 28 01 d0 e3 f1 37 fb 10 bc 01 bc 00 47",
+        "dispatcher principal de callbacks via trampoline",
+    )
+    if read_u32(data, 0x08000540) != MAIN_CALLBACK_SLOT_VA:
+        raise SystemExit("base de callbacks principal divergente")
+    expect(
+        data, 0x0801085A,
+        "0a 4a 0a 49 08 68 10 60 0a 48 08 60",
+        "instalação local do runner na callback principal",
+    )
+    if (
+        read_u32(data, 0x08010884) != 0x03004F80
+        or read_u32(data, 0x08010888) != MAIN_CALLBACK_SLOT_VA
+        or read_u32(data, 0x0801088C) != (CALLBACK_RUNNER_VA | 1)
+    ):
+        raise SystemExit("ponteiros da instalação do runner divergentes")
+    expect(
+        data, CALLBACK_RUNNER_VA,
+        "30 b5 0f 48 00 68 d1 f1 dd fb 0e 49 00 20 08 70",
+        "runner que chama a callback em 0x03004F84",
+    )
+    if read_u32(data, 0x08012424) != CALLBACK_RUNNER_SLOT_VA:
+        raise SystemExit("slot de callback lido pelo runner divergente")
+    expect(
+        data, 0x08015192,
+        "15 4f ba 46 15 48 84 46 15 49 89 46",
+        "preparação local do callback 0x080154A0",
+    )
+    expect(data, 0x080151CC, "62 46 53 46 1a 60", "gravação do callback 0x080154A0")
+    if read_u32(data, 0x080151E8) != CALLBACK_RUNNER_SLOT_VA or read_u32(data, 0x080151EC) != (CALLBACK_SETUP_VA | 1):
+        raise SystemExit("ponteiros do callback 0x080154A0 divergentes")
+    expect(data, 0x080152FA, "0a 49 0a 48 08 60", "segunda gravação do callback 0x080154A0")
+    if read_u32(data, 0x08015324) != CALLBACK_RUNNER_SLOT_VA or read_u32(data, 0x08015328) != (CALLBACK_SETUP_VA | 1):
+        raise SystemExit("segundo par de ponteiros do callback 0x080154A0 divergente")
+    expect(data, 0x08015562, "0f 49 00 20 08 70", "zera o índice callback antes da troca")
+    expect(data, 0x0801557E, "0d 49 0d 48 08 60", "troca o callback para 0x080155C8")
+    if (
+        read_u32(data, 0x080155A4) != 0x02023BE3
+        or read_u32(data, 0x080155B4) != CALLBACK_RUNNER_SLOT_VA
+        or read_u32(data, 0x080155B8) != (0x080155C8 | 1)
+    ):
+        raise SystemExit("ponteiros da transição para o callback 0x080155C8 divergentes")
+
     # A local function-pointer table selects the containing Thumb function.
     expect(
         data, 0x080155C8,
@@ -271,10 +322,14 @@ def main() -> int:
     print("registros candidatos +0: 68→0x59, 176→0x5D, 205/301→0x75, 243→0x90, 280→0xBA")
     print("dispatch local: 0x4A→0x08023C38; 0xA6→0x08029DAC")
     print(
-        "callback table 0x08250038: slot 0→0x08015CA0; índice 0x02023BE3 "
-        "seleciona o ponteiro chamado via BX r0; condição em 0x02023E8A verificada"
+        "rota estática: 0x030030F0→runner 0x080123E4→callback 0x03004F84; "
+        "0x080154A0 zera 0x02023BE3 e agenda 0x080155C8"
     )
-    print("bloco 0x0801632C no callback slot 0: 7 branches locais convergem; origem do índice/caller externo não testados")
+    print(
+        "tabela 0x08250038 slot 0→0x08015CA0; 0x080155C8 sobrescreve índice com "
+        "0x0C se 0x02023E8A != 0; runtime/condições não testados"
+    )
+    print("bloco 0x0801632C no callback slot 0: 7 branches locais convergem")
     for move_id, occurrences in learnset_hits.items():
         indices = sorted({index for index, _level in occurrences})
         print(f"learnset local: ID numérico {move_id} aparece {len(occurrences)} vez(es), tabela indices {indices}")
