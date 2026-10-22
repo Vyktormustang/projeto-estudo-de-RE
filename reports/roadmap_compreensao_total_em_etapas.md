@@ -362,12 +362,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `reports/plano_expansao_pokemon_geracoes.md`: congelar corte/escopo e auditar somente
   leitura tabelas, consumidores, limites, save/party/PC, espaço e assets. As tabelas locais
   candidatas de 412 espécies, 355 moves, 412 ponteiros de learnsets e 112 registros de
-  typecalc foram revalidadas; auditoria preliminar ainda identificou três consumidores adicionais
-  de learnsets com limite local de 20 entradas, limites numéricos de moves/tipos e um leitor
-  três leitores typechart adicionais, incluindo risco estático de índice one-past ainda sem
-  validação dinâmica (`reports/auditoria_fase1_consumidores_learnsets.md`,
-  `reports/auditoria_fase1_limites_moves_tipos.md`, `reports/auditoria_fase1_consumidor_typechart_secundario.md`).
-  Isso não autoriza expansão. Issue Linear `VYK-27`.
+  typecalc foram revalidadas; auditoria preliminar identificou três consumidores de learnsets
+  adicionais com cap de 20 entradas, limites numéricos de moves/tipos e três leitores typechart
+  adicionais. Um handler dispatchado pelo opcode `0xA6` tem LCG de período matemático completo e
+  permite o índice 112: lê o registro seguinte, mas o rejeita pelo `+2 = 0xCC`; consequência
+  runtime ainda não testada. Relatórios:
+  `reports/auditoria_fase1_consumidores_learnsets.md`,
+  `reports/auditoria_fase1_limites_moves_tipos.md` e
+  `reports/auditoria_fase1_consumidor_typechart_secundario.md`. Isso não autoriza expansão.
+  Issue Linear `VYK-27`.
 - **Trilha de RE de opcodes pausada no backlog:** `VYK-26`, handlers locais `0x45`–`0x47`.
   Retomar depois ou em paralelo quando priorizado; estados intermediários de `0x23`,
   caminhos de dano/callers/consumidores e demais domínios continuam desconhecidos.

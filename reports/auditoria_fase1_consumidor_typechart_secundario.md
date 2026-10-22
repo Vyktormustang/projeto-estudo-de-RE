@@ -1,6 +1,6 @@
 # Fase 1 — leitores adicionais da tabela local de effectiveness
 
-**Estado:** seguidos estaticamente três fluxos locais fora do handler typecalc do ciclo 25: uma rotina que consome os tipos armazenados por espécie, um fluxo de batalha que consulta move/estrutura e effectiveness, e um leitor de effectiveness chamado duas vezes por uma rotina superior. No leitor de índice aleatório, o código admite numericamente o índice 112 para uma tabela observada com índices 0–111: registramos como risco de leitura one-past, não como bug dinâmico confirmado. Call paths/runtimes completos continuam parciais. Nenhuma ROM/save foi modificada.
+**Estado:** seguidos estaticamente três fluxos locais fora do handler typecalc do ciclo 25: uma rotina que consome tipos da espécie, um fluxo de batalha que consulta move/estrutura e effectiveness, e um leitor chamado duas vezes por uma rotina superior. A tabela local de comandos de batalha encaminha os opcodes `0x4A` e `0xA6` a duas dessas rotinas. O handler `0x08029DAC` admite numericamente o índice 112 para uma tabela observada com índices 0–111; o RNG local tem ciclo matemático completo, mas a sequência de jogo não foi executada. Registramos uma leitura além do limite candidato, com rejeição imediata pelo próximo teste, não um bug/efeito de jogo confirmado. Nenhuma ROM/save foi modificada.
 
 ## Proveniência e método
 
@@ -8,6 +8,15 @@
 - Desmontagem Thumb com Capstone 5.0.7 temporário (`/tmp/capstone-py`); as palavras-base, pools, sequências e callsites citados foram conferidos contra bytes locais.
 - Tabela/handler já revalidados por `scripts/inspect_typecalc_path.py` e `scripts/inspect_expansion_numeric_domains.py`. REA/Ghidra e emulação não foram usados.
 - Identificadores de tipo/ability e propósitos de jogo não são atribuídos aos códigos numéricos locais.
+
+## Endereços no dispatch local de comandos
+
+O ciclo 25 havia localizado a tabela local de ponteiros de handlers em `0x0825011C`. A leitura direta desta ROM confirma:
+
+- índice/opcode `0x4A` (`74`): word em `0x08250244` é `0x08023C39`, ponteiro Thumb para código em `0x08023C38`;
+- índice/opcode `0xA6` (`166`): word em `0x082503B4` é `0x08029DAD`, ponteiro Thumb para código em `0x08029DAC`.
+
+Isso estabelece a associação local tabela→handler. Ainda não localizei um script específico contendo esses opcodes em posição de comando nem confirmei a execução de qualquer um deles em jogo.
 
 ## Leitor local `0x08039DB4` e caller `0x08039E3C`
 
@@ -37,11 +46,21 @@ Depois do scan, há outros testes locais, incluindo comparação com imediato `0
 
 ## Fluxo local `0x08029DAC` e leitura one-past potencial
 
-A rotina tem prólogo em `0x08029DAC` e usa o helper local `0x08044EC8`, cuja sequência lê um estado, multiplica/soma constantes, grava o novo estado e retorna a metade alta. O trecho `0x08029E9C–0x08029EBE` mascara o retorno com `0x7F`, compara com `0x70` e repete somente quando o valor é maior que 112. Para valores aceitos, calcula `3 × valor`, soma `0x0824F050` e lê o byte no começo dessa posição.
+A rotina tem prólogo em `0x08029DAC` e usa o helper local `0x08044EC8`. As instruções e literais locais mostram estado em `0x03005000`, multiplicador `0x41C64E6D`, incremento `0x6073`, gravação do novo estado e retorno da metade alta. O trecho `0x08029E9C–0x08029EBE` aplica `& 0x7F`, repete se o resultado for maior que `0x70`, e para valores aceitos calcula `3 × índice + 0x0824F050`.
 
-A tabela delimitada localmente tem 112 registros, índices 0–111, intervalo `[0x0824F050, 0x0824F1A0)`. Como `0x70` (112) passa pela comparação `bhi`, há um valor permitido que aponta para `0x0824F1A0`, logo após o intervalo; os bytes locais nesse endereço começam `C8 C9 CC`. A rotina usa o byte lido em comparações antes de qualquer uso posterior da linha. Isto é uma **possibilidade estática de leitura um registro além do limite candidato**; sem execução, sem determinar a distribuição/alcance do RNG neste fluxo e sem rastrear todas as condições, não afirmamos crash, corrupção nem efeito de jogo.
+Pelos parâmetros do LCG módulo `2^32` (`c` ímpar e `a ≡ 1 mod 4`), o estado tem período matemático completo. Logo, em seu ciclo existem saídas cuja metade alta, após `& 0x7F`, é 112. Isso estabelece que o valor pertence ao domínio do gerador; não demonstra quantas chamadas ocorrem nem em que ponto o estado real da sessão chega a ele.
 
-A mesma rotina contém um segundo scan em `0x08029F0A`: incrementa o deslocamento em 3 e compara com literal `0x14F` (335), cobrindo offsets 0–333, isto é, 112 posições (0–111). Esse limite é coerente com o comprimento candidato e contrasta com o caminho aleatório que admite índice 112. A word local `0x08029F90` fornece a base em ambos os loads (`0x08029EAC` e `0x08029F0A`). Caller/alcance do fluxo `0x08029DAC` ainda não rastreados.
+A tabela delimitada localmente tem 112 registros, índices 0–111, intervalo `[0x0824F050, 0x0824F1A0)`. O teste admite 112, e `base + 3 × 112 = 0x0824F1A0`, logo após o intervalo; os três bytes locais ali são `C8 C9 CC`. Se o primeiro byte passar na comparação, o código lê `+2` e o compara com 5; `0xCC` segue o ramo de rejeição (`bhi`) antes do caminho que usa uma linha válida. Portanto, a evidência sustenta uma **leitura estática de três bytes além do limite candidato e rejeição desse candidato**, não corrupção, crash ou efeito de jogo comprovado. A frequência/impacto desse retry não foi testada dinamicamente.
+
+A mesma rotina contém um segundo scan em `0x08029F0A`: incrementa o deslocamento em 3 e compara com literal `0x14F` (335), cobrindo offsets 0–333, isto é, índices 0–111. Esse limite é coerente com a tabela. A word em `0x08029F90` fornece a base nos loads `0x08029EAC` e `0x08029F0A`. A entrada `0xA6 → 0x08029DAC` na tabela local de comandos foi confirmada; ainda não localizamos um script específico que emita esse opcode.
+
+## Verificação reproduzível
+
+```bash
+python scripts/inspect_typechart_bounds.py
+```
+
+O verificador read-only confirma hash, duas entradas do dispatch, bytes/incremento/constantes do LCG, sequência de máscara/limite do handler e bytes imediatamente após a tabela candidata. Ele não procura scripts que emitam os opcodes, nem prova o estado RNG de uma partida ou substitui execução dinâmica.
 
 ## Fechamento das ocorrências candidatas e lacunas
 
@@ -49,6 +68,6 @@ O scanner encontra nove palavras brutas coincidentes com `0x0824F050`. O ciclo 2
 
 ## Próximo passo
 
-1. Rastrear os callers/dispatch indiretos de `0x08023C38` e `0x08029DAC` e verificar se o índice 112 é alcançável antes de decidir se a leitura one-past é funcional, inalcançável ou erro.
-2. Verificar testes/control flow em contexto isolado, sem editar ROM/save-base; manter a tabela fechada até compreender todos os leitores.
+1. Localizar/decodificar scripts que usem os opcodes `0x4A` e `0xA6`; a presença dos handlers na tabela não prova uso por um script específico.
+2. Verificar em contexto isolado o candidato de índice 112 e o ramo que rejeita `+2 = 0xCC`; não editar ROM/save-base nem converter leitura estática em bug confirmado sem teste.
 3. Continuar inventário de UI, nomes, ícones e outros consumidores de tipos; este relatório não demonstra suporte geral a novos códigos de tipo.
