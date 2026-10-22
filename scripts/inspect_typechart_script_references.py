@@ -22,8 +22,10 @@ MOVE_COUNT_CANDIDATE = 355
 MOVE_STRIDE = 12
 EFFECT_SCRIPT_TABLE_VA = 0x081D65A8
 COMMAND_TABLE_VA = 0x0825011C
-CALLBACK_TABLE_VA = 0x08250038
-CALLBACK_COUNT_CANDIDATE = 23
+PRIMARY_CALLBACK_TABLE_VA = 0x08250038
+PRIMARY_CALLBACK_COUNT_CANDIDATE = 14
+SECONDARY_CALLBACK_TABLE_VA = 0x08250070
+SECONDARY_CALLBACK_COUNT_CANDIDATE = 9
 CALLBACK_DISPATCH_VA = 0x080155E4
 CALLBACK_ENTRY0_VA = 0x08015CA0
 TRAMPOLINE_VA = 0x081E3BA8
@@ -247,10 +249,12 @@ def main() -> int:
     expect(data, 0x080152FA, "0a 49 0a 48 08 60", "segunda gravação do callback 0x080154A0")
     if read_u32(data, 0x08015324) != CALLBACK_RUNNER_SLOT_VA or read_u32(data, 0x08015328) != (CALLBACK_SETUP_VA | 1):
         raise SystemExit("segundo par de ponteiros do callback 0x080154A0 divergente")
-    expect(data, 0x08015562, "0f 49 00 20 08 70", "zera o índice callback antes da troca")
+    expect(data, 0x08015562, "0f 49 00 20 08 70", "zera temporariamente o índice callback")
+    expect(data, 0x08015568, "0e 49 0f 48 00 23 00 78 08 70", "copia byte de 0x02023BDA sobre o índice")
     expect(data, 0x0801557E, "0d 49 0d 48 08 60", "troca o callback para 0x080155C8")
     if (
         read_u32(data, 0x080155A4) != 0x02023BE3
+        or read_u32(data, 0x080155A8) != 0x02023BDA
         or read_u32(data, 0x080155B4) != CALLBACK_RUNNER_SLOT_VA
         or read_u32(data, 0x080155B8) != (0x080155C8 | 1)
     ):
@@ -271,8 +275,15 @@ def main() -> int:
     expect(data, 0x080157BA, "21 78 7f 20 08 40 20 70", "segundo clear bit 7 do guard byte")
     if read_u32(data, 0x080156B4) != 0x02023E8A or read_u32(data, 0x080157D0) != 0x02023E8A:
         raise SystemExit("literais do guard byte nos clears divergentes")
+    expect(data, 0x08016374, "10 b5", "entry primário slot 2")
+    expect(data, 0x0801687A, "00 2e 06 d0", "ramo condicional antes do write 4")
+    expect(data, 0x0801688C, "30 1c f0 bc 02 bc 08 47", "epílogo primário slot 2")
+    expect(data, 0x080168A4, "70 b5", "entry primário slot 3")
+    expect(data, 0x080169D8, "70 bc 01 bc 00 47", "epílogo primário slot 3")
+    expect(data, 0x08016C60, "10 b5", "entry primário slot 8")
+    expect(data, 0x08016C82, "10 bc 01 bc 00 47", "epílogo primário slot 8")
 
-    # A local function-pointer table selects the containing Thumb function.
+    # Adjacent local callback tables select the primary and follow-up handlers.
     expect(
         data, 0x080155C8,
         "70 b5 14 4e 30 78 14 4a 00 28 01 d0 0c 20 10 70",
@@ -281,26 +292,48 @@ def main() -> int:
     expect(
         data, CALLBACK_DISPATCH_VA,
         "11 49 10 78 80 00 40 18 00 68 ce f1 db fa",
-        "dispatch indireto da tabela de callbacks",
+        "dispatch primário indireto da tabela callback",
+    )
+    expect(
+        data, 0x08015606,
+        "0d 4b 0d 4a 31 78 7f 20 08 40 80 00 80 18 00 68 18 60 20 e0",
+        "dispatch secundário via 0x02023E8A e gravação do callback seguinte",
     )
     if (
         read_u32(data, 0x0801561C) != 0x02023E8A
         or read_u32(data, 0x08015620) != 0x02023BE3
-        or read_u32(data, 0x0801562C) != CALLBACK_TABLE_VA
+        or read_u32(data, 0x0801562C) != PRIMARY_CALLBACK_TABLE_VA
+        or read_u32(data, 0x08015640) != SECONDARY_CALLBACK_TABLE_VA
     ):
-        raise SystemExit("ponteiros do índice/condição/base da tabela de callbacks divergentes")
-    callback_off = offset(CALLBACK_TABLE_VA, CALLBACK_COUNT_CANDIDATE * 4 + 4, data)
-    callbacks = list(struct.unpack_from(f"<{CALLBACK_COUNT_CANDIDATE}I", data, callback_off))
+        raise SystemExit("ponteiros dos índices/bases das tabelas callback divergentes")
+    primary_off = offset(
+        PRIMARY_CALLBACK_TABLE_VA, PRIMARY_CALLBACK_COUNT_CANDIDATE * 4, data
+    )
+    primary_callbacks = list(
+        struct.unpack_from(f"<{PRIMARY_CALLBACK_COUNT_CANDIDATE}I", data, primary_off)
+    )
+    secondary_off = offset(
+        SECONDARY_CALLBACK_TABLE_VA, SECONDARY_CALLBACK_COUNT_CANDIDATE * 4 + 4, data
+    )
+    secondary_callbacks = list(
+        struct.unpack_from(f"<{SECONDARY_CALLBACK_COUNT_CANDIDATE}I", data, secondary_off)
+    )
     rom_end = ROM_BASE + len(data)
-    if callbacks[0] != 0x08015CA1 or not all(
-        ROM_BASE <= (p & ~1) < rom_end for p in callbacks
+    if (
+        primary_callbacks[0] != 0x08015CA1
+        or primary_callbacks[2] != 0x08016375
+        or primary_callbacks[3] != 0x080168A5
+        or primary_callbacks[8] != 0x08016C61
+        or secondary_callbacks[4] != 0x08015851
+        or secondary_callbacks[6] != 0x080158BD
+        or not all(ROM_BASE <= (p & ~1) < rom_end for p in primary_callbacks + secondary_callbacks)
     ):
-        raise SystemExit("slot 0 ou ponteiros da tabela callback candidata divergentes")
+        raise SystemExit("slots ou ponteiros das duas tabelas callback candidatas divergentes")
     next_callback_word = struct.unpack_from(
-        "<I", data, callback_off + CALLBACK_COUNT_CANDIDATE * 4
+        "<I", data, secondary_off + SECONDARY_CALLBACK_COUNT_CANDIDATE * 4
     )[0]
     if ROM_BASE <= (next_callback_word & ~1) < rom_end:
-        raise SystemExit("word seguinte à tabela callback também parece ponteiro")
+        raise SystemExit("word seguinte à tabela callback secundária também parece ponteiro")
     expect(
         data, CALLBACK_ENTRY0_VA, "f0 b5 57 46 4e 46 45 46 e0 b4 82 b0",
         "prólogo do callback slot 0",
@@ -339,14 +372,18 @@ def main() -> int:
     print("dispatch local: 0x4A→0x08023C38; 0xA6→0x08029DAC")
     print(
         "rota estática: 0x030030F0→runner 0x080123E4→callback 0x03004F84; "
-        "0x080154A0 zera 0x02023BE3 e agenda 0x080155C8"
+        "0x08015562 zera 0x02023BE3, mas 0x08015568 copia 0x02023BDA sobre ele"
     )
     print(
-        "tabela 0x08250038 slot 0→0x08015CA0; 0x080155C8 sobrescreve índice com "
-        "0x0C se 0x02023E8A != 0; código local escreve 4/6 nessa guarda"
+        "tabela primária candidata 0x08250038 (14 slots): slot 0→0x08015CA0; "
+        "0x080155C8 grava 0x0C se 0x02023E8A != 0; caso contrário mantém o valor copiado"
     )
-    print("semântica, predicados combinados e runtime não testados")
-    print("bloco 0x0801632C no callback slot 0: 7 branches locais convergem")
+    print(
+        "tabela secundária candidata 0x08250070 (9 slots) é usada no caminho "
+        "0x02023BE2 >= 0x02023BCC; 0x02023E8A & 0x7F seleciona o slot"
+    )
+    print("predicados combinados, semântica e runtime não testados")
+    print("bloco 0x0801632C no primário slot 0: 7 branches locais convergem")
     for move_id, occurrences in learnset_hits.items():
         indices = sorted({index for index, _level in occurrences})
         print(f"learnset local: ID numérico {move_id} aparece {len(occurrences)} vez(es), tabela indices {indices}")
