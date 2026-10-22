@@ -315,7 +315,13 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_copy_mutation_commands.py`; relatório:
   `reports/ciclo_40_subbyte_copyarray_copyindexed_local.md`. Estático e parcial; issue
   Linear `VYK-19`.
-- **Próximo:** seguir a sequência local a partir de `0x33`–`0x35` e completar estados
+- **Ciclo 41:** seguiu localmente `0x33`–`0x35` (`0x08022AB9`, `0x08022AE5`,
+  `0x08022B1D`): OR in-place de byte, halfword e word, com operands e avanços do cursor
+  registrados. Nomes upstream separados da evidência local. Script:
+  `scripts/inspect_battle_bitwise_commands.py`; relatório:
+  `reports/ciclo_41_orbyte_orhalfword_orword_local.md`. Estático e parcial; issue
+  Linear `VYK-20`.
+- **Próximo:** seguir a sequência local a partir de `0x36`–`0x38` e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
