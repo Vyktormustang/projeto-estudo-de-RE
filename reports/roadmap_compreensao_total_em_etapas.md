@@ -109,12 +109,12 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–26 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–27 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
 e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
-fluxo local de acerto/falha, recortes de dano, `typecalc`/efetividade e um ramo de
-ajuste pós-cálculo de dano. PC/armazenamento, fórmula completa de dano, demais
-consumidores, persistência e outros domínios continuam pendentes.
+fluxo local de acerto/falha, recortes de dano, `typecalc`/efetividade, ajuste de dano,
+animação e caminhos de atualização de HP. PC/armazenamento, fórmula completa de dano,
+demais consumidores, persistência e outros domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -224,12 +224,18 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_adjustnormaldamage.py`; relatório:
   `reports/ciclo_26_adjustnormaldamage_limites_item_estado.md`. Estático e parcial;
   acompanhado no Linear pela issue `VYK-5` do projeto Pokémon FireRed BR.
-- **Próximo:** issue `VYK-6` no projeto Linear Pokémon FireRed BR: inspecionar os
-  handlers locais `0x09`/`0x0A` de animação e `0x0B`/`0x0C` de atualização de HP;
-  registrar desvios e lacunas, sem presumir uma cadeia completa. Em paralelo,
-  investigar caminhos de dano/callers/consumidores ainda desconhecidos e manter a
-  auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais domínios.
-  Estes rastros não representam cobertura global.
+- **Ciclo 27:** seguiu localmente os handlers `0x09`/`0x0A` de animação/espera e
+  `0x0B`/`0x0C` de barra e dados de HP, com offsets, flags e cursor documentados e
+  nomes upstream separados. A rotina `0x0C` permanece parcial. Script:
+  `scripts/inspect_battle_anim_hp_updates.py`; relatório:
+  `reports/ciclo_27_animacao_atualizacao_hp_local.md`. Estático e parcial; issue
+  Linear `VYK-6`.
+- **Próximo:** seguir o opcode `0x0E` no script amostrado (`0x081D6936`, handler
+  local `0x0801FAD1`) e o fluxo adjacente de mensagens/resultados; registrar
+  consumidores e lacunas. Issue Linear `VYK-7`. Em paralelo, investigar caminhos de
+  dano/callers/consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
+  creche/evolução, PC/armazenamento e demais domínios. Estes rastros não representam
+  cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
