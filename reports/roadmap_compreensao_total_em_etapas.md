@@ -321,7 +321,13 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_bitwise_commands.py`; relatório:
   `reports/ciclo_41_orbyte_orhalfword_orword_local.md`. Estático e parcial; issue
   Linear `VYK-20`.
-- **Próximo:** seguir a sequência local a partir de `0x36`–`0x38` e completar estados
+- **Ciclo 42:** seguiu localmente `0x36`–`0x38` (`0x08022B61`, `0x08022B8D`,
+  `0x08022BC5`): operações BIC in-place em byte, halfword e word, com máscaras,
+  endereços e avanços do cursor registrados. Nomes upstream separados da evidência
+  local. Script: `scripts/inspect_battle_bic_commands.py`; relatório:
+  `reports/ciclo_42_bicbyte_bichalfword_bicword_local.md`. Estático e parcial; issue
+  Linear `VYK-21`.
+- **Próximo:** seguir a sequência local a partir de `0x39`–`0x3B` e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
