@@ -349,7 +349,16 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   Limites dos stacks não foram estabelecidos. Script:
   `scripts/inspect_battle_end3_protect_call_commands.py`; relatório:
   `reports/ciclo_45_end3_protect_call_local.md`. Estático e parcial; issue Linear `VYK-24`.
-- **Próximo:** seguir a sequência local a partir de `0x42` em diante e completar estados
+- **Ciclo 46:** seguiu localmente `0x42`–`0x44` (`0x08022D70`, `0x08022DCC`,
+  `0x08022E18`): comparação de tipos nos offsets `+0x21/+0x22` de registro indexado,
+  chamada condicional com destino inline e gravação de byte em endereço calculado.
+  Nomes upstream (`Cmd_jumpiftype2`, `Cmd_jumpifabilitypresent`,
+  `Cmd_endselectionscript`) estão separados da evidência local; efeitos internos de
+  `0x08019F18` permanecem parciais. Script:
+  `scripts/inspect_battle_jumpiftype2_abilitypresent_endselection.py`; relatório:
+  `reports/ciclo_46_jumpiftype2_abilitypresent_endselection_local.md`. Estático e parcial;
+  issue Linear `VYK-25`.
+- **Próximo:** seguir a sequência local a partir de `0x45` em diante e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
