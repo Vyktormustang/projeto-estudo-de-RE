@@ -109,13 +109,13 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–29 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–30 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
 e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
 fluxo local de acerto/falha, recortes de dano, `typecalc`/efetividade, ajuste de dano,
-animação, caminhos de atualização de HP, seleção de sons/mensagens e comandos de texto.
-PC/armazenamento, fórmula completa de dano, demais consumidores, persistência e outros
-domínios continuam pendentes.
+animação, caminhos de atualização de HP, seleção de sons/mensagens, comandos de texto
+e seleção por tabela. PC/armazenamento, fórmula completa de dano, demais consumidores,
+persistência e outros domínios continuam pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -243,9 +243,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_text_commands.py`; relatório:
   `reports/ciclo_29_comandos_texto_batalha_local.md`. Estático e parcial; issue Linear
   `VYK-8`.
-- **Próximo:** acompanhar no Linear pela issue `VYK-9` os opcodes locais `0x13`/`0x14`
-  (`0x0801FE31`/`0x0801FE85`) e seus dados de tabela/seleção, mantendo separados bytes,
-  inferência e semântica upstream. Em paralelo, investigar caminhos de dano/callers/
+- **Ciclo 30:** seguiu handlers `0x13`/`0x14` (`0x0801FE31`/`0x0801FE85`), observando
+  pointer u32 inline, seleção local de halfword por índice e cursor `+5`; rótulos de
+  tabela/seleção foram cruzados separadamente com upstream. Script:
+  `scripts/inspect_battle_table_text_commands.py`; relatório:
+  `reports/ciclo_30_tabelas_texto_selecao_local.md`. Estático e parcial; issue Linear
+  `VYK-9`.
+- **Próximo:** issue Linear `VYK-10`: inspecionar os handlers locais `0x15`–`0x17`
+  (`0x08021125`, `0x08021211`, `0x08021221`) e seus efeitos nos dados/estado de batalha,
+  registrando evidência e lacunas. Em paralelo, investigar caminhos de dano/callers/
   consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
   creche/evolução, PC/armazenamento e demais domínios. Estes rastros não representam
   cobertura global.
