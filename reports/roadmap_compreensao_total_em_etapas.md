@@ -358,11 +358,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_jumpiftype2_abilitypresent_endselection.py`; relatório:
   `reports/ciclo_46_jumpiftype2_abilitypresent_endselection_local.md`. Estático e parcial;
   issue Linear `VYK-25`.
-- **Próximo:** seguir a sequência local a partir de `0x45` em diante e completar estados
-  intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
-  paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
-  manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
-  domínios. Estes rastros não representam cobertura global.
+- **Prioridade atual — expansão de espécies/moves/tipos:** executar Fases 0–1 do plano
+  `reports/plano_expansao_pokemon_geracoes.md`: congelar corte/escopo e auditar somente
+  leitura tabelas, consumidores, limites, save/party/PC, espaço e assets. As tabelas locais
+  candidatas de 412 espécies, 355 moves, 412 ponteiros de learnsets e 112 registros de
+  typecalc foram revalidadas; isso não autoriza expansão. Issue Linear `VYK-27`.
+- **Trilha de RE de opcodes pausada no backlog:** `VYK-26`, handlers locais `0x45`–`0x47`.
+  Retomar depois ou em paralelo quando priorizado; estados intermediários de `0x23`,
+  caminhos de dano/callers/consumidores e demais domínios continuam desconhecidos.
+  Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
