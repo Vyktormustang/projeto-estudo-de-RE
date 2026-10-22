@@ -256,11 +256,18 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_effect_chance_commands.py`; relatório:
   `reports/ciclo_31_efeitos_opcodes_batalha_local.md`. Estático e parcial; issue Linear
   `VYK-10`.
-- **Próximo:** continuar pela tabela local com os handlers `0x18`–`0x1A` e expandir
-  o rastreio de chamadas/consumidores dos efeitos de batalha. Em paralelo, investigar
-  caminhos de dano/callers/consumidores ainda desconhecidos e manter a auditoria ampla
-  de espécie, creche/evolução, PC/armazenamento e demais domínios. Estes rastros não
-  representam cobertura global.
+- **Ciclo 32:** seguiu handlers locais `0x18`–`0x1A` (`0x08021231`, `0x080212AD`,
+  `0x080215A1`), registrando a limpeza condicional de words por máscara, ramificações
+  de estado/faint, cursor e chamadas. Os nomes upstream estão separados; o `0x19` ainda
+  tem sub-ramos sem identificação local completa. Script:
+  `scripts/inspect_battle_faint_status_commands.py`; relatório:
+  `reports/ciclo_32_transicoes_status_e_faint_local.md`. Estático e parcial; issue
+  Linear `VYK-11`.
+- **Próximo:** continuar pela tabela local com `0x1B` (`0x080215DD`), `0x1C`
+  (`0x08021641`) e `0x1D` (`0x080216B9`), além de expandir chamadas/consumidores de
+  batalha. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
+  desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento
+  e demais domínios. Estes rastros não representam cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
