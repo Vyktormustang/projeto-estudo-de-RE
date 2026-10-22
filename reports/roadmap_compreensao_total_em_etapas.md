@@ -275,11 +275,19 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_condition_commands.py`; relatório:
   `reports/ciclo_34_condicoes_ability_side_stat_local.md`. Estático e parcial; issue
   Linear `VYK-13`.
-- **Próximo:** seguir pela tabela local `0x21` (`0x08021989`), `0x22` (`0x08021A0D`)
-  e `0x23` (`0x08021A69`), além de expandir chamadas/consumidores de batalha. Em
-  paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
-  manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
-  domínios. Estes rastros não representam cobertura global.
+- **Ciclo 35:** seguiu `0x21`–`0x23` (`0x08021989`, `0x08021A0D`, `0x08021A69`):
+  teste local com inversão e destino inline, comparação dos dois bytes de registro,
+  e prólogo/dispatch/saída terminal de máquina de sete estados. O `0x23` permanece
+  parcialmente analisado; nomes upstream estão separados. Script:
+  `scripts/inspect_battle_condition_exp_commands.py`; relatório:
+  `reports/ciclo_35_condicoes_status_tipo_exp_local.md`. Estático e parcial; issue Linear
+  `VYK-14`.
+- **Próximo:** seguir pela tabela local `0x24` (`0x080223F9`), `0x25` (`0x080225D9`)
+  e `0x26` (`0x080225F1`), além de completar estados intermediários de `0x23` e
+  expandir chamadas/consumidores de batalha. Em paralelo, investigar caminhos de
+  dano/callers/consumidores ainda desconhecidos e manter a auditoria ampla de espécie,
+  creche/evolução, PC/armazenamento e demais domínios. Estes rastros não representam
+  cobertura global.
 
 Não há uma estimativa confiável de ciclos para a cobertura total antes de auditar o
 inventário global e as regiões sem classificação. É claramente um trabalho longo,
