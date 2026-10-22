@@ -109,11 +109,12 @@ revelar novos domínios):
     escopo por não aparecerem nos exemplos.
 
 **Estado:** pausa parcialmente coberta; motor de bytecode, handlers NPC e dados/
-consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–24 avançaram no domínio de
+consumidores de mapa iniciados nos ciclos 11–16. Ciclos 17–25 avançaram no domínio de
 Pokémon/batalha: BoxMon→equipe, cálculo de stats, tabelas locais candidatas de espécie
 e moves, ponteiros/listas de moves por nível, dispatch de efeitos, scripts/opcodes,
-fluxo local de acerto/falha e um recorte do cálculo de dano. PC/armazenamento, fórmula
-completa de dano, demais consumidores, persistência e outros domínios continuam pendentes.
+fluxo local de acerto/falha, recortes de dano e `typecalc`/efetividade. PC/armazenamento,
+fórmula completa de dano, demais consumidores, persistência e outros domínios continuam
+pendentes.
 
 ### Etapa 5 — Ligações entre sistemas e rastros completos
 
@@ -212,9 +213,15 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_damagecalc_path.py`; relatório:
   `reports/ciclo_24_damagecalc_base_damage_local.md`. Cruzamento upstream separado,
   análise estática e parcial.
-- **Próximo:** analisar o handler local `0x0801E849` (opcode `0x06`) e como ele
-  atualiza dano/flags; depois seguir comandos de animação e atualização de HP, além
-  dos retornos. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
+- **Ciclo 25:** seguiu opcode `0x06` até o handler local `0x0801E849`, com seleção
+  do tipo, ramo STAB, tabela local candidata de 112 registros em `0x0824F050`, helper
+  de modulação `0x0801E771` e ramos locais de habilidades; nomes semânticos foram
+  cruzados separadamente com upstream. Script: `scripts/inspect_typecalc_path.py`;
+  relatório: `reports/ciclo_25_typecalc_tipo_efetividade_local.md`. Estático e parcial.
+- **Próximo:** inspecionar o handler `0x07` em `0x0801F105` (ajuste normal de dano
+  no cruzamento upstream), depois os comandos locais `0x09`/`0x0A` de animação e
+  `0x0B`/`0x0C` de atualização de HP; registrar desvios e lacunas, sem presumir uma
+  cadeia completa. Em paralelo, investigar caminhos de dano/callers/consumidores ainda
   desconhecidos e manter a auditoria ampla de espécie, creche/evolução, PC/
   armazenamento e demais domínios. Estes rastros não representam cobertura global.
 
