@@ -296,7 +296,13 @@ esses rastros são amostras, não substitutos dos passes abrangentes por sistema
   `scripts/inspect_battle_jump_byte_commands.py`; relatório:
   `reports/ciclo_37_decrement_goto_jumpifbyte_local.md`. Estático e parcial; issue
   Linear `VYK-16`.
-- **Próximo:** seguir a sequência local a partir de `0x2A`–`0x2C` e completar estados
+- **Ciclo 38:** seguiu localmente `0x2A`–`0x2C` (`0x08022711`, `0x080227B9`,
+  `0x0802286D`): leituras indiretas de halfword/word, seis comparadores e saltos
+  condicionais, além de comparação de arrays por tamanho u8. Nomes upstream separados
+  da evidência local. Script: `scripts/inspect_battle_wide_array_commands.py`;
+  relatório: `reports/ciclo_38_jumpifwide_and_array_local.md`. Estático e parcial; issue
+  Linear `VYK-17`.
+- **Próximo:** seguir a sequência local a partir de `0x2D`–`0x2F` e completar estados
   intermediários de `0x23`, além de expandir chamadas/consumidores de batalha. Em
   paralelo, investigar caminhos de dano/callers/consumidores ainda desconhecidos e
   manter a auditoria ampla de espécie, creche/evolução, PC/armazenamento e demais
