@@ -22,6 +22,8 @@ on:
       - "scripts/gba_rom_header.py"
       - "scripts/ghidra_prepare_pyghidra.py"
       - "scripts/requirements-re.txt"
+      - "scripts/gba_bag_payload.py"
+      - "docs/MOD_BAG_V4.md"
       - ".github/workflows/re-tools.yml"
 
 permissions:
@@ -68,6 +70,12 @@ jobs:
 
       - name: Verificação independente do cabeçalho
         run: python3 scripts/gba_rom_header.py --self-test
+
+      - name: Payload v4 do mod (encoders Thumb + emulação Unicorn, sem ROM)
+        run: |
+          python3 -m pip install --quiet capstone unicorn
+          python3 scripts/gba_bag_payload.py --self-test
+          python3 scripts/gba_bag_payload.py --emulate
 
       - name: Guardar evidências
         if: always()

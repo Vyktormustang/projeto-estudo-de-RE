@@ -112,6 +112,27 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
   desenvolvimento; a validação de cabeçalho chama o `gba_rom_header.py`
   (testado com `--self-test`) e há fallback em PowerShell puro.
 
+### 0.8 Mod da mochila v4 — retorno do trampolim estava 2 B adiantado
+
+- **Achado (CONFIRMADO por aritmética + emulação):** o veneer em `0x08000A38`
+  cobre `0x08000A38..0x08000A3F`; a continuação é **`0x08000A40`**. O trampolim
+  v3 constrói `0x08000A40 + 3` e faz `bx` → **`0x08000A42`**, pulando **uma
+  instrução Thumb a cada chamada de `SetGpuReg`** (1.200+ callsites). Compatível
+  com as telas brancas observadas no v3.
+- **Segundo ajuste:** o gate deixou de ler o espelho `0x03003118`
+  (contexto-dependente) e passou a ler **`REG_KEYINPUT` (0x04000130)**,
+  ativo-baixo: combo quando `(REG_KEYINPUT & 0x0308) == 0`.
+- **Ferramenta:** `scripts/gba_bag_payload.py` (`--build`, `--emulate`,
+  `--self-test`, `--apply ROM -o SAIDA --variante regkey|sanity`).
+- **Evidência (Unicorn, sem ROM):** `--emulate` → 4 cenários de teclas corretos
+  (só L+R+START preenche) + `sanity` grava `AAAA`; todos com `PC=0x08000A40`,
+  Thumb ligado e `SP` balanceado. `--self-test` → OK.
+- **Próximo passo (PENDENTE, precisa da ROM):** aplicar a variante `sanity` numa
+  cópia, rodar 600 frames e ler `0x020258B8`: se aparecer `aa aa aa aa`, o hook
+  executa e o gate é o único problema; se continuar `00 00 37 dd`, `SetGpuReg`
+  não é chamada nessa cena e o site precisa mudar.
+- Detalhes: `docs/MOD_BAG_V4.md`.
+
 ## 3. Cheatsheet técnico (números já provados)
 - SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
 - Tramp @ `0x08EB0C00` (run 0xFF, ver `reports/freespace_map.tsv`), 158 B builder-

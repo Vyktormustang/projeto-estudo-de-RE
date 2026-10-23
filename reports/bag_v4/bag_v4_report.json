@@ -1,0 +1,67 @@
+{
+  "schema": "bag-payload/v4",
+  "site_va": "0x08000A38",
+  "tramp_va": "0x08EB0C00",
+  "continuacao_va": "0x08000A40",
+  "bag_va": "0x020258B8",
+  "keyinput_va": "0x04000130",
+  "combo_bits": "0x0308",
+  "itens": [
+    {
+      "slot": 0,
+      "id": "0x01",
+      "qty": 99
+    },
+    {
+      "slot": 1,
+      "id": "0x02",
+      "qty": 99
+    },
+    {
+      "slot": 2,
+      "id": "0x04",
+      "qty": 99
+    },
+    {
+      "slot": 3,
+      "id": "0x0D",
+      "qty": 99
+    },
+    {
+      "slot": 4,
+      "id": "0x1C",
+      "qty": 50
+    },
+    {
+      "slot": 5,
+      "id": "0x2D",
+      "qty": 30
+    },
+    {
+      "slot": 6,
+      "id": "0x32",
+      "qty": 30
+    },
+    {
+      "slot": 7,
+      "id": "0x13",
+      "qty": 99
+    }
+  ],
+  "variantes": {
+    "regkey": {
+      "payload_bytes": 128,
+      "tramp_bytes": 156,
+      "payload_sha256": "d180b7e020618e75e891065c2bd840184a124cd492e2205a0ed6ad010cc7f249",
+      "tramp_sha256": "c22502794145a0edc9a433aebdcbc7f34b1393b6a0003110b849391a16022b01"
+    },
+    "sanity": {
+      "payload_bytes": 30,
+      "tramp_bytes": 58,
+      "payload_sha256": "dafe58ad2e908904419224bac7c32f536108ccee800768c6ce9f4da26ef0792d",
+      "tramp_sha256": "8c9eea8f2b54b23e823bada7b978c8d2998f56846409468889e51f05066802f1"
+    }
+  },
+  "site_bytes": 8,
+  "site_sha256": "828aa781ee71fe35ee61ef85b7f83d33497b54d459d3fa03af5c939a0ebeacce"
+}
