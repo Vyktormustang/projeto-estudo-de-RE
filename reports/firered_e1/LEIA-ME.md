@@ -24,7 +24,7 @@
 
 | # | Problema | Detalhe |
 |---|---|---|
-| A | **Crash ao entrar na lista numérica** | Ao confirmar a lista, o jogo **reinicia** (volta para GAME FREAK). `05_crash_na_lista.png` |
+| A | **Crash ao entrar na lista numérica** | Ao confirmar a lista, o jogo **reinicia** (volta para GAME FREAK). `05_lista_vazia_antes_do_fix.png` |
 | B | Contagem "Seen/Owned" fica **vazia** na tela | pode ser o mesmo problema de A |
 | C | Espécies novas ainda **não têm sprite/dados** | normal: isso é E2/E6, não E1 |
 
@@ -187,3 +187,29 @@ Correção (agora parte de `apply_e1_port.py`, etapa 6b):
 3. Se for o `Alloc`: trocar a alocação dinâmica da lista por alocação estática em EWRAM
    (mas EWRAM está em 98,9% — ver plano) ou por paginação (só a página visível na memória).
 4. Fechar E1 quando lista numérica e contagem funcionarem.
+
+---
+
+## Estado final da E1 (2026-10-23)
+
+**ROM:** `b149aa89d20cd0de688acbb76eb83b3f42e77dd1ad9afa249a52abb0fb12f89c` (16 777 216 B)
+
+**Confirmado em jogo, com a ROM limpa (sem nenhuma instrumentação):**
+
+| # | prova | arquivo |
+|---|---|---|
+| 1 | título | `01_titulo_1025.png` |
+| 2 | campo em Pallet Town | `02_campo_pallet.png` |
+| 3 | menu com POKéDEX | `03_menu_pokedex.png` |
+| 4 | TABLE OF CONTENTS abre | `04_pokedex_abre.png` |
+| 5 | lista VAZIA (o bug, antes do fix) | `05_lista_vazia_antes_do_fix.png` |
+| 6 | lista Kanto com nomes e tipos | `10_lista_kanto_completa.png` |
+| 7 | modo nacional habilitado | `08_menu_modo_nacional.png` |
+| 8 | contadores Kanto/National | `09_contadores_nacional.png` |
+| 9 | **`No1025 PECHARUNT`** no fim | `07_lista_1025_pecharunt.png` |
+
+**O que NÃO está pronto ainda (é a E2 em diante):**
+
+- as 639 espécies novas têm constante e nome, mas **herdam dados** de espécie (stats,
+  tipos, learnset, sprite, cry). Um Treecko selvagem hoje não existe como encontro.
+- tipo Fada, split físico/especial, habilidades e movimentos das gens novas: E3–E5.
