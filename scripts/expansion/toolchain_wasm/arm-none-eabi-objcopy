@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+"""objcopy: GNU objcopy real (WASM)."""
+import sys
+from _wasm import roda
+sys.exit(roda("objcopy", sys.argv[1:]))

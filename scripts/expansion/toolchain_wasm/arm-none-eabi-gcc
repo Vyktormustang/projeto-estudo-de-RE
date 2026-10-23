@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""gcc (fachada): responde as consultas do Makefile e delega a compilacao ao cc1 real."""
+import sys
+from _wasm import ZIG, ARQ
+
+args = sys.argv[1:]
+for a in args:
+    if a.startswith("--print-prog-name="):
+        print("/tmp/tc/bin/arm-fake-cc1"); sys.exit(0)
+    if a.startswith("-print-file-name="):
+        print(ARQ + "/" + a.split("=", 1)[1]); sys.exit(0)
+    if a.startswith("--print-file-name="):
+        print(ARQ + "/" + a.split("=", 1)[1]); sys.exit(0)
+    if a in ("--version", "-v"):
+        print("arm-none-eabi-gcc (GCC) 14.2.0 (WASM)"); sys.exit(0)
+
+# compilacao direta (nao usada pelo Makefile modern, mas mantida por seguranca)
+sys.exit(__import__("subprocess").call([ZIG, "cc", "--target=arm-linux-musleabi"] + args))

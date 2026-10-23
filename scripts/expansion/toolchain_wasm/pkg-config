@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""pkg-config minimo: zlib/libpng instalados em /tmp/local."""
+import sys
+args = sys.argv[1:]
+if "--version" in args:
+    print("0.29.2"); sys.exit(0)
+if "--modversion" in args:
+    print("1.6.44" if any("png" in a for a in args) else "1.3.1"); sys.exit(0)
+if "--exists" in args:
+    sys.exit(0)
+cflags = "-I/tmp/local/include"
+libs_l = "-L/tmp/local/lib"
+libs_lib = "-lpng -lz"
+for a in args:
+    if a == "--cflags" or a == "--cflags-only-I":
+        print(cflags); sys.exit(0)
+    if a == "--libs-only-L":
+        print(libs_l); sys.exit(0)
+    if a == "--libs-only-l":
+        print(libs_lib); sys.exit(0)
+    if a == "--libs":
+        print(libs_l + " " + libs_lib); sys.exit(0)
+print(cflags + " " + libs_l + " " + libs_lib)

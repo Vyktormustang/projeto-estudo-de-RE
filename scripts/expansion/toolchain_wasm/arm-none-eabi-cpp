@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+"""cpp: pre-processador (clang -E do zig). Remove flags que o clang nao conhece."""
+import sys
+from _wasm import ZIG, roda
+import subprocess
+
+LIXO = {"-mthumb-interwork", "-mno-thumb-interwork", "-mabi=apcs-gnu", "-mword-relocations",
+        "-fno-toplevel-reorder", "-fno-diagnostics-show-caret", "-fno-show-column",
+        "-fno-tree-loop-distribute-patterns", "-fno-aggressive-loop-optimizations",
+        "-fno-ipa-cp-clone", "-fno-inline-functions-called-once", "-fira-algorithm=priority",
+        "-fno-var-tracking-assignments", "-fno-stack-protector"}
+out, i = [], 0
+a = sys.argv[1:]
+while i < len(a):
+    x = a[i]
+    if x in LIXO:
+        i += 1; continue
+    if x.startswith(("-mabi=", "-meabi=", "-march=", "-mtune=", "-mcpu=")):
+        i += 1; continue
+    if x in ("-march", "-mtune", "-mcpu"):
+        i += 2; continue
+    out.append(x); i += 1
+sys.exit(subprocess.call([ZIG, "cc", "--target=arm-linux-musleabi", "-E", "-mcpu=arm7tdmi"] + out))

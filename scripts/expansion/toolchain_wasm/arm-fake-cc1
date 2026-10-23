@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+"""cc1: GCC 14.2.0 real (WASM) via daemon. Le C pre-processado do stdin, escreve .s."""
+import sys, os
+from _daemon import compila
+
+SYSINC = "/tmp/pkg/package/share/gba/lib/libgba/sysinclude"
+
+args = [a for a in sys.argv[1:] if a != "-quiet"]
+destino = None          # None => stdout
+i = 0
+while i < len(args):
+    if args[i] == "-o" and i + 1 < len(args):
+        if args[i + 1] == "-":
+            destino = "-"
+            args[i + 1] = "/work/out.s"
+        else:
+            destino = args[i + 1]
+            args[i + 1] = "/work/out.s"
+    i += 1
+
+codigo, log, dados = compila(["-isystem", SYSINC] + args, sys.stdin.buffer.read())
+if log:
+    sys.stderr.write(log)
+if dados is None:
+    sys.exit(codigo or 1)
+if destino in (None, "-"):
+    sys.stdout.buffer.write(dados)
+else:
+    with open(destino, "wb") as f:
+        f.write(dados)
+sys.exit(codigo)

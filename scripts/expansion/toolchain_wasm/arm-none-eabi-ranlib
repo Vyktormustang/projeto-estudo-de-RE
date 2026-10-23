@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+import subprocess, sys
+ZIG = "/usr/local/lib/python3.11/dist-packages/ziglang/zig"
+sys.exit(subprocess.call([ZIG, "ranlib"] + sys.argv[1:]))

@@ -1,0 +1,5 @@
+#!/usr/bin/env python3
+"""ld: GNU ld real (WASM)."""
+import sys
+from _wasm import roda
+sys.exit(roda("ld", sys.argv[1:]))
