@@ -27,20 +27,34 @@
 | 3 | A tela de título é a de FireRed | `reports/firered/01_titulo_firered.png` (frame 8400) |
 | 4 | O jogo começa em Kanto | novo jogo leva ao quarto em Pallet Town: `reports/firered/03_quarto_pallet.png`; `src/new_game.c` faz `SetWarpDestination(MAP_PALLET_TOWN_PLAYERS_HOUSE_2F)` |
 | 5 | Existem Pokémon das Gens 2–9 na tabela selvagem | lido **direto do ROM**: `sRoute1_FireRed_LandMons` = Pidgey, **Starly, Stufful, Pidove**, … ; `sRoute22_FireRed_LandMons` = Rattata, **Pancham, Tandemaus, Clobbopus**, … |
+| 5b | **Encontro selvagem real com Pokémon novo, jogando** | andando na grama da **Rota 1**: *“You encountered a wild Starly!”* — `reports/firered/05_encontro_starly.png`; batalha iniciada em `06_batalha.png` |
+| 5c | O seletor de espécies mostra as Gen 9 com sprite | debug *Give → Pokémon*: **Glimmora #1572** com sprite correto, e **Klefki #707**, **Rufflet #627** |
 | 6 | As espécies novas estão habilitadas na engine | `include/config/species_enabled.h`: `P_GEN_7/8/9_POKEMON TRUE`; 1671 `SPECIES_*`, última `SPECIES_GLIMMORA_MEGA 1572` |
 | 7 | O arquivo no Drive é idêntico ao construído | sha256 do Drive (`890c0d06…0744`) = sha256 local |
 
 ## O que é PROVÁVEL (não testei até o fim)
 
-- **Encontrar e capturar** um Pokémon novo andando na grama. A tabela está no
-  ROM (item 5), mas o teste automatizado não chegou a andar na Rota 1: os
-  diálogos do prólogo (nome do rival, instruções do quarto) consomem muitos
-  frames e o script de teste parou no quarto. **Falta uma captura de tela de
-  uma batalha selvagem.**
+- **Capturar** o Pokémon novo (jogar a Poké Ball). O encontro acontece e a
+  batalha roda; eu não tinha Poké Bolas na bolsa para fechar a captura. A
+  mecânica de captura é a do expansion e não foi alterada, então deve funcionar.
 - **As 1025 espécies aparecem no Pokédex.** O modo FireRed usa o Pokédex
   regional de Kanto (`REGIONAL_DEX_COUNT = KANTO_DEX_COUNT`, 151 entradas);
   espécies fora de Kanto dependem da parte nacional, que no expansion é
   dinâmica. Não verifiquei na tela.
+
+## Problemas conhecidos do fork (não resolvidos)
+
+- **A escada do quarto em Pallet Town é sólida.** O warp do andar de cima está
+  em (10,2), mas o metatilo com `MB_DOWN_LEFT_STAIR_WARP` está em (9,3) e é
+  bloqueante; os warps das portas do andar de baixo também não têm metatilo de
+  porta. Ou seja: **dá para andar por Kanto, mas não dá para sair/entrar de
+  casas normalmente** pela porta. É um desalinhamento de dados do fork, não do
+  build. Contorno usado nos testes: **debug menu (R+START) → Utilities → Warp
+  to map warp → grupo 037, mapa 019** (Rota 1) ou **000** (Pallet Town).
+- **O jogo começa sem Pokémon** e o fluxo do laboratório do Oak não foi
+  exercitado por mim. Para testar batalhas: debug → *Give → Pokémon (Basic)*
+  (funciona; foi assim que entrou o Raticate da captura).
+
 
 ## O que é DESCONHECIDO
 

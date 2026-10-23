@@ -183,8 +183,17 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
   encontros Gen 2–9 **presentes no binário** (li `sRoute1_FireRed_LandMons`
   no ELF → Pidgey, Starly, Stufful, Pidove; Rota 22 → Pancham, Tandemaus,
   Clobbopus).
-- **PROVÁVEL (falta captura):** batalha selvagem real com um Pokémon novo na
-  grama da Rota 1. O driver de input não venceu os diálogos do prólogo.
+- **CONFIRMADO (2026-10-23, retomada):** andando na grama da Rota 1 aparece
+  **“You encountered a wild Starly!”** e a batalha roda normalmente —
+  `reports/firered/05_encontro_starly.png` e `06_batalha.png`. O seletor de
+  espécies do debug também mostra **Glimmora #1572** com sprite de Gen 9.
+- **PROVÁVEL:** efetivamente **capturar** (faltou Poké Ball na bolsa no teste)
+  e o Pokédex nacional exibindo as 1025 espécies.
+- **PROBLEMA CONHECIDO do fork:** portas/escadas não têm metatilo de warp
+  (a escada do quarto é sólida). Contorno: debug R+START → Utilities →
+  Warp to map warp → grupo 037/mapa 019 (Rota 1), 000 (Pallet Town).
+  Ferramenta: `scripts/firered/nav.py` (posição via RAM, auto-avanço de texto,
+  warp numérico).
 - **Receita reproduzível:** `scripts/firered/buildar_firered_expansion.sh`
   (`--self-test` 5/5) + `scripts/firered/misturar_encontros.py`
   (`--self-test` 18/18) + `scripts/firered/patches/000{1,2}-*.patch`.

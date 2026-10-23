@@ -13,6 +13,22 @@ e `MGBA_CORE` apontando para o `.so` compilado localmente.
 | `03_quarto_pallet.png` | 42000 | **novo jogo dentro do quarto em Pallet Town**, texto “...Okay! It's time to go!” |
 | `04_pallet_texto.png` | 31500 | o mesmo mapa antes, com “It's a POKéMON brand moving and delivery service.” |
 
+| `05_encontro_starly.png` | Rota 1 | **“You encountered a wild Starly!”** — Pokémon de Gen 4 selvagem, em jogo |
+| `06_batalha.png` | Rota 1 | batalha em andamento: Raticate (jogador) vs Starly selvagem |
+
+## Como essas capturas foram feitas (reproduzível)
+
+1. Rodar a intro e o prólogo até o quarto (`boot_test.py` / `nav.py --script`).
+2. Abrir o **debug menu** com `R + START` e usar
+   *Utilities → Warp to map warp* → grupo **037**, mapa **019** (Rota 1).
+   (Atalho necessário porque a porta da casa é sólida — ver `docs/FIRERED.md`.)
+3. Dá um Pokémon inicial pelo debug: *Give → Pokémon (Basic)*.
+4. Andar até a grama (tiles em `y=6` do layout) e esperar o encontro.
+
+Tudo isso está automatizado em `scripts/firered/nav.py`, que sabe:
+ler a posição do jogador da RAM, avançar textos sozinho e dirigir o menu
+numérico de warp.
+
 ## Prova dos Pokémon novos (nível de binário)
 
 A tabela de encontro da Rota 1 foi lida direto do `.gba`, no endereço do símbolo
