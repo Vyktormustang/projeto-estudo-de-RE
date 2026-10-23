@@ -40,6 +40,7 @@ REUSE=0
 DRY_RUN=0
 SELF_TEST=0
 ALLOW_INVALID_HEADER=0
+ENGINE="auto"   # auto | java | pyghidra
 LANGUAGE_ID="ARM:LE:32:v4t"
 ROM_BASE="0x08000000"
 ROM_BLOCK_NAME="GBA_ROM"
@@ -69,6 +70,9 @@ Opções:
   --max-runtime SEG      Mata o processo inteiro depois de SEG (padrão: sem limite).
   --allow-invalid-header Não aborta se o cabeçalho não validar (útil para ROM hack).
   --dry-run              Só mostra o comando que seria executado.
+  --engine auto|java|pyghidra
+                         Motor: java (analyzeHeadless + script .java, exige JDK) ou
+                         pyghidra (API Python, roda só com JRE). auto = detecta.
   --self-test            Valida ferramentas + faz um import completo da ROM sintética.
   --keep-temp            Mantém o projeto temporário do self-test.
   -h, --help             Esta ajuda.
@@ -86,6 +90,7 @@ while [ $# -gt 0 ]; do
     --reuse)                REUSE=1; shift ;;
     --timeout)              ANALYSIS_TIMEOUT="${2:?}"; shift 2 ;;
     --max-runtime)          MAX_RUNTIME="${2:?}"; shift 2 ;;
+    --engine)               ENGINE="${2:?--engine exige auto, java ou pyghidra}"; shift 2 ;;
     --allow-invalid-header) ALLOW_INVALID_HEADER=1; shift ;;
     --dry-run)              DRY_RUN=1; shift ;;
     --self-test)            SELF_TEST=1; shift ;;
@@ -104,15 +109,42 @@ done
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/re_env.sh"
 
+pyghidra_available() {
+  python3 -c 'import pyghidra' >/dev/null 2>&1
+}
+
+resolve_engine() {
+  case "$ENGINE" in
+    java|pyghidra) return 0 ;;
+    auto)
+      if [ -x "${JAVA_HOME:-/nonexistent}/bin/javac" ]; then
+        ENGINE=java
+      elif pyghidra_available; then
+        ENGINE=pyghidra
+      else
+        ENGINE=""
+      fi
+      return 0 ;;
+    *) die "--engine inválido: $ENGINE (use auto, java ou pyghidra)" ;;
+  esac
+}
+
 check_stack() { # check_stack <strict:0|1>
   local strict="$1" missing=0
 
-  if [ ! -x "${JAVA_HOME:-/nonexistent}/bin/javac" ]; then
-    log "pré-requisito ausente: JDK completo (JAVA_HOME/bin/javac)"
+  resolve_engine
+  if [ -z "$ENGINE" ]; then
+    log "nem JDK completo (javac) nem PyGhidra disponíveis"
+    log "  opção A: bash scripts/setup_re_tools.sh        (instala o JDK 21)"
+    log "  opção B: python3 -m pip install pyghidra        (roda só com JRE)"
+    missing=1
+  elif [ "$ENGINE" = java ] && [ ! -x "${JAVA_HOME:-/nonexistent}/bin/javac" ]; then
+    log "engine=java exige JDK completo (JAVA_HOME/bin/javac)"
     missing=1
   fi
-  if [ ! -x "${JAVA_HOME:-/nonexistent}/bin/java" ]; then
-    log "pré-requisito ausente: JAVA_HOME/bin/java"
+
+  if [ ! -x "${JAVA_HOME:-/nonexistent}/bin/java" ] && ! have java; then
+    log "pré-requisito ausente: um Java 21+ (JAVA_HOME/bin/java ou java no PATH)"
     missing=1
   fi
   if [ ! -x "${GHIDRA_INSTALL_DIR:-/nonexistent}/support/analyzeHeadless" ]; then
@@ -147,6 +179,7 @@ check_stack() { # check_stack <strict:0|1>
     [ "$strict" = 1 ] && exit 3
     return 3
   fi
+  log "motor selecionado: $ENGINE"
   return 0
 }
 
@@ -200,11 +233,49 @@ print_command() {
 # ---------------------------------------------------------------------------
 # Execução do import
 # ---------------------------------------------------------------------------
+run_import_pyghidra() { # run_import_pyghidra <rom> <project_dir> <project_name> <evidence>
+  local rom="$1" proj_dir="$2" proj_name="$3" evidence="$4"
+  local -a args=("$rom" --project-dir "$proj_dir" --project-name "$proj_name"
+                 --evidence "$evidence" --decompile)
+  [ "$NO_ANALYSIS" = 1 ] && args+=(--no-analysis)
+  [ "$MIRRORS" = 1 ] && args+=(--mirrors)
+
+  if [ "$DRY_RUN" = 1 ]; then
+    printf 'COMANDO:\n  python3 %q' "$SCRIPT_DIR/ghidra_prepare_pyghidra.py"
+    printf ' %q' "${args[@]}"
+    printf '\n'
+    return 0
+  fi
+
+  log "engine: pyghidra (não exige JDK; scripts .java não são usados)"
+  python3 "$SCRIPT_DIR/ghidra_prepare_pyghidra.py" "${args[@]}" 2>&1 \
+    | tee "$evidence/pyghidra.console.log"
+  local status="${PIPESTATUS[0]}"
+  if [ "$status" -ne 0 ]; then
+    warn "motor pyghidra terminou com código $status"
+    return 1
+  fi
+
+  local py_json="$evidence/gba_prepare_pyghidra.json"
+  if [ ! -s "$py_json" ]; then
+    warn "motor pyghidra não gerou $py_json"
+    return 1
+  fi
+  log "cross-check do cabeçalho (Python x Ghidra)"
+  python3 "$SCRIPT_DIR/gba_rom_header.py" "$rom" --compare "$py_json" || return 1
+  return 0
+}
+
 run_import() { # run_import <rom> <project_dir> <project_name> <evidence> <expect_full:0|1>
   local rom="$1" proj_dir="$2" proj_name="$3" evidence="$4" expect_full="$5"
   local cmd=()
 
   mkdir -p "$evidence" "$proj_dir" || die "não foi possível criar $evidence / $proj_dir"
+
+  if [ "$ENGINE" = pyghidra ]; then
+    run_import_pyghidra "$rom" "$proj_dir" "$proj_name" "$evidence"
+    return $?
+  fi
   build_command "$rom" "$proj_dir" "$proj_name" "$evidence" cmd
 
   if [ "$DRY_RUN" = 1 ]; then
@@ -212,6 +283,7 @@ run_import() { # run_import <rom> <project_dir> <project_name> <evidence> <expec
     return 0
   fi
 
+  log "engine:     $ENGINE"
   log "projeto:    $proj_dir/$proj_name"
   log "evidências: $evidence"
   print_command cmd >&2
@@ -279,7 +351,21 @@ PY
     fi
   fi
 
-  # Resumo do post-script
+  # Resumo (motor Java: post-script; motor Python: JSON unico)
+  if [ -s "$evidence/gba_prepare_pyghidra.json" ]; then
+    python3 - "$evidence/gba_prepare_pyghidra.json" <<'SUMMARY_PY'
+import json, sys
+doc = json.load(open(sys.argv[1], encoding="utf-8"))
+summary = doc.get("summary") or {}
+print(f"[ghidra-import] funcoes: {summary.get('function_count')} "
+      f"| simbolos: {summary.get('symbol_count')} "
+      f"| refs (destino/fonte): {summary.get('reference_destination_count')}/"
+      f"{summary.get('reference_source_count')}")
+decomp = doc.get("decompiled") or {}
+if decomp.get("ok"):
+    print(f"[ghidra-import] descompilado: {decomp.get('function')} @ {decomp.get('address')}")
+SUMMARY_PY
+  fi
   if [ -s "$post_json" ]; then
     python3 - "$post_json" <<'PY'
 import json, sys
@@ -338,6 +424,47 @@ self_test() {
   mkdir -p "$evidence" "$proj"
   python3 "$SCRIPT_DIR/make_synthetic_arm_image.py" --gba-rom --out "$rom" >/dev/null \
     || { warn "não foi possível gerar a ROM sintética"; return 1; }
+
+  if [ "$ENGINE" = pyghidra ]; then
+    log "== self-test do motor Python =="
+    if python3 "$SCRIPT_DIR/ghidra_prepare_pyghidra.py" --self-test; then
+      log "motor Python: OK"
+    else
+      warn "self-test do motor Python falhou"
+      SELF_TEST_FAILURES=$((SELF_TEST_FAILURES + 1))
+    fi
+  fi
+
+  if [ "$ENGINE" != java ]; then
+    log "== self-test do motor Python =="
+    if python3 "$SCRIPT_DIR/ghidra_prepare_pyghidra.py" --self-test; then
+      log "motor Python: OK"
+    else
+      warn "self-test do motor Python falhou"
+      SELF_TEST_FAILURES=$((SELF_TEST_FAILURES + 1))
+    fi
+    log "== Ghidra: import completo da ROM sintetica (motor $ENGINE) =="
+    NO_ANALYSIS=0
+    REUSE=0
+    DRY_RUN=0
+    if run_import "$rom" "$proj" selfproj "$evidence" 1; then
+      log "import completo: OK"
+    else
+      warn "import completo: FALHOU"
+      SELF_TEST_FAILURES=$((SELF_TEST_FAILURES + 1))
+    fi
+    if [ "$KEEP_TEMP" = 1 ]; then
+      log "artefatos do self-test mantidos em $tmp_root"
+    else
+      rm -rf "$tmp_root"
+    fi
+    if [ "$SELF_TEST_FAILURES" -eq 0 ]; then
+      log "self-test: TUDO OK"
+      return 0
+    fi
+    log "self-test: $SELF_TEST_FAILURES falha(s)"
+    return 1
+  fi
 
   log "== Ghidra: self-test das funções puras =="
   local pure_json="$evidence/gba_prepare_selftest.json"
@@ -434,7 +561,11 @@ main() {
     fi
     log "IMPORT CONCLUÍDO"
     log "abra no Ghidra: $GHIDRA_INSTALL_DIR/ghidraRun → projeto $PROJECT_DIR/$project_name"
-    log "evidências:    $EVIDENCE_DIR/{rom_header,gba_prepare_pre,gba_prepare_post}.json"
+    if [ "$ENGINE" = pyghidra ]; then
+      log "evidências:    $EVIDENCE_DIR/{rom_header,gba_prepare_pyghidra}.json"
+    else
+      log "evidências:    $EVIDENCE_DIR/{rom_header,gba_prepare_pre,gba_prepare_post}.json"
+    fi
     exit 0
   fi
   die "import FALHOU (veja $EVIDENCE_DIR/analyzeHeadless.console.log)"

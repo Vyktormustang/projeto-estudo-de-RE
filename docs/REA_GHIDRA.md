@@ -218,6 +218,19 @@ Para análise completa e fiel da ROM, use o Ghidra diretamente (abaixo).
 Pela GUI: `File > Import File…` → selecione a ROM → *Language* `ARM:LE:32:v4t`
 → *Options* do `BinaryLoader`: base `0x08000000` → OK → analisar.
 
+**Sem JDK:** o importador também roda pela API PyGhidra (só precisa de um Java
+21+ de runtime e `python3 -m pip install pyghidra`). Ele detecta o que existe e
+escolhe o motor:
+
+```bash
+python3 -m pip install pyghidra
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba    # motor automático
+```
+
+Evidência de execução real (ROM sintética, Java 25 só runtime): import + mapa do
+GBA + rótulos + auto-análise + **descompilação** funcionando. Detalhes e código
+descompilado em [`docs/GHIDRA_IMPORT.md`](GHIDRA_IMPORT.md) §8.
+
 Por linha de comando, use o importador do projeto — ele monta o comando acima
 **mais** o mapa de memória do GBA, os rótulos e as seeds ARM/Thumb:
 
@@ -283,6 +296,8 @@ O smoke test usa esse mesmo `0x020258B8` como literal carregado por `ldr`.
 | `.github/workflows/re-tools.yml` | CI manual (`workflow_dispatch`) que roda setup + check + smoke com internet normal |
 | `scripts/win/setup_re_tools.ps1` | instalador para Windows (JDK 21 + Ghidra + REA) |
 | `scripts/win/ghidra_import_gba.ps1` | importador para Windows (ARMv4T + mapa + rótulos) |
+| `scripts/ghidra_prepare_pyghidra.py` | motor **sem JDK** (PyGhidra): import + mapa + rótulos + análise + decompilação |
+| `scripts/requirements-re.txt` | dependências Python opcionais (`pyghidra`) |
 | `docs/WINDOWS.md` | guia Windows: GUI, PowerShell e WSL |
 
 Todos os scripts foram passados no `bash -n` e no `shellcheck` (0.11.0, nível
@@ -310,8 +325,11 @@ completam daqui.
 | Decompilador nativo | **CONFIRMADO** | `…/os/linux_x86_64/decompile` = ELF 64-bit x86-64; o REA valida “reports elf x86_64, which matches linux/x64” |
 | **JDK 21 completo** | **PENDENTE (não instalável aqui)** | não existe `javac` na máquina; `jdk4py` (PyPI) é um *jlink runtime* sem `jdk.compiler` |
 | `rea doctor` com JDK ausente | **CONFIRMADO** | `ghidra-java: ok=false, code=unsupported_version, detail="25.0.2; 64-bit; runtime only; … accepted a 64-bit full JDK 21 or newer"` → `provider_ghidra_available=false` |
-| Ghidra recusa JRE | **CONFIRMADO** | `support/analyzeHeadless` com `JAVA_HOME` apontando para a JRE: `WARNING: JAVA_HOME environment specifies unsupported java version` + `ERROR: Unable to prompt user for JDK path, no TTY detected.` |
-| Smoke test REA→Ghidra | **PENDENTE** | bloqueado pelo JDK acima; o script sai com código **3** e mensagem explícita |
+| Ghidra recusa JRE **pelo launcher oficial** | **CONFIRMADO** | `support/analyzeHeadless` com `JAVA_HOME` na JRE: `WARNING: JAVA_HOME environment specifies unsupported java version` + `ERROR: Unable to prompt user for JDK path, no TTY detected.` Causa: `analyzeHeadless` → `launch.sh ... jdk` → `LaunchSupport -jdk_home` (só aceita JDK). |
+| **Ghidra roda sem JDK pelo motor PyGhidra** | **CONFIRMADO (2026-10-22)** | `scripts/ghidra_prepare_pyghidra.py` com Java 25 *runtime only*: import `ARM:LE:32:v4t` + `BinaryLoader@0x08000000`, 6 blocos do GBA, 16 rótulos, seeds ARM/Thumb, auto-análise, **descompilação** de `gba_entry_arm` e `--self-test` → `TUDO OK`. Ver `docs/GHIDRA_IMPORT.md` §8 |
+| `analyzeHeadless` com JRE **chamando a classe direto** | **CONFIRMADO** | `java -cp …/Utility.jar ghidra.Ghidra ghidra.app.util.headless.AnalyzeHeadless …` roda import e análise com JRE; o que falha é **só** a compilação de scripts `.java` (precisa de `javac`) |
+| Smoke test REA→Ghidra | **PENDENTE** | o REA valida o Java por conta própria (`rea doctor`) e exige JDK completo — o motor PyGhidra não muda isso. O script sai com código **3** e mensagem explícita |
+| Importador da ROM no Ghidra (fora do REA) | **CONFIRMADO** | motor `pyghidra`, sem JDK; e motor `java` (script `.java`) com JDK — este último ainda **PENDENTE** aqui por falta de `javac` |
 | Sintaxe de raw-binary aceita pelo REA | **CONFIRMADO** | `rea inspect … --target-format raw-binary --architecture arm --entry-point 0x8000000 --provider ghidra` chega ao provider e falha só no runtime: `code=provider_unavailable`, `runtime_missing`, “Select a 64-bit full JDK 21 or newer on PATH, or set JAVA_HOME …” |
 | Lane correta para GBA | **CONFIRMADO** | o próprio REA informa que “headerless raw-binary analysis requires the Ghidra adapter with a caller-supplied architecture and entry point” (Hopper/IDA/Kuna recusam raw-binary) |
 

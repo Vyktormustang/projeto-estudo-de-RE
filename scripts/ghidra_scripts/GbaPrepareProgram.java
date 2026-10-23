@@ -102,8 +102,8 @@ public class GbaPrepareProgram extends GhidraScript {
 		{ 0x080000A0L, "gba_game_title", "CONFIRMADO", "Titulo do jogo, 12 bytes ASCII - GBATEK" },
 		{ 0x080000ACL, "gba_game_code", "CONFIRMADO", "Codigo do jogo, 4 bytes - GBATEK" },
 		{ 0x080000B0L, "gba_maker_code", "CONFIRMADO", "Codigo do fabricante, 2 bytes - GBATEK" },
-		{ 0x080000BDL, "gba_header_complement", "CONFIRMADO",
-			"Complement checksum do cabecalho - GBATEK" },
+		{ 0x080000BCL, "gba_header_checksum_word", "CONFIRMADO",
+			"Palavra com a versao (0xBC) e o complemento (0xBD) - GBATEK" },
 		{ 0x080000C0L, "gba_word_at_0xC0", "OBSERVADO",
 			"Palavra de 32 bits logo apos o cabecalho; reportada sem interpretacao" },
 		{ 0x04000000L, "REG_DISPCNT", "CONFIRMADO", "Display control - GBATEK (0x04000000)" },
@@ -459,7 +459,7 @@ public class GbaPrepareProgram extends GhidraScript {
 		List<String> anchorsFound = new ArrayList<>();
 		List<String> anchorsMissing = new ArrayList<>();
 		String[] anchors = { "gba_cart_header", "gba_game_title", "REG_KEYINPUT", "gBagSlots_slot0",
-			"SetGpuReg" };
+			"SetGpuReg", "gba_entry_arm" };
 		for (String anchor : anchors) {
 			List<Symbol> found = symbols.getGlobalSymbols(anchor);
 			if (found != null && !found.isEmpty()) {

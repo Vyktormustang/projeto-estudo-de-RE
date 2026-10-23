@@ -30,6 +30,13 @@ Saída esperada (resumo):
 Sem ROM à mão? `bash scripts/ghidra_import_gba.sh --self-test` gera uma ROM
 **sintética de 32 KB com cabeçalho válido** e roda o pipeline completo.
 
+**Sem JDK?** Instale o PyGhidra e o importador troca de motor sozinho (seção 8):
+
+```bash
+python3 -m pip install pyghidra
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba    # detecta: pyghidra
+```
+
 ---
 
 ## 2. Por que ARM:LE:32:v4t (e não a lane do REA)
@@ -185,7 +192,94 @@ Códigos de saída: `0` ok · `1` falhou · `2` uso · `3` pré-requisitos ausen
 
 ---
 
-## 8. Limites conhecidos e honestidade
+## 8. Rodar SEM JDK (motor PyGhidra) — CONFIRMADO
+
+O Ghidra oficial exige **JDK completo** no launcher (`analyzeHeadless` →
+`launch.sh ... jdk` → `LaunchSupport -jdk_home`). Sem `javac` o launcher recusa
+o Java e nada roda, mesmo com um Java 21+ de runtime perfeito.
+
+O projeto agora tem um **segundo motor** que contorna isso de forma legítima,
+usando a API oficial `PyGhidra`:
+
+```bash
+python3 -m pip install pyghidra          # traz o JPype junto
+python3 scripts/ghidra_prepare_pyghidra.py rom/sua_rom.gba
+```
+
+O importador escolhe o motor sozinho:
+
+```bash
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba                 # auto
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba --engine pyghidra
+bash scripts/ghidra_import_gba.sh rom/sua_rom.gba --engine java     # exige JDK
+```
+
+### 8.1 Por que funciona
+
+| Etapa | Launcher oficial | PyGhidra |
+|---|---|---|
+| Descobrir o Java | `LaunchSupport -jdk_home` (**só JDK**) | `launcher.java_home = <jre>` (setter público) |
+| Importar binário | `analyzeHeadless` | `ProgramLoader` + `BinaryLoader` |
+| Scripts de preparação | `.java` compilado em runtime (**precisa de javac**) | código Python via JPype (**não precisa**) |
+| Auto-análise / decompilador | iguais | iguais |
+
+### 8.2 Evidência desta execução (ROM sintética de 32 KB, Java 25 *runtime only*)
+
+```
+$ python3 scripts/ghidra_prepare_pyghidra.py /tmp/synth.gba --decompile
+[pyghidra] usando JRE /tmp/jdk4py_probe/jdk4py/java-runtime (sem javac)
+[pyghidra] Ghidra iniciado: java 25.0.2
+[pyghidra] importado: synth.gba (32768 bytes)
+[pyghidra] auto-análise em andamento...
+[pyghidra] funções: 2 | símbolos: 36 | refs: 20/4
+[pyghidra] cabeçalho: 'SYNTHETIC 1' 'TSTE' complemento OK
+```
+
+Descompilação real produzida (função `gba_entry_arm` em `0x080000C0`):
+
+```c
+void gba_entry_arm(void)
+{
+    /* WARNING: Could not recover jumptable at 0x080000c4. Too many branches */
+    /* WARNING: Treating indirect jump as call */
+    (*DAT_080000cc)();
+    return;
+}
+```
+
+E o cross-check independente:
+
+```
+$ python3 scripts/gba_rom_header.py /tmp/synth.gba --compare <json do Ghidra>
+[compare] OK  Python e Ghidra concordam em 11 campos do cabeçalho
+```
+
+`bash scripts/ghidra_import_gba.sh --self-test` fechou com `self-test: TUDO OK`
+(motor `pyghidra`, sem JDK).
+
+### 8.3 Como conseguir o Java 21+ sem baixar JDK
+
+Qualquer JRE 21+ serve para o motor PyGhidra. Um jeito reprodutível:
+
+```bash
+python3 -m pip download jdk4py          # wheel ~35 MB com JRE Temurin 25
+# descompacte o .whl (é um zip) e use <extraido>/jdk4py/java-runtime
+```
+
+Depois `JAVA_HOME=<...>/java-runtime` e rode o importador normalmente.
+
+### 8.4 O que cada motor não faz
+
+| | `--engine java` | `--engine pyghidra` |
+|---|---|---|
+| Import + mapa + rótulos + seeds | ✅ | ✅ |
+| Auto-análise + decompilador | ✅ | ✅ |
+| Precisa de JDK (javac) | ✅ | ❌ |
+| Usa o `analyzeHeadless` oficial | ✅ | ❌ (API `ProgramLoader`) |
+| Scripts `.java` de terceiros | ✅ | ❌ |
+| Evidência | `gba_prepare_pre/post.json` | `gba_prepare_pyghidra.json` |
+
+## 9. Limites conhecidos e honestidade
 
 - **Thumb na ROM inteira não sai "de graça".** O seed cobre a entrada; o resto
   aparece quando a auto-análise segue `bx`/`blx` — em jogos grandes, parte do
@@ -197,15 +291,16 @@ Códigos de saída: `0` ok · `1` falhou · `2` uso · `3` pré-requisitos ausen
   teclas zera em certas cenas. O rótulo diz isso no nome.
 - **`--mirrors` não é memória física**; use só se precisar seguir ponteiros
   espelhados.
-- **Este pipeline não foi executado neste sandbox** por falta de JDK (ver
-  `docs/REA_GHIDRA.md` §7). A validação aqui foi: sintaxe (tree-sitter/`bash -n`/
-  shellcheck), APIs conferidas no código-fonte oficial da tag 12.1.4 e opções
-  conferidas no README da própria instalação. A execução real roda no CI
-  (`.github/workflows/re-tools.yml`) e na sua máquina.
+- **O pipeline FOI executado** nesta máquina pelo motor `pyghidra` (Java 25
+  *runtime only*): import, mapa de memória, rótulos, seeds ARM/Thumb, auto-análise,
+  descompilação e cross-check — tudo sobre a ROM **sintética** de 32 KB (nenhum
+  byte de ROM comercial). O motor `--engine java` (script `.java` via
+  `analyzeHeadless`) continua **não executado** aqui, por falta de `javac`; ele
+  roda no CI e em qualquer máquina com JDK 21.
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 | Sintoma | Causa | Correção |
 |---|---|---|
@@ -219,12 +314,14 @@ Códigos de saída: `0` ok · `1` falhou · `2` uso · `3` pré-requisitos ausen
 
 ---
 
-## 10. Arquivos
+## 11. Arquivos
 
 | Arquivo | Papel |
 |---|---|
 | `scripts/ghidra_import_gba.sh` | orquestrador (pré-checagem, comando, verificações) |
 | `scripts/ghidra_scripts/GbaPrepareProgram.java` | pre/post-script: mapa, cabeçalho, rótulos, seeds |
 | `scripts/gba_rom_header.py` | leitor de cabeçalho independente + `--compare` + `--self-test` |
+| `scripts/ghidra_prepare_pyghidra.py` | **motor sem JDK**: importa/monta/analisa/descompila via PyGhidra |
+| `scripts/requirements-re.txt` | dependências Python opcionais (`pyghidra`) |
 | `scripts/make_synthetic_arm_image.py` | blob ARM e **ROM GBA sintética** (`--gba-rom`) para testes |
 | `docs/REA_GHIDRA.md` | instalação do stack (REA + Ghidra + JDK) |

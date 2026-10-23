@@ -20,6 +20,8 @@ on:
       - "scripts/ghidra_import_gba.sh"
       - "scripts/ghidra_scripts/GbaPrepareProgram.java"
       - "scripts/gba_rom_header.py"
+      - "scripts/ghidra_prepare_pyghidra.py"
+      - "scripts/requirements-re.txt"
       - ".github/workflows/re-tools.yml"
 
 permissions:
@@ -57,6 +59,12 @@ jobs:
 
       - name: Importador GBA no Ghidra (ROM sintética de 32 KB, sem a ROM)
         run: bash scripts/ghidra_import_gba.sh --self-test
+
+      - name: Motor PyGhidra (sem JDK, via JRE do runner)
+        run: |
+          python3 -m pip install --quiet pyghidra
+          python3 scripts/ghidra_prepare_pyghidra.py --self-test
+          bash scripts/ghidra_import_gba.sh --engine pyghidra --self-test
 
       - name: Verificação independente do cabeçalho
         run: python3 scripts/gba_rom_header.py --self-test

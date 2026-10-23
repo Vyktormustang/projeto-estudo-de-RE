@@ -34,7 +34,7 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
 - **Consequência para o roadmap:** a Fase 2 (Ghidra) segue bloqueada **apenas**
   por esse JDK; Ghidra e integração já estão instalados e validados.
 
-### 0.6 Importador da ROM no Ghidra (pronto, aguardando JDK para rodar)
+### 0.6 Importador da ROM no Ghidra (EXECUTADO: motor pyghidra, sem JDK)
 
 - **Comando único:** `bash scripts/ghidra_import_gba.sh rom/sua_rom.gba`
   (guia: `docs/GHIDRA_IMPORT.md`).
@@ -51,9 +51,17 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
   o Ghidra (11 campos + checagem de `v4t`).
 - **Teste sem a ROM:** `bash scripts/ghidra_import_gba.sh --self-test` gerou uma
   ROM sintética de 32 KB com cabeçalho válido e roda o pipeline inteiro.
-- **Status:** validado até onde o sandbox permite (sintaxe, ShellCheck,
-  tree-sitter no Java, APIs conferidas no fonte oficial 12.1.4 e opções no
-  README da instalação). Execução real fica no CI e na máquina do usuário.
+- **Status CONFIRMADO (2026-10-22):** o pipeline foi **executado de verdade**
+  nesta máquina sobre a ROM sintética de 32 KB, pelo motor `pyghidra`
+  (`scripts/ghidra_prepare_pyghidra.py`), com Java 25 **somente runtime**:
+  import ARMv4T ✔, 6 blocos de memória ✔, 16 rótulos ✔, seed ARM + Thumb ✔,
+  auto-análise ✔, **descompilação** ✔ (gerou C de `gba_entry_arm`) e
+  cross-check Python×Ghidra em 11 campos ✔. `--self-test` → `TUDO OK`.
+- **Sem JDK:** o motor `--engine pyghidra` usa a API oficial PyGhidra e pula o
+  `LaunchSupport -jdk_home` (que é o que exige `javac`). Basta
+  `python3 -m pip install pyghidra` + um Java 21+ runtime. O motor `--engine java`
+  (script `.java` via `analyzeHeadless`) segue exigindo JDK e ainda **não** foi
+  executado aqui.
 
 ## 1. O que NÃO refazer (causas-raiz já provadas)
 - **BL Thumb alcança só ±4 MB.** Hookar `0x08000B08 → 0x08EB0C00` (~15,4 MB) é

@@ -1,0 +1,8 @@
+# Dependências Python opcionais para o fluxo de RE deste projeto.
+#
+# pyghidra: permite importar/analisar a ROM no Ghidra SEM JDK completo
+#           (scripts/ghidra_prepare_pyghidra.py). Requer um Java 21+ de
+#           runtime (bin/java) — jdk4py serve se você não tiver nenhum.
+# capstone: desmontagem ARM/Thumb em scripts/gba_disasm.py deste projeto.
+#           Instale com: python3 -m pip install capstone
+pyghidra>=3.2,<4

@@ -91,7 +91,16 @@ if [ -x "${JAVA_HOME:-/nonexistent}/bin/javac" ]; then
     fail "JDK reportou versão '${jmajor:-?}' (Ghidra 12.1.4 exige >= 21)"
   fi
 else
-  fail "javac ausente — Ghidra/REA exigem JDK completo (JRE não serve); use o Temurin JDK 21"
+  note "javac ausente — o REA e o launcher oficial exigem JDK completo;"
+  note "  alternativa para o Ghidra: motor pyghidra (sem JDK) — veja abaixo"
+fi
+
+# Motor alternativo sem JDK (PyGhidra): não é falha se ausente, mas é bom saber.
+if python3 -c 'import pyghidra' >/dev/null 2>&1; then
+  pyver="$(python3 -c 'import pyghidra; print(getattr(pyghidra, "__version__", "?"))' 2>/dev/null)"
+  ok "pyghidra: $pyver (motor do importador sem JDK)"
+else
+  note "pyghidra ausente (opcional): 'python3 -m pip install pyghidra' habilita o importador sem JDK"
 fi
 
 # --- Ghidra ------------------------------------------------------------------

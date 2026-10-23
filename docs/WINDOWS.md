@@ -164,6 +164,38 @@ Nada é instalado dentro do repositório: vai para `%LOCALAPPDATA%\re-tools`.
 
 ---
 
+## 3.5 Caminho B2 — sem JDK: PyGhidra (só Java runtime)
+
+O Ghidra oficial exige **JDK completo** (com `javac`) no launcher. Se você só
+tem Java 21+ de runtime (ou nenhum Java ainda), use o motor PyGhidra — ele roda
+o import, o mapa de memória, a análise e o **decompilador** sem `javac`:
+
+```powershell
+# 1) Java 21+ runtime (se ainda não tiver). O JDK também serve.
+winget install --exact --id EclipseAdoptium.Temurin.21.JRE --accept-source-agreements --accept-package-agreements
+
+# 2) PyGhidra
+py -m pip install pyghidra
+
+# 3) Ghidra 12.1.4 (só extrair; não precisa rodar ghidraRun)
+cd $env:USERPROFILE\Downloads
+curl.exe -L -o ghidra_12.1.4.zip "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.4_build/ghidra_12.1.4_PUBLIC_20260921.zip"
+
+# 4) variáveis e import (motor detectado sozinho)
+$env:GHIDRA_INSTALL_DIR = "$env:USERPROFILE\tools\ghidra_12.1.4_PUBLIC"
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jre-21.0.13.9-hotspot"
+py scripts\ghidra_prepare_pyghidra.py C:\roms\sua_rom.gba
+```
+
+Para abrir o resultado na interface gráfica depois, é preciso o **JDK** (a GUI
+também passa pelo `LaunchSupport -jdk_home`). Sem JDK, o resultado fica nos
+JSONs de evidência e no projeto Ghidra salvo — que pode ser aberto em outra
+máquina com JDK.
+
+> **Confirmado neste projeto:** o motor PyGhidra foi executado com Java 25
+> *runtime only* e descompilou a função de entrada da ROM sintética
+> (`docs/GHIDRA_IMPORT.md` §8).
+
 ## 4. Caminho C — WSL (para ter REA + Ghidra juntos)
 
 Se você quer o fluxo completo do projeto (REA conversando com o Ghidra), precisa
