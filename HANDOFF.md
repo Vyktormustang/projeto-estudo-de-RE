@@ -147,12 +147,25 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
   `scripts/win/build-expansion.ps1` (build em um comando),
   `scripts/expansion/aplicar_configs.py` (liga Gen 1-9 e o menu de debug;
   `--self-test` OK).
-- **Não concluído aqui:** o build não terminou neste sandbox — não há acesso ao
-  toolchain ARM oficial (release assets do GitHub bloqueados). A alternativa com
-  Zig chegou a ~95% dos objetos e parou em macros do GNU `as`
-  (`scripts/expansion/toolchain_zig/README.md` documenta o limite).
-- **Próximo passo:** rodar `scripts\win\build-expansion.ps1` no Windows
-  (devkitPro GBA) e testar o `.gba` de 32 MB no mGBA.
+- **CONCLUÍDO (2026-10-23): ROM gerada e verificada.** O toolchain oficial
+  (release assets do GitHub) é inacessível aqui, mas o **GCC 14.2.0 real** e o
+  **binutils real** estão disponíveis como WebAssembly no pacote npm
+  `romdev-platform-gba`. Com eles o fonte da expansion compila **sem patch**
+  (`-mabi=apcs-gnu` já cobre os bitfields de enum que o clang recusava).
+  Ver `scripts/expansion/setup_wasm_toolchain.sh` e
+  `scripts/expansion/toolchain_wasm/`.
+- **Prova em emulador (mGBA 0.10.5 compilado aqui):** GAME FREAK @600 f,
+  título EMERALD @7200 f, teclado "YOUR NAME?" @9600 f,
+  "All right, are you ready?" @12000 f — capturas em `reports/expansion/`.
+  12/12 nomes de espécies (Bulbasaur→Pecharunt) achados dentro da ROM com o
+  `charmap.txt` do próprio jogo.
+- **ROM:** `rom/pokemon_emerald_expansion_gen1-9.gba`, 33 554 432 B,
+  sha256 `7ffdf2db4a43a614b69a3b50ae631789b5b58e9568288c70158010d2cb98f647`
+  (gitignored, por regra do projeto). Cópia no Google Drive, ver
+  `docs/EXPANSION.md` §1.
+- **Próximo passo (opcional):** rebuild com `DEBUG_OVERWORLD_MENU TRUE` para
+  dar qualquer Pokémon/item pelo menu de debug (R+START no mapa). O fonte
+  original também compila; o rebuild só demora ~40 min neste sandbox.
 
 ## 3. Cheatsheet técnico (números já provados)
 - SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
