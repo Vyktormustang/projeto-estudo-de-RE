@@ -130,9 +130,10 @@ O script cobre **Linux x86_64**. Nas outras plataformas:
   mesmo zip do Ghidra (ele traz o decompilador em
   `Ghidra/Features/Decompiler/os/mac_x86_64` ou `mac_arm_64`). Exporte
   `JAVA_HOME` e `GHIDRA_INSTALL_DIR` manualmente.
-- **Windows**: Ghidra e REA funcionam, mas o suporte do REA ao provider Ghidra no
-  Windows é **P0 (experimental/read-only)**. Para este projeto (ROM de GBA), o
-  caminho recomendado continua sendo Linux/macOS.
+- **Windows**: Ghidra roda nativamente, mas o REA fala com ele em modo
+  **P0 (experimental/read-only)** e **não aceita `raw-binary`** — ou seja, a
+  integração REA→Ghidra **não funciona para a ROM de GBA no Windows nativo**.
+  Guia dedicado: **[`WINDOWS.md`](WINDOWS.md)** (GUI, scripts `.ps1` e WSL).
 
 ---
 
@@ -280,6 +281,9 @@ O smoke test usa esse mesmo `0x020258B8` como literal carregado por `ldr`.
 | `scripts/gba_rom_header.py` | leitor de cabeçalho independente + `--compare` com o Ghidra |
 | `reports/re_tools/` | evidências geradas pelo smoke test (JSON, sha256) |
 | `.github/workflows/re-tools.yml` | CI manual (`workflow_dispatch`) que roda setup + check + smoke com internet normal |
+| `scripts/win/setup_re_tools.ps1` | instalador para Windows (JDK 21 + Ghidra + REA) |
+| `scripts/win/ghidra_import_gba.ps1` | importador para Windows (ARMv4T + mapa + rótulos) |
+| `docs/WINDOWS.md` | guia Windows: GUI, PowerShell e WSL |
 
 Todos os scripts foram passados no `bash -n` e no `shellcheck` (0.11.0, nível
 style) e testados nos modos em que o ambiente permite (ver §7). O workflow

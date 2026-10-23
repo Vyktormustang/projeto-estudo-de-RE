@@ -92,6 +92,18 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
    `reports/site_v3.hex` + `reports/tramp_v3.hex`). ROM modificada sha256 esperada:
    `348025c1...2215a3`.
 
+### 0.7 Windows (quando `bash` não existe)
+
+- Guia: `docs/WINDOWS.md`. Três caminhos: GUI do Ghidra (mais simples),
+  `scripts/win/setup_re_tools.ps1` + `scripts/win/ghidra_import_gba.ps1`
+  (automação) e WSL (fluxo completo).
+- **Limite do Windows nativo:** o provider Ghidra do REA é P0 somente-leitura e
+  **recusa `raw-binary`** → REA→Ghidra **não funciona** para GBA ali. Ghidra
+  sozinho funciona. Para os dois juntos: WSL.
+- Os `.ps1` foram escritos/revisados mas **não executados** no ambiente Linux de
+  desenvolvimento; a validação de cabeçalho chama o `gba_rom_header.py`
+  (testado com `--self-test`) e há fallback em PowerShell puro.
+
 ## 3. Cheatsheet técnico (números já provados)
 - SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
 - Tramp @ `0x08EB0C00` (run 0xFF, ver `reports/freespace_map.tsv`), 158 B builder-

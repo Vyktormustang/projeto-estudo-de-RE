@@ -29,6 +29,9 @@ Checksums usados pelo instalador:
 
 ## Instalação
 
+**No Windows não existe `bash`** — use `docs/WINDOWS.md` (GUI do Ghidra, scripts
+`.ps1` ou WSL). Os comandos abaixo são para Linux/macOS/WSL.
+
 ```bash
 bash scripts/setup_re_tools.sh          # REA + JDK 21 + Ghidra 12.1.4 (~800 MB de download)
 source scripts/re_env.sh                # exporta JAVA_HOME, GHIDRA_INSTALL_DIR e PATH
