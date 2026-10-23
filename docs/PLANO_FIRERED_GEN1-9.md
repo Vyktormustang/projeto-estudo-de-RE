@@ -75,6 +75,39 @@ travamento silencioso no boot, não como erro de compilação.
 
 ---
 
+## Decisão de arquitetura: ID de espécie = número da Pokédex Nacional
+
+Hoje o FireRed **não** usa a numeração nacional: os IDs internos vão 1–251 (Kanto + Johto) e depois
+252–276 são `SPECIES_OLD_UNOWN_*` (placeholders), com `SPECIES_TREECKO = 277`. Ou seja, o ID interno
+de Hoenn não bate com a dex nacional (Treecko é #252 na nacional).
+
+Isso poderia virar um pesadelo de remapeamento. Mas foi verificado arquivo por arquivo que
+**todas as tabelas por espécie do FireRed usam inicializador designado**:
+
+```c
+const struct SpeciesInfo gSpeciesInfo[] = { [SPECIES_BULBASAUR] = { ... }, ... };
+const struct Evolution gEvolutionTable[NUM_SPECIES][EVOS_PER_MON] = { [SPECIES_BULBASAUR] = {{...}} };
+const u16 *const gLevelUpLearnsets[NUM_SPECIES] = { [SPECIES_BULBASAUR] = sBulbasaurLevelUpLearnset };
+const u8 gEnemyMonElevation[NUM_SPECIES] = { [SPECIES_BUTTERFREE] = 8 };
+```
+
+Como a chave é o **nome** da constante, mudar o número não desalinha nada: a tabela se reorganiza
+sozinha na compilação. Só as listas ordenadas (`gPokedexOrder_*`) e as tabelas de texto/ordem da
+Pokédex são por posição e precisam ser **regeradas**.
+
+**Decisão:** renumerar tudo para `ID = número da Pokédex Nacional` (1…1025), `SPECIES_EGG = 1026`,
+`NUM_SPECIES = 1026`, formas depois. Ganhos:
+
+- acaba a tradução mental entre ID interno e dex nacional;
+- mapas de encontro, times de treinador e scripts continuam funcionando, porque usam o **nome**;
+- `struct Pokemon` não muda: `species` já é `u16` (cabe 1025 com folga — não há bitfield de 10 bits
+  limitando o ID, o que era o risco nº 1 desta etapa).
+
+**Custo:** o save antigo deixa de ser compatível com o novo build. Não é problema — o entregável é
+uma ROM nova, não um upgrade de save.
+
+---
+
 ## Tamanho do que existe hoje (base pura)
 
 | Item | Base pura | Alvo (Gen 9) |
@@ -123,14 +156,14 @@ metatítulo — não o código de warp. Foi exatamente o que faltava no fork rej
 
 **Arquivos**
 
-- `include/constants/species.h` — de 412 para 1025 + formas.
+- `include/constants/species.h` — renumerado para a dex nacional (1…1025) + `SPECIES_EGG = 1026`.
 - `include/constants/pokedex.h` — `NATIONAL_DEX_MEW`/`NATIONAL_DEX_COUNT`.
 - `include/global.h` — `struct Pokedex` (`owned[]`, `seen[]` crescem de 52 para 129 bytes).
 - `src/data/pokemon/pokedex_orders.h`, `pokedex_entries.h`, `pokedex_categories.h`.
 - `src/pokemon.c`, `src/pokedex.c` — qualquer laço com teto fixo em `KANTO_DEX_COUNT`.
 
-**Regra de compatibilidade:** os IDs 1–386 **não mudam**. Isso mantém encontros, saves de teste e
-todo o conteúdo de Kanto funcionando sem reescrever tabela nenhuma.
+**Regra de compatibilidade:** nenhum **nome** de constante muda (só o número). Encontros, times de
+treinador, scripts e `species_info.h` continuam válidos como estão — todos são indexados por nome.
 
 **Aceite**
 
