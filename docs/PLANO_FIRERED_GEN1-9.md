@@ -422,6 +422,39 @@ sai errada**, porque o offset muda a cada build (na base pura é `0x6F94`; no fo
 
 ---
 
+## Registro de progresso
+
+### 2026-10-23 — E1 em andamento
+
+**Feito**
+
+- `scripts/firered/gen_species_constants.py` — gera `species.h`, `pokedex.h` e os nomes a partir do
+  pokefirered + repositório de referência. `--self-test` passa: **1025 espécies, 386 reaproveitadas,
+  639 novas** (Gen 4–9).
+- `scripts/firered/apply_e1_port.py` — aplica o port inteiro num clone limpo, de forma idempotente.
+- Renumeração aplicada no clone: espécies 1…1025 pela dex nacional, `SPECIES_EGG = 1026`.
+- Removidos os 25 buracos `SPECIES_OLD_UNOWN_*` (eram placeholders) e todos os seus usos:
+  `pokedex_orders.h`, `species_info.h`, `level_up_learnset_pointers.h`, `tmhm_learnsets.h`,
+  tabelas gráficas (`front_pic_table`, `back_pic_table`, `palette_table`, `shiny_palette_table`,
+  `front/back_pic_coordinates`, `footprint_table`), `pokemon_icon.c`, `pokemon.c`, `menu2.c`.
+- `SpeciesToCryId` reescrito para a nova numeração; `HOENN_MON_SPECIES_START` 277 → 252.
+- Save reacomodado: `filler_B20` −154 B (Pokédex cresceu de 2×52 para 2×129 B),
+  `unused_3A94` 64 → 60 B (`seen1`/`seen2` crescendo no SaveBlock1).
+
+**Estado do build**
+
+O `make` chega ao fim **sem nenhum erro de compilação** (`grep -c "error:" = 0`), mas **o link não
+regenera o `.elf`/`.gba`** neste ambiente: o `ld` (wrapper WASM do toolchain do sandbox) imprime o
+mapa de memória e retorna 0 sem escrever a saída. O `pokefirered_modern.gba` continua com o sha256 da
+base pura (`32e26d4f…`). Portanto: **E1 ainda NÃO está confirmada** — falta produzir e bootar a ROM.
+
+**Próximo passo**
+
+1. Resolver o link (rodar o passo de link isolado; se o wrapper continuar falhando, linkar com
+   `ld` nativo em WSL/CI) e obter o `.gba` novo.
+2. Boot + título + andar + os dois warps (mesmo teste da E0) com o build de 1025 espécies.
+3. Se o jogo abrir a Pokédex com `NATIONAL_DEX_COUNT = 1025` sem estourar, fechar a E1.
+
 ## Registro de decisões
 
 | Data | Decisão | Motivo |
