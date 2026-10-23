@@ -1,0 +1,38 @@
+diff --git a/asm/macros/map.inc b/asm/macros/map.inc
+index 20405533..1792d5b8 100644
+--- a/asm/macros/map.inc
++++ b/asm/macros/map.inc
+@@ -105,16 +105,30 @@
+ 
+ 	@ Defines a background hidden item event for map data
+ 	.macro bg_hidden_item_event x:req, y:req, elevation:req, item:req, flag:req, quantity=1, underfoot=FALSE
+-	.if \flag < FLAG_HIDDEN_ITEMS_START
+-	.error "Hidden Item flag \flag is too small. Must be >= FLAG_HIDDEN_ITEMS_START."
+-	.endif
+ 	.if \item >= (1 << 12)
+ 	.error "quantity \quantity too large"
+ 	.endif
+ 	.if \quantity >= (1 << 7)
+ 	.error "quantity \quantity too large"
+ 	.endif
++#ifdef FIRERED
++	@ Build FireRed: os mapas de Hoenn continuam no ROM mas nao sao jogaveis, e o
++	@ fork define as flags de item escondido de Hoenn como 0 em flags_frlg.h.
++	@ Aceita 0 (indice 0) em vez de abortar a montagem.
++	.if \flag == 0
++	bg_event \x, \y, \elevation, BG_EVENT_HIDDEN_ITEM, \item | (0 << 11) | (\quantity << 24) | (\underfoot << 31)
++	.else
++	.if \flag < FLAG_HIDDEN_ITEMS_START
++	.error "Hidden Item flag \flag is too small. Must be >= FLAG_HIDDEN_ITEMS_START."
++	.endif
++	bg_event \x, \y, \elevation, BG_EVENT_HIDDEN_ITEM, \item | (((\flag) - FLAG_HIDDEN_ITEMS_START) << 11) | (\quantity << 24) | (\underfoot << 31)
++	.endif
++#else
++	.if \flag < FLAG_HIDDEN_ITEMS_START
++	.error "Hidden Item flag \flag is too small. Must be >= FLAG_HIDDEN_ITEMS_START."
++	.endif
+ 	bg_event \x, \y, \elevation, BG_EVENT_HIDDEN_ITEM, \item | (((\flag) - FLAG_HIDDEN_ITEMS_START) << 11)| (\quantity << 24) | (\underfoot << 31)
++#endif
+ 	.endm
+ 
+ 	@ Defines a background secret base event for map data

@@ -167,6 +167,36 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
   dar qualquer Pokémon/item pelo menu de debug (R+START no mapa). O fonte
   original também compila; o rebuild só demora ~40 min neste sandbox.
 
+### 0.10 FireRed com os Pokémon novos — ENTREGUE (2026-10-23)
+
+- **Pedido:** jogar **FireRed** com os Pokémon novos, como uma ROM nova já
+  modificada. Feito: build próprio do fork `CharonChaos88/FireRedExpansion`
+  (pokeemerald-expansion **1.15** + mapas de Kanto/Sevii de FireRed).
+- **ROM:** `rom/pokefirered_expansion_gen1-9.gba`, 33 554 432 B, sha256
+  `890c0d06c3cf9f3709c372f81a9d6499d3eee2d23eece08de529006556870744`
+  (gitignored). Cabeçalho `POKEMON FIRE` / `BPRE`.
+- **Drive (público):**
+  https://drive.google.com/file/d/1ddQIcLe6nZ03Eq4JOA3F24VybAz_dBpP/view?usp=drivesdk
+  — sha256 do Drive confere com o local.
+- **CONFIRMADO:** compila com `make firered` (EXIT=0); título **FIRE RED**
+  (frame 8400); novo jogo abre no **quarto em Pallet Town** (frame 42000);
+  encontros Gen 2–9 **presentes no binário** (li `sRoute1_FireRed_LandMons`
+  no ELF → Pidgey, Starly, Stufful, Pidove; Rota 22 → Pancham, Tandemaus,
+  Clobbopus).
+- **PROVÁVEL (falta captura):** batalha selvagem real com um Pokémon novo na
+  grama da Rota 1. O driver de input não venceu os diálogos do prólogo.
+- **Receita reproduzível:** `scripts/firered/buildar_firered_expansion.sh`
+  (`--self-test` 5/5) + `scripts/firered/misturar_encontros.py`
+  (`--self-test` 18/18) + `scripts/firered/patches/000{1,2}-*.patch`.
+  Documento completo: `docs/FIRERED.md`; capturas: `reports/firered/`.
+- **Dois bugs do fork que o build expôs (corrigidos por patch):**
+  (a) `asm/macros/map.inc` abortava com flag de item escondido 0 — o fork zera
+  as flags de Hoenn no modo FireRed; (b) `map_data_rules.mk` fixava
+  `mapjson map emerald`, gerando `.inc` em modo Emerald e quebrando o link com
+  `undefined reference to gTileset_Building`.
+- **Limites:** inglês; engine do Emerald (menus/sons); enredo de Kanto não
+  testado de ponta a ponta; sem compatibilidade com saves oficiais.
+
 ## 3. Cheatsheet técnico (números já provados)
 - SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
 - Tramp @ `0x08EB0C00` (run 0xFF, ver `reports/freespace_map.tsv`), 158 B builder-

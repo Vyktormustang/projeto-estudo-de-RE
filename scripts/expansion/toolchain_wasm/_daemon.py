@@ -1,6 +1,7 @@
 """Cliente do daemon cc1 (GCC 14.2 em WASM)."""
 import base64, json, os, socket, subprocess, sys, time
 
+AQUI = os.path.dirname(os.path.abspath(__file__))
 SOCK = "/tmp/cc1.%d.sock"
 NDAEMONS = int(os.environ.get("CC1_DAEMONS", "3"))
 
@@ -15,7 +16,7 @@ def _daemon(idx):
             return caminho
         except OSError:
             os.unlink(caminho)
-    subprocess.Popen(["node", "/tmp/cc1d.mjs", caminho],
+    subprocess.Popen(["node", os.path.join(AQUI, "cc1d.mjs"), caminho],
                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                      start_new_session=True)
     for _ in range(600):

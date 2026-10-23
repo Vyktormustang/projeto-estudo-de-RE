@@ -5,7 +5,8 @@ ZIG = "/usr/local/lib/python3.11/dist-packages/ziglang/zig"
 PKG = "/tmp/pkg/package/wasm"
 ARQ = "/tmp/pkg/package/share/gba/lib/arm-archives"
 SYSINC = "/tmp/pkg/package/share/gba/lib/libgba/sysinclude"
-RUNNER = "/tmp/wtool.mjs"
+AQUI = os.path.dirname(os.path.abspath(__file__))
+RUNNER = os.path.join(AQUI, "wtool.mjs")
 
 
 def roda(tool, argv, stdin=None, cwd=None):
