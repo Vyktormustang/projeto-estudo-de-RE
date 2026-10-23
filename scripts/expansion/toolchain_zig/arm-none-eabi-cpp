@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+import sys
+from _common import cc
+sys.exit(cc(sys.argv[1:], extra=["-E"]))

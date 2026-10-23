@@ -1,0 +1,7 @@
+#!/bin/bash
+case "$1" in
+  --cflags) echo "-I/tmp/local/include" ;;
+  --libs-only-L) echo "-L/tmp/local/lib" ;;
+  --libs) echo "-L/tmp/local/lib -lpng -lz" ;;
+  *) exit 0 ;;
+esac

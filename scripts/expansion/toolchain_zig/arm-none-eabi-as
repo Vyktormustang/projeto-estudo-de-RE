@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""as: monta com o MC do LLVM.
+
+Diferenças em relação ao GNU as que tratamos aqui:
+  * .include é resolvido a partir do CWD -> rodamos com cwd = dir do fonte;
+  * --defsym -> injetado como .equ no topo do fonte;
+  * o alvo musl assume Thumb, mas o código mistura ARM/Thumb -> -marm;
+  * o GNU aceita 'mov r1, #1' em Thumb (alias de movs); o LLVM não.
+    Refazemos SOMENTE as linhas que o assembler rejeita, com o sufixo S.
+"""
+import sys, subprocess, tempfile, os, re
+
+ZIG = "/tmp/tc/bin/_zig"
+ALVO = "--target=arm-linux-musleabi"
+CPU = "-mcpu=arm7tdmi"
+LIXO = {"-mthumb-interwork", "-mabi=apcs-gnu", "-meabi=5", "-fno-toplevel-reorder"}
+S_FORMS = ("mov", "add", "sub", "and", "orr", "eor", "lsl", "lsr", "asr",
+           "mul", "neg", "adc", "sbc", "bic", "mvn", "rsb", "ror")
+
+def normaliza(argv):
+    out, i = [], 0
+    while i < len(argv):
+        a = argv[i]
+        if a in LIXO:
+            i += 1; continue
+        if a.startswith(("-mabi=", "-meabi=", "-march=", "-mtune=", "-mcpu=")):
+            i += 1; continue
+        if a in ("-march", "-mtune", "-mcpu"):
+            i += 2; continue
+        out.append(a); i += 1
+    return [CPU] + out
+
+def com_s(linha):
+    """Adiciona o sufixo S ao mnemônico, se aplicável."""
+    m = re.match(r"^(\s*)([a-z]+)(\s+.*)$", linha)
+    if not m:
+        return linha
+    esp, mnem, resto = m.groups()
+    if mnem in S_FORMS:
+        return f"{esp}{mnem}s{resto}"
+    return linha
+
+def main():
+    args, defs = [], []
+    i = 0
+    argv = sys.argv[1:]
+    while i < len(argv):
+        a = argv[i]
+        if a == "--defsym" and i + 1 < len(argv):
+            defs.append(argv[i+1]); i += 2; continue
+        if a.startswith("--defsym="):
+            defs.append(a.split("=", 1)[1]); i += 1; continue
+        if a == "-o" and i + 1 < len(argv):
+            args += [a, argv[i+1]]; i += 2; continue
+        args.append(a); i += 1
+
+    cwd0 = os.getcwd()
+    fontes = [a for a in args if a.endswith((".s", ".S"))]
+    src = os.path.abspath(fontes[0]) if fontes else None
+    if "-o" in args:
+        k = args.index("-o")
+        if not os.path.isabs(args[k+1]):
+            args[k+1] = os.path.abspath(args[k+1])
+    args = [os.path.abspath(a) if a.endswith((".s", ".S")) and os.path.isfile(a) else a
+            for a in args]
+
+    preludio = "".join(".equ %s, %s\n" % tuple(d.split("=", 1)) for d in defs if "=" in d)
+    fontes_arquivo = [a for a in args if a.endswith((".s", ".S"))]
+    # sem arquivo de entrada (ou com "-"), o texto chega por stdin
+    entrada_stdin = ("-" in args) or (not fontes_arquivo)
+    if entrada_stdin:
+        base = [a for a in args if a != "-" and not a.endswith((".s", ".S"))]
+        texto = preludio + sys.stdin.read()
+    elif preludio:
+        base = [a for a in args if not a.endswith((".s", ".S"))]
+        texto = preludio + open(fontes_arquivo[0]).read()
+    else:
+        base, texto = args, None
+
+    def ajusta_offsets(t):
+        """GNU as aceita [r0, SYM]; o LLVM exige [r0, #SYM] (senao 'register expected')."""
+        import re as _re
+        padrao = _re.compile(r"\[\s*(r\d+|sp|lr|pc|ip|fp|sl|sb)\s*,\s*([^\]\n]+?)\s*\]")
+        def repl(m):
+            base, oper = m.group(1), m.group(2).strip()
+            if _re.match(r"^(#|[rsp]\d|sp\b|lr\b|pc\b|ip\b|fp\b|sl\b|sb\b)", oper) or oper.startswith("["):
+                return m.group(0)
+            if _re.match(r"^-\s*(r\d+|sp\b|lr\b|pc\b|ip\b|fp\b|sl\b|sb\b)", oper):  # -r2/-lr: registrador
+                return m.group(0)
+            if False:
+                return m.group(0)
+            return "[%s, #(%s)]" % (base, oper)
+        return padrao.sub(repl, t)
+
+    def repara(linha):
+        """Conserta uma linha que o LLVM rejeitou (o GNU as era mais tolerante)."""
+        import re as _re
+        # 1) deslocamento sem '#': "lsr 6" -> "lsr #6"
+        nova = _re.sub(r"\b(lsl|lsr|asr|ror)(\s+)(\d+)\b", r"\1\2#\3", linha)
+        if nova != linha:
+            return nova
+        # operandos com colchetes (memoria) ja sao tratados em ajusta_offsets
+        if "[" in linha or "]" in linha:
+            return linha
+        # 2) terceiro operando imediato sem '#': "add r7, r0, SYM" -> "add r7, r0, #(SYM)"
+        m = _re.match(r"^(\s*[a-z]+\s+[^,\s]+,\s*[^,\s]+,\s*)([^#\[\s].*)$", linha)
+        if m and not _re.match(r"^[rsp]\d", m.group(2)):
+            return "%s#(%s)" % (m.group(1), m.group(2).strip())
+        # 3) segundo operando imediato sem '#': "tst r0, SYM" -> "tst r0, #(SYM)"
+        m = _re.match(r"^(\s*[a-z]+\s+[^,\s]+,\s*)([^#\[\s].*)$", linha)
+        if m and not _re.match(r"^[rsp]\d", m.group(2)) and not m.group(2).startswith(("=", "-")):
+            return "%s#(%s)" % (m.group(1), m.group(2).strip())
+        return linha
+
+    def sem_loc(t):
+        """Sem .loc o assembler reporta a linha do .s (o autocorretor acerta)."""
+        import re as _re
+        return _re.sub(r"^[ \t]*\.loc[ \t]+.*\n", "", t, flags=_re.M)
+    if texto is not None:
+        texto = sem_loc(texto)
+        texto = ajusta_offsets(texto)
+    dir_tmp = os.path.dirname(src) if src else cwd0
+    base = [a for a in args if not a.endswith((".s", ".S"))]
+
+    for _ in range(15):
+        if texto is not None:
+            fd, tmp = tempfile.mkstemp(suffix=".s", dir=dir_tmp, prefix="_wrap_")
+            os.write(fd, texto.encode()); os.close(fd)
+            cmd = [ZIG, "cc", ALVO, "-c", "-x", "assembler-with-cpp",
+                   "-Wa,-I," + cwd0, "-marm"] + normaliza(base + [tmp])
+        else:
+            tmp = None
+            cmd = [ZIG, "cc", ALVO, "-c", "-x", "assembler-with-cpp",
+                   "-Wa,-I," + cwd0, "-marm"] + normaliza(args)
+        r = subprocess.run(cmd, capture_output=True, text=True, cwd=dir_tmp)
+        if tmp:
+            try: os.unlink(tmp)
+            except OSError: pass
+        if r.returncode == 0:
+            return 0
+        if tmp is None:
+            sys.stderr.write(r.stderr); return r.returncode
+        alvos = re.findall(r"^(.*?):(\d+):\d+: error: ", r.stderr, re.M)
+        if not alvos:
+            sys.stderr.write(r.stderr); return r.returncode
+        linhas = texto.split("\n")
+        mudou = False
+        for _arq, num in alvos:
+            k = int(num) - 1
+            if 0 <= k < len(linhas):
+                nova = repara(linhas[k])
+                if nova == linhas[k]:
+                    nova = com_s(linhas[k])
+                if nova != linhas[k]:
+                    linhas[k] = nova; mudou = True
+        if not mudou:
+            sys.stderr.write(r.stderr); return r.returncode
+        texto = "\n".join(linhas)
+    sys.stderr.write("as: muitas iteracoes de correcao\n")
+    return 1
+
+sys.exit(main())

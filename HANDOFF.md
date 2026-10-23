@@ -134,6 +134,26 @@ bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo
   e falha na Debian 12 (glibc 2.36); compilar o mGBA 0.10.5 do fonte resolve
   (cmake + ninja, `-DBUILD_LIBRETRO=ON -DUSE_ZLIB=OFF ...`).
 
+### 0.9 Caminho para "todos os Pokémon até a geração atual"
+
+- **Decisão (2026-10-22):** o pedido não cabe como patch no FireRed PT-BR
+  (tabelas fixas, sem tipo Fada, sem split físico/especial, ROM de 16 MB).
+  O caminho escolhido é compilar a **pokeemerald-expansion** (Emerald), que já
+  traz Gen 1-9 + mecânicas; PT-BR fica como fase 2.
+- **Verificado no código (v1.17.2):** `P_GEN_1..9_POKEMON = TRUE`,
+  `B_PHYSICAL_SPECIAL_SPLIT`, `B_MEGA_EVO_*`, `B_FLAG_DYNAMAX_BATTLE`,
+  `B_FLAG_TERA_ORB_*`.
+- **Entregue:** `docs/EXPANSION.md` (passo a passo Windows + o que se perde),
+  `scripts/win/build-expansion.ps1` (build em um comando),
+  `scripts/expansion/aplicar_configs.py` (liga Gen 1-9 e o menu de debug;
+  `--self-test` OK).
+- **Não concluído aqui:** o build não terminou neste sandbox — não há acesso ao
+  toolchain ARM oficial (release assets do GitHub bloqueados). A alternativa com
+  Zig chegou a ~95% dos objetos e parou em macros do GNU `as`
+  (`scripts/expansion/toolchain_zig/README.md` documenta o limite).
+- **Próximo passo:** rodar `scripts\win\build-expansion.ps1` no Windows
+  (devkitPro GBA) e testar o `.gba` de 32 MB no mGBA.
+
 ## 3. Cheatsheet técnico (números já provados)
 - SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
 - Tramp @ `0x08EB0C00` (run 0xFF, ver `reports/freespace_map.tsv`), 158 B builder-

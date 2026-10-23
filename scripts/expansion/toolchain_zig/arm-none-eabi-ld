@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+import sys, subprocess
+args=[]
+for a in sys.argv[1:]:
+    if a == "--print-memory-usage":
+        continue
+    args.append(a)
+sys.exit(subprocess.call(["/tmp/tc/bin/_zig","cc","--target=arm-linux-musleabi","-nostdlib"]+args))
