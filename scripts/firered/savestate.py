@@ -121,6 +121,22 @@ class Estado:
         else:
             self.d[base + byte] &= ~(1 << bit)
 
+    def set_var(self, var_id: int, valor: int, off: dict) -> None:
+        """Escreve uma variável de script (u16) no SaveBlock1."""
+        indice = var_id - 0x4000
+        struct.pack_into("<H", self.d, self.s1 + off["s1_vars"] + indice * 2, valor)
+
+    def set_nacional(self, off: dict) -> None:
+        """Liga a Pokédex nacional: as três condições de IsNationalPokedexEnabled.
+
+        `src/event_data.c` exige `pokedex.nationalMagic == 0xB9`,
+        `VarGet(VAR_NATIONAL_DEX) == 0x6258` e `FLAG_SYS_NATIONAL_DEX`.
+        """
+        self.set_flag(0x829, True, off)          # FLAG_SYS_POKEDEX_GET
+        self.set_flag(0x840, True, off)          # FLAG_SYS_NATIONAL_DEX
+        self.d[self.s2 + off["s2_pokedex"] + 3] = 0xB9
+        self.set_var(0x404E, 0x6258, off)        # VAR_NATIONAL_DEX
+
     def get_flag(self, num: int, off: dict) -> bool:
         base = self.s1 + off["s1_flags"]
         return bool(self.d[base + num // 8] & (1 << (num % 8)))
@@ -140,6 +156,9 @@ def main() -> int:
     p_dex.add_argument("nums", nargs="+", type=int)
     p_dex.add_argument("--no-caught", action="store_true")
 
+    p_nac = sub.add_parser("nacional", help="liga a Pokédex nacional (flag + magic + var)")
+    p_nac.set_defaults(sem_extra=True)
+
     p_flag = sub.add_parser("flag")
     p_flag.add_argument("--set", dest="ligar", nargs="*", type=lambda s: int(s, 0))
     p_flag.add_argument("--clear", dest="desligar", nargs="*", type=lambda s: int(s, 0))
@@ -156,6 +175,9 @@ def main() -> int:
         print(f"SaveBlock1: 0x{est.s1:X}   SaveBlock2: 0x{est.s2:X}")
         for f, nome in ((0x829, "POKEDEX_GET"), (0x840, "NATIONAL_DEX")):
             print(f"flag {nome:<13}: {est.get_flag(f, off)}")
+        print(f"nationalMagic  : 0x{est.d[est.s2 + off['s2_pokedex'] + 3]:02X}")
+        var = struct.unpack_from("<H", est.d, est.s1 + off["s1_vars"] + (0x404E - 0x4000) * 2)[0]
+        print(f"VAR_NATIONAL_DEX: 0x{var:04X}")
         return 0
 
     if a.cmd == "party":
@@ -170,6 +192,9 @@ def main() -> int:
         est.marcar_dex(a.nums, visto=True, capturado=not a.no_caught, off=off)
         print(f"{len(a.nums)} espécies marcadas na Pokédex: {a.nums[:8]}"
               f"{' ...' if len(a.nums) > 8 else ''}")
+    elif a.cmd == "nacional":
+        est.set_nacional(off)
+        print("Pokédex nacional ligada (flag 0x829/0x840, nationalMagic 0xB9, VAR 0x404E=0x6258)")
     elif a.cmd == "flag":
         est.set_flag(0x829, True, off)   # POKEDEX_GET
         for n in a.ligar or []:

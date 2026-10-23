@@ -46,7 +46,7 @@ if [ "$SO_BUILD" -eq 0 ]; then
   if [ -x /tmp/tc/bin/arm-none-eabi-as ] && [ -x /tmp/tc/bin/arm-fake-cc1 ]; then
     ok "toolchain ARM ja existe em /tmp/tc/bin"
   else
-    log "1/4 toolchain ARM (wasm) ~2 min"
+    log "1/8 toolchain ARM (wasm) ~2 min"
     bash "$RAIZ/scripts/expansion/setup_wasm_toolchain.sh" >/tmp/setup_tc.log 2>&1 \
       || { tail -20 /tmp/setup_tc.log; exit 1; }
     ok "toolchain em /tmp/tc/bin"
@@ -58,7 +58,7 @@ export PATH=/tmp/tc/bin:$PATH
 if [ -d "$PF/.git" ]; then
   ok "clone ja existe em $PF"
 else
-  log "2/4 clonando pret/pokefirered ~30 s"
+  log "2/8 clonando pret/pokefirered ~30 s"
   rm -rf "$PF"
   git clone --depth 1 https://github.com/pret/pokefirered "$PF" >/tmp/setup_clone.log 2>&1
   ok "clone em $PF"
@@ -68,13 +68,22 @@ fi
 if [ -f /tmp/fre/include/constants/pokedex.h ]; then
   ok "referencia RHH ja existe em /tmp/fre"
 else
-  log "clonando a referencia RHH (pokeemerald-expansion) ~40 s"
+  log "clonando a referencia RHH (pokeemerald-expansion) ~60 s"
   rm -rf /tmp/fre
   git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/rh-hideout/pokeemerald-expansion /tmp/fre >/tmp/setup_fre.log 2>&1 \
-    && ( cd /tmp/fre && git sparse-checkout set include >/dev/null 2>&1 ) \
+    && ( cd /tmp/fre && git sparse-checkout set include \
+          src/data/pokemon/species_info src/data/pokemon/level_up_learnsets >/dev/null 2>&1 ) \
     || { tail -10 /tmp/setup_fre.log; exit 1; }
   ok "referencia em /tmp/fre"
+fi
+
+# clone antigo pode ter so `include` no sparse-checkout: completa sem re-clonar
+if [ -d /tmp/fre/.git ] && [ ! -d /tmp/fre/src/data/pokemon/species_info ]; then
+  log "completando a referencia RHH (species_info + learnsets)"
+  ( cd /tmp/fre && git sparse-checkout add src/data/pokemon/species_info \
+      src/data/pokemon/level_up_learnsets >/tmp/setup_fre.log 2>&1 ) \
+    || { tail -10 /tmp/setup_fre.log; exit 1; }
 fi
 
 log "aplicando o port E1 (1025 especies)"
@@ -82,9 +91,16 @@ python3 "$RAIZ/scripts/firered/apply_e1_port.py" --pokefirered "$PF" >/tmp/setup
   || { tail -20 /tmp/setup_port.log; exit 1; }
 ok "port aplicado"
 
+# ------------------------------------------------- 2b. dados das especies (E2)
+log "3/8 gerando os dados das especies 387-1025 (E2)"
+python3 "$RAIZ/scripts/firered/gen_species_data.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e2.log 2>&1 \
+  || { tail -20 /tmp/setup_e2.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e2.log)"
+
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then
-  log "3/4 headers libpng/zlib p/ compilar as ferramentas ~1 min"
+  log "4/8 headers libpng/zlib p/ compilar as ferramentas ~1 min"
   mkdir -p /tmp/local/include /tmp/local/lib
   ( cd /tmp/local
     curl -sSL -o png.tgz https://github.com/pnggroup/libpng/archive/refs/tags/v1.6.39.tar.gz
@@ -115,7 +131,7 @@ fi
 export CPATH=/tmp/local/include
 export LIBRARY_PATH=/tmp/local/lib
 
-log "compilando as ferramentas do pokefirered (make tools) ~1 min"
+log "5/8 compilando as ferramentas do pokefirered (make tools) ~1 min"
 if [ ! -x "$PF/tools/gbagfx/gbagfx" ]; then
   ( cd "$PF" && make tools -j2 >/tmp/setup_tools.log 2>&1 ) \
     || { tail -30 /tmp/setup_tools.log; exit 1; }
@@ -123,17 +139,23 @@ fi
 ok "ferramentas prontas"
 
 # ------------------------------------------------------------------ 4. build
-log "compilando a ROM (primeira vez ~9 min, incremental ~10 s)"
+log "6/8 compilando a ROM (primeira vez ~9 min, incremental ~10 s)"
 ( cd "$PF" && make -j2 MODERN=1 CC1_DAEMONS=2 >/tmp/setup_build.log 2>&1 ) \
   || { grep -m5 "error:" /tmp/setup_build.log; exit 1; }
 ok "ROM: $(sha256sum "$PF/pokefirered_modern.gba" | cut -c1-16) ($(stat -c%s "$PF/pokefirered_modern.gba") B)"
+
+log "6b/8 conferindo os dados da E2 dentro do ROM (nao confia no compilador)"
+python3 "$RAIZ/scripts/firered/verificar_rom.py" --pokefirered "$PF" \
+  >/tmp/setup_verif.log 2>&1 \
+  || { tail -20 /tmp/setup_verif.log; exit 1; }
+ok "$(tail -1 /tmp/setup_verif.log)"
 
 # -------------------------------------------------------------------- 5. mGBA
 if [ "$SEM_MGBA" -eq 0 ]; then
   if [ -f /tmp/mgba-0.10.5/build/mgba_libretro.so ]; then
     ok "core do mGBA ja existe"
   else
-    log "4/4 compilando o core libretro do mGBA ~4 min"
+    log "7/8 compilando o core libretro do mGBA ~4 min"
     python3 -m pip install --break-system-packages -q cmake
     ( cd /tmp
       [ -d mgba-0.10.5 ] || curl -sSL -o mgba.tgz https://github.com/mgba-emu/mgba/archive/refs/tags/0.10.5.tar.gz
@@ -154,7 +176,7 @@ if [ "$SEM_MGBA" -eq 0 ]; then
 fi
 
 # --------------------------------------------------------------- 6. offsets
-log "gerando os offsets de struct do build ARM (0,3 s)"
+log "8/8 gerando os offsets de struct do build ARM (0,3 s)"
 python3 "$RAIZ/scripts/firered/offsets.py" --pokefirered "$PF" --json >/tmp/pf_offsets.json 2>/tmp/setup_offsets.log
 ok "offsets em /tmp/pf_offsets.json"
 [ -s /tmp/setup_offsets.log ] && sed 's/^/    /' /tmp/setup_offsets.log

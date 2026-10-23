@@ -40,8 +40,8 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | Etapa | Título | Estado |
 |---|---|---|
 | **E0** | Baseline: FireRed puro compilado e bootando | **CONCLUÍDA** (2026-10-23) |
-| E1 | Constantes e limites: 1025 espécies | a fazer |
-| E2 | Gerador de dados de espécie | a fazer |
+| E1 | Constantes e limites: 1025 espécies | **CONCLUÍDA** (2026-10-23) |
+| E2 | Gerador de dados de espécie | **CONCLUÍDA** (2026-10-23) |
 | E3 | Tipo Fada + split físico/especial | a fazer |
 | E4 | Movimentos | a fazer |
 | E5 | Habilidades | a fazer |
@@ -464,8 +464,42 @@ Também na 6c: número da dex com 4 dígitos (`No1025`; antes saía truncado a p
 - Nunca confiar em offset de struct vindo do compilador do host **nem** do toolchain com ABI
   diferente: medir no binário que roda.
 
-**Próximo passo:** E2 (gerador de dados de espécie) — hoje as 639 espécies novas existem como
-constantes e nome, mas sem stats/tipos/learnset próprios.
+**Próximo passo:** E2 (feita em 2026-10-23) → E3.
+
+### 2026-10-23 — E2 CONCLUÍDA
+
+**Resultado:** as 639 espécies novas (Gen 4–9) passaram a ter dados de verdade dentro do ROM:
+stats, tipos, catch rate, exp yield, EVs, gênero, ovos, habilidades, cor, entrada de Pokédex
+(categoria/altura/peso/descrição), evolução e golpes por nível. Prova em jogo: ficha do
+`No387 TURTWIG` (HT 1'04", WT 22.5 lbs, descrição nova) e do `No1025 PECHARUNT`.
+
+- ROM: `79891813…` (16 777 216 B); EWRAM 259 338 B (98,93 %), IWRAM 29 592 B (90,31 %)
+- Provas: `reports/firered_e2/` (8 capturas) + `LEIA-ME.md` com o que está confirmado
+- Conferência no binário: `verificar_rom.py` → 639 espécies, 639 entradas de Pokédex,
+  639 learnsets e 217 evoluções **byte a byte** iguais ao gerado
+
+**O que o gerador faz** (`scripts/firered/gen_species_data.py`): lê os headers
+`species_info/*.h` do RHH (`/tmp/fre`) e emite cinco arquivos em
+`src/data/pokemon/*_gen4_9.h` + um bloco de ponteiros de learnset. Aceita `--self-test`
+(20 amostras conferidas contra valores oficiais), `--write` e `--check` (falha se o gerado
+foi editado à mão).
+
+**Números da geração:** 639 espécies; 507 habilidades ausentes no FireRed viraram
+`ABILITY_NONE`; 126 exp yields limitados a 255 (`u8`); 51 evoluções puladas (método que o
+FireRed não implementa); 3123 golpes filtrados (voltam na E4); 48 tipos substituídos (Fada
+entra na E3); 28 descrições substituídas (RHH usa expressão C no texto).
+
+**Pendências cosméticas descobertas em jogo (E7):** a categoria aparece cortada na primeira
+palavra no `REVISION 0` do motor (o dado está completo); `No1025PECHARUNT` sem espaço; os
+contadores “Seen/Owned” estouram a caixa com 4 dígitos.
+
+**Aprendizados de método:** tamanho de struct tem de ser medido **no ROM** (`SpeciesInfo`
+= 28 B e `Evolution` = 8 B por causa do `-mabi=apcs-gnu`; o probe dizia 26 e 6); `"` não
+existe no charmap do FireRed; `nav.py` agora converte vídeo só nos frames com PNG
+(~1500 fps em vez de 100).
+
+**Próximo passo:** E3 (tipo Fada + split físico/especial) — hoje 48 tipos ainda usam
+substituto e os golpes da Gen 4+ estão filtrados.
 
 ## Registro de decisões
 

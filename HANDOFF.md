@@ -20,8 +20,13 @@ como registro histórico.
 - **E1 CONCLUÍDA:** ROM com 1025 espécies (sha256 `b149aa89…`) compila, boota, joga e a
   Pokédex lista de `No001 BULBASAUR` a `No1025 PECHARUNT`. Provas em
   `reports/firered_e1/` (07_lista_1025_pecharunt.png é a definitiva).
-- **Próximo passo:** E2 (`VYK-30`) — gerador de dados de espécie (stats, tipos, learnset
-  para as 639 espécies novas).
+- **E2 CONCLUÍDA:** as 639 espécies novas agora têm stats, tipos, catch/exp, EVs, gênero,
+  ovos, habilidades, cor, entrada de Pokédex (categoria/altura/peso/descrição), evolução e
+  golpes por nível. ROM `79891813…` (16 777 216 B). Prova em jogo: ficha do `No387 TURTWIG`
+  e do `No1025 PECHARUNT` em `reports/firered_e2/`. Conferência byte a byte no binário com
+  `scripts/firered/verificar_rom.py` (639/639/639 + 217 evoluções).
+- **Próximo passo:** E3 (`VYK-31`) — tipo Fada + split físico/especial (48 tipos ainda usam
+  substituto e 3123 golpes da Gen 4+ estão filtrados).
 
 ### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
 

@@ -48,9 +48,22 @@ CAMPOS = {
     "dex_owned": ("struct Pokedex", "owned"),
     "dex_seen": ("struct Pokedex", "seen"),
     "pokemon_size": ("struct Pokemon", None),
+    # E2: tabelas de espécie (usadas por verificar_rom.py)
+    "speciesinfo_size": ("struct SpeciesInfo", None),
+    "pokedexentry_size": ("struct PokedexEntry", None),
+    "evolution_size": ("struct Evolution", None),
+    "si_baseHP": ("struct SpeciesInfo", "baseHP"),
+    "si_types": ("struct SpeciesInfo", "types"),
+    "si_catchRate": ("struct SpeciesInfo", "catchRate"),
+    "si_expYield": ("struct SpeciesInfo", "expYield"),
+    "si_abilities": ("struct SpeciesInfo", "abilities"),
+    "pe_categoryName": ("struct PokedexEntry", "categoryName"),
+    "pe_height": ("struct PokedexEntry", "height"),
+    "pe_description": ("struct PokedexEntry", "description"),
 }
 
 TEMPLATE = """#include "global.h"
+#include "pokedex.h"
 {corpo}
 """
 

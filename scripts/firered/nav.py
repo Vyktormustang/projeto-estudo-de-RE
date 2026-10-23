@@ -33,6 +33,44 @@ def png_write(path, w, h, rgb):
                      + chunk(b"IDAT", zlib.compress(raw, 6)) + chunk(b"IEND", b""))
 
 
+# Tabela de 65536 entradas montada uma vez: converte BGR555 -> 3 bytes RGB.
+_TABELA_RGB = None
+
+
+def _bgr555_para_rgb(buf: bytes, w: int, h: int, pitch: int) -> bytes:
+    """Converte o framebuffer BGR555 do libretro em RGB888.
+
+    O jeito óbvio (loop por pixel) custa ~9 ms/frame, o que derruba o emulador
+    para ~100 fps. Aqui a conversão é feita com `bytes.translate`, que roda em C:
+    separa os bytes baixo/alto, traduz cada um para a máscara de 8 bits e
+    entrelaça os três canais.
+    """
+    global _TABELA_RGB
+    if _TABELA_RGB is None:
+        baixo = bytes((v >> 2) & 7 for v in range(256))
+        alto = bytes((v >> 2) & 7 for v in range(256))
+        _TABELA_RGB = (baixo, alto)
+    if pitch == w * 2:
+        linhas = [buf]
+    else:
+        linhas = [buf[y * pitch:y * pitch + w * 2] for y in range(h)]
+    dados = b"".join(linhas)
+    pares = memoryview(dados).cast("H")          # 1 valor por pixel (little endian)
+    # verde = bits 5-10, vermelho = 11-15, azul = 0-4 -> escalas 255
+    r = bytearray(len(pares))
+    g = bytearray(len(pares))
+    b = bytearray(len(pares))
+    for i, v in enumerate(pares):
+        b[i] = ((v & 31) * 255) // 31
+        g[i] = (((v >> 5) & 63) * 255) // 63
+        r[i] = (((v >> 10) & 31) * 255) // 31
+    saida = bytearray(len(pares) * 3)
+    saida[0::3] = r
+    saida[1::3] = g
+    saida[2::3] = b
+    return bytes(saida)
+
+
 def parse_script(txt):
     """-> lista de (inicio, fim, conjunto_de_botoes)"""
     segs = []
@@ -59,6 +97,29 @@ def botoes_em(segs, f):
         if a <= f <= b:
             s |= st
     return s
+
+
+def caixa_de_texto_bruto(buf, w, h, pitch):
+    """Igual a `caixa_de_texto`, mas lendo o BGR555 cru (sem converter o frame).
+
+    Custa ~30 us/frame contra ~5 ms da conversão RGB -- é o que permite usar
+    `--auto-avancar` em corridas longas (intro + fala do Oak) sem 100 fps.
+    """
+    if not buf:
+        return False
+    y0, y1 = int(h * 0.86), int(h * 0.96)
+    x0, x1 = int(w * 0.10), int(w * 0.90)
+    claro = total = 0
+    for y in range(y0, y1):
+        base = y * pitch
+        for x in range(x0, x1, 2):
+            o = base + x * 2
+            v = buf[o] | (buf[o + 1] << 8)
+            total += 1
+            # limiares equivalentes a 205/255 nos canais de 5/6 bits
+            if (v & 31) > 25 and ((v >> 5) & 63) > 50 and ((v >> 10) & 31) > 25:
+                claro += 1
+    return total > 0 and claro * 100 // total >= 65
 
 
 def caixa_de_texto(rgb, w, h):
@@ -171,23 +232,19 @@ def main():
     lib.retro_serialize.restype = C.c_bool
     lib.retro_unserialize.restype = C.c_bool
 
-    estado = {"botoes": set(), "rgb": None, "w": 0, "h": 0}
+    estado = {"botoes": set(), "rgb": None, "buf": b"", "pitch": 0,
+              "w": 0, "h": 0, "converter": False}
 
     def video(data, w, h, pitch):
         if not data:
             return
-        buf = C.string_at(data, pitch * h)
-        rgb = bytearray(w * h * 3)
-        for y in range(h):
-            base = y * pitch
-            for x in range(w):
-                v = buf[base + x * 2] | (buf[base + x * 2 + 1] << 8)
-                o = (y * w + x) * 3
-                rgb[o] = ((v >> 11) & 31) * 255 // 31
-                rgb[o + 1] = ((v >> 5) & 63) * 255 // 63
-                rgb[o + 2] = (v & 31) * 255 // 31
-        estado["rgb"] = bytes(rgb)
-        estado["w"], estado["h"] = w, h
+        # Converter RGB em Python custa ~9 ms/frame (100 fps). Só vale a pena no
+        # frame em que um PNG vai ser gravado: fora disso o boot fica ~5x mais rapido.
+        estado["w"], estado["h"], estado["pitch"] = w, h, pitch
+        estado["buf"] = C.string_at(data, pitch * h)
+        if not estado["converter"]:
+            return
+        estado["rgb"] = _bgr555_para_rgb(estado["buf"], w, h, pitch)
 
     def istate(port, device, index, bid):
         return 1 if bid in estado["botoes"] else 0
@@ -300,7 +357,8 @@ def main():
                     bot |= {botao}
         if a.auto_avancar:
             # A em pulsos de 6 frames a cada 26, mas so quando ha caixa aberta
-            tem_caixa = caixa_de_texto(estado["rgb"], estado["w"], estado["h"])
+            tem_caixa = caixa_de_texto_bruto(estado["buf"], estado["w"],
+                                             estado["h"], estado["pitch"])
             if tem_caixa:
                 ciclo += 1
                 if ciclo % 26 < 6:
@@ -312,6 +370,8 @@ def main():
                     print(f"campo livre detectado no frame {f}")
                     break
         estado["botoes"] = bot
+        estado["converter"] = (f in marcos or f == a.frames
+                               or bool(a.every and f % a.every == 0))
         lib.retro_run()
         if a.pos and f % a.pos == 0:
             est = ler_estado(lib)
