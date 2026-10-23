@@ -81,6 +81,62 @@ a ROM antiga:
 Corrigidos no repositório (e em `/tmp/tc/bin`). Resultado: rebuild completo caiu de ~8 min para
 **~1 s** quando só um `.c` muda.
 
+
+---
+
+## Investigação do crash — conclusão (2026-10-23, segunda rodada)
+
+### Causa descartada: alocação de heap
+
+`Alloc(NATIONAL_DEX_COUNT * 16)` = 16.400 B **não** derruba a Pokédex. Teste isolado:
+com o `Alloc` reduzido a 32 B o comportamento foi idêntico; com o `Alloc` original e só o
+sanity check desativado, a Pokédex **abre e fecha normalmente**, voltando ao campo
+(`/tmp/tj/001390.png`, build `da328f32`).
+
+### Causa encontrada: `StartMenuPokedexSanityCheck`
+
+```c
+static bool8 StartMenuPokedexSanityCheck(void)
+{
+    if (... == StartMenuPokedexCallback && GetNationalPokedexCount(0) == 0)
+        return FALSE;
+    return TRUE;
+}
+```
+
+`GetNationalPokedexCount(FLAG_GET_SEEN)` percorre **1025** entradas em vez de 386 e, mais
+importante, valida o **anticheat**: o bit só conta se estiver igual em
+`SaveBlock2.pokedex.seen`, `SaveBlock1.seen1` e `SaveBlock1.seen2`. Qualquer inconsistência
+entre os três zera a contagem e o menu **recusa** abrir — sem mensagem, sem crash, o A
+simplesmente não faz nada. Não é bug do port: é o próprio FireRed protegendo a Pokédex.
+
+### Segundo problema: estabilidade dos savestates
+
+Descobri na prática que **savestate do mGBA para esta ROM só é confiável se vier de um boot
+completo ou de uma cadeia inteiramente feita com a mesma ROM**. Estados manipulados por
+ferramenta e reusados em ROMs diferentes (ou derivados em sequência) ficam "mortos": os
+frames saem idênticos em qualquer input, como se o jogo tivesse parado de rodar. Foi a causa
+de várias rodadas perdidas nesta etapa.
+
+Detalhe técnico que explica parte disso: savestate é um **delta do cartucho**, e o mGBA só
+estabiliza o estado depois de algum tempo de execução. Os frames `0f18b626` que se repetem em
+todos os testes vêm de um desses estados mortos.
+
+### Consequência prática (regra para as próximas etapas)
+
+- Toda rodada de teste longo começa com **boot completo** (~2 min com `--pulsos`), não com
+  savestate herdado.
+- Para telas que dependem de Pokédex, o estado tem de ser montado **por inteiro** (bitmaps
+  coerentes nos três lugares) e **depois** validado com `savestate_diff.py` num frame curto.
+- `--pulsos` no `nav.py` é obrigatório em menus: o FireRed lê `JOY_NEW` (borda), então botão
+  segurado por 40 frames conta **uma** vez e às vezes se perde no meio da transição.
+
+### O que continua pendente na E1
+
+1. Fazer o teste end-to-end da lista numérica com estado montado corretamente (um boot só).
+2. Confirmar que a lista mostra `#1025` e rola sem crash.
+3. Só então fechar a E1.
+
 ## Próximo passo
 
 1. Criar um savestate base **deste** build (boot completo, já feito: `/tmp/full2/room.bin`).

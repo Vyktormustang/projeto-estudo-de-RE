@@ -146,6 +146,9 @@ def main():
                     help="DIRECAO: anda nessa direcao; se a posicao nao mudar, aperta B (fuga) e segue")
     ap.add_argument("--parar-livre", action="store_true",
                     help="para assim que a caixa de texto desaparecer")
+    ap.add_argument("--pulsos", default="",
+                    help='frame:BOTAO,... - aperta 6 frames e solta 20. '
+                         'Menus do FireRed ignoram botao segurado; use para A/START.')
     a = ap.parse_args()
     global SBL1_OFF
     if a.map:
@@ -238,6 +241,16 @@ def main():
         modo_af = dict(dir=a.andar_fugir.strip().upper())
         print(f"andar-fugir na direcao {modo_af['dir']}")
 
+    pulsos = []
+    for parte in (a.pulsos or "").split(","):
+        parte = parte.strip()
+        if not parte:
+            continue
+        fr, bt = parte.split(":")
+        pulsos.append((int(fr), BTN[bt.strip().upper()]))
+    if pulsos:
+        print(f"{len(pulsos)} pulso(s): " + ", ".join(f"f{f}:{b}" for f, b in pulsos[:6]))
+
     livre_ha = 0          # frames consecutivos sem caixa de texto
     ciclo = 0
     for f in range(1, a.frames + 1):
@@ -280,6 +293,11 @@ def main():
                     bot = bot | {BTN[modo_af["dir"]]}
                     if f % 200 == 0:
                         print(f"  f{f:5d} ({est['x']},{est['y']}) mapa {est['grupo']}:{est['mapa']}")
+        if pulsos:
+            for inicio, botao in pulsos:
+                # pulso: 6 frames apertado, 20 solto (o menu le JOY_NEW, nao o estado)
+                if inicio <= f < inicio + 6:
+                    bot |= {botao}
         if a.auto_avancar:
             # A em pulsos de 6 frames a cada 26, mas so quando ha caixa aberta
             tem_caixa = caixa_de_texto(estado["rgb"], estado["w"], estado["h"])
