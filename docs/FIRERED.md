@@ -1,5 +1,11 @@
 # FireRed com os Pokémon novos (Gen 1–9) — build próprio
 
+> **⚠️ DOCUMENTO HISTÓRICO (fork pokeemerald-expansion — rejeitado como base).**
+> A entrega descrita aqui existe e funciona, mas **não é o alvo do projeto**.
+> A base oficial agora é o FireRed de verdade (`pret/pokefirered`), com plano em
+> [`docs/PLANO_FIRERED_GEN1-9.md`](PLANO_FIRERED_GEN1-9.md) e etapas no Linear (VYK-28…VYK-37).
+> Mantido como registro: as provas de encontro selvagem continuam válidas como técnica.
+
 **O que é:** um `.gba` que começa em **Pallet Town, Kanto**, com a tela de título
 **“Pokémon FIRE RED Version”**, rodando na engine **pokeemerald-expansion 1.15**
 — ou seja, com as espécies, movimentos, habilidades e mecânicas das **Gens 1 a 9**.

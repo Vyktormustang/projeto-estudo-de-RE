@@ -85,6 +85,22 @@ def caixa_de_texto(rgb, w, h):
 
 IWRAM_BASE = 0x19000
 EWRAM_BASE = 0x21000
+# Offset de gSaveBlock1Ptr dentro da IWRAM (0x03000000). Muda a cada build,
+# por isso o valor abaixo e so fallback: prefira --map <arquivo .map>.
+SBL1_OFF = 0x52D8
+
+
+def offset_sbl1_do_map(caminho):
+    """Le gSaveBlock1Ptr num .map do linker e devolve o offset relativo a IWRAM."""
+    import re
+    txt = Path(caminho).read_text(errors="replace")
+    m = re.search(r"0x0?(3[0-9a-fA-F]{6})\s+gSaveBlock1Ptr\s*$", txt, re.M)
+    if not m:
+        raise SystemExit(f"gSaveBlock1Ptr nao encontrado em {caminho}")
+    addr = int(m.group(1), 16)
+    if not 0x03000000 <= addr < 0x03008000:
+        raise SystemExit(f"gSaveBlock1Ptr fora da IWRAM: 0x{addr:08X}")
+    return addr - 0x03000000
 
 
 def ler_estado(lib):
@@ -95,7 +111,7 @@ def ler_estado(lib):
         return None
     d = b.raw[:tam]
     try:
-        ptr = struct.unpack_from("<I", d, IWRAM_BASE + 0x52D8)[0]
+        ptr = struct.unpack_from("<I", d, IWRAM_BASE + SBL1_OFF)[0]
         if not (0x02000000 <= ptr < 0x02040000):
             return None
         off = EWRAM_BASE + (ptr - 0x02000000)
@@ -120,6 +136,8 @@ def main():
     ap.add_argument("--every", type=int, default=0)
     ap.add_argument("--auto-avancar", type=int, default=0,
                     help="aperta A sozinho ENQUANTO houver caixa de texto; limite de frames")
+    ap.add_argument("--map", default="",
+                    help="arquivo .map do linker; resolve o endereco de gSaveBlock1Ptr")
     ap.add_argument("--pos", type=int, default=0,
                     help="a cada N frames imprime posicao (x,y) e mapa lidos da RAM")
     ap.add_argument("--ir-ate", default="",
@@ -129,6 +147,10 @@ def main():
     ap.add_argument("--parar-livre", action="store_true",
                     help="para assim que a caixa de texto desaparecer")
     a = ap.parse_args()
+    global SBL1_OFF
+    if a.map:
+        SBL1_OFF = offset_sbl1_do_map(a.map)
+        print(f"gSaveBlock1Ptr: offset IWRAM 0x{SBL1_OFF:04X} (de {a.map})")
 
     lib = C.CDLL(a.core)
     for nome, tipos in (("retro_set_environment", [C.c_void_p]),

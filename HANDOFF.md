@@ -7,6 +7,23 @@
 
 ---
 
+## 0.0 ⚠️ Direção atual (2026-10-23) — leia antes do resto
+
+O trabalho agora é: **FireRed de verdade (`pret/pokefirered`) + as 9 gerações**, alterando
+**só o necessário**. A ROM de expansão (seções abaixo) foi **rejeitada como base** e fica
+como registro histórico.
+
+- **Plano de etapas:** [`docs/PLANO_FIRERED_GEN1-9.md`](docs/PLANO_FIRERED_GEN1-9.md)
+- **Linear:** projeto *FireRed Gen 1-9 (base pret/pokefirered)*, etapas `VYK-28` … `VYK-37`
+- **E0 concluída:** base pura compila (sha256 `32e26d4f…`), boota, escadas e portas
+  funcionam — provas em `reports/firered_base/` e `docs/PLANO_FIRERED_GEN1-9.md`
+- **Próximo passo:** E1 (`VYK-29`) — 1025 constantes de espécie + limites.
+
+Ambiente: `/tmp` é apagado entre sessões. Reclonar `pret/pokefirered` e refazer o toolchain
+antes de continuar. Build: `make -j2 MODERN=1 CC1_DAEMONS=2` (~8 min).
+
+---
+
 ## 0. Estado resumido (1 parágrafo)
 Fases 0–6 rodadas: ROM identificada/censada, callgraph, decoder de texto, driver
 headless mGBA, mochila mapeada (slot 0 @ `0x020258B8`, `{id:u16,qty:u16}`, 4 B/slot).
