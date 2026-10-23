@@ -312,6 +312,82 @@ def conferir(rom: bytes, simbolos: dict[str, int], especies: dict[str, dict],
 # ---------------------------------------------------------------------------
 # self-test (não precisa de ROM nem de toolchain)
 # ---------------------------------------------------------------------------
+def conferir_e3(rom: bytes, simbolos: dict[str, int], numeros: dict[str, int],
+                constantes: dict[str, int], poke: Path) -> list[str]:
+    """Confere no ROM: tabela de efetividade, tipos Fada e categorias de golpe."""
+    falhas: list[str] = []
+
+    # --- tabela de tipos
+    if "gTypeEffectiveness" not in simbolos:
+        return ["gTypeEffectiveness fora do .map"]
+    tam = 0
+    m = re.search(r"#define TYPE_EFFECT_TABLE_SIZE (\d+)",
+                  (poke / "include/battle_main.h").read_text())
+    if m:
+        tam = int(m.group(1))
+    if not tam:
+        return ["TYPE_EFFECT_TABLE_SIZE nao encontrado"]
+
+    base = simbolos["gTypeEffectiveness"] - 0x08000000
+    regras: dict[tuple[int, int], int] = {}
+    for i in range(0, tam, 3):
+        atk, dfn, mult = rom[base + i], rom[base + i + 1], rom[base + i + 2]
+        if atk in (constantes.get("TYPE_ENDTABLE", 0xFF),):
+            break
+        regras[(atk, dfn)] = mult
+
+    fada = constantes.get("TYPE_FAIRY", 18)
+    esperado = {
+        (fada, constantes["TYPE_DRAGON"]): 20,
+        (fada, constantes["TYPE_FIGHTING"]): 20,
+        (fada, constantes["TYPE_DARK"]): 20,
+        (fada, constantes["TYPE_STEEL"]): 5,
+        (fada, constantes["TYPE_POISON"]): 5,
+        (fada, constantes["TYPE_FIRE"]): 5,
+        (constantes["TYPE_DRAGON"], fada): 0,
+        (constantes["TYPE_POISON"], fada): 20,
+        (constantes["TYPE_STEEL"], fada): 20,
+        (constantes["TYPE_FIGHTING"], fada): 5,
+        (constantes["TYPE_BUG"], fada): 5,
+        (constantes["TYPE_DARK"], fada): 5,
+    }
+    for chave, valor in esperado.items():
+        if regras.get(chave) != valor:
+            falhas.append(f"efetividade {chave} = {regras.get(chave)}, esperava {valor}")
+
+    # --- especies com tipo Fada
+    base_esp = simbolos["gSpeciesInfo"] - 0x08000000
+    com_fada = []
+    for nome, idx in numeros.items():
+        o = base_esp + TAM_ESPECIE * idx
+        if rom[o + OFF_TIPOS] == fada or rom[o + OFF_TIPOS + 1] == fada:
+            com_fada.append(nome)
+    if len(com_fada) < 30:
+        falhas.append(f"so {len(com_fada)} especies com TYPE_FAIRY no ROM")
+
+    # --- categorias de golpe
+    if "gMoveCategories" in simbolos:
+        o = simbolos["gMoveCategories"] - 0x08000000
+        categorias = rom[o:o + constantes.get("MOVES_COUNT", 355)]
+        esperado_cat = {"MOVE_POUND": 0, "MOVE_BODY_SLAM": 0, "MOVE_FLAMETHROWER": 1,
+                        "MOVE_THUNDERBOLT": 1, "MOVE_GROWL": 2, "MOVE_SWORDS_DANCE": 2}
+        for golpe, valor in esperado_cat.items():
+            if golpe not in constantes:
+                falhas.append(f"{golpe} fora de moves.h")
+            elif categorias[constantes[golpe]] != valor:
+                falhas.append(f"{golpe}: categoria {categorias[constantes[golpe]]} != {valor}")
+        fisicos = sum(1 for c in categorias if c == 0)
+        if not 80 <= fisicos <= 200:
+            falhas.append(f"{fisicos} golpes fisicos (esperava 80..200)")
+    else:
+        falhas.append("gMoveCategories fora do .map")
+
+    if not falhas:
+        print(f"  E3 ok: {len(esperado)} regras de Fada, {len(com_fada)} especies com Fada, "
+              "categorias de golpe no ROM")
+    return falhas
+
+
 def self_test() -> int:
     """Monta um ROM sintético e confere que o verificador acerta e detecta erro."""
     global CHARMAP
@@ -435,6 +511,8 @@ def main() -> int:
           f"{len(evolucoes)} evoluções")
     rel = conferir(rom, simbolos, especies, dex, learnsets, evolucoes, numeros,
                    constantes, amostras=a.amostras)
+    if (poke / "src/data/battle_moves_category.h").exists():
+        rel["falhas"] += conferir_e3(rom, simbolos, numeros, constantes, poke)
 
     if a.json:
         print(json.dumps(dict(falhas=rel["falhas"], conferidos=rel["conferidos"]),

@@ -25,8 +25,16 @@ como registro histórico.
   golpes por nível. ROM `79891813…` (16 777 216 B). Prova em jogo: ficha do `No387 TURTWIG`
   e do `No1025 PECHARUNT` em `reports/firered_e2/`. Conferência byte a byte no binário com
   `scripts/firered/verificar_rom.py` (639/639/639 + 217 evoluções).
-- **Próximo passo:** E3 (`VYK-31`) — tipo Fada + split físico/especial (48 tipos ainda usam
-  substituto e 3123 golpes da Gen 4+ estão filtrados).
+- **E3 CONCLUÍDA:** o jogo agora tem o **tipo Fada** (19º tipo, 12 regras da Gen 6: Fada×Dragão
+  2×, Fada×Aço 0,5×, Dragão×Fada 0×) e o **split físico/especial por golpe** — antes o FireRed
+  escolhia a stat pelo *tipo* do golpe. ROM `748dbec7…` (16 777 216 B). Provas em
+  `reports/firered_e3/`: ficha com `TYPE/FAIRY`, menu de golpes com `TYPE/FAIRY`, “It's super
+  effective!” contra Dragão, “It doesn't affect” de Dragão em Fada, batalha de Kanto intacta.
+  O split foi medido em batalha: dois golpes de 40 BP do mesmo tipo no mesmo alvo deram **29**
+  (físico) e **38** (especial) — `scripts/firered/prova_batalha_e3.py` monta/desfaz a ROM de prova.
+- **Próximo passo:** E4 (`VYK-32`) — movimentos: 3123 golpes filtrados voltam, ~150 com efeito
+  próprio. Estratégia em três ondas (dados → motor por classe → casos especiais) descrita em
+  `docs/PLANO_FIRERED_GEN1-9.md`.
 
 ### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
 

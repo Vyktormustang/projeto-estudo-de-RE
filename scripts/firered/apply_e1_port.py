@@ -333,11 +333,74 @@ def aplicar(poke: Path, check: bool) -> int:
     return 0
 
 
+def self_test() -> int:
+    """Testa as três transformações de texto puras (sem tocar no clone)."""
+    # 1) OLD_UNOWN: o bloco macro inteiro sai, o resto fica
+    entrada = (
+        "[SPECIES_UNOWN] =\n"
+        "{\n"
+        "#if P_FAMILY_UNOWN\n"
+        "    .foo = 1,\n"
+        "#endif\n"
+        "},\n"
+        "#define OLD_UNOWN_SPECIES_INFO \\\n"
+        "    [SPECIES_UNOWN_A] = { .bar = 2 },\n"
+        "    [SPECIES_UNOWN_B] = { .bar = 3 }\n"
+        "#define OUTRA_COISA 1\n"
+        "fim\n")
+    saida = remover_macro_old_unown(entrada)
+    assert "OLD_UNOWN" not in saida, saida
+    assert "[SPECIES_UNOWN] =" in saida and "fim" in saida, saida
+    assert "#define OUTRA_COISA 1" in saida, "comeu a linha seguinte ao bloco"
+    assert saida.count("[SPECIES_UNOWN_A]") == 0
+
+    # 2) remover_linhas conta o que removeu
+    texto, n = remover_linhas("a\nREMOVER_ME\nb\nREMOVER_ME\nc", "REMOVER_ME")
+    assert n == 2 and texto == "a\nb\nc", (n, texto)
+    texto, n = remover_linhas("a\nb", "NAO_EXISTE")
+    assert n == 0 and texto == "a\nb"
+
+    # 3) dex de 4 dígitos: a função antiga sai e a nova formata 1025 certo
+    fonte = (
+        "static void DexScreen_PrintNum3LeadingZeroes(u8 windowId, u8 fontId, u16 num, u8 x, u8 y, u8 colorIdx)\n"
+        "{\n"
+        "    u8 buff[4];\n"
+        "    buff[0] = (num / 100) + CHAR_0;\n"
+        "    buff[1] = ((num %= 100) / 10) + CHAR_0;\n"
+        "    buff[2] = (num % 10) + CHAR_0;\n"
+        "    buff[3] = EOS;\n"
+        "    DexScreen_AddTextPrinterParameterized(windowId, fontId, buff, x, y, colorIdx);\n"
+        "}\n")
+    nova = numero_dex_4_digitos(fonte)
+    assert "num >= 1000" in nova and "buff[5]" in nova
+    # mesma conta do C novo: abaixo de 1000 tem de dar EXATAMENTE o que a função
+    # antiga dava (3 dígitos com zeros à esquerda); a partir de 1000 ganha o 4º
+    def formata(num):
+        b = []
+        if num >= 1000:
+            b.append(num // 1000)
+        b += [(num // 100) % 10, (num // 10) % 10, num % 10]
+        return "".join(str(d) for d in b)
+
+    def formata_antiga(num):
+        return f"{num % 1000:03d}"
+
+    for n in (1, 25, 99, 100, 386, 999):
+        assert formata(n) == formata_antiga(n), (n, formata(n), formata_antiga(n))
+    assert formata(1000) == "1000" and formata(1025) == "1025", formata(1025)
+
+    print("self-test ok: OLD_UNOWN, remover_linhas e número de dex com 4 dígitos")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pokefirered", default="/tmp/pokefirered")
     ap.add_argument("--check", action="store_true", help="falha se sobrar referência a OLD_UNOWN")
+    ap.add_argument("--self-test", dest="self_test", action="store_true")
     a = ap.parse_args()
+    if a.self_test:
+        return self_test()
     poke = Path(a.pokefirered)
     if not (poke / "Makefile").exists():
         print(f"não parece um clone do pokefirered: {poke}")

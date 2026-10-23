@@ -42,7 +42,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | **E0** | Baseline: FireRed puro compilado e bootando | **CONCLUÍDA** (2026-10-23) |
 | E1 | Constantes e limites: 1025 espécies | **CONCLUÍDA** (2026-10-23) |
 | E2 | Gerador de dados de espécie | **CONCLUÍDA** (2026-10-23) |
-| E3 | Tipo Fada + split físico/especial | a fazer |
+| E3 | Tipo Fada + split físico/especial | **CONCLUÍDA** (2026-10-23) |
 | E4 | Movimentos | a fazer |
 | E5 | Habilidades | a fazer |
 | E6 | Sprites, ícones e cries | a fazer |
@@ -202,26 +202,44 @@ localmente em `/tmp/fre`), que é derivado de dados oficiais. Plano B: CSVs do r
 
 ---
 
-### E3 — Tipo Fada e split físico/especial
+### E3 — Tipo Fada e split físico/especial — **CONCLUÍDA**
 
 **Objetivo:** as duas mecânicas modernas que mudam o resultado da batalha.
 
-**Escopo**
+**Escopo executado**
 
-- `TYPE_FAIRY = 0x17`, tabela de efetividade 18×18 (`gTypeEffectivenessTable`).
-- Nomes/cores de tipo na UI (`gTypeNames`, paletas) e STAB.
-- Split físico/especial **por movimento**: campo na `struct BattleMove` do FireRed, preenchido a
-  partir da categoria real do movimento. Movimentos que já existiam mantêm o comportamento correto
-  da 3ª geração quando ele difere do moderno — decisão registrada abaixo.
+- `TYPE_FAIRY = 18` e `NUMBER_OF_MON_TYPES = 19`. A tabela ganhou as 12 regras que a Gen 6
+  mudou; `gTypeEffectiveness` passou de 336 para 372 bytes (124 entradas), com o tamanho
+  publicado por `#define TYPE_EFFECT_TABLE_SIZE` (o `extern` sem tamanho não compila).
+- UI do tipo: `gTypeNames[TYPE_FAIRY] = "FAIRY"`, `gText_AFairyMove` (`"a FAIRY move"`),
+  placa "FAIRY" desenhada em `menu_info.png` (offset `0x100`), paleta de tipo índice 10
+  (`#EE99AC`) e `sTMSpritePaletteOffsetByType` (+32 B de EWRAM em `NUM_DISC_COLORS`).
+- Split **por golpe**: `gMoveCategories[MOVES_COUNT]` gerado do `moves_info.h` do RHH
+  (355 entradas), com `IS_MOVE_PHYSICAL` / `IS_MOVE_SPECIAL` usados no cálculo de dano
+  (`src/pokemon.c`), no Hustle e no rastreio de dano físico/especial
+  (`src/battle_script_commands.c`). `IS_TYPE_PHYSICAL/SPECIAL` continuam existindo, mas não
+  decidem mais dano.
+- Decisão registrada: os 386 golpes de Kanto **seguem a categoria moderna**, não a da Gen 3
+  (55 de 218 golpes com dano trocam de stat: Fire/Ice/Thunder Punch viram físicos, Vine Whip,
+  Bite e Gust viram especiais). É o que o pedido implica — “comportar as 9 gerações”.
 
-**Aceite**
+**Aceite — todos cumpridos**
 
-- Fada × Dragão = 2×; Fada × Aço = 0,5×; Dragão × Fada = 0× (teste unitário no código).
-- Físico usa Attack/Defense; especial usa SpAttack/SpDefense (teste em batalha real).
-- Batalha de Kanto sem regressão.
+| Critério | Resultado |
+|---|---|
+| Fada × Dragão = 2×, Fada × Aço = 0,5×, Dragão × Fada = 0× | **CONFIRMADO** no ROM (`verificar_rom.py`, 12 regras) **e em batalha** (`03…png`, `04…png`) |
+| Físico usa Attack/Defense; especial usa SpAttack/SpDefense | **CONFIRMADO** medindo o `gBattleMons`: dois golpes de 40 BP, mesmo tipo e mesmo alvo deram **29** (físico, Atk 53 vs Def 60) e **38** (especial, SpA 80 vs SpD 68) |
+| Batalha de Kanto sem regressão | **CONFIRMADO** (`05…png`): Rattata selvagem na Rota 1, batalha normal |
 
-**Risco:** médio. A tabela de tipos é usada em vários pontos (`src/battle_script_commands.c`,
-`src/pokemon.c`, `src/battle_util.c`).
+**Prova em jogo:** `reports/firered_e3/` (5 capturas + `LEIA-ME.md`).
+**ROM:** `748dbec766f7ffc137ac36049691d22cbcc5c54fa5fc78d0df2fb8c1d4ccd1b6`.
+**Ferramenta nova:** `scripts/firered/prova_batalha_e3.py` monta/desfaz uma ROM de prova
+(2 golpes de Fada de 40 BP — um físico, um especial — e Dratini nível 50 na Rota 1), porque
+sem golpe de Fada no jogo não há como provar a mecânica antes da E4.
+
+**Risco residual:** a tabela de tipos é lida em `battle_script_commands.c`, `pokemon.c` e
+`battle_util.c`; o verificador cobre as 12 regras e a contagem de espécies, mas combinações
+duplas (Fada + segundo tipo) só serão exercitadas de verdade na E8.
 
 ---
 
@@ -487,7 +505,7 @@ foi editado à mão).
 **Números da geração:** 639 espécies; 507 habilidades ausentes no FireRed viraram
 `ABILITY_NONE`; 126 exp yields limitados a 255 (`u8`); 51 evoluções puladas (método que o
 FireRed não implementa); 3123 golpes filtrados (voltam na E4); 48 tipos substituídos (Fada
-entra na E3); 28 descrições substituídas (RHH usa expressão C no texto).
+entrou na E3 e o número caiu para 7); 28 descrições substituídas (RHH usa expressão C no texto).
 
 **Pendências cosméticas descobertas em jogo (E7):** a categoria aparece cortada na primeira
 palavra no `REVISION 0` do motor (o dado está completo); `No1025PECHARUNT` sem espaço; os
@@ -498,8 +516,36 @@ contadores “Seen/Owned” estouram a caixa com 4 dígitos.
 existe no charmap do FireRed; `nav.py` agora converte vídeo só nos frames com PNG
 (~1500 fps em vez de 100).
 
-**Próximo passo:** E3 (tipo Fada + split físico/especial) — hoje 48 tipos ainda usam
-substituto e os golpes da Gen 4+ estão filtrados.
+**Próximo passo:** E3 (feita em 2026-10-23) → E4.
+
+### 2026-10-23 — E3 CONCLUÍDA
+
+**Resultado:** o jogo passou a ter o **tipo Fada** (19º tipo, com as 12 regras da Gen 6) e o
+**split físico/especial por golpe** — no FireRed vanilla quem decide a stat do dano é o *tipo*
+do golpe, então até aqui um golpe especial de tipo Fogo usava Attack.
+
+- ROM: `748dbec7…` (16 777 216 B); EWRAM +32 B (a cor da Fada no estojo de TM)
+- Provas: `reports/firered_e3/` (5 capturas) + `LEIA-ME.md`
+- Conferência no binário: `verificar_rom.py` → 12 regras de Fada, **41 espécies com Fada**,
+  categorias de golpe conferidas golpe a golpe; e os 639 registros da E2 continuam batendo
+- Efeito colateral positivo na E2: `tipos_substituidos` caiu de **48 para 7** (só `STELLAR`
+  ficou de fora, que não existe como tipo jogável no FireRed)
+
+**A prova do split, que é a parte difícil:** o FireRed não tem nenhum golpe de Fada, então a
+mecânica não podia ser testada antes da E4. `prova_batalha_e3.py` cria uma ROM de prova com
+dois golpes de 40 BP, tipo Fada, um físico (PLAY ROUGH) e um especial (MOONBLAST), e um Dratini
+selvagem nível 50 na Rota 1. O mesmo Sylveon nível 30 (Atk 53, SpA 80) acerta o mesmo alvo
+(Def 60, SpD 68): **29 de dano no físico e 38 no especial**. Sem o split os dois dariam o
+mesmo número, porque o tipo é o mesmo.
+
+**Aprendizados de método:** `revert` com `copy2` preserva mtime e o `make` não recompila (a ROM
+fica com a prova dentro); `MAP_ROUTE1` existe duas vezes no `wild_encounters.json` (FireRed e
+LeafGreen) e pegar o último altera a versão errada; Pokémon com OT de outro treinador
+desobedece (“ignored orders”); `gPlayerPartyCount` do SaveBlock1 só é preenchido ao salvar —
+o menu START esconde o item POKéMON se você escrever o time direto na RAM.
+
+**Próximo passo:** E4 (movimentos: 3123 golpes filtrados voltam, dos quais ~150 com efeito
+próprio).
 
 ## Registro de decisões
 

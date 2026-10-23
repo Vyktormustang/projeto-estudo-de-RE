@@ -55,9 +55,10 @@ TIPOS_FIRERED = {
     "TYPE_GROUND", "TYPE_ROCK", "TYPE_BUG", "TYPE_GHOST", "TYPE_STEEL",
     "TYPE_MYSTERY", "TYPE_FIRE", "TYPE_WATER", "TYPE_GRASS", "TYPE_ELECTRIC",
     "TYPE_PSYCHIC", "TYPE_ICE", "TYPE_DRAGON", "TYPE_DARK",
+    "TYPE_FAIRY",      # E3: existe no motor a partir do port da E3
 }
-# tipos que ainda não existem no FireRed (E3 traz Fada)
-TIPOS_SUBSTITUTOS = {"TYPE_FAIRY": "TYPE_NORMAL", "TYPE_STELLAR": "TYPE_NORMAL"}
+# tipos que o FireRed (nem com a E3) tem: STELLAR é exclusivo do Terapagos
+TIPOS_SUBSTITUTOS = {"TYPE_STELLAR": "TYPE_NORMAL"}
 
 EVO_SUPORTADAS = {
     "EVO_FRIENDSHIP", "EVO_FRIENDSHIP_DAY", "EVO_FRIENDSHIP_NIGHT",
@@ -1081,7 +1082,7 @@ AMOSTRAS = {
                    catch=45, exp=64, evs={"HP": 1}, egg=15, color="BODY_COLOR_BROWN"),
     "DECIDUEYE": dict(stats=(78, 107, 75, 70, 100, 100), types=("TYPE_GRASS", "TYPE_GHOST"),
                       catch=45, exp=265, evs={"Attack": 3}, egg=15, color="BODY_COLOR_BROWN"),
-    "MIMIKYU": dict(stats=(55, 90, 80, 96, 50, 105), types=("TYPE_GHOST", "TYPE_NORMAL"),
+    "MIMIKYU": dict(stats=(55, 90, 80, 96, 50, 105), types=("TYPE_GHOST", "TYPE_FAIRY"),
                     catch=45, exp=167, evs={"SpDefense": 2}, egg=20, color="BODY_COLOR_YELLOW"),
     "GROOKEY": dict(stats=(50, 65, 50, 65, 40, 40), types=("TYPE_GRASS", "TYPE_GRASS"),
                     catch=45, exp=62, evs={"Attack": 1}, egg=20, color="BODY_COLOR_GREEN"),
@@ -1093,6 +1094,10 @@ AMOSTRAS = {
                        catch=45, exp=62, evs={"Speed": 1}, egg=20, color="BODY_COLOR_GREEN"),
     "MEOWSCARADA": dict(stats=(76, 110, 70, 123, 81, 70), types=("TYPE_GRASS", "TYPE_DARK"),
                         catch=45, exp=265, evs={"Speed": 3}, egg=20, color="BODY_COLOR_GREEN"),
+    # E3: Fada deixou de ser substituida por Normal
+    "FLORGES_RED": dict(stats=(78, 65, 68, 75, 112, 154), types=("TYPE_FAIRY", "TYPE_FAIRY"),
+                        catch=45, exp=276, evs={"SpDefense": 3}, egg=20,
+                        color="BODY_COLOR_WHITE"),
     "PECHARUNT": dict(stats=(88, 88, 160, 88, 88, 88), types=("TYPE_POISON", "TYPE_GHOST"),
                       catch=3, exp=300, evs={"Defense": 3}, egg=20, color="BODY_COLOR_PURPLE"),
 }

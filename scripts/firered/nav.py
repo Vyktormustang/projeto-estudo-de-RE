@@ -149,6 +149,7 @@ EWRAM_BASE = 0x21000
 # Offset de gSaveBlock1Ptr dentro da IWRAM (0x03000000). Muda a cada build,
 # por isso o valor abaixo e so fallback: prefira --map <arquivo .map>.
 SBL1_OFF = 0x52D8
+BATALHA_OFF = 0      # gBattleMons (EWRAM) -- resolvido do .map
 
 
 def offset_sbl1_do_map(caminho):
@@ -162,6 +163,52 @@ def offset_sbl1_do_map(caminho):
     if not 0x03000000 <= addr < 0x03008000:
         raise SystemExit(f"gSaveBlock1Ptr fora da IWRAM: 0x{addr:08X}")
     return addr - 0x03000000
+
+
+def simbolo_em_memoria(mapa, nome):
+    """Offset do simbolo dentro do savestate (IWRAM 0x19000 / EWRAM 0x21000)."""
+    import re
+    txt = Path(mapa).read_text(errors="replace")
+    m = re.search(r"0x0?([0-9a-fA-F]{8})\s+" + re.escape(nome) + r"\s*$", txt, re.M)
+    if not m:
+        raise SystemExit(f"simbolo {nome} nao encontrado em {mapa}")
+    addr = int(m.group(1), 16)
+    if 0x03000000 <= addr < 0x03008000:
+        return IWRAM_BASE + (addr - 0x03000000)
+    if 0x02000000 <= addr < 0x02040000:
+        return EWRAM_BASE + (addr - 0x02000000)
+    raise SystemExit(f"{nome} em 0x{addr:08X}: regiao nao mapeada")
+
+
+TAM_BATTLEMON = 0x58
+
+
+def ler_batalha(lib, off):
+    """Le gBattleMons[0..1]: especie, nivel, HP, stats usadas e tipos."""
+    tam = lib.retro_serialize_size()
+    b = C.create_string_buffer(tam)
+    if not lib.retro_serialize(C.cast(b, C.c_void_p), tam):
+        return []
+    d = b.raw[:tam]
+    saida = []
+    for i in range(2):
+        o = off + i * TAM_BATTLEMON
+        esp, atk, dfs, vel, satk, sdef = struct.unpack_from("<6H", d, o)
+        hp, = struct.unpack_from("<H", d, o + 0x28)
+        nivel, = struct.unpack_from("<B", d, o + 0x2A)
+        maxhp, = struct.unpack_from("<H", d, o + 0x2C)
+        t1, t2 = d[o + 0x21], d[o + 0x22]
+        saida.append(dict(esp=esp, nivel=nivel, hp=hp, maxhp=maxhp, atk=atk,
+                          dfs=dfs, satk=satk, sdef=sdef, tipos=(t1, t2)))
+    return saida
+
+
+def ler_u32(lib, off):
+    tam = lib.retro_serialize_size()
+    b = C.create_string_buffer(tam)
+    if not lib.retro_serialize(C.cast(b, C.c_void_p), tam):
+        return 0
+    return struct.unpack_from("<I", b.raw[:tam], off)[0]
 
 
 def ler_estado(lib):
@@ -201,20 +248,33 @@ def main():
                     help="arquivo .map do linker; resolve o endereco de gSaveBlock1Ptr")
     ap.add_argument("--pos", type=int, default=0,
                     help="a cada N frames imprime posicao (x,y) e mapa lidos da RAM")
+    ap.add_argument("--batalha", type=int, default=0,
+                    help="a cada N frames imprime os dois gBattleMons (HP, stats)")
     ap.add_argument("--ir-ate", default="",
                     help="navegacao fechada ate um destino em linha reta: x,y,direcao(UP/DOWN/LEFT/RIGHT)")
     ap.add_argument("--andar-fugir", default="",
                     help="DIRECAO: anda nessa direcao; se a posicao nao mudar, aperta B (fuga) e segue")
+    ap.add_argument("--voltas", type=int, default=1,
+                    help="quantas vezes repete a rota (para achar encontro na grama)")
+    ap.add_argument("--parar-quando", default="",
+                    help="NOME de um u32 no .map: para quando o valor for != 0")
+    ap.add_argument("--rota", default="",
+                    help='pontos "x,y" ou "grupo:mapa,x,y" separados por ";" - anda em '
+                         'linha reta com realimentacao da posicao (atravessa portas e '
+                         'mapas; o ponto com mapa espera a transicao terminar)')
     ap.add_argument("--parar-livre", action="store_true",
                     help="para assim que a caixa de texto desaparecer")
     ap.add_argument("--pulsos", default="",
-                    help='frame:BOTAO,... - aperta 6 frames e solta 20. '
+                    help='frame:BOTAO[:duracao],... - aperta N frames (padrao 6) e solta 20. '
                          'Menus do FireRed ignoram botao segurado; use para A/START.')
     a = ap.parse_args()
-    global SBL1_OFF
+    global SBL1_OFF, BATALHA_OFF
     if a.map:
         SBL1_OFF = offset_sbl1_do_map(a.map)
         print(f"gSaveBlock1Ptr: offset IWRAM 0x{SBL1_OFF:04X} (de {a.map})")
+        if a.batalha:
+            BATALHA_OFF = simbolo_em_memoria(Path(a.map), "gBattleMons")
+            print(f"gBattleMons: offset {BATALHA_OFF:#07x} (de {a.map})")
 
     lib = C.CDLL(a.core)
     for nome, tipos in (("retro_set_environment", [C.c_void_p]),
@@ -298,15 +358,62 @@ def main():
         modo_af = dict(dir=a.andar_fugir.strip().upper())
         print(f"andar-fugir na direcao {modo_af['dir']}")
 
-    pulsos = []
+    pulsos = []   # (frame, botão, duração)
     for parte in (a.pulsos or "").split(","):
         parte = parte.strip()
         if not parte:
             continue
-        fr, bt = parte.split(":")
-        pulsos.append((int(fr), BTN[bt.strip().upper()]))
+        campos = parte.split(":")
+        if len(campos) not in (2, 3):
+            raise SystemExit(f"pulso inválido: {parte!r} (use frame:BOTAO[:duracao])")
+        pulsos.append((int(campos[0]), BTN[campos[1].strip().upper()],
+                       int(campos[2]) if len(campos) == 3 else 6))
     if pulsos:
-        print(f"{len(pulsos)} pulso(s): " + ", ".join(f"f{f}:{b}" for f, b in pulsos[:6]))
+        print(f"{len(pulsos)} pulso(s): " + ", ".join(f"f{f}:{b}x{d}" for f, b, d in pulsos[:6]))
+
+    parar_sym = None
+    if a.parar_quando:
+        parar_sym = simbolo_em_memoria(Path(a.map), a.parar_quando) if a.map else None
+        if parar_sym is None:
+            raise SystemExit("--parar-quando precisa de --map")
+        print(f"--parar-quando {a.parar_quando} em 0x{parar_sym:05X} (savestate)")
+
+    erro_rota = None
+    rota = None
+    if a.rota:
+        pontos = []
+        for parte in a.rota.split(";"):
+            parte = parte.strip()
+            if not parte:
+                continue
+            if ":" in parte and "," not in parte:
+                # "grupo:mapa" sozinho = chegar em qualquer (x,y) desse mapa
+                g, m = parte.split(":")
+                pontos.append((int(g), int(m), None, None))
+                continue
+            campos = parte.split(",")
+            if len(campos) == 4:      # g:m,x,y,DIR -> ao chegar, empurra DIR
+                gm, px, py, dirn = campos
+                g, m = gm.split(":")
+                pontos.append((int(g), int(m), int(px), int(py), dirn.strip().upper()))
+                continue
+            if len(campos) == 3:
+                gm, px, py = campos
+                g, m = gm.split(":")
+                pontos.append((int(g), int(m), int(px), int(py)))
+            elif len(campos) == 2:
+                pontos.append((None, None, int(campos[0]), int(campos[1])))
+            else:
+                raise SystemExit(f"ponto de rota invalido: {parte!r}")
+        rota = {"pontos": pontos, "i": 0, "parado": 0, "ult": None, "espera": 0}
+        def _nome(p):
+            if p[0] is None:
+                return f"({p[2]},{p[3]})"
+            if p[2] is None:
+                return f"{p[0]}:{p[1]}"
+            extra = f" +{p[4]}" if len(p) > 4 else ""
+            return f"{p[0]}:{p[1]}({p[2]},{p[3]}){extra}"
+        print("rota:", " -> ".join(_nome(p) for p in pontos))
 
     livre_ha = 0          # frames consecutivos sem caixa de texto
     ciclo = 0
@@ -327,6 +434,79 @@ def main():
                 bot = bot | ({BTN[destino["dir"]]} if ok else set())
                 if f % 20 == 0:
                     print(f"  frame {f:5d}: ({est['x']},{est['y']}) mapa {est['grupo']}:{est['mapa']}")
+        if rota:
+            est = ler_estado(lib)
+            if est and rota.get("empurrar"):
+                d, n = rota["empurrar"]
+                bot = bot | {BTN[d]}
+                rota["empurrar"] = [d, n - 1] if n > 1 else None
+                est = None      # nao mexe na rota enquanto empurra
+            if est and rota["i"] < len(rota["pontos"]):
+                alvo = rota["pontos"][rota["i"]]
+                gm_ok = alvo[0] is None or (est["grupo"], est["mapa"]) == (alvo[0], alvo[1])
+                pos_ok = alvo[2] is None or (est["x"], est["y"]) == (alvo[2], alvo[3])
+                if gm_ok and pos_ok:
+                    print(f"  rota: ponto {rota['i'] + 1}/{len(rota['pontos'])} "
+                          f"({est['x']},{est['y']}) mapa {est['grupo']}:{est['mapa']} f{f}")
+                    rota["i"] += 1
+                    rota["parado"] = 0
+                    rota["ult"] = None
+                    rota["espera"] = 8     # deixa a transicao de mapa terminar
+                    if len(alvo) > 4:
+                        rota["empurrar"] = [alvo[4], 40]
+                elif not gm_ok:
+                    # ainda na transicao de mapa: nao anda, so espera
+                    rota["espera2"] = rota.get("espera2", 0) + 1
+                    if rota["espera2"] > 900:
+                        erro_rota = (f"mapa {est['grupo']}:{est['mapa']} nao virou "
+                                     f"{alvo[0]}:{alvo[1]} em 900 frames")
+                        break
+                else:
+                    rota["espera2"] = 0
+                    dx, dy = alvo[2] - est["x"], alvo[3] - est["y"]
+                    if rota["espera"] > 0:
+                        rota["espera"] -= 1
+                    elif dx == 0 and dy == 0:
+                        pass
+                    else:
+                        # trecho torto: anda um eixo por vez (x primeiro)
+                        if dx:
+                            d = "RIGHT" if dx > 0 else "LEFT"
+                        else:
+                            d = "DOWN" if dy > 0 else "UP"
+                        bot = bot | {BTN[d]}
+                        if (est["x"], est["y"]) == rota["ult"]:
+                            rota["parado"] += 1
+                        else:
+                            rota["parado"] = 0
+                        rota["ult"] = (est["x"], est["y"])
+                        if rota["parado"] > 45:
+                            # preso: dialogo aberto, parede ou NPC -> A/B para sair
+                            if rota["parado"] % 30 < 8:
+                                bot = bot | {BTN["A"]}
+                            elif rota["parado"] % 30 < 16:
+                                bot = bot | {BTN["B"]}
+                            if rota["parado"] % 60 == 0:
+                                print(f"  rota: preso em ({est['x']},{est['y']}) "
+                                      f"-> A/B (f{f})")
+                            if rota["parado"] > 600:
+                                erro_rota = (f"travado em ({est['x']},{est['y']}) "
+                                             f"indo para ({alvo[2]},{alvo[3]})")
+                                break
+            elif est and rota["i"] >= len(rota["pontos"]):
+                if rota.get("fim") is None:
+                    rota["fim"] = f
+                    print(f"rota concluída em ({est['x']},{est['y']}) "
+                          f"mapa {est['grupo']}:{est['mapa']} f{f}")
+                if rota.get("voltas_feitas", 1) < a.voltas:
+                    rota["voltas_feitas"] = rota.get("voltas_feitas", 1) + 1
+                    rota["i"] = 0
+                    rota["parado"] = 0
+                    rota["ult"] = None
+                    rota["espera"] = 0
+                    print(f"  rota: volta {rota['voltas_feitas']}/{a.voltas} f{f}")
+                elif not a.shots:
+                    break
         if modo_af:
             est = ler_estado(lib)
             if est:
@@ -350,10 +530,14 @@ def main():
                     bot = bot | {BTN[modo_af["dir"]]}
                     if f % 200 == 0:
                         print(f"  f{f:5d} ({est['x']},{est['y']}) mapa {est['grupo']}:{est['mapa']}")
+        if parar_sym is not None and f % 4 == 0:
+            if ler_u32(lib, parar_sym):
+                print(f"condicao {a.parar_quando} != 0 no frame {f} -> parando")
+                break
         if pulsos:
-            for inicio, botao in pulsos:
-                # pulso: 6 frames apertado, 20 solto (o menu le JOY_NEW, nao o estado)
-                if inicio <= f < inicio + 6:
+            for inicio, botao, duracao in pulsos:
+                # pulso: N frames apertado (padrao 6), 20 solto (o menu le JOY_NEW)
+                if inicio <= f < inicio + duracao:
                     bot |= {botao}
         if a.auto_avancar:
             # A em pulsos de 6 frames a cada 26, mas so quando ha caixa aberta
@@ -373,6 +557,11 @@ def main():
         estado["converter"] = (f in marcos or f == a.frames
                                or bool(a.every and f % a.every == 0))
         lib.retro_run()
+        if a.batalha and f % a.batalha == 0:
+            for i, m in enumerate(ler_batalha(lib, BATALHA_OFF)):
+                print(f"f{f:5d} b{i} esp={m['esp']:4d} nv={m['nivel']:3d} "
+                      f"hp={m['hp']:3d}/{m['maxhp']:<3d} atk={m['atk']:3d} def={m['dfs']:3d} "
+                      f"spa={m['satk']:3d} spd={m['sdef']:3d} tipos={m['tipos']}")
         if a.pos and f % a.pos == 0:
             est = ler_estado(lib)
             if est:
@@ -392,6 +581,9 @@ def main():
             print(f"state salvo: {a.saida} ({tam} B)")
         else:
             print("falha ao serializar")
+
+    if erro_rota:
+        print(f"rota: {erro_rota}")
 
     if estado["rgb"]:
         png_write(outdir / "final.png", estado["w"], estado["h"], estado["rgb"])

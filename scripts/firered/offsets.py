@@ -45,6 +45,8 @@ CAMPOS = {
     "s1_seen1": ("struct SaveBlock1", "seen1"),
     "s1_seen2": ("struct SaveBlock1", "seen2"),
     "s2_pokedex": ("struct SaveBlock2", "pokedex"),
+    "s2_playerName": ("struct SaveBlock2", "playerName"),
+    "s2_playerTrainerId": ("struct SaveBlock2", "playerTrainerId"),
     "dex_owned": ("struct Pokedex", "owned"),
     "dex_seen": ("struct Pokedex", "seen"),
     "pokemon_size": ("struct Pokemon", None),
@@ -107,14 +109,7 @@ def extrair(poke: Path, toolchain: Path | None) -> dict[str, int]:
     if not saida.exists():
         raise SystemExit(f"compilação falhou:\n{r.stderr[-2000:]}")
 
-    texto = saida.read_text()
-    valores: dict[str, int] = {}
-    # cada função sai como "c_nome:" seguida de movw/movs r0, #N
-    for m in re.finditer(r"^c_(\w+):.*?$(.*?)(?=^c_\w+:|\Z)", texto, re.M | re.S):
-        nome, corpo = m.group(1), m.group(2)
-        v = re.search(r"mov[wst]?\s+r0,\s*#(\d+)", corpo)
-        if v:
-            valores[nome] = int(v.group(1))
+    valores = _valores_do_assembly(saida.read_text())
     faltando = set(CAMPOS) - set(valores)
     if faltando:
         raise SystemExit(f"não consegui extrair: {sorted(faltando)}")
@@ -126,13 +121,58 @@ def extrair(poke: Path, toolchain: Path | None) -> dict[str, int]:
     return valores
 
 
+def _valores_do_assembly(texto: str) -> dict[str, int]:
+    """Le `movw/movs r0, #N` de cada função `c_<campo>` do .s do gcc."""
+    valores: dict[str, int] = {}
+    for m in re.finditer(r"^c_(\w+):.*?$(.*?)(?=^c_\w+:|\Z)", texto, re.M | re.S):
+        nome, corpo = m.group(1), m.group(2)
+        v = re.search(r"mov[wst]?\s+r0,\s*#(\d+)", corpo)
+        if v:
+            valores[nome] = int(v.group(1))
+    return valores
+
+
+def self_test() -> int:
+    """Garante que o parser entende as três formas que o gcc emite."""
+    fake = """
+    .text
+c_s1_pos:
+    movs r0, #0
+    bx lr
+c_s1_flags:
+    movw r0, #3884
+    bx lr
+c_s2_pokedex:
+    movw r0, #24
+    movw r3, #999
+    bx lr
+c_zero:
+    movs r0, #0
+    bx lr
+"""
+    v = _valores_do_assembly(fake)
+    assert v == {"s1_pos": 0, "s1_flags": 3884, "s2_pokedex": 24, "zero": 0}, v
+    # todo campo declarado tem de caber num único `movw` (0..65535)
+    assert all(0 <= valor <= 0xFFFF for valor in v.values())
+    # e o VERIFICADOS_NO_ROM tem de ser subconjunto de CAMPOS (senão nunca é usado)
+    orfaos = set(VERIFICADOS_NO_ROM) - set(CAMPOS)
+    assert not orfaos, f"VERIFICADOS_NO_ROM com campo inexistente: {orfaos}"
+    print(f"self-test ok: parser de .s em 3 formas; {len(CAMPOS)} campos, "
+          f"{len(VERIFICADOS_NO_ROM)} conferidos no ROM")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pokefirered", default="/tmp/pokefirered")
     ap.add_argument("--toolchain", default="/tmp/tc/bin")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--gravar", default="", help="grava o JSON neste caminho")
+    ap.add_argument("--self-test", dest="self_test", action="store_true")
     a = ap.parse_args()
+
+    if a.self_test:
+        return self_test()
 
     val = extrair(Path(a.pokefirered), Path(a.toolchain) if Path(a.toolchain).exists() else None)
     if a.json:
