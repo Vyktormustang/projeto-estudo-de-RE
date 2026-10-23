@@ -99,6 +99,91 @@ def remover_linhas(texto: str, padrao: str) -> tuple[str, int]:
     return "\n".join(novas), n
 
 
+def completar_tabela_nacional(s: str, poke: Path) -> str:
+    """Reescreve sSpeciesToNationalPokedexNum com as 1025 especies.
+
+    A tabela do FireRed tem 386 inicializadores dentro de um array de
+    NUM_SPECIES-1 posicoes. Depois da E1 o array tem 1025 posicoes, e as 639
+    restantes ficam zeradas -- NationalPokedexNumToSpecies(n) devolvia 0 para
+    todo Gen 4-9 e a lista da Pokedex saia vazia.
+
+    Como a E1 numerou as especies IGUAL a dex nacional (ID = numero nacional),
+    a tabela e simplesmente 1..1025.
+    """
+    ini = s.find("static const u16 sSpeciesToNationalPokedexNum")
+    if ini == -1:
+        raise SystemExit("nao achei sSpeciesToNationalPokedexNum em pokemon.c")
+    fim = s.index("};", ini) + 2
+    fontes = list((poke / "include/constants").glob("species.h"))
+    nomes = []
+    for linha in fontes[0].read_text().splitlines():
+        m = re.match(r"#define SPECIES_(\w+)\s+(\d+)\s*$", linha.strip())
+        if m and 1 <= int(m.group(2)) <= 1025:
+            nomes.append((m.group(1), int(m.group(2))))
+    nomes.sort(key=lambda par: par[1])
+    if len(nomes) != 1025:
+        raise SystemExit(f"esperava 1025 especies, achei {len(nomes)}")
+    corpo = "\n".join(f"    [SPECIES_{n} - 1] = {v}," for n, v in nomes)
+    nova = ("// TABELA_NACIONAL_COMPLETA: ID de especie == numero da dex nacional\n"
+            "static const u16 sSpeciesToNationalPokedexNum[NUM_SPECIES - 1] =\n{\n"
+            + corpo + "\n};")
+    return s[:ini] + nova + s[fim:]
+
+
+def busca_binaria_nacional(s: str) -> str:
+    """Troca a varredura linear de NationalPokedexNumToSpecies por busca binaria.
+
+    A versao linear percorre ate 1025 posicoes por chamada, e a tela da Pokedex
+    chama a funcao uma vez por especie ao montar a lista: O(n^2) = ~1 milhao de
+    comparacoes a cada abertura.
+    """
+    antigo = """u16 NationalPokedexNumToSpecies(u16 nationalNum)
+{
+    u16 species;
+
+    if (!nationalNum)
+        return 0;
+
+    species = 0;
+
+    while (species < NUM_SPECIES - 1 && sSpeciesToNationalPokedexNum[species] != nationalNum)
+        species++;
+
+    if (species == NUM_SPECIES - 1)
+        return 0;
+
+    return species + 1;
+}"""
+    novo = """u16 NationalPokedexNumToSpecies(u16 nationalNum)
+{
+    // Busca binaria: a tabela e crescente (ver TABELA_NACIONAL_COMPLETA).
+    s32 lo = 0;
+    s32 hi = NUM_SPECIES - 2;
+
+    if (!nationalNum)
+        return 0;
+
+    while (lo <= hi)
+    {
+        s32 mid = (lo + hi) / 2;
+
+        if (sSpeciesToNationalPokedexNum[mid] == nationalNum)
+            return mid + 1;
+        if (sSpeciesToNationalPokedexNum[mid] < nationalNum)
+            lo = mid + 1;
+        else
+            hi = mid - 1;
+    }
+
+    return 0;
+}"""
+    if antigo not in s:
+        if "Busca binaria: a tabela e crescente" in s:
+            return s
+        raise SystemExit("nao achei NationalPokedexNumToSpecies para trocar")
+    return s.replace(antigo, novo)
+
+
 def aplicar(poke: Path, check: bool) -> int:
     mudancas: list[str] = []
 
@@ -151,6 +236,18 @@ def aplicar(poke: Path, check: bool) -> int:
         s, n = remover_linhas(ler(p), "OLD_UNOWN")
         if gravar(p, s):
             mudancas.append(f"{nome}: -{n} linhas OLD_UNOWN")
+
+    # 6b) pokemon.c — tabela nacional completa e busca binaria.
+    #     A tabela original do FireRed cobre so as 386 primeiras especies; sem
+    #     preencher as 639 restantes, NationalPokedexNumToSpecies devolve 0 para
+    #     qualquer Gen 4-9 e a Pokedex desenha linhas vazias.
+    p = poke / "src/pokemon.c"
+    s = ler(p)
+    if "TABELA_NACIONAL_COMPLETA" not in s:
+        s = completar_tabela_nacional(s, poke)
+        s = busca_binaria_nacional(s)
+        if gravar(p, s):
+            mudancas.append("pokemon.c: tabela nacional 1..1025 + busca binaria")
 
     # 6) cry de Hoenn: o bloco agora começa em 252, não em 277
     p = poke / "src/data/pokemon/cry_ids.h"

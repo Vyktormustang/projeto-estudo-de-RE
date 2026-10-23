@@ -65,6 +65,21 @@ def montar_fonte() -> str:
     return "".join(l + "\n" for l in linhas)
 
 
+# Offsets que o probe NAO acerta: o build usa `-mabi=apcs-gnu` (ABI ARM antiga),
+# que empacota structs de um jeito que o gcc do probe (ABI EABI) nao reproduz.
+# Cada valor abaixo foi medido DENTRO do ROM em execucao: um trecho de
+# diagnostico grava, em 0x0203FFF0, o endereco relativo de cada campo
+# (`(u8*)&gSaveBlock1Ptr->seen2 - (u8*)gSaveBlock1Ptr`). Ver docs/FIRERED.md.
+#
+# Historico: `s1_seen2` saia 0x39C4 quando o valor real e 0x3A64 (160 bytes de
+# diferenca). O anticheat da Pokedex compara SaveBlock2.pokedex.seen com
+# SaveBlock1.seen1 e seen2; escrever no lugar errado zerava a contagem e a
+# lista da Pokedex aparecia VAZIA (sem crash) -- foi o que travou a E1.
+VERIFICADOS_NO_ROM = {
+    "s1_seen2": 0x3A64,   # medido em 2026-10-23, ROM da E1 (1025 especies)
+}
+
+
 def extrair(poke: Path, toolchain: Path | None) -> dict[str, int]:
     env = dict(os.environ)
     if toolchain:
@@ -90,6 +105,11 @@ def extrair(poke: Path, toolchain: Path | None) -> dict[str, int]:
     faltando = set(CAMPOS) - set(valores)
     if faltando:
         raise SystemExit(f"não consegui extrair: {sorted(faltando)}")
+    for k, v in VERIFICADOS_NO_ROM.items():
+        if valores.get(k) != v:
+            print(f"aviso: {k} medido no ROM = 0x{v:X}; probe dizia 0x{valores[k]:X}"
+                  " -- usando o valor do ROM", file=sys.stderr)
+            valores[k] = v
     return valores
 
 

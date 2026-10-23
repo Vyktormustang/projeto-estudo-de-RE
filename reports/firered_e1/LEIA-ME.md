@@ -137,6 +137,49 @@ todos os testes vêm de um desses estados mortos.
 2. Confirmar que a lista mostra `#1025` e rola sem crash.
 3. Só então fechar a E1.
 
+
+### TERCEIRA RODADA — causa raiz de verdade (2026-10-23)
+
+Tudo acima estava certo sobre o sanity check, mas faltava o principal: **os offsets
+de struct que a ferramenta calculava estavam errados**. O build usa
+`-mabi=apcs-gnu` (ABI ARM antiga) e o probe do `offsets.py` compilava com a ABI
+moderna (EABI); as duas empacotam `struct SaveBlock1` de formas diferentes.
+
+Medido **dentro do ROM em execução** (trecho de diagnóstico que grava o endereço
+relativo de cada campo em `0x0203FF00`):
+
+| campo | probe dizia | ROM usa |
+|---|---|---|
+| `SaveBlock1.seen2` | `0x39C4` | **`0x3A64`** |
+| `SaveBlock2.pokedex.seen` | `0x0091` (absoluto 169) | **169** (ok) |
+| `SaveBlock2.pokedex.owned` | `0x0010` (absoluto 40) | **40** (ok) |
+| `SaveBlock1.seen1` | `0x05F8` | `0x05F8` (ok) |
+
+Como o anticheat compara `pokedex.seen` com `seen1` **e** `seen2`, escrever só em
+`0x39C4` fazia a comparação falhar, `GetNationalPokedexCount` devolvia 0 e a
+lista saía VAZIA (sem crash, sem mensagem). Não era bug do port nem do `Alloc`.
+
+Correção: `offsets.py` agora tem `VERIFICADOS_NO_ROM`, com os valores medidos no
+próprio ROM, e avisa quando o probe discorda.
+
+### Causa raiz 2: `NationalPokedexNumToSpecies` só conhecia 386 espécies
+
+`sSpeciesToNationalPokedexNum` é `[NUM_SPECIES - 1]` (1025 posições) mas só tinha
+386 inicializadores — as outras 639 ficavam **zero**. Toda Gen 2-9 virava espécie
+0 e a lista mostrava `-----`. Além disso a função era uma varredura linear,
+chamada uma vez por espécie ao montar a lista: O(n²).
+
+Correção (agora parte de `apply_e1_port.py`, etapa 6b):
+- tabela gerada com as 1025 entradas em ordem nacional;
+- `NationalPokedexNumToSpecies` virou busca binária.
+
+### Confirmado em jogo
+
+- lista numérica Kanto: `No001 BULBASAUR` (GRASS/POISON), `No004 CHARMANDER`,
+  `No007 SQUIRTLE`, com ícone de capturado e tipos — `reports/firered_e1/06_lista_kanto.png`
+- contadores `Seen:`/`Owned:` corretos na tela de conteúdo
+- Pokédex abre e fecha sem crash
+
 ## Próximo passo
 
 1. Criar um savestate base **deste** build (boot completo, já feito: `/tmp/full2/room.bin`).
