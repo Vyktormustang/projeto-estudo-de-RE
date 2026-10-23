@@ -131,16 +131,19 @@ def aplicar(poke: Path, check: bool) -> int:
         if gravar(p, s):
             mudancas.append("pokemon.c: SpeciesToCryId reescrito para a nova numeração")
 
-    # 4) menu2.c — as formas do Unown passam a usar as constantes de forma
+    # 4) menu2.c — formas do Unown: reusa SPECIES_UNOWN_* (nome trocado, valor mantido
+    #    relativo a NUM_SPECIES) e remove os dois #define locais, que agora conflitariam
+    #    com os de species.h.
     p = poke / "src/menu2.c"
     s = ler(p)
-    s = s.replace("species = SPECIES_OLD_UNOWN_EMARK;", "species = SPECIES_UNOWN_EMARK;")
-    s = s.replace("species = SPECIES_OLD_UNOWN_QMARK;", "species = SPECIES_UNOWN_QMARK;")
     s = s.replace(
         '// Not actually "old" given these were introduced in Gen 3,\n'
         "// but they're used as equivalents here alongside the other OLD_UNOWN\n", "")
+    s, _ = remover_linhas(s, "#define SPECIES_UNOWN_EMARK")
+    s, _ = remover_linhas(s, "#define SPECIES_UNOWN_QMARK")
+    s = s.replace("SPECIES_OLD_UNOWN_", "SPECIES_UNOWN_")
     if gravar(p, s):
-        mudancas.append("menu2.c: formas do Unown apontam para SPECIES_UNOWN_*")
+        mudancas.append("menu2.c: formas do Unown em SPECIES_UNOWN_* (defines locais removidos)")
 
     # 5) demais tabelas — a linha do placeholder sai
     for nome in DADOS_COM_OLD_UNOWN:

@@ -133,6 +133,20 @@ const outputs = [];
 for (let i = 0; i < args.length; i++) {
   if ((args[i] === "-o" || args[i] === "-Map" || args[i] === "--Map") && i + 1 < args.length) outputs.push(args[i + 1]);
 }
+// objcopy usa `objcopy ENTRADA SAIDA` (sem -o). Sem isto, a .gba final nunca era
+// regravada e o build "passava" entregando a ROM do build anterior.
+if (tool === "objcopy") {
+  const pos = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a.startsWith("-")) continue;
+    if (["-I", "-O", "--input-target", "--output-target", "-j", "--only-section",
+         "-R", "--remove-section", "--change-section-address", "--set-section-flags",
+         "-i", "--info"].includes(args[i - 1] ?? "")) continue;
+    pos.push(a);
+  }
+  if (pos.length >= 2) outputs.push(pos[pos.length - 1]);
+}
 for (const o of outputs) ensureDir(path.posix.dirname(vfsOf(o)));
 
 // 4) snapshot do host (para detectar arquivos novos)
@@ -185,9 +199,11 @@ async function salva(vp, rel) {
 }
 await walk("/work", "");
 
+// Saidas declaradas (-o / -Map) sao SEMPRE gravadas. Antes havia um `continue`
+// quando o arquivo ja existia no host, e o efeito era cruel: o linker rodava,
+// reportava sucesso e o .elf/.gba ficavam congelados no build anterior.
 for (const o of outputs) {
   const vp = vfsOf(o);
-  try { await access(path.resolve(cwdHost, o), FSC.F_OK); continue; } catch {}
   try { await salva(vp, o); } catch {}
 }
 process.exit(exitCode);
