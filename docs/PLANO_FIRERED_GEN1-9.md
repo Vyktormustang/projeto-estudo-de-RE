@@ -150,7 +150,7 @@ metatítulo — não o código de warp. Foi exatamente o que faltava no fork rej
 
 ---
 
-### E1 — Constantes e limites: 1025 espécies
+### E1 — Constantes e limites: 1025 espécies (CONCLUÍDA)
 
 **Objetivo:** o jogo "conhece" 1025 espécies. Nenhuma mecânica nova, só o espaço reservado.
 
@@ -424,36 +424,48 @@ sai errada**, porque o offset muda a cada build (na base pura é `0x6F94`; no fo
 
 ## Registro de progresso
 
-### 2026-10-23 — E1 em andamento
+### 2026-10-23 — E1 CONCLUÍDA
 
-**Feito**
+**Resultado:** ROM com 1025 espécies compila, boota, joga e a Pokédex lista até `No1025 PECHARUNT`.
 
-- `scripts/firered/gen_species_constants.py` — gera `species.h`, `pokedex.h` e os nomes a partir do
-  pokefirered + repositório de referência. `--self-test` passa: **1025 espécies, 386 reaproveitadas,
-  639 novas** (Gen 4–9).
-- `scripts/firered/apply_e1_port.py` — aplica o port inteiro num clone limpo, de forma idempotente.
-- Renumeração aplicada no clone: espécies 1…1025 pela dex nacional, `SPECIES_EGG = 1026`.
-- Removidos os 25 buracos `SPECIES_OLD_UNOWN_*` (eram placeholders) e todos os seus usos:
-  `pokedex_orders.h`, `species_info.h`, `level_up_learnset_pointers.h`, `tmhm_learnsets.h`,
-  tabelas gráficas (`front_pic_table`, `back_pic_table`, `palette_table`, `shiny_palette_table`,
-  `front/back_pic_coordinates`, `footprint_table`), `pokemon_icon.c`, `pokemon.c`, `menu2.c`.
-- `SpeciesToCryId` reescrito para a nova numeração; `HOENN_MON_SPECIES_START` 277 → 252.
-- Save reacomodado: `filler_B20` −154 B (Pokédex cresceu de 2×52 para 2×129 B),
-  `unused_3A94` 64 → 60 B (`seen1`/`seen2` crescendo no SaveBlock1).
+- ROM: `1c5b4f2c…` (16 777 216 B), build `-j2 MODERN=1 CC1_DAEMONS=2`
+- Memória: EWRAM 259 338 B (98,93 %), IWRAM 29 592 B, ROM 9 415 608 B (28,06 %)
+- Confirmado em jogo: título → quarto → escada → porta → Pallet → menu → Pokédex →
+  TABLE OF CONTENTS → lista Kanto (BULBASAUR/CHARMANDER/SQUIRTLE com tipos e ícone de
+  capturado) → modo nacional → lista de 1025 itens, último = `No1025 PECHARUNT`.
+- Prova na RAM: array `listItems` com 1025 entradas; `[251]`=252 Treecko, `[905]`=906
+  Sprigatito, `[1024]`=1025 Pecharunt, todos com `seen=1`.
 
-**Estado do build**
+**Dois bugs reais encontrados (e corrigidos) nesta etapa**
 
-O `make` chega ao fim **sem nenhum erro de compilação** (`grep -c "error:" = 0`), mas **o link não
-regenera o `.elf`/`.gba`** neste ambiente: o `ld` (wrapper WASM do toolchain do sandbox) imprime o
-mapa de memória e retorna 0 sem escrever a saída. O `pokefirered_modern.gba` continua com o sha256 da
-base pura (`32e26d4f…`). Portanto: **E1 ainda NÃO está confirmada** — falta produzir e bootar a ROM.
+1. **Offsets de struct errados.** O `offsets.py` compilava o probe com a ABI EABI; o build
+   usa `-mabi=apcs-gnu`. `SaveBlock1.seen2` real é `0x3A64`, não `0x39C4`. O anticheat da
+   Pokédex exige que `pokedex.seen`, `seen1` e `seen2` concordem — escrever no lugar errado
+   zerava a contagem e a lista saía vazia (sem crash). Agora os valores medidos **dentro do
+   ROM** ficam em `VERIFICADOS_NO_ROM` no `offsets.py`.
+2. **`sSpeciesToNationalPokedexNum` com 386 de 1025 entradas.** As 639 restantes ficavam
+   zero, então toda Gen 2–9 virava espécie 0 e desenhava `-----`. Corrigido na etapa 6b do
+   `apply_e1_port.py` (tabela completa + busca binária em vez de varredura linear).
 
-**Próximo passo**
+Também na 6c: número da dex com 4 dígitos (`No1025`; antes saía truncado a partir de #1000).
 
-1. Resolver o link (rodar o passo de link isolado; se o wrapper continuar falhando, linkar com
-   `ld` nativo em WSL/CI) e obter o `.gba` novo.
-2. Boot + título + andar + os dois warps (mesmo teste da E0) com o build de 1025 espécies.
-3. Se o jogo abrir a Pokédex com `NATIONAL_DEX_COUNT = 1025` sem estourar, fechar a E1.
+**Ferramentas criadas**
+
+- `scripts/firered/setup_ambiente.sh` — reconstrói toolchain + clone + port + `make tools` +
+  build + mGBA num comando. O `/tmp` zera entre sessões; sem isso eram ~20 min perdidos por vez.
+- `scripts/firered/offsets.py` — offsets conferidos contra o ROM em execução.
+- `scripts/firered/savestate.py` / `savestate_diff.py` / `nav.py` (`--pulsos`, `--auto-avancar`).
+
+**Lição de método (para as próximas etapas)**
+
+- Savestate só vale para a ROM exata que o gerou; estado manipulado por ferramenta pode ficar
+  "morto" (frames idênticos a qualquer input). Teste longo começa com boot completo.
+- Menus do FireRed leem `JOY_NEW` (borda): botão segurado conta uma vez. Usar `--pulsos`.
+- Nunca confiar em offset de struct vindo do compilador do host **nem** do toolchain com ABI
+  diferente: medir no binário que roda.
+
+**Próximo passo:** E2 (gerador de dados de espécie) — hoje as 639 espécies novas existem como
+constantes e nome, mas sem stats/tipos/learnset próprios.
 
 ## Registro de decisões
 

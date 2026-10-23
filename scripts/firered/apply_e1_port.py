@@ -184,6 +184,42 @@ def busca_binaria_nacional(s: str) -> str:
     return s.replace(antigo, novo)
 
 
+def numero_dex_4_digitos(s: str) -> str:
+    """Faz o numero da dex caber em 4 digitos (#1025).
+
+    `DexScreen_PrintNum3LeadingZeroes` monta o buffer com exatamente 3 digitos,
+    entao a partir da especie 1000 o texto saia truncado. A funcao nova decide o
+    numero de digitos em tempo de execucao e mantem os zeros a esquerda.
+    """
+    antigo = """static void DexScreen_PrintNum3LeadingZeroes(u8 windowId, u8 fontId, u16 num, u8 x, u8 y, u8 colorIdx)
+{
+    u8 buff[4];
+    buff[0] = (num / 100) + CHAR_0;
+    buff[1] = ((num %= 100) / 10) + CHAR_0;
+    buff[2] = (num % 10) + CHAR_0;
+    buff[3] = EOS;
+    DexScreen_AddTextPrinterParameterized(windowId, fontId, buff, x, y, colorIdx);
+}"""
+    novo = """static void DexScreen_PrintNum3LeadingZeroes(u8 windowId, u8 fontId, u16 num, u8 x, u8 y, u8 colorIdx)
+{
+    // DexScreen_PrintNum4: a Pokédex vai até 1025, então o número pode ter
+    // 4 dígitos. Mantém os zeros à esquerda e o alinhamento das colunas.
+    u8 buff[5];
+    u8 n = 0;
+
+    if (num >= 1000)
+        buff[n++] = (num / 1000) + CHAR_0;
+    buff[n++] = ((num / 100) % 10) + CHAR_0;
+    buff[n++] = ((num / 10) % 10) + CHAR_0;
+    buff[n++] = (num % 10) + CHAR_0;
+    buff[n] = EOS;
+    DexScreen_AddTextPrinterParameterized(windowId, fontId, buff, x, y, colorIdx);
+}"""
+    if antigo not in s:
+        raise SystemExit("nao achei DexScreen_PrintNum3LeadingZeroes")
+    return s.replace(antigo, novo)
+
+
 def aplicar(poke: Path, check: bool) -> int:
     mudancas: list[str] = []
 
@@ -248,6 +284,16 @@ def aplicar(poke: Path, check: bool) -> int:
         s = busca_binaria_nacional(s)
         if gravar(p, s):
             mudancas.append("pokemon.c: tabela nacional 1..1025 + busca binaria")
+
+    # 6c) pokedex_screen.c — numero da dex com 4 digitos
+    #     DexScreen_PrintNum3LeadingZeroes escreve exatamente 3 digitos; a partir
+    #     da especie 1000 o numero saia cortado ("No!25" em vez de "No1025").
+    p = poke / "src/pokedex_screen.c"
+    s = ler(p)
+    if "DexScreen_PrintNum4" not in s:
+        s = numero_dex_4_digitos(s)
+        if gravar(p, s):
+            mudancas.append("pokedex_screen.c: numero da dex com 4 digitos")
 
     # 6) cry de Hoenn: o bloco agora começa em 252, não em 277
     p = poke / "src/data/pokemon/cry_ids.h"

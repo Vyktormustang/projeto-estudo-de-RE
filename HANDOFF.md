@@ -17,7 +17,19 @@ como registro histórico.
 - **Linear:** projeto *FireRed Gen 1-9 (base pret/pokefirered)*, etapas `VYK-28` … `VYK-37`
 - **E0 concluída:** base pura compila (sha256 `32e26d4f…`), boota, escadas e portas
   funcionam — provas em `reports/firered_base/` e `docs/PLANO_FIRERED_GEN1-9.md`
-- **Próximo passo:** E1 (`VYK-29`) — 1025 constantes de espécie + limites.
+- **E1 CONCLUÍDA:** ROM com 1025 espécies (sha256 `b149aa89…`) compila, boota, joga e a
+  Pokédex lista de `No001 BULBASAUR` a `No1025 PECHARUNT`. Provas em
+  `reports/firered_e1/` (07_lista_1025_pecharunt.png é a definitiva).
+- **Próximo passo:** E2 (`VYK-30`) — gerador de dados de espécie (stats, tipos, learnset
+  para as 639 espécies novas).
+
+### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
+
+```bash
+bash scripts/firered/setup_ambiente.sh     # ~15 min do zero, ~10 s se já existe
+export PATH=/tmp/tc/bin:$PATH
+export MGBA_CORE=/tmp/mgba-0.10.5/build/mgba_libretro.so
+```
 
 Ambiente: `/tmp` é apagado entre sessões. Reclonar `pret/pokefirered` e refazer o toolchain
 antes de continuar. Build: `make -j2 MODERN=1 CC1_DAEMONS=2` (~8 min).
