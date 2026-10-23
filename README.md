@@ -27,7 +27,7 @@ por prova em frames/screenshots/dumps de RAM.
 | Emulador headless **completo** (frames, input agendado, snaps PNG, save-state, mem-dumps) | ✅ | `scripts/gba_libretro_emu.py` |
 | **Mapa da mochila**: array @ `0x020258B8`, 4 B/slot `{id:u16, qty:u16}` | ✅ CONFIRMADO | este README ↓ |
 | Formatos/offsets no save-state (EWRAM/IWRAM) p/ inspeção offline | ✅ | `notes_mods_codigo.md` |
-| **Mod v3** (hook-veneer + combo L+R+START → preencher 8 slots) | 🛠 em validação | `rom_mod/BAG_MOD_v3.gba` |
+| **Mod v4** (veneer + REG_KEYINPUT + retorno corrigido) | ✅ **VALIDADO** (print + dump) | `reports/mod_v4/`, `docs/MOD_BAG_V4.md` |
 | Patch de texto demo (safe-text-slot) — primeiro modificador de ROM | ✅ | `rom_mod/PATCH_TEXTO_DEMO_PIDGEY.gba` |
 
 ---
@@ -77,10 +77,14 @@ por prova em frames/screenshots/dumps de RAM.
 ### Status de validação (honesto)
 
 - Boot v3: **estável no jogo** (overworld ok; sem preenchimento sem combo ✓).
-- Combo: **ainda não escreveu** no state de teste — diagnóstico aponta o
-  espelho `0x03003118` ser **contexto-dependente** (zera na cena-bedroom).
-  Próximo passo da lista: espelho-fonte de teclas robusto + payload sempre-escreve
-  de sanidade. *(Ninguém aqui chama de 'feito' antes do print da mochila cheia.)*
+- Combo: **FUNCIONA.** Duas causas corrigidas na v4: (1) o trampolim voltava
+  para `0x08000A42` em vez de `0x08000A40` — pulava uma instrução Thumb a cada
+  `SetGpuReg`; (2) o gate lia o espelho contexto-dependente `0x03003118` e agora
+  lê `REG_KEYINPUT` (`0x04000130`, ativo-baixo).
+  **Evidência:** `reports/mod_v4/BAG_CHEIA_contraste.png` (tela ITENS com
+  MASTER BOLA/ULTRA BOLA/POKÉ BOLA/POÇÃO/LIMONADA/CINZA SAGRADA) e dump
+  `01 00 63 00 02 00 63 00 …` em `0x020258B8`. Detalhes: `docs/MOD_BAG_V4.md`.
+  **Combo recomendado: START+SELECT** (L+R abre a ajuda nativa do jogo).
 
 ---
 
