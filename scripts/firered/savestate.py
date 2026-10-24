@@ -114,7 +114,7 @@ def _stats_nivel(base: tuple[int, ...], nivel: int, iv: int = 31) -> tuple[int, 
 
 def montar_pokemon(especie: int, nivel: int, golpes: list[int], base: tuple[int, ...],
                    nome: bytes, pid: int = 600, otid: int = 0x12345678,
-                   ot: str = "ARENA") -> bytes:
+                   ot: str = "ARENA", amizade: int = 70) -> bytes:
     """Monta os 100 bytes de `struct Pokemon` válidos (checksum incluso).
 
     `base` são os 6 stats base na ordem do `struct SpeciesInfo`
@@ -129,7 +129,7 @@ def montar_pokemon(especie: int, nivel: int, golpes: list[int], base: tuple[int,
 
     # Substruct 0 (Growth): species, heldItem, exp, ppBonuses, friendship, filler
     exp = min(nivel ** 3, 0xFFFFFFFF)
-    growth = struct.pack("<HHI B B H", especie, 0, exp, 0, 70, 0)
+    growth = struct.pack("<HHI B B H", especie, 0, exp, 0, amizade & 0xFF, 0)
     # Substruct 1 (Attacks)
     attacks = struct.pack("<4H4B", *moves, *pp)
     # Substruct 2 (EVs/contest)
@@ -359,6 +359,8 @@ def main() -> int:
     p_mon.add_argument("--level", type=int, default=20)
     p_mon.add_argument("--moves", nargs="*", type=lambda s: int(s, 0), default=[])
     p_mon.add_argument("--pid", type=lambda s: int(s, 0), default=600)
+    p_mon.add_argument("--friendship", type=int, default=70,
+                       help="amizade (>=220 dispara EVO_FRIENDSHIP no level up)")
     p_mon.add_argument("--outsider", action="store_true",
                        help="usa OT de outro treinador (o Pokémon desobedece)")
 
@@ -418,6 +420,7 @@ def main() -> int:
         else:
             otid, ot = est.dados_do_jogador(off)
         mon = montar_pokemon(a.species, a.level, a.moves or [], base, nome,
+                             amizade=a.friendship,
                              pid=a.pid, otid=otid, ot=ot)
         est.escrever_pokemon(a.slot, mon)
         # receber o primeiro Pokémon liga FLAG_SYS_POKEMON_GET (0x828); sem ela o

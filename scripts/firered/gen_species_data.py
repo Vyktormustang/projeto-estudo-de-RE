@@ -60,11 +60,180 @@ TIPOS_FIRERED = {
 # tipos que o FireRed (nem com a E3) tem: STELLAR é exclusivo do Terapagos
 TIPOS_SUBSTITUTOS = {"TYPE_STELLAR": "TYPE_NORMAL"}
 
-EVO_SUPORTADAS = {
-    "EVO_FRIENDSHIP", "EVO_FRIENDSHIP_DAY", "EVO_FRIENDSHIP_NIGHT",
-    "EVO_LEVEL", "EVO_TRADE", "EVO_TRADE_ITEM", "EVO_ITEM",
-    "EVO_LEVEL_ATK_GT_DEF", "EVO_LEVEL_ATK_EQ_DEF", "EVO_LEVEL_ATK_LT_DEF",
+# ----------------------------------------------------------------------------
+# onda 2c: evoluções modernas mapeadas para o motor vanilla do FireRed
+# ----------------------------------------------------------------------------
+NIVEL_SEM_EQUIVALENTE = 36   # método sem equivalente (golpe, local, item inexistente)
+NIVEL_TROCA = 37             # evolução por troca: impossível jogando solo
+
+# pedras modernas -> pedra equivalente que existe no FireRed
+PEDRAS_EQUIVALENTES = {
+    "ITEM_DUSK_STONE": "ITEM_MOON_STONE",
+    "ITEM_DAWN_STONE": "ITEM_SUN_STONE",
+    "ITEM_SHINY_STONE": "ITEM_SUN_STONE",
+    "ITEM_ICE_STONE": "ITEM_WATER_STONE",
 }
+
+# métodos por nível que o motor do FireRed implementa tal e qual
+# (EVO_FRIENDSHIP_DAY/NIGHT existem no src/pokemon.c mas estão COMENTADOS —
+# nunca disparam no FRLG; por isso amizade DAY/NIGHT vira EVO_FRIENDSHIP puro)
+EVO_NIVEL_VANILLA = {
+    "EVO_LEVEL", "EVO_LEVEL_ATK_GT_DEF", "EVO_LEVEL_ATK_EQ_DEF",
+    "EVO_LEVEL_ATK_LT_DEF", "EVO_LEVEL_SILCOON", "EVO_LEVEL_CASCOON",
+    "EVO_LEVEL_NINJASK", "EVO_LEVEL_SHEDINJA",
+}
+
+
+def mapear_evolucao(metodo: str, param_txt: str, param_num: int,
+                    itens: set[str], cond: str = ""):
+    """Mapeia um método de evolução do RHH para o motor vanilla.
+
+    `cond` é o 4º campo opcional do RHH (`CONDITIONS({IF_MIN_FRIENDSHIP,...})`):
+    no formato atual, amizade é `EVO_LEVEL 0` + condição — e não um método.
+
+    Devolve (metodo, param_c, degradado) ou None para descartar a entrada.
+    `degradado=True` marca o mapeamento de última instância (nível fixo):
+    quando o mesmo alvo tem outra entrada melhor, a degradada perde.
+    """
+    if metodo == "EVO_NONE" or "MEGA" in metodo or "PRIMAL" in metodo:
+        return None
+    if metodo.startswith("EVO_TRADE"):
+        return ("EVO_LEVEL", str(NIVEL_TROCA), True)
+    if metodo.startswith("EVO_ITEM"):
+        item = param_txt.strip()
+        if item in itens:
+            return ("EVO_ITEM", item, False)
+        eq = PEDRAS_EQUIVALENTES.get(item)
+        if eq and eq in itens:
+            return ("EVO_ITEM", eq, False)
+        return ("EVO_LEVEL", str(NIVEL_SEM_EQUIVALENTE), True)
+    if metodo.startswith("EVO_FRIENDSHIP") or "IF_MIN_FRIENDSHIP" in cond:
+        # cobre o método antigo (DAY/NIGHT estão comentados no FRLG), o
+        # MOVE_TYPE (Sylveon) e o formato novo (EVO_LEVEL 0 + condição)
+        return ("EVO_FRIENDSHIP", "0", False)
+    if metodo in EVO_NIVEL_VANILLA:
+        if param_num > 0:
+            return (metodo, str(param_num), False)
+        return ("EVO_LEVEL", str(NIVEL_SEM_EQUIVALENTE), True)
+    if metodo.startswith("EVO_LEVEL_") and param_num > 0:
+        # DAY/NIGHT/DUSK/RAIN/FOG/MALE/FEMALE...: mesmo nível, sem a condição
+        return ("EVO_LEVEL", str(param_num), False)
+    # golpe conhecido, local, pancadas, recuo, 999 moedas... -> nível fixo
+    return ("EVO_LEVEL", str(NIVEL_SEM_EQUIVALENTE), True)
+
+
+def escolher_por_alvo(entradas):
+    """Uma entrada por alvo: fica a primeira não degradada, senão a primeira.
+
+    `entradas`: lista de (metodo, param, alvo, degradado). Ex.: Magneton tem
+    Magnezone por local (degradado p/ nível) E por Thunder Stone — fica a pedra.
+    """
+    por_alvo, ordem = {}, []
+    for met, par, alvo, degradado in entradas:
+        if alvo not in por_alvo:
+            por_alvo[alvo] = (met, par, degradado)
+            ordem.append(alvo)
+        elif por_alvo[alvo][2] and not degradado:
+            por_alvo[alvo] = (met, par, degradado)
+    return [(por_alvo[a][0], por_alvo[a][1], a) for a in ordem]
+
+
+def resolver_conflitos(entradas, base=()):
+    """Monta a linha final: `base` (vanilla, intocada) + novas entradas, sem
+    alvo repetido nem (método, parâmetro) repetido — com dois gatilhos iguais
+    só o primeiro dispararia (ex.: Eevee já usa Water Stone p/ Vaporeon, então
+    Glaceon via Ice Stone→Water Stone degrada para nível)."""
+    final = list(base)
+    alvos = {a for _, _, a in final}
+    for met, par, alvo in entradas:
+        if alvo in alvos:
+            continue
+        while any(m == met and p == par for m, p, _ in final):
+            if met != "EVO_LEVEL":
+                met, par = "EVO_LEVEL", str(NIVEL_SEM_EQUIVALENTE)
+            else:
+                par = str(int(par) + 1)
+        final.append((met, par, alvo))
+        alvos.add(alvo)
+    return final
+
+
+def linhas_evolucao_vanilla(poke: Path) -> dict[str, list[tuple[str, str, str]]]:
+    """Linhas do evolution.h vanilla (antes do bloco gerado): nome -> entradas."""
+    texto = (poke / "src" / "data" / "pokemon" / "evolution.h").read_text()
+    corte = texto.find(MARCA_BASE)
+    if corte != -1:
+        texto = texto[:corte]
+    linhas: dict[str, list[tuple[str, str, str]]] = {}
+    for m in re.finditer(r"\[SPECIES_([A-Z0-9_]+)\]\s*=\s*", texto):
+        i = m.end()
+        if i >= len(texto) or texto[i] != "{":
+            continue
+        prof, j = 0, i
+        while j < len(texto):
+            if texto[j] == "{":
+                prof += 1
+            elif texto[j] == "}":
+                prof -= 1
+                if prof == 0:
+                    break
+            j += 1
+        entradas = []
+        for arg in separar_args(texto[i + 1:j]):
+            mm = re.match(r"^\{(.*)\}$", arg.strip(), re.S)
+            if not mm:
+                continue
+            partes = separar_args(mm.group(1))
+            if len(partes) >= 3:
+                entradas.append((partes[0].strip(), partes[1].strip(),
+                                 partes[2].strip()))
+        linhas[m.group(1)] = entradas
+    return linhas
+
+
+def entradas_evolucao(bruto_evo, conhecidas, env, rel,
+                      numeracao=None, alvo_minimo=0):
+    """Parseia EVOLUTION(...) do RHH e devolve entradas já mapeadas
+    [(metodo, param, alvo, degradado)]. Com `alvo_minimo`, só alvos cujo
+    número nacional é >= alvo_minimo (passe cross-gen)."""
+    dentro = corpo_macro(bruto_evo, "EVOLUTION")
+    if not dentro:
+        return []
+    # o RHH embute `#if P_GEN_x_CROSS_EVOS` DENTRO da macro (Kleavor, Sylveon,
+    # Gallade...); como tratamos todos os P_* como ligados, basta descartar as
+    # linhas de pré-processador — as vírgulas órfãs viram argumentos vazios.
+    dentro = re.sub(r"(?m)^\s*#\s*(?:if|ifdef|ifndef|elif|else|endif).*$",
+                    "", dentro)
+    saida = []
+    for arg in separar_args(dentro):
+        m = re.match(r"^\{(.*)\}$", arg.strip(), re.S)
+        if not m:
+            continue
+        partes = separar_args(m.group(1))
+        if len(partes) < 3:
+            continue
+        metodo, param, alvo = (partes[0].strip(), partes[1].strip(),
+                               partes[2].strip())
+        cond = partes[3].strip() if len(partes) > 3 else ""
+        if alvo not in conhecidas["species"]:
+            rel["evos_puladas"] += 1
+            continue
+        if alvo_minimo and numeracao is not None:
+            if numeracao.get(alvo[len("SPECIES_"):], 0) < alvo_minimo:
+                continue        # evolução que o vanilla já cobre
+        try:
+            p = avaliar(param, env)
+        except ValueError:
+            p = 0
+        r = mapear_evolucao(metodo, param, p, conhecidas["items"], cond)
+        if r is None:
+            rel["evos_puladas"] += 1
+            continue
+        met, par, degradado = r
+        if met != metodo:
+            rel["evos_adaptadas"] += 1
+        saida.append((met, par, alvo, degradado))
+    return saida
 
 PRIMEIRA_GEN4 = 387          # Turtwig
 
@@ -507,7 +676,8 @@ def gerar(ref: Path, poke: Path) -> tuple[dict[str, str], str, dict[str, int]]:
 
     rel = {
         "especies": 0, "habilidades_ausentes": 0, "exp_limitado": 0,
-        "evos_puladas": 0, "golpes_filtrados": 0, "categoria_truncada": 0,
+        "evos_puladas": 0, "evos_adaptadas": 0, "evos_cruzadas": 0,
+        "golpes_filtrados": 0, "categoria_truncada": 0,
         "tipos_substituidos": 0,
     }
 
@@ -685,33 +855,11 @@ def gerar(ref: Path, poke: Path) -> tuple[dict[str, str], str, dict[str, int]]:
         # ---------------- evoluções ----------------
         bruto_evo = c.get("evolutions")
         if bruto_evo:
-            dentro = corpo_macro(bruto_evo, "EVOLUTION")
-            if dentro:
-                entradas = []
-                for arg in separar_args(dentro):
-                    m = re.match(r"^\{(.*)\}$", arg.strip(), re.S)
-                    if not m:
-                        continue
-                    partes = separar_args(m.group(1))
-                    if len(partes) < 3:
-                        continue
-                    metodo, param, alvo = partes[0].strip(), partes[1].strip(), partes[2].strip()
-                    if metodo not in EVO_SUPORTADAS:
-                        rel["evos_puladas"] += 1
-                        continue
-                    if alvo not in conhecidas["species"]:
-                        rel["evos_puladas"] += 1
-                        continue
-                    try:
-                        p = avaliar(param, env)
-                    except ValueError:
-                        p = 0
-                    if metodo == "EVO_ITEM" and param not in conhecidas["items"]:
-                        rel["evos_puladas"] += 1
-                        continue
-                    entradas.append(f"{{{metodo}, {p}, {alvo}}}")
-                if entradas:
-                    linhas_evo.append(f"    [SPECIES_{nome}] = {{{', '.join(entradas)}}},\n")
+            cand = entradas_evolucao(bruto_evo, conhecidas, env, rel)
+            linha = resolver_conflitos(escolher_por_alvo(cand))
+            if linha:
+                corpo = ", ".join(f"{{{m}, {p}, {a}}}" for m, p, a in linha)
+                linhas_evo.append(f"    [SPECIES_{nome}] = {{{corpo}}},\n")
 
         # ---------------- learnset ----------------
         nome_ls = (c.get("levelUpLearnset") or "").strip()
@@ -732,6 +880,41 @@ def gerar(ref: Path, poke: Path) -> tuple[dict[str, str], str, dict[str, int]]:
             linhas_ponteiros.append(
                 f"    [SPECIES_{nome}] = s{nome.title()}LevelUpLearnsetG4,\n")
 
+    # -------- evoluções cruzadas: espécies antigas (1-386) -> alvos novos ----
+    # Magneton->Magnezone, Eevee->Leafeon/Glaceon/Sylveon, Kirlia->Gallade...
+    # A linha vanilla (quando existe) é re-emitida INTACTA na frente; como o
+    # bloco gerado entra no fim do inicializador, o designated initializer
+    # posterior substitui a linha inteira (por isso a base precisa vir junto).
+    vanilla = linhas_evolucao_vanilla(poke)
+    maior_linha = 0
+    for ndex, nome in ordens:
+        if ndex >= PRIMEIRA_GEN4:
+            continue
+        c = bloco_da_especie(nome, dados)
+        if c is None:
+            continue
+        bruto_evo = c.get("evolutions")
+        if not bruto_evo:
+            continue
+        cand = entradas_evolucao(bruto_evo, conhecidas, env, rel,
+                                 numeracao, PRIMEIRA_GEN4)
+        novas = escolher_por_alvo(cand)
+        if not novas:
+            continue
+        base = vanilla.get(nome, [])
+        linha = resolver_conflitos(novas, base)
+        if len(linha) <= len(base):
+            continue
+        rel["evos_cruzadas"] += len(linha) - len(base)
+        maior_linha = max(maior_linha, len(linha))
+        corpo = ", ".join(f"{{{m}, {p}, {a}}}" for m, p, a in linha)
+        linhas_evo.append(
+            f"    [SPECIES_{nome}] = {{{corpo}}}, "
+            f"// cross-gen: linha vanilla re-emitida + alvos Gen 4-9\n")
+    if maior_linha > 8:
+        raise SystemExit(f"linha de evolução com {maior_linha} entradas; "
+                         "EVOS_PER_MON=8 não comporta — revisar política")
+
     arquivos = {
         "species_info_gen4_9.h": (
             "// Gerado por scripts/firered/gen_species_data.py -- nao editar a mao.\n"
@@ -750,7 +933,12 @@ def gerar(ref: Path, poke: Path) -> tuple[dict[str, str], str, dict[str, int]]:
         ),
         "evolution_gen4_9.h": (
             "// Gerado por scripts/firered/gen_species_data.py -- nao editar a mao.\n"
-            "// Evoluções das espécies 387-1025 (Gen 4-9).\n"
+            "// Evoluções das espécies 387-1025 (Gen 4-9) + linhas cross-gen\n"
+            "// (espécies antigas com alvos novos: Magneton->Magnezone etc.).\n"
+            "// Política (onda 2c): métodos modernos mapeados p/ o motor vanilla —\n"
+            "//   amizade (qualquer variante) -> EVO_FRIENDSHIP;\n"
+            "//   pedra moderna -> pedra equivalente (Dusk->Moon, Dawn/Shiny->Sun,\n"
+            "//   Ice->Water); troca -> EVO_LEVEL 37; sem equivalente -> EVO_LEVEL 36.\n"
             + "".join(linhas_evo)
         ),
         "level_up_learnsets_gen4_9.h": (
@@ -981,6 +1169,15 @@ def aplicar(poke: Path, arquivos: dict[str, str], ponteiros: str) -> list[str]:
     """Grava os headers e insere os `#include` / ponteiros (idempotente)."""
     destino = poke / "src" / "data" / "pokemon"
     mudancas = []
+
+    # onda 2c: a linha do Eevee chega a 8 evoluções (5 vanilla + 3 novas)
+    const = poke / "include" / "constants" / "pokemon.h"
+    s = const.read_text()
+    if "#define EVOS_PER_MON 5" in s:
+        const.write_text(s.replace(
+            "#define EVOS_PER_MON 5",
+            "#define EVOS_PER_MON 8 // GERADO(e7-evolucoes): era 5; Eevee usa 8"))
+        mudancas.append("EVOS_PER_MON 5->8 em include/constants/pokemon.h")
     for nome, conteudo in arquivos.items():
         p = destino / nome
         if not p.exists() or p.read_text() != conteudo:
@@ -1112,9 +1309,79 @@ AMOSTRAS = {
 }
 
 
+def _self_test_evolucoes() -> int:
+    """Casos sintéticos da política da onda 2c (não dependem da referência)."""
+    falhas = 0
+    itens = {"ITEM_FIRE_STONE", "ITEM_WATER_STONE", "ITEM_THUNDER_STONE",
+             "ITEM_LEAF_STONE", "ITEM_MOON_STONE", "ITEM_SUN_STONE"}
+    casos = [
+        # (metodo, param_txt, param_num) -> esperado (met, par, degradado)
+        ("EVO_LEVEL", "32", 32, ("EVO_LEVEL", "32", False)),
+        ("EVO_FRIENDSHIP_DAY", "0", 0, ("EVO_FRIENDSHIP", "0", False)),
+        ("EVO_FRIENDSHIP_MOVE_TYPE", "TYPE_FAIRY", 0, ("EVO_FRIENDSHIP", "0", False)),
+        ("EVO_TRADE_ITEM", "ITEM_ELECTIRIZER", 0, ("EVO_LEVEL", "37", True)),
+        ("EVO_ITEM", "ITEM_THUNDER_STONE", 0, ("EVO_ITEM", "ITEM_THUNDER_STONE", False)),
+        ("EVO_ITEM", "ITEM_DUSK_STONE", 0, ("EVO_ITEM", "ITEM_MOON_STONE", False)),
+        ("EVO_ITEM", "ITEM_TART_APPLE", 0, ("EVO_LEVEL", "36", True)),
+        ("EVO_LEVEL_NIGHT", "25", 25, ("EVO_LEVEL", "25", False)),
+        ("EVO_USE_MOVE_TWENTY_TIMES", "MOVE_PSYSHIELD_BASH", 0, ("EVO_LEVEL", "36", True)),
+        ("EVO_NONE", "0", 0, None),
+    ]
+    for met, ptxt, pnum, esperado in casos:
+        obtido = mapear_evolucao(met, ptxt, pnum, itens)
+        if obtido != esperado:
+            print(f"  FALHA mapear_evolucao({met}): {obtido} != {esperado}")
+            falhas += 1
+    # formato novo do RHH: condição no 4º campo
+    casos_cond = [
+        # Budew: amizade = EVO_LEVEL 0 + IF_MIN_FRIENDSHIP
+        ("EVO_LEVEL", "0", 0, "CONDITIONS({IF_MIN_FRIENDSHIP, FRIENDSHIP_EVO_THRESHOLD})",
+         ("EVO_FRIENDSHIP", "0", False)),
+        # Scyther->Scizor estilo novo: troca segurando item continua troca->37
+        ("EVO_TRADE", "0", 0, "CONDITIONS({IF_HOLD_ITEM, ITEM_METAL_COAT})",
+         ("EVO_LEVEL", "37", True)),
+        # nível com condição de hora: mantém o nível, derruba a condição
+        ("EVO_LEVEL", "20", 20, "CONDITIONS({IF_TIME, TIME_NIGHT})",
+         ("EVO_LEVEL", "20", False)),
+    ]
+    for met, ptxt, pnum, cond, esperado in casos_cond:
+        obtido = mapear_evolucao(met, ptxt, pnum, itens, cond)
+        if obtido != esperado:
+            print(f"  FALHA mapear_evolucao({met}): {obtido} != {esperado}")
+            falhas += 1
+    # Magneton: local (degradado) + Thunder Stone para o mesmo alvo -> pedra
+    e = escolher_por_alvo([("EVO_LEVEL", "36", "SPECIES_MAGNEZONE", True),
+                           ("EVO_ITEM", "ITEM_THUNDER_STONE", "SPECIES_MAGNEZONE", False)])
+    if e != [("EVO_ITEM", "ITEM_THUNDER_STONE", "SPECIES_MAGNEZONE")]:
+        print(f"  FALHA escolher_por_alvo (Magneton): {e}")
+        falhas += 1
+    # Eevee: base vanilla intocada; Ice->Water colide com Vaporeon -> nível 36
+    base = [("EVO_ITEM", "ITEM_THUNDER_STONE", "SPECIES_JOLTEON"),
+            ("EVO_ITEM", "ITEM_WATER_STONE", "SPECIES_VAPOREON"),
+            ("EVO_ITEM", "ITEM_FIRE_STONE", "SPECIES_FLAREON"),
+            ("EVO_FRIENDSHIP_DAY", "0", "SPECIES_ESPEON"),
+            ("EVO_FRIENDSHIP_NIGHT", "0", "SPECIES_UMBREON")]
+    novas = [("EVO_ITEM", "ITEM_LEAF_STONE", "SPECIES_LEAFEON"),
+             ("EVO_ITEM", "ITEM_WATER_STONE", "SPECIES_GLACEON"),
+             ("EVO_FRIENDSHIP", "0", "SPECIES_SYLVEON")]
+    linha = resolver_conflitos(novas, base)
+    ok = (linha[:5] == base and len(linha) == 8
+          and ("EVO_ITEM", "ITEM_LEAF_STONE", "SPECIES_LEAFEON") in linha
+          and ("EVO_LEVEL", "36", "SPECIES_GLACEON") in linha
+          and ("EVO_FRIENDSHIP", "0", "SPECIES_SYLVEON") in linha)
+    if not ok:
+        print(f"  FALHA resolver_conflitos (Eevee): {linha}")
+        falhas += 1
+    if falhas == 0:
+        print(f"  ok: política de evoluções da onda 2c "
+              f"({len(casos) + len(casos_cond)} mapeamentos + Magneton + Eevee)")
+    return falhas
+
+
 def self_test(ref: Path, poke: Path) -> int:
     falhas = 0
     print(f"self-test: {ref} -> {poke}")
+    falhas += _self_test_evolucoes()
     dados = carregar_referencia(ref)
     if len(dados) < ULTIMA_ESPECIE:
         print(f"  FALHA: só {len(dados)} espécies na referência")

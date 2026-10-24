@@ -105,3 +105,53 @@ pastel/rosadas — era defeito **da régua, não do jogo** (a ROM sempre esteve
 certa; paletas no ROM conferidas pela E6). Relatórios antigos (E1-E6) ainda têm
 o tom antigo; continuam válidos como prova de comportamento (texto, formas,
 HP), só a cor está deslocada.
+
+
+---
+
+## Onda 2c — evoluções modernas no motor vanilla (2026-10-24)
+
+ROM desta onda: md5 `7fcfdf53cc541f8dd571436ba8887759`.
+
+**O problema:** até a onda 2b só evoluções por nível funcionavam de fato — as
+10 `EVO_ITEM` geradas tinham **item 0** (nunca disparam), 7 eram `EVO_TRADE`
+(impossível jogando solo), amizade saía como "nível 0" (formato novo do RHH:
+`EVO_LEVEL 0` + `CONDITIONS({IF_MIN_FRIENDSHIP,...})`), e **nenhuma evolução
+cruzada** existia (Magneton→Magnezone, Eevee→Leafeon... o gerador só olhava
+espécies 387+; os `#if P_GEN_x_CROSS_EVOS` dentro de `EVOLUTION(...)` ainda
+engoliam Kleavor, Sylveon, Gallade e Froslass).
+
+**Política de mapeamento (gen_species_data.py, auditável no header gerado):**
+
+| método moderno | vira no FireRed |
+|---|---|
+| amizade (qualquer variante, incl. Sylveon) | `EVO_FRIENDSHIP` (limiar 220 do motor) |
+| pedra que existe (Fire/Water/Thunder/Leaf/Moon/Sun) | `EVO_ITEM` com a própria pedra |
+| pedra moderna | pedra equivalente: Dusk→Moon, Dawn/Shiny→Sun, Ice→Water |
+| troca (com ou sem item) | `EVO_LEVEL 37` |
+| nível com condição (hora, gênero, clima...) | `EVO_LEVEL` no mesmo nível |
+| sem equivalente (golpe, local, 999 moedas...) | `EVO_LEVEL 36` |
+
+Conflitos resolvidos por linha: alvo duplicado fica com a entrada "melhor"
+(Magneton tem Magnezone por local E por Thunder Stone → fica a pedra); gatilho
+repetido degrada para nível (Eevee já usa Water Stone p/ Vaporeon → Glaceon
+vira nível 36). Linhas vanilla são re-emitidas INTACTAS na frente dos anexos
+cross-gen (conteúdo original preservado). `EVOS_PER_MON` 5→8 (Eevee usa 8).
+
+**Conferência no binário (`verificar_rom.py`, self-test 11/11):** 233 espécies
+novas com evolução, zero trocas, zero item 0; amostras Eevee (8 entradas),
+Magneton, Kirlia→Gallade (Sun Stone), Riolu, Boldore conferidas byte a byte.
+
+**Prova em jogo (as 3 mecânicas):**
+
+| # | imagem | o que mostra |
+|---|---|---|
+| 10 | `10_thunderstone_no_magneton.png` | THUNDERSTONE usada no MAGNETON (bolsa vanilla) |
+| 11 | `11_magneton_virou_magnezone.png` | "Congratulations! Your MAGNETON evolved into MAGNEZONE!" (RAM: 82→462) |
+| 12 | `12_riolu_virou_lucario_amizade.png` | amizade 252 + level up → LUCARIO (RAM: 447→448) |
+| 13 | `13_boldore_virou_gigalith_nv37.png` | troca mapeada p/ nível: Boldore nv37 → GIGALITH (RAM: 525→526) |
+
+Nota de fidelidade vanilla: o FRLG só permite evoluir para fora da dex de
+Kanto depois da **National Dex** (guardas em `pokemon.c`/`evolution_scene.c`/
+`party_menu.c`, mantidas intactas) — igual ao jogo original com Gen 2. O
+savestate de prova já tem a Nacional ligada; o jogador real a recebe do Oak.

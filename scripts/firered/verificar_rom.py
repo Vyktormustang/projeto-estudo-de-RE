@@ -54,7 +54,22 @@ TAM_DEX = 0x24
 # (mesmo efeito do apcs-gnu). Medido: gLevelUpLearnsets - gEvolutionTable =
 # 0xA050 = 41040 = 1026 espécies * 5 evoluções * 8 bytes.
 TAM_EVOLUCAO = 8
-EVOS_POR_ESPECIE = 5
+EVOS_POR_ESPECIE = 5   # fallback; desde a onda 2c o build usa 8 (Eevee) -> medir!
+NUM_ESPECIES = 1026
+
+
+def evos_por_especie(simbolos: dict[str, int]) -> int:
+    """Mede no .map: gLevelUpLearnsets - gEvolutionTable = 1026 * N * 8.
+
+    A onda 2c subiu EVOS_PER_MON de 5 para 8; medir em vez de fixar evita o
+    erro clássico de "sizeof de cabeça" (ver o passo de 8/16 B dos treinadores).
+    """
+    if "gLevelUpLearnsets" in simbolos and "gEvolutionTable" in simbolos:
+        delta = simbolos["gLevelUpLearnsets"] - simbolos["gEvolutionTable"]
+        n, resto = divmod(delta, TAM_EVOLUCAO * NUM_ESPECIES)
+        if resto == 0 and 1 <= n <= 16:
+            return n
+    return EVOS_POR_ESPECIE
 
 # offsets dentro de struct SpeciesInfo
 OFF_STATS = 0
@@ -134,7 +149,7 @@ def ler_constantes(poke: Path) -> dict[str, int]:
     aliases: dict[str, str] = {}
     for rel in ("include/constants/moves.h", "include/constants/species.h",
                 "include/constants/pokedex.h", "include/constants/pokemon.h",
-                "include/constants/abilities.h",
+                "include/constants/abilities.h", "include/constants/items.h",
                 "include/battle.h"):        # MOVE_TARGET_* moram aqui
         caminho = poke / rel
         if not caminho.exists():
@@ -313,7 +328,8 @@ def conferir(rom: bytes, simbolos: dict[str, int], especies: dict[str, dict],
 
         # --- evolução
         if "gEvolutionTable" in simbolos and nome in evolucoes:
-            o = rom_offset("gEvolutionTable") + TAM_EVOLUCAO * EVOS_POR_ESPECIE * idx
+            o = (rom_offset("gEvolutionTable")
+                 + TAM_EVOLUCAO * evos_por_especie(simbolos) * idx)
             metodo, param, alvo = struct.unpack_from("<HHH", rom, o)
             esperado_metodo, esperado_param, esperado_alvo = evolucoes[nome]
             got = (metodo, param, alvo)
@@ -1122,12 +1138,76 @@ def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
     elif verboso:
         falhas.append("gDexCategories fora do .map")
 
+    # --- 5. evoluções (onda 2c): modernas mapeadas para o motor vanilla
+    com_evo = 0
+    if "gEvolutionTable" in simbolos:
+        consts = ler_constantes(poke)
+        n_evos = evos_por_especie(simbolos)
+        base_evo = simbolos["gEvolutionTable"] - 0x08000000
+
+        def linha_evo(num_especie: int) -> list[tuple[int, int, int]]:
+            o = base_evo + TAM_EVOLUCAO * n_evos * num_especie
+            saida = []
+            for i in range(n_evos):
+                met, par, alvo = struct.unpack_from("<HHH", rom,
+                                                    o + TAM_EVOLUCAO * i)
+                if met:
+                    saida.append((met, par, alvo))
+            return saida
+
+        if n_evos != 8:
+            falhas.append(f"gEvolutionTable: {n_evos} evoluções por espécie "
+                          "(a onda 2c esperava 8)")
+        else:
+            EVO_FRIEND = consts.get("EVO_FRIENDSHIP", 1)
+            EVO_LEVEL = consts.get("EVO_LEVEL", 4)
+            EVO_TRADE = consts.get("EVO_TRADE", 5)
+            EVO_TRADE_IT = consts.get("EVO_TRADE_ITEM", 6)
+            EVO_ITEM = consts.get("EVO_ITEM", 7)
+            # amostras da política: cross-gen, pedra equivalente, amizade, troca
+            amostras = [
+                ("EEVEE", (EVO_FRIEND, 0, numeros.get("SYLVEON", -1))),
+                ("EEVEE", (EVO_ITEM, consts.get("ITEM_LEAF_STONE", -1),
+                           numeros.get("LEAFEON", -1))),
+                ("EEVEE", (EVO_LEVEL, 36, numeros.get("GLACEON", -1))),
+                ("MAGNETON", (EVO_ITEM, consts.get("ITEM_THUNDER_STONE", -1),
+                              numeros.get("MAGNEZONE", -1))),
+                ("KIRLIA", (EVO_ITEM, consts.get("ITEM_SUN_STONE", -1),
+                            numeros.get("GALLADE", -1))),
+                ("RIOLU", (EVO_FRIEND, 0, numeros.get("LUCARIO", -1))),
+                ("BOLDORE", (EVO_LEVEL, 37, numeros.get("GIGALITH", -1))),
+            ]
+            for nome_e, entrada in amostras:
+                if nome_e in numeros and entrada not in linha_evo(numeros[nome_e]):
+                    falhas.append(f"gEvolutionTable: {nome_e} sem {entrada} "
+                                  f"(tem {linha_evo(numeros[nome_e])})")
+            # varredura das espécies novas: nada de troca nem item 0
+            trocas = itens_zero = 0
+            for ne in range(387, 1026):
+                ln = linha_evo(ne)
+                if ln:
+                    com_evo += 1
+                for met, par, _ in ln:
+                    if met in (EVO_TRADE, EVO_TRADE_IT):
+                        trocas += 1
+                    if met == EVO_ITEM and par == 0:
+                        itens_zero += 1
+            if trocas:
+                falhas.append(f"gEvolutionTable: {trocas} evoluções por troca "
+                              "em espécies novas (política manda nível 37)")
+            if itens_zero:
+                falhas.append(f"gEvolutionTable: {itens_zero} EVO_ITEM com item 0 "
+                              "(nunca disparam)")
+    else:
+        falhas.append("gEvolutionTable fora do .map")
+
     if verboso and not falhas:
         extra_t = ""
         if "gTrainers" in simbolos and trocas_no_fonte:
-            extra_t = f" e {novas_t} slots de treinador com espécie nova"
+            extra_t = f", {novas_t} slots de treinador com espécie nova"
         print(f"  E7 ok: Rota 1 = {fr[0]}, {fr[1]}, {fr[2]} (2 slots novos, Gen 9 no 1o), "
-              f"as 4 ordens da dex, as 9 páginas de habitat com 1025 entradas{extra_t}")
+              f"as 4 ordens da dex, as 9 páginas de habitat com 1025 entradas{extra_t} "
+              f"e {com_evo} espécies novas com evolução (sem troca, sem item 0)")
     return falhas
 
 
@@ -1138,7 +1218,19 @@ def self_test_e7() -> int:
     (tmp / "include/constants").mkdir(parents=True)
     (tmp / "include/constants/species.h").write_text(
         "#define SPECIES_PIDGEY 16\n#define SPECIES_LECHONK 915\n"
-        "#define SPECIES_SKWOVET 819\n#define SPECIES_RATTATA 19\n")
+        "#define SPECIES_SKWOVET 819\n#define SPECIES_RATTATA 19\n"
+        "#define SPECIES_EEVEE 133\n#define SPECIES_SYLVEON 700\n"
+        "#define SPECIES_LEAFEON 470\n#define SPECIES_GLACEON 471\n"
+        "#define SPECIES_MAGNETON 82\n#define SPECIES_MAGNEZONE 462\n"
+        "#define SPECIES_KIRLIA 281\n#define SPECIES_GALLADE 475\n"
+        "#define SPECIES_RIOLU 447\n#define SPECIES_LUCARIO 448\n"
+        "#define SPECIES_BOLDORE 525\n#define SPECIES_GIGALITH 526\n")
+    (tmp / "include/constants/pokemon.h").write_text(
+        "#define EVO_FRIENDSHIP 1\n#define EVO_LEVEL 4\n#define EVO_TRADE 5\n"
+        "#define EVO_TRADE_ITEM 6\n#define EVO_ITEM 7\n")
+    (tmp / "include/constants/items.h").write_text(
+        "#define ITEM_THUNDER_STONE 96\n#define ITEM_LEAF_STONE 98\n"
+        "#define ITEM_SUN_STONE 93\n")
     (tmp / "src/data").mkdir(parents=True)
     (tmp / "src/data/trainer_parties.h").write_text(
         ".species = SPECIES_KRICKETOT, // GERADO(e7-treinadores): era SPECIES_CATERPIE\n"
@@ -1187,6 +1279,21 @@ def self_test_e7() -> int:
     struct.pack_into("<I", rom, o + 0x24, 0x08151000)
     struct.pack_into("<H", rom, 0x151000 + 4, 401)       # slot 0: Kricketot
     struct.pack_into("<H", rom, 0x151000 + 8 + 4, 915)   # slot 1: Lechonk (passo 8)
+
+    # evoluções: tabela com 8 entradas/espécie; o delta p/ gLevelUpLearnsets
+    # é exatamente 1026 * 8 * 8 (é assim que evos_por_especie mede o 8)
+    sim["gEvolutionTable"] = 0x08160000
+    sim["gLevelUpLearnsets"] = sim["gEvolutionTable"] + 1026 * 8 * 8
+    def evo(ne, i, met, par, alvo):
+        struct.pack_into("<HHH", rom, sim["gEvolutionTable"] - 0x08000000
+                         + 64 * ne + 8 * i, met, par, alvo)
+    evo(133, 0, 7, 96, 135); evo(133, 1, 7, 97, 134); evo(133, 2, 7, 95, 136)
+    evo(133, 3, 2, 0, 196); evo(133, 4, 3, 0, 197)        # Espeon/Umbreon
+    evo(133, 5, 1, 0, 700); evo(133, 6, 7, 98, 470); evo(133, 7, 4, 36, 471)
+    evo(82, 0, 7, 96, 462)                                # Magneton
+    evo(281, 0, 4, 30, 282); evo(281, 1, 7, 93, 475)      # Kirlia
+    evo(447, 0, 1, 0, 448)                                # Riolu
+    evo(525, 0, 4, 37, 526)                               # Boldore
 
     mistura = [16, 915, 819] + [19] * 9
     for simbolo in ("sRoute1_FireRed_LandMons", "sRoute1_LeafGreen_LandMons"):
@@ -1241,6 +1348,27 @@ def self_test_e7() -> int:
     checa("sem o simbolo no .map reprova",
           bool(conferir_e7(bytes(rom), {k: v for k, v in sim.items()
                                         if k != "gPokedexOrder_Type"}, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    # planta uma troca numa espécie nova (Boldore): a política manda nível 37
+    struct.pack_into("<HHH", quebrado, sim["gEvolutionTable"] - 0x08000000
+                     + 64 * 525, 5, 0, 526)
+    checa("evolucao por troca em especie nova reprova",
+          bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    # EVO_ITEM com item 0 nunca dispara (o bug da onda 1)
+    struct.pack_into("<HHH", quebrado, sim["gEvolutionTable"] - 0x08000000
+                     + 64 * 447, 7, 0, 448)
+    checa("EVO_ITEM com item 0 reprova",
+          bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    # some com o Sylveon da linha do Eevee
+    struct.pack_into("<HHH", quebrado, sim["gEvolutionTable"] - 0x08000000
+                     + 64 * 133 + 8 * 5, 0, 0, 0)
+    checa("Eevee sem Sylveon por amizade reprova",
+          bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
 
     print(f"\nE7: {ok_total}/{ok_total + falhas} casos ok")
     return 0 if falhas == 0 else 1

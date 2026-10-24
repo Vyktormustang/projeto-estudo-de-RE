@@ -376,7 +376,7 @@ parâmetro de `AbilityBattleEffects()`. Depois disso os IDs não precisam mais c
 
 ---
 
-### E7 — Encontros, treinadores e UI — **CONCLUÍDA (ondas 1, 2a e 2b)**
+### E7 — Encontros, treinadores e UI — **CONCLUÍDA (ondas 1, 2a, 2b e 2c)**
 
 **Estado (2026-10-24): onda 1 concluída (encontros + captura + Pokédex utilizável) e
 onda 2a concluída (páginas de habitat: a ficha da dex das espécies novas está correta).**
@@ -808,10 +808,25 @@ navegação real Rota 1 → Viridian → Rota 2 → Floresta e fuga automática 
 serve — só zera no setup da batalha seguinte). ROM md5
 `a44251245f49682a6c56396f32d90b14`.
 
-**Pendência (onda 2c):** evoluções por método moderno além de nível (amizade, item,
-troca → mapeadas para o motor vanilla). A **ficha da dex de espécie nova já está
-correta** (habitats gerados); a lista da Pokédex mostra as 1025 e a ordem A-Z usa o
-nome em inglês do RHH.
+**Onda 2c (2026-10-24): evoluções modernas FEITAS — E7 completa.** ROM md5
+`7fcfdf53cc541f8dd571436ba8887759`. `gen_species_data.py` agora mapeia todo método
+moderno para o motor vanilla (política auditável no cabeçalho de
+`evolution_gen4_9.h`): amizade (qualquer variante, incl. o formato novo do RHH
+`EVO_LEVEL 0` + `CONDITIONS({IF_MIN_FRIENDSHIP,...})`) → `EVO_FRIENDSHIP`; pedra
+moderna → equivalente (Dusk→Moon, Dawn/Shiny→Sun, Ice→Water); troca → nível 37;
+sem equivalente → nível 36. Passe **cross-gen** novo: espécies antigas com alvo
+Gen 4-9 (Magneton→Magnezone por Thunder Stone, Eevee→Leafeon/Glaceon/Sylveon,
+Kirlia→Gallade por Sun Stone, 28 anexos) com a linha vanilla re-emitida intacta;
+`EVOS_PER_MON` 5→8. Bugs mortos: 10 `EVO_ITEM` com item 0 (nunca disparavam), 7
+`EVO_TRADE` inalcançáveis, amizade virando "nível 0", `#if` dentro de
+`EVOLUTION(...)` engolindo Kleavor/Sylveon/Gallade/Froslass. Conferência no
+binário: 233 espécies novas com evolução, zero troca, zero item 0 (self-test
+11/11). **Prova em jogo das 3 mecânicas** (PNGs 10-13 do relatório): Thunder
+Stone → MAGNEZONE, amizade 252 → LUCARIO, Boldore nv37 → GIGALITH. Guardas de
+National Dex do FRLG mantidas (cross-gen só após a Nacional, como no original).
+
+A **ficha da dex de espécie nova já está correta** (habitats gerados); a lista da
+Pokédex mostra as 1025 e a ordem A-Z usa o nome em inglês do RHH.
 
 **Defeito da ficha da dex — CORRIGIDO (2026-10-24, mesma rodada):** ao capturar uma espécie Gen 4-9
 a ficha da dex mostrava `No800`, nome `??????????` e `HT/WT ???`. Não era a `gPokedexEntries`
