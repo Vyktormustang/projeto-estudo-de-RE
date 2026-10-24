@@ -48,7 +48,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E6 | Sprites, ícones e cries | **CONCLUÍDA — onda 1** (2026-10-24) |
 | E7 | Encontros, treinadores e UI | **CONCLUÍDA — ondas 1 e 2a** (2026-10-24) |
 | E8 | Testes automatizados e regressão | a fazer (testes pontuais já existem) |
-| E9 | Entrega: ROM final, Drive e documentação | a fazer |
+| E9 | Entrega: ROM final, Drive e documentação | **parcial** — build E7 já no Drive (2026-10-24) |
 
 ---
 
@@ -446,6 +446,14 @@ resumo, evolução) e tratar a Pokédex completa como sub-etapa própria, sem tr
 ---
 
 ### E9 — Entrega
+
+**Parcial (2026-10-24):** o build da E7 (ondas 1 e 2a) já está no Drive com link
+público — `pokefirered_gen1-9_E7.gba`, md5 `821f35a7805fa2738576a33b6682c1b2`:
+<https://drive.google.com/file/d/1g5CCRzxsPp5QtI-aNL5DjabzPzxDURRF/view>.
+Provas do critério final nesta build em `reports/firered_e9/LEIA-ME.md`
+(título, porta de casa entra/sai, Gen 9 selvagem capturável na Rota 1,
+Pokédex até #1025 com ficha correta). A entrega *final* ainda depende de
+E7 onda 2b + E8.
 
 - Build final, sha256, cabeçalho conferido.
 - Upload no **Google Drive** com link público + conferência de sha256 contra o local.
