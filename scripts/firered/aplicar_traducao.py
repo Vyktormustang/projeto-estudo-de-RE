@@ -74,7 +74,13 @@ def aplicar_mapas(clone: Path, charmap: set[str], escrever: bool) -> int:
         por_label = dict(traducoes)
         aplicadas = ja_ok = 0
         labels_vistos: set[str] = set()
-        for inc in sorted((clone / "data/maps").glob("*/text.inc")):
+        # Onda 6+: além dos mapas, os textos de sistema em data/text/*.inc.
+        # Fora: new_game_intro/save (cópia integral via traducao/) e braille
+        # (sistema de escrita dos puzzles — não se traduz).
+        incs = sorted((clone / "data/maps").glob("*/text.inc")) + sorted(
+            p for p in (clone / "data/text").glob("*.inc")
+            if p.name not in ("new_game_intro.inc", "save.inc", "braille.inc"))
+        for inc in incs:
             texto = inc.read_text(encoding="utf-8")
             mudou = False
             def trocar(m: re.Match) -> str:
