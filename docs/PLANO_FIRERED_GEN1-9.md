@@ -868,3 +868,24 @@ o sintoma de estado velho é "0 batalhas" ou jogador congelado.
 | 2026-10-23 | IDs 1–386 congelados | Não quebrar encontros/saves/conteúdo de Kanto |
 | 2026-10-23 | Dados gerados por script, nunca à mão | 1025 espécies × 20 campos não é editável à mão |
 | 2026-10-23 | EWRAM tratado como recurso escasso (98,87% cheio) | Medido no linker, não estimado |
+
+
+---
+
+## E8 — Regressão — **CONCLUÍDA (2026-10-24)**
+
+Matriz completa na ROM final `7fcfdf53cc541f8dd571436ba8887759`
+(`reports/firered_e8/LEIA-ME.md`): verificar_rom E2-E7 ok; E4 golpes 6/6;
+E5 habilidades 3/3; E7 captura APROVADO; boot refeito. Pegadinha achada e
+consertada: o scanner da prova E5 limitava espécies a 386 (pré-E7) — limites
+de prova devem vir de `NUM_SPECIES`, não do conteúdo da época.
+
+## E9 — Entrega — **CONCLUÍDA (2026-10-24)**
+
+Build final `pokefirered_gen1-9.gba` no Drive, pública:
+<https://drive.google.com/file/d/1P3F4sLYEik4mBwidRFkJmSERjM8A2HyD/view>
+md5 `7fcfdf53cc541f8dd571436ba8887759`,
+sha256 `b2874f30abc9805a4de90f97e058908a292baa5fbd10816e183abec1d29ec2d8`.
+Detalhes e conferência de hash em `reports/firered_e9/LEIA-ME.md`.
+
+**Projeto E0-E9: todas as etapas concluídas.**

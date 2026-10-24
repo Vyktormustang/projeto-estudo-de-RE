@@ -111,7 +111,9 @@ def achar_encontro(rom: bytes, simbolos: dict[str, int]) -> tuple[int, int, int]
             especies = [struct.unpack_from("<H", rom, oa + 4 * i + 2)[0] for i in range(12)]
             if not all(1 <= n <= 10 for n in niveis):
                 continue
-            if not all(1 <= e <= 386 for e in especies):
+            # desde a E7 a Rota 1 tem espécies Gen 4-9 (ex.: 915, 819):
+            # o teto é NUM_SPECIES-1, não 386 (pegadinha achada na regressão E8)
+            if not all(1 <= e <= 1025 for e in especies):
                 continue
             return oa, oi, passo
     raise SystemExit("não achei a tabela de encontros da Rota 1 (não vou chutar endereço)")

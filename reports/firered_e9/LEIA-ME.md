@@ -29,3 +29,31 @@ Para regerar: `bash scripts/firered/setup_ambiente.sh`.
 
 > Nota: PNGs regerados em 2026-10-24 após o conserto do conversor de cores do
 > `nav.py` (RGB565 com vermelho deslocado 1 bit — detalhe no LEIA-ME da E7).
+
+
+---
+
+## Build FINAL (2026-10-24) — E9 fechada
+
+**Download (link público):**
+<https://drive.google.com/file/d/1P3F4sLYEik4mBwidRFkJmSERjM8A2HyD/view>
+(download direto: <https://drive.google.com/uc?id=1P3F4sLYEik4mBwidRFkJmSERjM8A2HyD&export=download>)
+
+| campo | valor |
+|---|---|
+| arquivo | `pokefirered_gen1-9.gba` (16 777 216 B) |
+| md5 | `7fcfdf53cc541f8dd571436ba8887759` |
+| sha256 | `b2874f30abc9805a4de90f97e058908a292baa5fbd10816e183abec1d29ec2d8` |
+| base | `pret/pokefirered` (FireRed de verdade), build `MODERN=1` |
+| conteúdo | E1-E7 completas: 1025 espécies, golpes, habilidades, sprites, encontros selvagens, habitats da dex, 481 slots de treinador e evoluções modernas |
+| regressão | E8 completa nesta build (ver `reports/firered_e8/LEIA-ME.md`) |
+
+Cópia local no workspace: `rom/pokefirered_gen1-9.gba` (a pasta `rom/` não é
+versionada — regra do projeto). A build intermediária da E7-2a ficou no Drive
+renomeada `pokefirered_gen1-9_E7_DESATUALIZADA.gba` para não ser confundida.
+
+Como conferir no Windows (PowerShell):
+```powershell
+Get-FileHash .\pokefirered_gen1-9.gba -Algorithm SHA256
+Get-FileHash .\pokefirered_gen1-9.gba -Algorithm MD5
+```
