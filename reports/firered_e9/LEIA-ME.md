@@ -26,3 +26,6 @@ Para regerar: `bash scripts/firered/setup_ambiente.sh`.
 1. Baixe o `.gba` no link acima.
 2. Abra no **mGBA** (`https://mgba.io/downloads.html`) — apenas jogue; nada de patcher.
 3. Sem ROM base: este arquivo já é a ROM completa.
+
+> Nota: PNGs regerados em 2026-10-24 após o conserto do conversor de cores do
+> `nav.py` (RGB565 com vermelho deslocado 1 bit — detalhe no LEIA-ME da E7).

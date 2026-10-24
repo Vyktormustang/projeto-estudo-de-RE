@@ -34,36 +34,36 @@ def png_write(path, w, h, rgb):
 
 
 # Tabela de 65536 entradas montada uma vez: converte BGR555 -> 3 bytes RGB.
-_TABELA_RGB = None
+
 
 
 def _bgr555_para_rgb(buf: bytes, w: int, h: int, pitch: int) -> bytes:
-    """Converte o framebuffer BGR555 do libretro em RGB888.
+    """Converte o framebuffer RGB565 do libretro em RGB888.
 
-    O jeito óbvio (loop por pixel) custa ~9 ms/frame, o que derruba o emulador
-    para ~100 fps. Aqui a conversão é feita com `bytes.translate`, que roda em C:
-    separa os bytes baixo/alto, traduz cada um para a máscara de 8 bits e
-    entrelaça os três canais.
+    Formato MEDIDO, não presumido (branco puro no dump cru = 0xFFFF, que só
+    existe em RGB565; em 0RGB1555 seria 0x7FFF): o core do mGBA entrega
+    R bits 11-15, G bits 5-10 (6 bits), B bits 0-4. Para medir de novo:
+    `NAV_DUMP_RAW=/tmp/raw.bin nav.py ...` grava o último frame cru.
+
+    Durante as E1-E7 o vermelho era lido em bits 10-14 (deslocado 1): o bit
+    alto do verde vazava para o vermelho e o vermelho real perdia o bit de
+    cima — tudo saía pastel/rosado (o "outono" na Rota 1). O jogo sempre
+    esteve certo; a régua é que media errado.
     """
-    global _TABELA_RGB
-    if _TABELA_RGB is None:
-        baixo = bytes((v >> 2) & 7 for v in range(256))
-        alto = bytes((v >> 2) & 7 for v in range(256))
-        _TABELA_RGB = (baixo, alto)
     if pitch == w * 2:
         linhas = [buf]
     else:
         linhas = [buf[y * pitch:y * pitch + w * 2] for y in range(h)]
     dados = b"".join(linhas)
     pares = memoryview(dados).cast("H")          # 1 valor por pixel (little endian)
-    # verde = bits 5-10, vermelho = 11-15, azul = 0-4 -> escalas 255
+    # RGB565: azul = bits 0-4, verde = 5-10 (6 bits), vermelho = 11-15
     r = bytearray(len(pares))
     g = bytearray(len(pares))
     b = bytearray(len(pares))
     for i, v in enumerate(pares):
         b[i] = ((v & 31) * 255) // 31
         g[i] = (((v >> 5) & 63) * 255) // 63
-        r[i] = (((v >> 10) & 31) * 255) // 31
+        r[i] = (((v >> 11) & 31) * 255) // 31
     saida = bytearray(len(pares) * 3)
     saida[0::3] = r
     saida[1::3] = g
@@ -116,8 +116,8 @@ def caixa_de_texto_bruto(buf, w, h, pitch):
             o = base + x * 2
             v = buf[o] | (buf[o + 1] << 8)
             total += 1
-            # limiares equivalentes a 205/255 nos canais de 5/6 bits
-            if (v & 31) > 25 and ((v >> 5) & 63) > 50 and ((v >> 10) & 31) > 25:
+            # limiares equivalentes a 205/255 nos canais 5/6/5 do RGB565
+            if (v & 31) > 25 and ((v >> 5) & 63) > 50 and ((v >> 11) & 31) > 25:
                 claro += 1
     return total > 0 and claro * 100 // total >= 65
 
@@ -667,6 +667,10 @@ def main():
     if erro_rota:
         print(f"rota: {erro_rota}")
 
+    import os as _os
+    if _os.environ.get("NAV_DUMP_RAW") and estado["buf"]:
+        Path(_os.environ["NAV_DUMP_RAW"]).write_bytes(estado["buf"])
+        print(f"raw: {estado['w']}x{estado['h']} pitch {estado['pitch']} -> {_os.environ['NAV_DUMP_RAW']}")
     if estado["rgb"]:
         png_write(outdir / "final.png", estado["w"], estado["h"], estado["rgb"])
     print("PNGs em", outdir)

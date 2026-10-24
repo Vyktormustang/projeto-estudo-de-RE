@@ -91,3 +91,17 @@ Como chegou lá (reprodutível): `nav.py --rota` com fuga automática de batalha
 (`gMain.inBattle`, ciclo B,B,DOWN,RIGHT,A) — Rota 1 → Viridian (var `0x4051`=2
 destrava o velhinho) → Rota 2 → Floresta, 38 waypoints, e a visão do Rick
 dispara a batalha de treinador de verdade (nada é injetado no time dele).
+
+
+---
+
+## Nota sobre cores (2026-10-24)
+
+Os PNGs deste relatório foram **regerados** depois de um conserto no conversor
+de cores do `nav.py`: o framebuffer do core é **RGB565** (medido: branco puro =
+`0xFFFF`), mas o vermelho era lido deslocado 1 bit (bits 10-14 em vez de
+11-15). O bit alto do verde vazava para o vermelho e as capturas saíam
+pastel/rosadas — era defeito **da régua, não do jogo** (a ROM sempre esteve
+certa; paletas no ROM conferidas pela E6). Relatórios antigos (E1-E6) ainda têm
+o tom antigo; continuam válidos como prova de comportamento (texto, formas,
+HP), só a cor está deslocada.

@@ -834,6 +834,13 @@ Prova em jogo (mesma ROM, nova captura): a ficha agora abre em
 (`reports/firered_e7/04_ficha_dex_lechonk.png`). `verificar_rom.py` passou a percorrer
 os ponteiros de `gDexCategories` no ROM e exige as 1025 espécies.
 
+**Lição registrada (cores):** o conversor de pixels do `nav.py` lia o framebuffer
+RGB565 do mGBA com o vermelho deslocado 1 bit — todas as capturas até 2026-10-24
+saíram pastel/rosadas ("outono" na Rota 1). Formato foi **medido** (branco cru =
+`0xFFFF` ⇒ RGB565; `NAV_DUMP_RAW=... nav.py` grava o frame cru para re-medir), o
+conversor corrigido e os PNGs da E7/E9 regerados. Não presumir formato de pixel:
+medir. O jogo nunca teve as cores erradas.
+
 **Lição registrada:** savestate só vale na ROM exata. Depois de qualquer build, refazer
 `prova_golpes_e4.py --preparar-estado` (~30 s) antes de qualquer prova em jogo —
 o sintoma de estado velho é "0 batalhas" ou jogador congelado.
