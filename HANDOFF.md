@@ -73,8 +73,20 @@ como registro histórico.
   precisa mais caber em 256. Se mexer em `SpeciesInfo`, `BattlePokemon` ou `BattleMsgData`,
   rode `scripts/firered/offsets.py` de novo: o `nav.py` lê o HP por ali (`PF_OFFSETS`).
   **O que ficou para a onda 2:** cries oficiais, animação própria de ataque, formas alternativas.
-- **Próximo passo:** E7 (`VYK-35`) — encontros, treinadores e UI (espécies novas na Rota 1;
-  Pokédex até #1025). Antes: conferir a folga de EWRAM (~2,7 KB).
+- **E7 CONCLUÍDA (ondas 1, 2a, 2b, 2c):** espécies novas **obteníveis** — encontros
+  selvagens misturados (Lechonk capturável na Rota 1, prova em jogo APROVADA), habitats da
+  Pokédex (Naive Bayes p/ #387+, categorias oficiais até #386), **481 slots de treinador**
+  com espécies novas e **evoluções modernas** adaptadas (troca→lv37, item exclusivo→pedra
+  equivalente ou lv36; 233 linhas evolutivas funcionais; provas em jogo: Magnezone por pedra,
+  Lucario por amizade, Gigalith por nível — `reports/firered_e7/10-13_*.png`).
+- **E8 CONCLUÍDA:** regressão completa na ROM final `7fcfdf53…` — matriz 100% PASS em
+  `reports/firered_e8/LEIA-ME.md`; comando único: `bash scripts/firered/rodar_regressao.sh`.
+  Pegadinha corrigida: a prova E5 limitava espécies a 386 (pré-E7) → teto agora é 1025.
+- **E9 CONCLUÍDA — ENTREGA FINAL:** `pokefirered_gen1-9.gba` pública no Google Drive
+  (<https://drive.google.com/file/d/1P3F4sLYEik4mBwidRFkJmSERjM8A2HyD/view>), md5
+  `7fcfdf53cc541f8dd571436ba8887759`, sha256 `b2874f30…`. Documento de entrega (o que
+  mudou/não mudou, limitações, CONFIRMADO/PROVÁVEL/DESCONHECIDO, como jogar no Windows):
+  `docs/FIRERED_BASE.md`. **Projeto E0-E9 completo** (Linear VYK-28…VYK-37 Done).
 
 ### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
 
