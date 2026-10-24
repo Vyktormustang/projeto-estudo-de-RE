@@ -8,9 +8,10 @@ com as 9 gerações), **sem quebrar nada** do que foi provado em E0-E9.
 | o quê | decisão | motivo |
 |---|---|---|
 | Nomes de espécies | **inglês** (Pikachu, Lechonk…) | nomes oficiais são mundiais, nunca traduzidos |
-| Nomes de golpes | **PT-BR** (terminologia oficial de Pokémon GO/anime quando existir; ex.: Tackle → Investida) | existe terminologia oficial consolidada |
-| Nomes de habilidades | **PT-BR** (idem) | idem |
-| Nomes de itens | **PT-BR** (Potion → Poção) | idem |
+| Nomes de golpes | **inglês** (Tackle, Thunderbolt…) | decisão do usuário (estética), 2026-10-24 |
+| Nomes de habilidades | **inglês** (consistência com golpes) | idem |
+| Nomes de itens | **inglês** (Potion, Ultra Ball…) | decisão do usuário (estética), 2026-10-24 |
+| Descrições de golpes/itens/habilidades | **PT-BR** | prosa acompanha o resto do jogo |
 | Nomes de lugares | **manter** (Pallet Town, Rota 1 traduz "Route"→"Rota") | consistência com mapas/placas |
 | Diálogos, menus, batalha, descrições | **PT-BR integral** | objetivo do projeto |
 | Acentos | suporte completo, inclusive **ã õ Ã Õ** (não existem na fonte original — ver T1) | português de verdade |
@@ -40,9 +41,10 @@ habilidade 12, item 14 caracteres. Tradução que não cabe → abreviar.
 - **T2 — Interface:** menus, bolsa, save, opções, telas de UI
   (`src/strings.c` e afins).
 - **T3 — Batalha:** mensagens de batalha ("X used Y!" → "X usou Y!").
-- **T4 — Itens:** nomes + descrições (limite 14).
-- **T5 — Golpes + habilidades:** nomes (16/12) + descrições, terminologia
-  oficial GO/anime.
+- **T4 — Itens:** só as DESCRIÇÕES (nomes ficam em inglês — decisão do
+  usuário).
+- **T5 — Golpes + habilidades:** só as DESCRIÇÕES (nomes ficam em inglês —
+  decisão do usuário).
 - **T6 — Pokédex:** descrições das 1.025 espécies.
 - **T7 — História:** diálogos dos 430 mapas, em ondas (Kanto por regiões;
   Sevii Islands por último).
