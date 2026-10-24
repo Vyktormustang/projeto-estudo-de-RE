@@ -88,7 +88,12 @@ def _pixels_da_linha(bruta: bytes, profundidade: int, largura: int) -> list[int]
             saida.append(b >> 4)
             saida.append(b & 0xF)
         return saida[:largura]
-    raise ValueError(f"profundidade {profundidade} nao suportada (so 4 e 8)")
+    if profundidade == 2:  # fontes do pokefirered (latin_*.png) são 2 bpp
+        saida = []
+        for b in bruta:
+            saida += [(b >> 6) & 3, (b >> 4) & 3, (b >> 2) & 3, b & 3]
+        return saida[:largura]
+    raise ValueError(f"profundidade {profundidade} nao suportada (so 2, 4 e 8)")
 
 
 def _desfiltrar(tipo: int, linha: bytes, anterior: bytes, bpp: int) -> bytes:
@@ -214,18 +219,25 @@ def _chunk(tipo: bytes, corpo: bytes) -> bytes:
 
 def escrever(png: Png, caminho: str | Path) -> None:
     prof = png.profundidade
-    if prof not in (4, 8):
-        raise ValueError("so' grava 4 ou 8 bits")
+    if prof not in (2, 4, 8):
+        raise ValueError("so' grava 2, 4 ou 8 bits")
     linhas = bytearray()
     for linha in png.linhas:
         linhas.append(0)                      # filtro None: previsível e estável
         if prof == 8:
             linhas += bytes(linha)
-        else:
+        elif prof == 4:
             for i in range(0, png.largura, 2):
                 alto = linha[i] & 0xF
                 baixo = (linha[i + 1] & 0xF) if i + 1 < png.largura else 0
                 linhas.append((alto << 4) | baixo)
+        else:  # 2 bpp (4 pixels por byte)
+            for i in range(0, png.largura, 4):
+                b = 0
+                for j in range(4):
+                    v = (linha[i + j] & 3) if i + j < png.largura else 0
+                    b |= v << (6 - 2 * j)
+                linhas.append(b)
     ihdr = struct.pack(">IIBBBBB", png.largura, png.altura, prof, 3, 0, 0, 0)
     plte = b"".join(bytes(c) for c in png.paleta)
     saida = [ASSINATURA, _chunk(b"IHDR", ihdr), _chunk(b"PLTE", plte)]
