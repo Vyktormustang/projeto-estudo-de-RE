@@ -288,7 +288,12 @@ class Estado:
         if passo != 4:
             raise SystemExit(f"ItemSlot com {passo} B (esperado 4)")
         base = self.s1 + off[campo] + slot * passo
-        struct.pack_into("<HH", self.d, base, item_id, qtd)
+        # A quantidade da bolsa é cifrada: qty ^ (SaveBlock2.encryptionKey & 0xFFFF)
+        # (src/item.c: SetBagItemQuantity). OBS: o comentário /*0xF20*/ do
+        # global.h está DESATUALIZADO após a Pokédex Gen 9; o offset real,
+        # medido com o compilador do projeto (offsetof), é 0xF24.
+        key = struct.unpack_from("<I", self.d, self.s2 + off.get("s2_encryptionKey", 0xF24))[0]
+        struct.pack_into("<HH", self.d, base, item_id, qtd ^ (key & 0xFFFF))
 
     def set_nacional(self, off: dict) -> None:
         """Liga a Pokédex nacional: as três condições de IsNationalPokedexEnabled.

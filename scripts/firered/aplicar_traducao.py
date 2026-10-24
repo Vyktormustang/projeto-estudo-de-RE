@@ -39,6 +39,13 @@ DICIONARIOS_C = [
     (AQUI / "traducao_batalha_ptbr.py", "src/battle_message.c"),
 ]
 
+
+# dicionários itemId -> [linhas] aplicados a campos de arquivos .json
+# (jsonproc regenera o .h correspondente no build)
+DICIONARIOS_JSON = [
+    (AQUI / "traducao_itens_ptbr.py", "src/data/items.json", "description_english"),
+]
+
 RE_STRING = re.compile(r'\.string\s+"(.*)"')
 RE_LABEL = re.compile(r"^(\w+)::", re.M)
 RE_PLACEHOLDER = re.compile(r"\{[^{}]+\}")
@@ -160,9 +167,73 @@ def aplicar_strings_c(clone: Path, charmap: set[str], escrever: bool) -> int:
     return total
 
 
+
+def aplicar_json(clone: Path, charmap: set[str], escrever: bool) -> int:
+    """Aplica dicionários itemId -> [linhas] em campos de arquivos .json."""
+    import json as _json
+    total = 0
+    SEP = chr(92) + "n"  # separador \n literal (2 chars), como nos .c
+    for arq_py, alvo, campo in DICIONARIOS_JSON:
+        if not arq_py.exists():
+            continue
+        ns: dict = {}
+        exec(arq_py.read_text(encoding="utf-8"), ns)
+        trad: dict[str, list[str]] = ns["TRADUCOES"]
+        destino = clone / alvo
+        rotarq = alvo.split("/")[-1]
+        texto = destino.read_text(encoding="utf-8")
+        re_campo = re.compile('("' + campo + '"' + chr(92) + 's*:' + chr(92) + 's*)"((?:[^"' + chr(92) + chr(92) + ']|' + chr(92) + chr(92) + '.)*)"')
+        problemas = aplicados = ja_ok = 0
+        for item_id, linhas in trad.items():
+            rot = rotarq + ":" + item_id
+            if not isinstance(linhas, list) or not (1 <= len(linhas) <= 3):
+                print("ERRO  " + rot + ": precisa ser lista de 1-3 linhas")
+                problemas += 1
+                continue
+            if any((chr(92) in ln or chr(10) in ln) for ln in linhas):
+                print("ERRO  " + rot + ": linha com barra/newline embutida")
+                problemas += 1
+                continue
+            novo = SEP.join(linhas)
+            m_id = re.search('"itemId"' + chr(92) + 's*:' + chr(92) + 's*"' + re.escape(item_id) + '"', texto)
+            if not m_id:
+                print("ERRO  " + rot + ": itemId não encontrado")
+                problemas += 1
+                continue
+            m = re_campo.search(texto, m_id.end())
+            if not m:
+                print("ERRO  " + rot + ": campo não encontrado")
+                problemas += 1
+                continue
+            atual = _json.loads('"' + m.group(2) + '"')
+            if atual == novo:
+                ja_ok += 1
+                continue
+            erros = _validar_corpo(rot, novo, atual, charmap)
+            avisos = [e for e in erros if "AVISO" in e]
+            erros = [e for e in erros if "AVISO" not in e]
+            for a in avisos:
+                print("aviso  " + a)
+            if erros:
+                for e in erros:
+                    print("ERRO  " + e)
+                problemas += len(erros)
+                continue
+            novo_raw = _json.dumps(novo)[1:-1]
+            texto = texto[:m.start(2)] + novo_raw + texto[m.end(2):]
+            aplicados += 1
+        if escrever and aplicados:
+            destino.write_text(texto, encoding="utf-8")
+        print(rotarq + ": " + str(aplicados) + " aplicadas, " + str(ja_ok) + " já ok, "
+              + str(problemas) + " problemas (de " + str(len(trad)) + " no dicionário)")
+        total += problemas
+    return total
+
+
 def aplicar(clone: Path, escrever: bool) -> int:
     charmap = chars_do_charmap(clone)
     problemas = aplicar_strings_c(clone, charmap, escrever)
+    problemas += aplicar_json(clone, charmap, escrever)
     arquivos = sorted(p for p in RAIZ_TRADUCAO.rglob("*") if p.is_file())
     if not arquivos:
         print("nada em traducao/ para aplicar")
