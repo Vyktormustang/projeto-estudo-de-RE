@@ -37,6 +37,8 @@ LIMITE_LINHA = 36
 DICIONARIOS_C = [
     (AQUI / "traducao_strings_ptbr.py", "src/strings.c"),
     (AQUI / "traducao_batalha_ptbr.py", "src/battle_message.c"),
+    (AQUI / "traducao_golpes_ptbr.py", "src/move_descriptions.c"),
+    (AQUI / "traducao_habilidades_ptbr.py", "src/data/text/abilities.h"),
 ]
 
 
@@ -138,6 +140,12 @@ def aplicar_strings_c(clone: Path, charmap: set[str], escrever: bool) -> int:
         texto = destino.read_text(encoding="utf-8")
         problemas = aplicados = ja_ok = 0
         for var, novo in trad.items():
+            if isinstance(novo, list):
+                if any((chr(92) in ln or chr(10) in ln) for ln in novo):
+                    print(f"ERRO  {rotarq}:{var}: linha com barra/newline embutida")
+                    problemas += 1
+                    continue
+                novo = (chr(92) + "n").join(novo)
             m = re.search(RE_VAR_C.format(var=re.escape(var)), texto)
             if not m:
                 print(f"ERRO  {rotarq}:{var}: variável não encontrada")
