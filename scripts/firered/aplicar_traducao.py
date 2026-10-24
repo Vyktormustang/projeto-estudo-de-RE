@@ -32,19 +32,26 @@ from pathlib import Path
 AQUI = Path(__file__).parent
 RAIZ_TRADUCAO = AQUI / "traducao"
 LIMITE_LINHA = 36
+# dicionário var -> texto PT para strings _("...") de src/strings.c
+ARQ_STRINGS_C = AQUI / "traducao_strings_ptbr.py"
 
 RE_STRING = re.compile(r'\.string\s+"(.*)"')
 RE_LABEL = re.compile(r"^(\w+)::", re.M)
-RE_PLACEHOLDER = re.compile(r"\{[A-Z_0-9]+\}")
-RE_CONTROLE = re.compile(r"\{[A-Z_0-9]+\}|\\n|\\p|\\l|\$")
+RE_PLACEHOLDER = re.compile(r"\{[^{}]+\}")
+RE_CONTROLE = re.compile(r"\{[^{}]+\}|\\n|\\p|\\l|\$")
 
 
 def chars_do_charmap(clone: Path) -> set[str]:
     chars = set()
     for ln in (clone / "charmap.txt").read_text(encoding="utf-8").splitlines():
         m = re.match(r"^'(.+?)'\s*=", ln)
-        if m and len(m.group(1)) == 1:
-            chars.add(m.group(1))
+        if not m:
+            continue
+        ch = m.group(1)
+        if ch == "\\'":
+            ch = "'"
+        if len(ch) == 1:
+            chars.add(ch)
     return chars
 
 
@@ -87,9 +94,67 @@ def validar(rel: Path, traduzido: str, original: str, charmap: set[str]) -> list
     return erros
 
 
+RE_VAR_C = r'((?:ALIGNED\(4\)\s+)?const u8 {var}\[\]\s*=\s*_\(")((?:[^"\\]|\\.)*)("\))'
+
+
+def _validar_corpo(rotulo: str, novo: str, velho: str, charmap: set[str]) -> list[str]:
+    erros = []
+    if sorted(RE_PLACEHOLDER.findall(novo)) != sorted(RE_PLACEHOLDER.findall(velho)):
+        erros.append(f"{rotulo}: placeholders mudaram")
+    for ch in RE_CONTROLE.sub("", novo):
+        if ch not in charmap:
+            erros.append(f"{rotulo}: caractere fora do charmap: {ch!r}")
+    for linha in re.split(r"\\n|\\p|\\l", novo):
+        # tokens sem largura visível não contam
+        linha = re.sub(r"\{(PAUSE[^{}]*|PLAY_[^{}]*|COLOR [^{}]*|SHADOW [^{}]*|HIGHLIGHT [^{}]*|FONT_[^{}]*|CLEAR[^{}]*|ESCAPE [^{}]*)\}", "", linha)
+        pura = RE_PLACEHOLDER.sub("XXXXXXX", linha)
+        if len(pura) > LIMITE_LINHA:
+            erros.append(f"{rotulo}: AVISO linha com {len(pura)} chars")
+    return erros
+
+
+def aplicar_strings_c(clone: Path, charmap: set[str], escrever: bool) -> int:
+    """Aplica o dicionário var->texto em src/strings.c."""
+    if not ARQ_STRINGS_C.exists():
+        return 0
+    ns: dict = {}
+    exec(ARQ_STRINGS_C.read_text(encoding="utf-8"), ns)
+    trad: dict[str, str] = ns["TRADUCOES"]
+    destino = clone / "src/strings.c"
+    texto = destino.read_text(encoding="utf-8")
+    problemas = aplicados = ja_ok = 0
+    for var, novo in trad.items():
+        m = re.search(RE_VAR_C.format(var=re.escape(var)), texto)
+        if not m:
+            print(f"ERRO  strings.c:{var}: variável não encontrada")
+            problemas += 1
+            continue
+        atual = m.group(2)
+        if atual == novo:
+            ja_ok += 1
+            continue
+        erros = _validar_corpo(f"strings.c:{var}", novo, atual, charmap)
+        avisos = [e for e in erros if "AVISO" in e]
+        erros = [e for e in erros if "AVISO" not in e]
+        for a in avisos:
+            print(f"aviso  {a}")
+        if erros:
+            for e in erros:
+                print(f"ERRO  {e}")
+            problemas += len(erros)
+            continue
+        texto = texto[:m.start(2)] + novo + texto[m.end(2):]
+        aplicados += 1
+    if escrever and aplicados:
+        destino.write_text(texto, encoding="utf-8")
+    print(f"strings.c: {aplicados} aplicadas, {ja_ok} já ok, {problemas} problemas"
+          f" (de {len(trad)} no dicionário)")
+    return problemas
+
+
 def aplicar(clone: Path, escrever: bool) -> int:
     charmap = chars_do_charmap(clone)
-    problemas = 0
+    problemas = aplicar_strings_c(clone, charmap, escrever)
     arquivos = sorted(p for p in RAIZ_TRADUCAO.rglob("*") if p.is_file())
     if not arquivos:
         print("nada em traducao/ para aplicar")

@@ -56,4 +56,4 @@ Cada etapa: muda → compila → prova em jogo (screenshot) → commit → Linea
 ## Status
 
 - **T1 — CONCLUÍDA (2026-10-24):** fonte com ã/õ/Ã/Õ nas 4 fontes latinas, charmap, larguras, ferramentas (`aplicar_fonte_ptbr.py`, `aplicar_traducao.py`) e intro do jogo traduzida — provas em `reports/firered_t1/`.
-- **T2 — PRÓXIMA.**
+- **T2 — EM ANDAMENTO (onda 1 concluída: 255 strings de src/strings.c + save.inc; provas em reports/firered_t2/).**
