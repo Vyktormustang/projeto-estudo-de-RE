@@ -8,7 +8,7 @@ Uso:
 --script: segmentos "inicio-fim:BOTAO" (segura) ou "frame:BOTAO" (aperta 8 frames).
 BOTOES: A B UP DOWN LEFT RIGHT START SELECT L R
 """
-import argparse, ctypes as C, os, struct, sys, zlib
+import argparse, ctypes as C, json, os, struct, sys, zlib
 from pathlib import Path
 
 ENV_CB = C.CFUNCTYPE(None, C.c_uint, C.c_void_p)
@@ -180,11 +180,38 @@ def simbolo_em_memoria(mapa, nome):
     raise SystemExit(f"{nome} em 0x{addr:08X}: regiao nao mapeada")
 
 
-TAM_BATTLEMON = 0x58
+# Layout de `struct BattlePokemon`. Os valores antigos (passo 0x58, hp 0x28,
+# level 0x2A, maxHP 0x2C, tipos 0x21/0x22) valiam enquanto `ability` era u8.
+# A E6 alargou `ability` para u16 (ID de habilidade passa de 255), o que empurra
+# tudo depois dele. Deixe o `offsets.py` medir e passe o JSON:
+#     export PF_OFFSETS=/tmp/pf_offsets.json
+# Sem o JSON, os padrões abaixo continuam valendo para o layout ANTIGO.
+LAYOUT_BATALHA = {
+    "tamanho": 0x58, "hp": 0x28, "nivel": 0x2A, "maxhp": 0x2C,
+    "type1": 0x21, "type2": 0x22, "ability": 0x20,
+}
 
 
-def ler_batalha(lib, off):
+def carregar_layout(caminho: str | None = None) -> dict[str, int]:
+    """Lê o `battlemon_size`/`bm_*` do JSON do `offsets.py`, se existir."""
+    caminho = caminho or os.environ.get("PF_OFFSETS", "/tmp/pf_offsets.json")
+    try:
+        dados = json.loads(Path(caminho).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return dict(LAYOUT_BATALHA)
+    chave = {"tamanho": "battlemon_size", "hp": "bm_hp", "nivel": "bm_level",
+             "maxhp": "bm_maxHP", "type1": "bm_type1", "type2": "bm_type2",
+             "ability": "bm_ability"}
+    layout = dict(LAYOUT_BATALHA)
+    for campo, nome in chave.items():
+        if isinstance(dados.get(nome), int):
+            layout[campo] = dados[nome]
+    return layout
+
+
+def ler_batalha(lib, off, layout: dict[str, int] | None = None):
     """Le gBattleMons[0..1]: especie, nivel, HP, stats usadas e tipos."""
+    L = layout or LAYOUT_BATALHA
     tam = lib.retro_serialize_size()
     b = C.create_string_buffer(tam)
     if not lib.retro_serialize(C.cast(b, C.c_void_p), tam):
@@ -192,14 +219,16 @@ def ler_batalha(lib, off):
     d = b.raw[:tam]
     saida = []
     for i in range(2):
-        o = off + i * TAM_BATTLEMON
+        o = off + i * L["tamanho"]
         esp, atk, dfs, vel, satk, sdef = struct.unpack_from("<6H", d, o)
-        hp, = struct.unpack_from("<H", d, o + 0x28)
-        nivel, = struct.unpack_from("<B", d, o + 0x2A)
-        maxhp, = struct.unpack_from("<H", d, o + 0x2C)
-        t1, t2 = d[o + 0x21], d[o + 0x22]
+        hp, = struct.unpack_from("<H", d, o + L["hp"])
+        nivel, = struct.unpack_from("<B", d, o + L["nivel"])
+        maxhp, = struct.unpack_from("<H", d, o + L["maxhp"])
+        t1, t2 = d[o + L["type1"]], d[o + L["type2"]]
+        habilidade = struct.unpack_from("<H", d, o + L["ability"])[0]
         saida.append(dict(esp=esp, nivel=nivel, hp=hp, maxhp=maxhp, atk=atk,
-                          dfs=dfs, satk=satk, sdef=sdef, tipos=(t1, t2)))
+                          dfs=dfs, satk=satk, sdef=sdef, tipos=(t1, t2),
+                          habilidade=habilidade))
     return saida
 
 
@@ -252,6 +281,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--rom", required=True)
     ap.add_argument("--core", default=_core_padrao())
+    ap.add_argument("--offsets", default=None,
+                    help="JSON do offsets.py; sem ele uso o layout de antes da E6 "
+                         "(campo ability u8)")
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--frames", type=int, default=0)
     ap.add_argument("--in", dest="entrada")
@@ -285,6 +317,7 @@ def main():
                     help='frame:BOTAO[:duracao],... - aperta N frames (padrao 6) e solta 20. '
                          'Menus do FireRed ignoram botao segurado; use para A/START.')
     a = ap.parse_args()
+    layout = carregar_layout(a.offsets)
     global SBL1_OFF, BATALHA_OFF
     if a.map:
         SBL1_OFF = offset_sbl1_do_map(a.map)
@@ -575,7 +608,7 @@ def main():
                                or bool(a.every and f % a.every == 0))
         lib.retro_run()
         if a.batalha and f % a.batalha == 0:
-            for i, m in enumerate(ler_batalha(lib, BATALHA_OFF)):
+            for i, m in enumerate(ler_batalha(lib, BATALHA_OFF, layout)):
                 print(f"f{f:5d} b{i} esp={m['esp']:4d} nv={m['nivel']:3d} "
                       f"hp={m['hp']:3d}/{m['maxhp']:<3d} atk={m['atk']:3d} def={m['dfs']:3d} "
                       f"spa={m['satk']:3d} spd={m['sdef']:3d} tipos={m['tipos']}")

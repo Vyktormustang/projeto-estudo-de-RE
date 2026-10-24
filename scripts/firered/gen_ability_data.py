@@ -89,36 +89,33 @@ def dados_do_rhh(ref: Path) -> dict[str, dict]:
 def habilidades_usadas(ref: Path, pf: Path) -> dict[str, int]:
     """Quantas espécies do nosso jogo usam cada habilidade (slots 1 e 2).
 
-    Lê as espécies que existem no ROM (SPECIES_* >= 387, da E1) e casa com os
-    blocos do RHH usando o MESMO parser da E2 — se usasse outro, uma espécie
-    com macro poderia ficar de fora e a habilidade dela cairia na faixa > 255.
+    A fonte é **só o RHH**, com as macros expandidas (`carregar_referencia`), e o
+    filtro de "quais espécies são nossas" vem de `species.h` (fixo pela E1).
+
+    Já foi diferente e deu bug: ler também o `species_info_gen4_9.h` que a E2
+    gera fazia o conjunto depender do **estado** do clone. Na primeira passada as
+    habilidades ainda eram `ABILITY_NONE` e a conta dava 172; depois da segunda
+    passada dava 229, e o plano de IDs mudava — as mesmas espécies ficavam com
+    IDs diferentes em cada rodada (`verificar_rom.py` reprovava 18 delas).
+    Depender só do RHH (commit fixado) torna o resultado o mesmo sempre.
     """
     from collections import Counter
     texto_esp = (Path(pf) / "include/constants/species.h").read_text(encoding="utf-8")
     nossas = {n for n, v in re.findall(r"^#define (SPECIES_\w+) (\d+)$", texto_esp, re.M)
               if int(v) >= 387}
     uso: Counter = Counter()
-
-    def somar(texto: str, so_nossas: bool) -> None:
-        for nome, corpo in gen.blocos_de_especie(texto).items():
-            if so_nossas and f"SPECIES_{nome}" not in nossas:
-                continue
-            achado = gen.campos(corpo).get("abilities", "")
-            m = re.search(r"\{\s*([A-Z0-9_]+)\s*,\s*([A-Z0-9_]+)", achado)
-            if not m:
-                continue
-            for item in m.groups():
-                if item.startswith("ABILITY_") and item != "ABILITY_NONE":
-                    uso[item] += 1
-
-    for arquivo in sorted((Path(ref) / "src/data/pokemon/species_info").glob("*.h")):
-        somar(arquivo.read_text(encoding="utf-8", errors="replace"), so_nossas=True)
-    # o header gerado pela E2 é a palavra final: espécie que o parser do RHH não
-    # alcança (corpo montado por macro) aparece aqui, e sem isso a habilidade
-    # dela cairia na faixa > 255 e seria truncada para outra habilidade.
-    gerado = Path(pf) / "src/data/pokemon/species_info_gen4_9.h"
-    if gerado.exists():
-        somar(gerado.read_text(encoding="utf-8", errors="replace"), so_nossas=False)
+    dados = gen.carregar_referencia(Path(ref))
+    for nome in nossas:
+        curto = nome[len("SPECIES_"):]
+        bloco = gen.bloco_da_especie(curto, dados)
+        if bloco is None:
+            continue
+        m = re.search(r"\{\s*([A-Z0-9_]+)\s*,\s*([A-Z0-9_]+)", bloco.get("abilities", ""))
+        if not m:
+            continue
+        for item in m.groups():
+            if item.startswith("ABILITY_") and item != "ABILITY_NONE":
+                uso[item] += 1
     return dict(uso)
 
 
@@ -148,17 +145,15 @@ def planejar(pf: Path, ref: Path) -> dict:
 
     uso = habilidades_usadas(ref, pf)
     candidatas = [n for n in rhh_dados if n not in existentes]
-    usadas = [n for n in candidatas if uso.get(n)]
-    livres = 256 - max(existentes.values()) - 1          # vagas até ABILITY 255
-    if len(usadas) > livres:
+    # Ordem canônica do RHH. Já foi "por uso" para caber em u8; com o campo u16
+    # (apply_e6_port.py) isso não é mais preciso — e ordem fixa é auditável: o ID
+    # de `ABILITY_EARTH_EATER` não muda se a lista de espécies mudar.
+    ordem = sorted(candidatas, key=lambda n: rhh_dados[n]["id"])
+    usadas = [n for n in ordem if uso.get(n)]
+    livres = 65536 - max(existentes.values()) - 1
+    if len(candidatas) > livres:
         raise SystemExit(
-            f"{len(usadas)} habilidades usadas por alguma espécie não cabem em {livres} "
-            f"IDs u8 (ABILITIES_COUNT teria de passar de 256, e 'abilities[2]' e' u8). "
-            f"Ou alarga o campo para u16, ou reduz o conjunto de espécies.")
-    # usadas primeiro (mais frequentes na frente: ID menor = mais "antigo"),
-    # depois as que nenhuma espécie usa — essas podem passar de 255 sem efeito.
-    ordem = sorted(usadas, key=lambda n: (-uso[n], rhh_dados[n]["id"]))
-    ordem += sorted((n for n in candidatas if not uso.get(n)), key=lambda n: rhh_dados[n]["id"])
+            f"{len(candidatas)} habilidades não cabem em {livres} IDs u16")
 
     # casa por NOME; o que já existe mantém o ID do FireRed
     novas: list[tuple[str, str, str, str]] = []   # (const, nome, desc, simbolo)
@@ -179,6 +174,8 @@ def planejar(pf: Path, ref: Path) -> dict:
     total = maior + 1
 
     longos = [n for _, n, _, _ in novas if len(n) > NOME_MAX]
+    # Avaliação: com u16 qualquer ID serve, mas o resumo do jogo mostra o nome —
+    # habilidade sem nome legível continua sendo dado sem efeito. Nada a abortar.
     ids_usadas = [v for n, v in atribuidas if uso.get(n)]
     usadas_plano = len(ids_usadas)
     return {
@@ -533,7 +530,11 @@ def _montar_arvore_teste(raiz: Path) -> tuple[Path, Path]:
     (pf / FR_BATTLE_MAIN).write_text(FR_MAIN_TESTE, encoding="utf-8")
     (pf / FR_SUMMARY).write_text(FR_SUMMARY_TESTE, encoding="utf-8")
     (pf / "include/constants/species.h").write_text(SPECIES_TESTE, encoding="utf-8")
-    (ref / "src/data/pokemon/species_info/gen_teste.h").write_text(SPECIES_INFO_TESTE, encoding="utf-8")
+    # o nome precisa casar com `gen_*_families.h`: é o que `carregar_referencia`
+    # (do gen_species_data) varre em produção. `gen_teste.h` passava no parser
+    # antigo e criava um teste que não reproduzia o caminho real.
+    (ref / "src/data/pokemon/species_info/gen_9_families.h").write_text(
+        SPECIES_INFO_TESTE, encoding="utf-8")
     (pf / "charmap.txt").write_text(CHARMAP_TESTE, encoding="utf-8")
     return pf, ref
 
@@ -564,11 +565,11 @@ def self_test() -> int:
 
         # 3. casamento por nome: CACOPHONY/AIR_LOCK do FireRed ficam de fora
         assert [n for n, _, _, _ in plano["novas"]] == ["ABILITY_TANGLED_FEET", "ABILITY_MOTOR_DRIVE", "ABILITY_EARTH_EATER"]
-        # TANGLED_FEET é usada por uma espécie: vai para 78 mesmo não sendo a
-        # primeira na ordem do RHH (as usadas precisam caber em u8)
+        # Ordem canônica do RHH (o campo é u16 desde a E6, então não há mais
+        # motivo para priorizar as usadas).
         assert dict(plano["atribuidas"]) == {
             "ABILITY_TANGLED_FEET": 78, "ABILITY_MOTOR_DRIVE": 79, "ABILITY_EARTH_EATER": 80}
-        assert plano["maior_id_usada"] == 78
+        assert plano["maior_id_usada"] == 78          # só a TANGLED_FEET é usada
         assert plano["total"] == 81
         assert plano["fr_sem_rhh"] == ["ABILITY_CACOPHONY"], plano["fr_sem_rhh"]  # AIR_LOCK casa por nome
         ok += 1

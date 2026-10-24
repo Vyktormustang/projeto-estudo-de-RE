@@ -62,10 +62,27 @@ CAMPOS = {
     "pe_categoryName": ("struct PokedexEntry", "categoryName"),
     "pe_height": ("struct PokedexEntry", "height"),
     "pe_description": ("struct PokedexEntry", "description"),
+    # E6: layout de batalha. `ability` virou u16 (ID de habilidade > 255), o que
+    # empurra type1/type2/pp/hp/level/maxHP e muda o passo de `gBattleMons`.
+    # Quem lê a RAM (nav.py, provas) tem de usar ESTES números, não os de antes.
+    "battlemon_size": ("struct BattlePokemon", None),
+    "bm_species": ("struct BattlePokemon", "species"),
+    "bm_ability": ("struct BattlePokemon", "ability"),
+    "bm_type1": ("struct BattlePokemon", "type1"),
+    "bm_type2": ("struct BattlePokemon", "type2"),
+    "bm_hp": ("struct BattlePokemon", "hp"),
+    "bm_level": ("struct BattlePokemon", "level"),
+    "bm_maxHP": ("struct BattlePokemon", "maxHP"),
+    # E6: layout das tabelas de sprite (quem lê o ROM precisa do passo certo)
+    "moncoords_size": ("struct MonCoords", None),
+    "compressed_spritesheet_size": ("struct CompressedSpriteSheet", None),
+    "compressed_spritepalette_size": ("struct CompressedSpritePalette", None),
+    "speciesname_len": ("struct SpeciesInfo", "baseHP"),   # só p/ ancorar o include
 }
 
 TEMPLATE = """#include "global.h"
 #include "pokedex.h"
+#include "data.h"
 {corpo}
 """
 
@@ -102,7 +119,12 @@ def extrair(poke: Path, toolchain: Path | None) -> dict[str, int]:
     fonte = Path(tempfile.mkdtemp()) / "offsets.c"
     fonte.write_text(TEMPLATE.format(corpo=montar_fonte()))
     saida = fonte.with_suffix(".s")
-    cmd = ["arm-none-eabi-gcc", "-mthumb", "-O0", "-S", "-o", str(saida),
+    # `-mabi=apcs-gnu` é o que o build do pokefirered usa (ver CFLAGS do Makefile).
+    # Sem ele o probe mede com a ABI EABI, que **não** arredonda struct para
+    # múltiplo de 4: `struct MonCoords` (2x u8) sai 2 no probe e 4 no ROM, e o
+    # array de coordenadas de sprite é lido com o passo errado. A regra do APCS
+    # é "todo struct ocupa múltiplo de 4 bytes".
+    cmd = ["arm-none-eabi-gcc", "-mthumb", "-mabi=apcs-gnu", "-O0", "-S", "-o", str(saida),
            "-iquote", "include", "-iquote", "gflib",
            "-D", "FIRERED=1", "-D", "ENGLISH=1", "-D", "MODERN=1", str(fonte)]
     r = subprocess.run(cmd, cwd=poke, env=env, capture_output=True, text=True)

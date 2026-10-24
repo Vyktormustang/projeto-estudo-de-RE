@@ -119,7 +119,8 @@ def achar_encontro(rom: bytes, simbolos: dict[str, int]) -> tuple[int, int, int]
 
 def rom_com_selvagem(origem: Path, destino: Path, especie: int, nivel: int,
                      simbolos: dict[str, int], *,
-                     sem_habilidade: bool = False) -> Path:
+                     sem_habilidade: bool = False,
+                     poke: Path | None = None) -> Path:
     """Copia a ROM e troca **os 12 slots** da grama da Rota 1 por `especie`/`nivel`.
 
     Trocar só o slot 0 não serve: o jogo sorteia entre os 12, e a batalha de
@@ -134,11 +135,17 @@ def rom_com_selvagem(origem: Path, destino: Path, especie: int, nivel: int,
         if "gSpeciesInfo" not in simbolos:
             raise SystemExit("gSpeciesInfo fora do .map")
         o = simbolos["gSpeciesInfo"] - 0x08000000 + TAM_ESPECIE * especie + OFF_HABILIDADES
-        if rom[o] != ABILITY_EARTH_EATER:
-            raise SystemExit(f"espécie {especie}: habilidade {rom[o]}, esperava "
+        poke = poke or origem.parent
+        e_u16 = "u16 abilities[2]" in (poke / "include/pokemon.h").read_text(errors="replace")
+        if e_u16:
+            lido = struct.unpack_from("<2H", rom, o)[0]
+        else:
+            lido = rom[o]
+        if lido != ABILITY_EARTH_EATER:
+            raise SystemExit(f"espécie {especie}: habilidade {lido}, esperava "
                              f"{ABILITY_EARTH_EATER} (layout mudou? não vou zerar no escuro)")
-        rom[o] = 0
-        rom[o + 1] = 0
+        # zera os dois slots no layout ATUAL (u8: 2 bytes; u16: 4 bytes)
+        rom[o:o + (4 if e_u16 else 2)] = b"\x00" * (4 if e_u16 else 2)
     destino.write_bytes(rom)
     return destino
 
@@ -171,7 +178,9 @@ def ler_hp(log: str) -> list[tuple[int, int, int]]:
 
 
 def lutar(rom: Path, mapa: Path, estado: Path, outdir: Path, frames: int = 3200,
-          shots: int = 40) -> str:
+          shots: int = 40, offsets: Path | None = None) -> str:
+    """`offsets` é obrigatório na prática desde a E6: `ability` virou u16 e o
+    passo de `BattlePokemon` mudou — sem o JSON o nav lê o HP no lugar errado."""
     """Entra na grama (sobe/desce), depois martela A para lutar."""
     passos = []
     for i in range(14):
@@ -179,12 +188,13 @@ def lutar(rom: Path, mapa: Path, estado: Path, outdir: Path, frames: int = 3200,
         passos.append(f"{ini}-{ini + 150}:{'UP' if i % 2 == 0 else 'DOWN'}")
     saida = outdir / "batalha.bin"
     log = nav(rom=rom, map=mapa, in_=estado, out=saida, outdir=outdir,
-              frames=3400, script=";".join(passos), parar_quando="gBattleTypeFlags")
+              frames=3400, script=";".join(passos), parar_quando="gBattleTypeFlags",
+              offsets=offsets)
     if "condicao gBattleTypeFlags" not in log:
         return "SEM_BATALHA\n" + log[-3000:]
     pulsos = ",".join(f"{f}:A:6" for f in range(200, frames, 40))
     log += nav(rom=rom, map=mapa, in_=saida, outdir=outdir, frames=frames,
-               pulsos=pulsos, batalha=100, every=shots)
+               pulsos=pulsos, batalha=100, every=shots, offsets=offsets)
     return log
 
 
@@ -217,15 +227,17 @@ def batalha(pf: Path, golpe: int, especie: int, temporario: Path,
         if not m:
             raise SystemExit("ABILITY_EARTH_EATER não está em abilities.h")
         ABILITY_EARTH_EATER = int(m.group(1))
-        if ABILITY_EARTH_EATER > 255:
+        if ABILITY_EARTH_EATER > 255 and "u16 abilities[2]" not in \
+                (pf / "include/pokemon.h").read_text(errors="replace"):
             raise SystemExit(f"ABILITY_EARTH_EATER = {ABILITY_EARTH_EATER} não cabe no u8 "
-                             f"de abilities[2]")
+                             f"de abilities[2] (rode apply_e6_port.py)")
     rom = rom_com_selvagem(rom_original, temporario / "rom_prova.gba", especie,
-                           NIVEL_SELVAGEM, simbolos, sem_habilidade=sem_habilidade)
+                           NIVEL_SELVAGEM, simbolos, sem_habilidade=sem_habilidade,
+                           poke=pf)
     estado = temporario / "jogador.bin"
     if not preparar_time(rom, mapa, offsets, golpe, estado):
         raise SystemExit("savestate.py pokemon falhou")
-    log = lutar(rom, mapa, estado, temporario / "shots")
+    log = lutar(rom, mapa, estado, temporario / "shots", offsets=offsets)
     hps = ler_hp(log)
     if not hps:
         return dict(ok=False, motivo="sem leitura de HP (batalha não abriu?)", log=log, hps=[])
