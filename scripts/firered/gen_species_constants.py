@@ -145,8 +145,12 @@ def emitir_nomes(natdex: list[str], tabela: list[tuple[int, str]], original: str
     for numero, nome in tabela:
         if nome in existentes:
             continue
-        legivel = natdex[numero].replace("_", " ")[:10].ljust(10)
+        # sem `ljust(10)`: o espaço de enchimento ia para dentro do jogo e a
+        # caixa de batalha mostrava "Go! SYLVEON   !" (o array já tem 11 colunas)
+        legivel = natdex[numero].replace("_", " ")[:10].rstrip()
         novas.append(f'    [SPECIES_{nome}] = _("{legivel}"),')
+    # entradas antigas foram gravadas com espaço de enchimento: limpa
+    original = re.sub(r'(\[SPECIES_\w+\] = _\("[^"]*?) +"\)', r'\1")', original)
     if not novas:
         return original
     return original.replace("};", "\n".join(novas) + "\n};", 1) if original.rstrip().endswith("};") else original

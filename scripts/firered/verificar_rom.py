@@ -61,6 +61,7 @@ OFF_STATS = 0
 OFF_TIPOS = 6
 OFF_CATCH = 8
 OFF_EXP = 9
+OFF_HABILIDADES = 0x16      # u8 abilities[2]
 # offsets dentro de struct PokedexEntry
 OFF_CATEGORIA = 0
 OFF_ALTURA = 12
@@ -120,10 +121,17 @@ CHARMAP: dict[int, str] = {}
 
 
 def ler_constantes(poke: Path) -> dict[str, int]:
-    """`#define NOME valor` dos headers de constantes (golpes, espécies, tipos)."""
+    """`#define NOME valor` dos headers de constantes (golpes, espécies, tipos).
+
+    Aceita também alias (`#define MOVE_VISE_GRIP MOVE_VICE_GRIP`), resolvidos em
+    cadeia no fim: sem isso os learnsets com o nome novo do RHH davam "esperado
+    -1" e a conferência reprovava uma ROM correta.
+    """
     valores: dict[str, int] = {}
+    aliases: dict[str, str] = {}
     for rel in ("include/constants/moves.h", "include/constants/species.h",
                 "include/constants/pokedex.h", "include/constants/pokemon.h",
+                "include/constants/abilities.h",
                 "include/battle.h"):        # MOVE_TARGET_* moram aqui
         caminho = poke / rel
         if not caminho.exists():
@@ -133,6 +141,20 @@ def ler_constantes(poke: Path) -> dict[str, int]:
                          r"\s*(?://.*)?$", linha)
             if m:
                 valores.setdefault(m.group(1), int(m.group(2), 0))
+            else:
+                # alias: `#define MOVE_VISE_GRIP MOVE_VICE_GRIP` (a E4 criou 4 destes)
+                a = re.match(r"\s*#define\s+([A-Z][A-Z0-9_]*)\s+([A-Z][A-Z0-9_]*)\s*(?://.*)?$", linha)
+                if a:
+                    aliases[a.group(1)] = a.group(2)
+    # resolve os aliases em cadeia (MOVE_X -> MOVE_Y -> número)
+    for nome in aliases:
+        visto: set[str] = set()
+        alvo = nome
+        while alvo in aliases and alvo not in visto:
+            visto.add(alvo)
+            alvo = aliases[alvo]
+        if alvo in valores:
+            valores[nome] = valores[alvo]
     return valores
 
 
@@ -576,6 +598,106 @@ def conferir_e4(rom: bytes, simbolos: dict[str, int], constantes: dict[str, int]
     return falhas
 
 
+# ---------------------------------------------------------------------------
+# E5: habilidades
+# ---------------------------------------------------------------------------
+def esperado_habilidades(poke: Path) -> tuple[dict[str, str], dict[str, str]]:
+    """`(nomes, descricoes)` de `src/data/text/abilities.h`."""
+    texto = (poke / "src/data/text/abilities.h").read_text(encoding="utf-8")
+    nomes = {n: t for n, t in re.findall(r'\[(ABILITY_[A-Z0-9_]+)\] = _\("([^"]*)"\),', texto)}
+    descricoes: dict[str, str] = {}
+    simbolos = {m.group(1): m.group(2) for m in
+                re.finditer(r'static const u8 (s[A-Za-z0-9]+Description)\[\] = _\("([^"]*)"\);', texto)}
+    for nome, simbolo in re.findall(r"\[(ABILITY_[A-Z0-9_]+)\] = (s[A-Za-z0-9]+Description),", texto):
+        if simbolo in simbolos:
+            descricoes[nome] = simbolos[simbolo]
+    return nomes, descricoes
+
+
+def conferir_e5(rom: bytes, simbolos: dict[str, int], constantes: dict[str, int],
+                poke: Path, numeros: dict[str, int] | None = None,
+                verboso: bool = True) -> list[str]:
+    """Confere no ROM: nomes, descrições e as habilidades de cada espécie nova."""
+    falhas: list[str] = []
+    if "gAbilityNames" not in simbolos or "gAbilityDescriptionPointers" not in simbolos:
+        return ["gAbilityNames/gAbilityDescriptionPointers fora do .map"]
+    total = constantes.get("ABILITIES_COUNT", 0)
+    nomes, descricoes = esperado_habilidades(poke)
+    if not total:
+        return ["ABILITIES_COUNT nao encontrado em abilities.h"]
+    if len(nomes) != total:
+        falhas.append(f"{len(nomes)} nomes em abilities.h, ABILITIES_COUNT {total}")
+
+    # --- nomes: descobre o passo comparando com o que o gerador escreveu
+    base = simbolos["gAbilityNames"] - 0x08000000
+    verificaveis = [(constantes[n], t) for n, t in nomes.items() if n in constantes and n != "ABILITY_NONE"]
+    passo, melhor = 0, -1
+    for candidato in (17, 13, 12, 16, 20, 24):        # ABILITY_NAME_LENGTH + 1 = 17 com a E5
+        acertos = sum(1 for i, t in verificaveis if decodificar(rom, base + candidato * i, 24) == t)
+        if acertos > melhor:
+            passo, melhor = candidato, acertos
+    if melhor < len(verificaveis):
+        erros = 0
+        for i, t in verificaveis:
+            lido = decodificar(rom, base + passo * i, 24)
+            if lido != t:
+                erros += 1
+                if erros <= 5:
+                    falhas.append(f"gAbilityNames[{i}] = {lido!r}, esperava {t!r}")
+        if erros > 5:
+            falhas.append(f"... e mais {erros - 5} nomes de habilidade errados")
+
+    # --- descrições: todo ponteiro tem de cair dentro do ROM e ler texto
+    base_ptr = simbolos["gAbilityDescriptionPointers"] - 0x08000000
+    ruins = 0
+    for i in range(total):
+        ptr = struct.unpack_from("<I", rom, base_ptr + 4 * i)[0]
+        if not 0x08000000 <= ptr < 0x0A000000:
+            ruins += 1
+            if ruins <= 5:
+                falhas.append(f"descrição da habilidade {i}: ponteiro inválido {ptr:#x}")
+            continue
+        texto = decodificar(rom, ptr - 0x08000000, 80)
+        if not texto.strip():
+            ruins += 1
+            if ruins <= 5:
+                falhas.append(f"descrição da habilidade {i}: texto vazio")
+    if ruins > 5:
+        falhas.append(f"... e mais {ruins - 5} descrições de habilidade com problema")
+
+    # --- habilidades das espécies novas (é o que a E5 destrava: antes era ABILITY_NONE)
+    fonte = poke / "src/data/pokemon/species_info_gen4_9.h"
+    if "gSpeciesInfo" in simbolos and fonte.exists():
+        if numeros is None:
+            numeros = gen.numeracao_nacional(poke)
+        base_esp = simbolos["gSpeciesInfo"] - 0x08000000
+        blocos = gen.blocos_de_especie(fonte.read_text(encoding="utf-8"))
+        conferidas = 0
+        for nome_curto, corpo in blocos.items():
+            if nome_curto not in numeros:
+                continue
+            # `campos()` devolve o valor já sem o nome do campo: `{ABILITY_X, ABILITY_Y}`
+            m = re.search(r"\{\s*([A-Z0-9_]+)\s*,\s*([A-Z0-9_]+)",
+                          gen.campos(corpo).get("abilities", ""))
+            if not m:
+                continue
+            esperado = [constantes.get(m.group(1), -1), constantes.get(m.group(2), -1)]
+            o = base_esp + TAM_ESPECIE * numeros[nome_curto] + OFF_HABILIDADES
+            lido = [rom[o], rom[o + 1]]
+            if lido != esperado:
+                falhas.append(f"{nome_curto}: habilidades {lido} != {esperado}")
+            conferidas += 1
+        if verboso and falhas:
+            print("  exemplos:", "; ".join(f.split(":")[0] for f in falhas[:8]))
+        if verboso:
+            print(f"  E5 ok: {total} habilidades, {melhor}/{len(verificaveis)} nomes e "
+                  f"{total} descrições conferidas; habilidades de {conferidas} espécies novas "
+                  f"batem com o gerado")
+        if conferidas == 0:
+            falhas.append("não conferi a habilidade de nenhuma espécie (numeros vazio?)")
+    return falhas
+
+
 def self_test_e4() -> int:
     """ROM sintetica: confere que o verificador de golpes aprova e reprova."""
     global CHARMAP
@@ -736,6 +858,78 @@ def self_test() -> int:
 
 
 # ---------------------------------------------------------------------------
+def self_test_e5() -> int:
+    """ROM sintética: confere que a conferência de habilidades aprova e reprova."""
+    global CHARMAP
+    guardado = CHARMAP
+    CHARMAP = {0x00: " ", **{0xBB + i: c for i, c in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ")}}
+    falhas = 0
+    tmp = Path(tempfile.mkdtemp())
+    (tmp / "src/data/text").mkdir(parents=True)
+    (tmp / "src/data/pokemon").mkdir(parents=True)
+    (tmp / "include/constants").mkdir(parents=True)
+    (tmp / "include/constants/abilities.h").write_text(
+        "#define ABILITY_NONE 0\n#define ABILITY_STENCH 1\n#define ABILITY_EARTH_EATER 2\n"
+        "#define ABILITIES_COUNT 3\n")
+    (tmp / "src/data/text/abilities.h").write_text(
+        'static const u8 sNoneDescription[] = _("No special ability.");\n'
+        'static const u8 sStenchDescription[] = _("Moves may cause flinching.");\n'
+        'static const u8 sEarthEaterDescription[] = _("Restores HP if hit by a Ground move.");\n'
+        "const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =\n{\n"
+        "    [ABILITY_NONE] = sNoneDescription,\n"
+        "    [ABILITY_STENCH] = sStenchDescription,\n"
+        "    [ABILITY_EARTH_EATER] = sEarthEaterDescription,\n};\n"
+        "const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =\n{\n"
+        '    [ABILITY_NONE] = _("-------"),\n'
+        '    [ABILITY_STENCH] = _("STENCH"),\n'
+        '    [ABILITY_EARTH_EATER] = _("EARTH EATER"),\n};\n')
+    (tmp / "src/data/pokemon/species_info_gen4_9.h").write_text(
+        "    [SPECIES_ORTHWORM] =\n    {\n        .baseHP        = 70,\n"
+        "        .abilities = { ABILITY_EARTH_EATER, ABILITY_NONE },\n    },\n")
+    numeros = {"ORTHWORM": 968}   # chave sem o prefixo SPECIES_, como em numeracao_nacional
+
+    rom = bytearray(0x50000)
+    simbolos = dict(gAbilityNames=0x08010000, gAbilityDescriptionPointers=0x08020000,
+                    gSpeciesInfo=0x08030000)
+    const = dict(ABILITY_NONE=0, ABILITY_STENCH=1, ABILITY_EARTH_EATER=2, ABILITIES_COUNT=3)
+
+    def escrever(quebrar: bool = False):
+        for i, nome in enumerate(["", "STENCH", "EARTH EATER"]):
+            o = 0x10000 + 17 * i
+            rom[o:o + 17] = bytes([0xFF]) * 17
+            rom[o:o + len(nome)] = bytes([0xBB + ord(c) - 65 if c != " " else 0x00 for c in nome])
+        for i in range(3):
+            struct.pack_into("<I", rom, 0x20000 + 4 * i, 0x08040000 + 0x40 * i)
+            texto = ["No special ability.", "Moves may cause flinching.",
+                     "Restores HP if hit by a Ground move."][i]
+            if quebrar and i == 2:
+                struct.pack_into("<I", rom, 0x20000 + 4 * i, 0x12345678)
+            o = 0x40000 + 0x40 * i
+            rom[o:o + len(texto)] = bytes([0xBB + ord(c) - 65 if c.isalpha() else (0x00 if c == " " else 0xAD)
+                                           for c in texto.upper()])
+        o = 0x30000 + TAM_ESPECIE * 968 + OFF_HABILIDADES
+        rom[o] = 2 if not quebrar else 0
+        rom[o + 1] = 0
+
+    escrever()
+    bom = conferir_e5(bytes(rom), simbolos, const, tmp, numeros, verboso=False)
+    if bom:
+        print(f"  FALHA: ROM de habilidades correta reprovada: {bom[:3]}")
+        falhas += 1
+    else:
+        print("  ok: habilidades corretas aprovadas")
+
+    escrever(quebrar=True)
+    ruim = conferir_e5(bytes(rom), simbolos, const, tmp, numeros, verboso=False)
+    if not any("ORTHWORM" in f or "ponteiro" in f for f in ruim):
+        print(f"  FALHA: habilidade errada não detectada: {ruim[:3]}")
+        falhas += 1
+    else:
+        print("  ok: habilidade errada detectada")
+    CHARMAP = guardado
+    return 1 if falhas else 0
+
+
 def main() -> int:
     global CHARMAP
     ap = argparse.ArgumentParser()
@@ -751,7 +945,7 @@ def main() -> int:
 
     if a.self_test:
         print("self-test: verificador de dados no ROM")
-        return self_test() | self_test_e4()
+        return self_test() | self_test_e4() | self_test_e5()
 
     poke = a.pokefirered
     rom_path = a.rom or (poke / "pokefirered_modern.gba")
@@ -796,7 +990,11 @@ def main() -> int:
         rel["falhas"] += conferir_e3(rom, simbolos, numeros, constantes, poke)
     if (poke / "src/data/text/move_names.h").exists():
         rel["falhas"] += conferir_e4(rom, simbolos, constantes, poke)
+    if (poke / "src/data/text/abilities.h").exists():
+        rel["falhas"] += conferir_e5(rom, simbolos, constantes, poke)
 
+    for falha in rel["falhas"]:
+        print(f"  FALHA: {falha}")
     if a.json:
         print(json.dumps(dict(falhas=rel["falhas"], conferidos=rel["conferidos"]),
                          indent=2, ensure_ascii=False))

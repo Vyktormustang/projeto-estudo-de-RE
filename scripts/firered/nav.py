@@ -230,11 +230,28 @@ def ler_estado(lib):
         return None
 
 
+def _core_padrao() -> str:
+    """Primeiro núcleo do mGBA que existir (o caminho muda entre sessões).
+
+    `setup_ambiente.sh` compila em `/tmp/mgba-0.10.5/build`, mas sessões antigas
+    deixaram o build em `/tmp/mgba/mgba-0.10.5/build`; aceitar os dois evita o
+    `OSError: cannot open shared object` que já quebrou uma bateria de testes.
+    """
+    candidatos = [os.environ.get("MGBA_CORE", "")] + [
+        "/tmp/mgba-0.10.5/build/mgba_libretro.so",
+        "/tmp/mgba/mgba-0.10.5/build/mgba_libretro.so",
+        str(Path.home() / "mgba-0.10.5/build/mgba_libretro.so"),
+    ]
+    for c in candidatos:
+        if c and Path(c).exists():
+            return c
+    return candidatos[1]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--rom", required=True)
-    ap.add_argument("--core", default=os.environ.get(
-        "MGBA_CORE", "/tmp/mgba/mgba-0.10.5/build/mgba_libretro.so"))
+    ap.add_argument("--core", default=_core_padrao())
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--frames", type=int, default=0)
     ap.add_argument("--in", dest="entrada")

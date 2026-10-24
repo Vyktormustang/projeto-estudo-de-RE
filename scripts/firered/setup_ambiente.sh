@@ -124,6 +124,30 @@ python3 "$RAIZ/scripts/firered/gen_move_data.py" --pokefirered "$PF" \
   || { tail -20 /tmp/setup_e4.log; exit 1; }
 ok "$(tail -1 /tmp/setup_e4.log)"
 
+# --------------------------------------- 2e. habilidades das Gen 4-9 (E5)
+# Ordem importa e e' circular de proposito:
+#   1) a E2 roda antes e grava ABILITY_NONE onde a habilidade nao existe;
+#   2) a E5 usa esse arquivo para saber QUAIS habilidades alguma especie usa
+#      (elas precisam caber no u8 de `abilities[2]`, i.e. ID < 256);
+#   3) a E2 roda de novo e agora resolve os nomes.
+log "3d/8 gerando as habilidades das Gen 4-9 (E5)"
+python3 "$RAIZ/scripts/firered/gen_ability_data.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e5.log 2>&1 \
+  || { tail -20 /tmp/setup_e5.log; exit 1; }
+ok "$(grep -E 'habilidades novas' /tmp/setup_e5.log | tail -1)"
+
+log "3e/8 regerando os dados das especies com as habilidades novas (E5)"
+python3 "$RAIZ/scripts/firered/gen_species_data.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e5b.log 2>&1 \
+  || { tail -20 /tmp/setup_e5b.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e5b.log)"
+
+log "3f/8 aplicando o gancho de motor da E5 (Earth Eater)"
+python3 "$RAIZ/scripts/firered/apply_e5_port.py" --pokefirered "$PF" \
+  >/tmp/setup_e5c.log 2>&1 \
+  || { tail -20 /tmp/setup_e5c.log; exit 1; }
+ok "$(grep -E 'aplicado|nada a fazer' /tmp/setup_e5c.log | tail -1)"
+
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then
   log "4/8 headers libpng/zlib p/ compilar as ferramentas ~1 min"

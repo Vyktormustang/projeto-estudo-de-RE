@@ -208,8 +208,17 @@ def blocos_de_especie(texto: str) -> dict[str, str]:
         resto = m.group(2).strip()
         if resto.startswith("{") or resto == "":
             fim = marcas[i + 1].start() if i + 1 < len(marcas) else len(texto)
+            trecho = texto[m.start():fim]
+            # `#define` no meio do trecho é a definição de uma macro da PRÓXIMA
+            # espécie (o FireRed/RHH define macros entre blocos). Sem cortar aqui,
+            # o corpo da macro entra no bloco anterior e o `campos()` lê o
+            # `.abilities`/`.natDexNum` dela: foi assim que Fezandipiti virou
+            # Ogerpon (ABILITY_NONE + dex errada).
+            corte = trecho.find("\n#define")
+            if corte != -1:
+                trecho = trecho[:corte]
             # expande só o bloco (pequeno): fragmentos tipo FLORGES_MISC_INFO(...)
-            saida[nome] = _expandir_chamadas(texto[m.start():fim], fn)
+            saida[nome] = _expandir_chamadas(trecho, fn)
             continue
         alvo = resto.rstrip(",").strip()
         if alvo in obj:

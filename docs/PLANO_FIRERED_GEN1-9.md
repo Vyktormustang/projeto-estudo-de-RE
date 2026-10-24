@@ -44,7 +44,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E2 | Gerador de dados de espécie | **CONCLUÍDA** (2026-10-23) |
 | E3 | Tipo Fada + split físico/especial | **CONCLUÍDA** (2026-10-23) |
 | E4 | Movimentos | **CONCLUÍDA — onda 1** (2026-10-23) |
-| E5 | Habilidades | a fazer |
+| E5 | Habilidades | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E6 | Sprites, ícones e cries | a fazer |
 | E7 | Encontros, treinadores e UI | a fazer |
 | E8 | Testes automatizados e regressão | a fazer (testes pontuais já existem) |
@@ -291,6 +291,33 @@ olhos do jogador; a onda 3 pode continuar depois da entrega.
 
 ### E5 — Habilidades
 
+**Estado (2026-10-23): onda 1 concluída (dados + 1 gancho de motor).**
+
+| item | número |
+|---|---|
+| habilidades no jogo | **321** (78 do FireRed + 243 novas) |
+| nomes e descrições | 321 / 321 |
+| espécies novas com habilidade de verdade | **639** (antes: 0) |
+| habilidades usadas por alguma espécie | 172 novas, IDs 78-249 |
+| habilidades com efeito no motor | **1** (Earth Eater, Gen 9) |
+
+ROM `0faf4181…`; prova em `reports/firered_e5/LEIA-ME.md`.
+
+**A armadilha:** `struct SpeciesInfo.abilities[2]` é **u8**. Com 321 habilidades, 66 IDs
+passavam de 255 e truncavam em silêncio (`QUARK_DRIVE` 283 virava `EFFECT_SPORE` 27) em
+67 espécies. A solução foi ordenar as IDs novas **por uso**: as 172 que alguma espécie usa
+cabem em 78-249, as 71 que nenhuma usa ficam em 250-320. O gerador aborta se não couber.
+Alargar o campo para `u16` é a dívida técnica registrada.
+
+**A prova em batalha** é diferencial triplo (Orthworm nível 30 na Rota 1, Sylveon com
+Bulldoze): Tackle fere (84→72), Bulldoze com Earth Eater não faz nada (84→84) e Bulldoze
+no **mesmo** Orthworm com a habilidade zerada nocauteia (84→0).
+
+**O que falta (onda 2):** as outras 242 habilidades novas são dados sem efeito — o
+`switch` do `AbilityBattleEffects` não as trata (silencioso, não trava). Implementar por
+classe (imunidade, boost de tipo, clima, ao entrar em campo, ao levar dano) é o próximo
+passo natural, junto com a ordem de prioridade que o plano já previa.
+
 **Objetivo:** de 78 para ~310.
 
 **Escopo**
@@ -303,9 +330,10 @@ olhos do jogador; a onda 3 pode continuar depois da entrega.
 
 **Aceite**
 
-- Toda espécie tem habilidade válida atribuída (checado pelo script do E1).
-- Intimidate reduz Attack ao entrar; Levitate é imune a Golpe Terrestre; uma habilidade de Gen 9
-  funciona.
+- ✅ Toda espécie tem habilidade válida atribuída — `verificar_rom.py` confere as 639
+  espécies novas byte a byte no ROM; `habilidades_ausentes` = 0.
+- ✅ Intimidate e Levitate continuam como estavam (IDs 0-77 intocados; sem regressão).
+- ✅ Uma habilidade de Gen 9 funciona: **Earth Eater**, provada em batalha.
 
 **Risco:** médio-alto. Habilidade sem implementação é **silenciosa** (não quebra nada) — então o
 risco de travar é baixo; o risco é ficar "sem efeito" sem que ninguém perceba.
@@ -540,6 +568,20 @@ existe no charmap do FireRed; `nav.py` agora converte vídeo só nos frames com 
 (~1500 fps em vez de 100).
 
 **Próximo passo:** E3 (feita em 2026-10-23) → E4.
+
+### 2026-10-23 — E5 CONCLUÍDA (onda 1: dados + Earth Eater)
+
+**Resultado:** o jogo passou de 78 para **321 habilidades**, com nome, descrição e
+atribuição correta nas 639 espécies novas (antes todas eram `ABILITY_NONE`).
+
+- ROM: `0faf4181…` (16 777 216 B); +18 KB em relação à E4
+- Provas: `reports/firered_e5/` (3 capturas) + `LEIA-ME.md`
+- Conferência no binário: `verificar_rom.py` → `E5 ok: 321 habilidades, 320/320 nomes e
+  321 descrições conferidas; habilidades de 639 espécies novas batem com o gerado`
+- Batalha: `prova_habilidades_e5.py --prova` → 3/3, com prova negativa
+- Dois bugs antigos apareceram no caminho: o `#define` que fazia o Fezandipiti herdar os
+  dados do Ogerpon (E2) e o espaço de enchimento nos nomes de espécie (E1) que aparecia
+  como `Go! SYLVEON   !` na batalha
 
 ### 2026-10-23 — E4 CONCLUÍDA (onda 1: dados)
 

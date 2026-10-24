@@ -40,7 +40,16 @@ como registro histórico.
   **O que ficou para as ondas 2-3:** 191 golpes ainda caem em fallback (`EFFECT_HIT`/`EFFECT_SPLASH`)
   — funcionam e não travam, mas não têm o efeito moderno; e os 442 usam a animação genérica de
   TACKLE.
-- **Próximo passo:** E5 (`VYK-33`) — habilidades (78 → ~310), começando pelas de Kanto.
+- **E5 CONCLUÍDA (onda 1):** o jogo tem **321 habilidades** (78 do FireRed + 243 das Gen 4-9),
+  com nome, descrição e atribuição certa nas 639 espécies novas — antes todas eram
+  `ABILITY_NONE`. ROM `0faf4181…`. Prova em `reports/firered_e5/`: Orthworm selvagem nível 30
+  toma Tackle (84→72), **não** toma Bulldoze com Earth Eater (84→84) e **nocauteia** com o
+  mesmo Bulldoze quando a habilidade é zerada (84→0).
+  ⚠️ `abilities[2]` é `u8`: as IDs das habilidades **usadas** ficam em 78-249, as que
+  nenhuma espécie usa vão para 250-320. O gerador aborta se não couber — não alargue o
+  campo sem revisar `GetBattlerAbility`.
+  **O que ficou para a onda 2:** 242 habilidades são só dado (o motor não as trata).
+- **Próximo passo:** E6 (`VYK-34`) — sprites, ícones e cries das 639 espécies novas.
 
 ### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
 
