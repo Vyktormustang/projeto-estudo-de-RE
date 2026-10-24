@@ -324,6 +324,20 @@ python3 "$RAIZ/scripts/firered/offsets.py" --pokefirered "$PF" --json >/tmp/pf_o
 ok "offsets em /tmp/pf_offsets.json"
 [ -s /tmp/setup_offsets.log ] && sed 's/^/    /' /tmp/setup_offsets.log
 
+# ------------------------------------------------- 9. tradução PT-BR (T1-T7)
+# Sem isto, um clone recém-religado fica em inglês e o aplicar_traducao.py
+# aborta com "char fora do charmap: ã" (a fonte T1 ainda não existe no clone).
+# Ordem obrigatória: fonte (T1) ANTES do dicionário, depois rebuild.
+log "9/9 aplicando fonte PT-BR (T1) + dicionários de tradução + rebuild"
+python3 "$RAIZ/scripts/firered/aplicar_fonte_ptbr.py" --pokefirered "$PF" --write \
+  >/tmp/setup_fonte.log 2>&1 || { tail -10 /tmp/setup_fonte.log; exit 1; }
+python3 "$RAIZ/scripts/firered/aplicar_traducao.py" --pokefirered "$PF" --write \
+  >/tmp/setup_trad.log 2>&1 || { tail -20 /tmp/setup_trad.log; exit 1; }
+grep -E 'ERRO' /tmp/setup_trad.log && { echo "tradução com ERROs acima"; exit 1; }
+( cd "$PF" && make -j2 MODERN=1 CC1_DAEMONS=2 >/tmp/setup_rebuild.log 2>&1 ) \
+  || { tail -10 /tmp/setup_rebuild.log; exit 1; }
+ok "ROM PT-BR: $(md5sum "$PF/pokefirered_modern.gba" | cut -d' ' -f1)"
+
 cat <<'FIM'
 
 Ambiente pronto. Exporte antes de usar as ferramentas:
