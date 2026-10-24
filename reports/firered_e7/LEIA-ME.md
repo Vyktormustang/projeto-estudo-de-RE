@@ -1,8 +1,12 @@
 # E7 — capturas de tela (Rota 1)
 
-ROM: `pokefirered_modern.gba`, md5 **`fb49a1ac2c466b71504a9d7978391165`**
-(16 777 216 B). Estado de partida: `/tmp/e7cap2/captura/com_bolas.bin`
-(savestate da Rota 1 com 20 Poké Balls na pocket de bolas).
+ROM: `pokefirered_modern.gba`, md5 **`821f35a7805fa2738576a33b6682c1b2`**
+(16 777 216 B). Estado de partida: savestate da Rota 1 (`/tmp/e4estado/rota1.bin`,
+gerado por `prova_golpes_e4.py --preparar-estado`) com 20 Poké Balls na pocket de bolas.
+
+**Savestate só vale na ROM exata que o gerou.** Toda mudança no jogo muda o md5 e o
+estado congela ou cai na tela errada; depois de qualquer build, refaça
+`python3 scripts/firered/prova_golpes_e4.py --preparar-estado`.
 
 Reprodução automática, sem editar a ROM:
 
@@ -33,16 +37,25 @@ lido de `gPlayerParty` na EWRAM — não da mensagem na tela.
 | `01_lechonk_selvagem_rota1.png` | encontro | **LECHONK (Gen 9, #915)** selvagem na Rota 1, nível 3 |
 | `02_pokeball_selecionada.png` | 1500 | bolsa na pocket **POKé BALLS**, "POKé BALL is selected" |
 | `03_gotcha_lechonk_capturado.png` | 2400 | **"Gotcha! LECHONK was caught!"** |
-| `04_teclado_apelido.png` | 3300 | teclado "LECHONK's nickname?" (é aqui que o roteiro fecha com START) |
-| `05_de_volta_rota1.png` | 4400 | de volta à grama da Rota 1, time com 2 Pokémon |
+| `04_ficha_dex_lechonk.png` | 2900 | **ficha da dex: `No915 LECHONK`, "Hog POKéMON", HT 1'08", WT 22.5 lbs.** e o texto da espécie |
+| `05_teclado_apelido.png` | 3300 | teclado "LECHONK's nickname?" (é aqui que o roteiro fecha com START) |
+| `06_de_volta_rota1.png` | 4400 | de volta à grama da Rota 1, time com 2 Pokémon |
 
-## Defeito conhecido (onda 2)
+## Defeito da ficha da dex — corrigido nesta rodada
 
-Logo depois do "Gotcha!", o jogo abre a **ficha da dex da espécie nova** e ela mostra
-`No800`, nome `??????????` e `HT/WT ???`. Motivo encontrado: a ficha é aberta pelo
-caminho "categoria" (`DexScreen_LookUpCategoryBySpecies`), e
-`src/data/pokemon/pokedex_categories.h` — as páginas de *habitat* (Grassland, Forest…)
-— **continua com as 386 espécies vanilla**. Espécie que não está em nenhuma página
-deixa categoria/página/cursor com valor antigo, e a tela imprime outra espécie.
-O número/altura/peso **não** vêm de `gPokedexEntries` (que já tem #915 correto:
-categoria "Hog", 5 dm, 102 hg) — o problema é só a tabela de habitats não gerada.
+Antes, ao capturar uma espécie nova, a ficha abria com `No800`, nome `??????????` e
+`HT/WT ???`. A causa **não** era `gPokedexEntries` (que já tinha #915 = "Hog", 5 dm,
+102 hg): era `src/data/pokemon/pokedex_categories.h`, as páginas de **habitat** da dex,
+que continuavam com as 386 espécies vanilla. `DexScreen_LookUpCategoryBySpecies(915)`
+não achava a espécie e devolvia "não achei" **sem** mexer em
+`category`/`pageNum`/`categoryCursorPosInPage` — a tela desenhava a espécie que estava
+no cursor antigo.
+
+Conserto: `scripts/firered/gen_pokedex_categories.py` gera as páginas que faltavam
+(`pokedex_categories_gen4_9.h`), sem tocar nas 386 vanilla. O habitat das novas é uma
+**HIPÓTESE**: um classificador Naive Bayes treinado nos tipos das 386 vanilla (o jogo
+não tem habitat oficial depois da Gen 3). Lechonk caiu em Grassland, junto de Fuecoco.
+
+Conferência no binário: `verificar_rom.py` agora percorre os ponteiros de
+`gDexCategories` no ROM e exige as 1025 espécies:
+`E7 ok: ... as 4 ordens da dex e as 9 páginas de habitat com 1025 entradas`.

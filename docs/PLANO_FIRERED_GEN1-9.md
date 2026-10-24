@@ -46,7 +46,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E4 | Movimentos | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E5 | Habilidades | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E6 | Sprites, ícones e cries | **CONCLUÍDA — onda 1** (2026-10-24) |
-| E7 | Encontros, treinadores e UI | **CONCLUÍDA — onda 1** (2026-10-24) |
+| E7 | Encontros, treinadores e UI | **CONCLUÍDA — ondas 1 e 2a** (2026-10-24) |
 | E8 | Testes automatizados e regressão | a fazer (testes pontuais já existem) |
 | E9 | Entrega: ROM final, Drive e documentação | a fazer |
 
@@ -376,9 +376,10 @@ parâmetro de `AbilityBattleEffects()`. Depois disso os IDs não precisam mais c
 
 ---
 
-### E7 — Encontros, treinadores e UI — **CONCLUÍDA (onda 1)**
+### E7 — Encontros, treinadores e UI — **CONCLUÍDA (ondas 1 e 2a)**
 
-**Estado (2026-10-24): onda 1 concluída (encontros + Pokédex utilizável).**
+**Estado (2026-10-24): onda 1 concluída (encontros + captura + Pokédex utilizável) e
+onda 2a concluída (páginas de habitat: a ficha da dex das espécies novas está correta).**
 
 | item | número |
 |---|---|
@@ -388,6 +389,8 @@ parâmetro de `AbilityBattleEffects()`. Depois disso os IDs não precisam mais c
 | Rota 1 (grama) | PIDGEY, **LECHONK**, **SKWOVET**, RATTATA, … (slot 0 intacto) |
 | ordens da Pokédex | 4 × **1025** entradas (antes 386 — lia 639 posições além do fim) |
 | Pokédex nacional | ativa desde o início (antes: só depois da Elite 4) |
+| páginas de habitat (`gDexCategories`) | 9 categorias cobrindo **1-1025** (antes: 386) |
+| captura provada em jogo | Lechonk na Rota 1 → time `[700, 915]` |
 
 **O bug que só apareceu agora:** as quatro ordens da Pokédex (`gPokedexOrder_*`)
 continuavam com **386** entradas enquanto `NUM_SPECIES` já era 1026 desde a E1.
@@ -760,7 +763,7 @@ passou a ter **Lechonk (Gen 9, 20%)** e **Skwovet (Gen 8, 10%)** na grama, com o
 (Pidgey) intacto para a rota continuar sendo a Rota 1. Foram 680 slots trocados em 454
 tabelas, cobrindo Kanto e as Sete Ilhas.
 
-- ROM: md5 **`fb49a1ac2c466b71504a9d7978391165`** (16 777 216 B)
+- ROM: md5 **`821f35a7805fa2738576a33b6682c1b2`** (16 777 216 B)
 - Conferência no binário: `verificar_rom.py` → `E7 ok: Rota 1 = 16, 915, 819 (2 slots
   novos, Gen 9 no 1o) e as 4 ordens da dex com 1025 entradas`
 - Prova em jogo: `prova_encontros_e7.py --prova` — anda na grama da Rota 1 **sem
@@ -789,18 +792,34 @@ lido. Não trava: abre a Pokédex em A-Z/TIPO/ALTURA/PESO e lê 639 posições a
 cada array. **Lição:** aviso de compilação que aponta índice fora do array é bug, não ruído.
 
 **Pendências (onda 2 da E7):** times de treinadores com espécies novas (hoje só os
-encontros selvagens), evoluções por método moderno além de nível, e a lista da Pokédex
-mostrando o ícone/nome das 1025 (a navegação funciona; a ordem A-Z usa o nome em inglês
-do RHH).
+encontros selvagens) e evoluções por método moderno além de nível. A **ficha da dex de
+espécie nova já está correta** (habitats gerados); a lista da Pokédex mostra as 1025 e a
+ordem A-Z usa o nome em inglês do RHH.
 
-**Defeito aberto com causa identificada (2026-10-24):** ao capturar uma espécie Gen 4-9
-a ficha da dex mostra `No800`, nome `??????????` e `HT/WT ???`. Não é a `gPokedexEntries`
-(essa já tem #915 = "Hog", 5 dm, 102 hg): é `src/data/pokemon/pokedex_categories.h`,
-as páginas de **habitat** da dex, que continuam com as 386 espécies vanilla. A ficha
+**Defeito da ficha da dex — CORRIGIDO (2026-10-24, mesma rodada):** ao capturar uma espécie Gen 4-9
+a ficha da dex mostrava `No800`, nome `??????????` e `HT/WT ???`. Não era a `gPokedexEntries`
+(essa já tinha #915 = "Hog", 5 dm, 102 hg): era `src/data/pokemon/pokedex_categories.h`,
+as páginas de **habitat** da dex, que continuavam com as 386 espécies vanilla. A ficha
 pós-captura é aberta por `DexScreen_LookUpCategoryBySpecies()`; espécie que não está em
 nenhuma página deixa `category`/`pageNum`/`categoryCursorPosInPage` com o valor anterior
-e a tela imprime outra espécie. Conserto: gerar a tabela de habitats para 1-1025
-(precisa do habitat de cada espécie) e conferir a ficha por captura em jogo.
+e a tela imprime outra espécie.
+
+Conserto feito: `scripts/firered/gen_pokedex_categories.py` (self-test 7 casos,
+`--check`) gera `pokedex_categories_gen4_9.h` com as 639 espécies novas em 163 páginas
+novas, **sem tocar** nas 386 vanilla. Não existe habitat oficial depois da Gen 3, então
+o gerador **aprende o critério do próprio FireRed**: conta a frequência de cada tipo em
+cada uma das 9 categorias entre as 386 vanilla e usa Naive Bayes (Laplace) para
+classificar as novas — é HIPÓTESE, documentada no cabeçalho do gerado. Lechonk →
+Grassland (junto de Fuecoco).
+
+Prova em jogo (mesma ROM, nova captura): a ficha agora abre em
+**`No915 LECHONK`, "Hog POKéMON", HT 1'08", WT 22.5 lbs.** com o texto da espécie
+(`reports/firered_e7/04_ficha_dex_lechonk.png`). `verificar_rom.py` passou a percorrer
+os ponteiros de `gDexCategories` no ROM e exige as 1025 espécies.
+
+**Lição registrada:** savestate só vale na ROM exata. Depois de qualquer build, refazer
+`prova_golpes_e4.py --preparar-estado` (~30 s) antes de qualquer prova em jogo —
+o sintoma de estado velho é "0 batalhas" ou jogador congelado.
 
 ## Registro de decisões
 

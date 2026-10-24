@@ -206,6 +206,16 @@ python3 "$RAIZ/scripts/firered/gen_pokedex_orders.py" --pokefirered "$PF" \
   || { tail -20 /tmp/setup_e7c.log; exit 1; }
 ok "$(tail -1 /tmp/setup_e7c.log)"
 
+# As paginas de habitat da dex (`gDexCategories`) continuavam com as 386
+# vanilla: a ficha pos-captura de uma especie Gen 4-9 abria em outra especie
+# ("No800"/"???"). Este gerador NAO precisa do RHH: aprende o criterio das 386
+# vanilla e distribui as novas por tipo.
+log "3l/8 paginas de habitat da Pokedex ate #1025 (E7)"
+python3 "$RAIZ/scripts/firered/gen_pokedex_categories.py" --pokefirered "$PF" --write \
+  >/tmp/setup_e7d.log 2>&1 \
+  || { tail -20 /tmp/setup_e7d.log; exit 1; }
+ok "$(grep -c . /tmp/setup_e7d.log) linhas: $(sed -n '2p' /tmp/setup_e7d.log | sed 's/^ *//')"
+
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then
   log "4/8 headers libpng/zlib p/ compilar as ferramentas ~1 min"

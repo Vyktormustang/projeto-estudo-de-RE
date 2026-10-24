@@ -982,6 +982,28 @@ ORDENS_DEX = ("gPokedexOrder_Alphabetical", "gPokedexOrder_Type",
               "gPokedexOrder_Height", "gPokedexOrder_Weight")
 
 
+def especies_nas_categorias(rom: bytes, simbolos: dict[str, int]) -> list[int]:
+    """Espécies listadas nas 9 páginas de habitat (`gDexCategories`).
+
+    Layout (src/pokedex_screen.c e data/pokemon/pokedex_categories.h):
+
+        gDexCategories[9]      -> { const struct PokedexCategoryPage *page; u8 count; }  (8 B)
+        PokedexCategoryPage[]  -> { const u16 *species; u8 count; }                      (8 B)
+        species[]              -> u16[]
+
+    Percorrer os ponteiros no ROM é o que prova que a tabela foi *compilada* com
+    as 1025 — o header podia estar certo e o linker ter cortado a tabela.
+    """
+    base = simbolos["gDexCategories"] - 0x08000000
+    saida: list[int] = []
+    for i in range(9):
+        ponteiro, paginas = struct.unpack_from("<IB", rom, base + i * 8)
+        for j in range(paginas):
+            spp_ponteiro, quantos = struct.unpack_from("<IB", rom, ponteiro - 0x08000000 + j * 8)
+            saida.extend(struct.unpack_from(f"<{quantos}H", rom, spp_ponteiro - 0x08000000))
+    return saida
+
+
 def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
                 verboso: bool = True) -> list[str]:
     """Confere no ROM a mistura de encontros e o tamanho das ordens da dex.
@@ -1047,9 +1069,19 @@ def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
             falhas.append(f"{nome}: nao e permutacao de 1..1025 "
                           f"({len(fora)} fora da faixa, {repetidos} repetidos)")
 
+    # --- 3. páginas de habitat: toda espécie 1..1025 tem de estar em uma
+    if "gDexCategories" in simbolos:
+        cats = especies_nas_categorias(rom, simbolos)
+        if sorted(cats) != list(range(1, 1026)):
+            faltam = sorted(set(range(1, 1026)) - set(cats))
+            falhas.append(f"gDexCategories: {len(cats)} espécies nas 9 páginas, "
+                          f"faltam {len(faltam)} (ex.: {faltam[:4]})")
+    elif verboso:
+        falhas.append("gDexCategories fora do .map")
+
     if verboso and not falhas:
-        print(f"  E7 ok: Rota 1 = {fr[0]}, {fr[1]}, {fr[2]} (2 slots novos, Gen 9 no 1o) "
-              f"e as 4 ordens da dex com 1025 entradas")
+        print(f"  E7 ok: Rota 1 = {fr[0]}, {fr[1]}, {fr[2]} (2 slots novos, Gen 9 no 1o), "
+              f"as 4 ordens da dex e as 9 páginas de habitat com 1025 entradas")
     return falhas
 
 
@@ -1068,6 +1100,33 @@ def self_test_e7() -> int:
     for i, nome in enumerate(ORDENS_DEX):
         sim[nome] = 0x08110000 + i * 0x2000
         struct.pack_into("<1025H", rom, sim[nome] - 0x08000000, *ordem)
+
+    # páginas de habitat: 9 categorias, páginas de 4 em 4 cobrindo 1..1025
+    sim["gDexCategories"] = 0x08130000
+    paginas: list[tuple[int, list[int]]] = []
+    proxima = 1
+    while proxima <= 1025:
+        lote = list(range(proxima, min(proxima + 4, 1026)))
+        paginas.append((0x08140000 + len(paginas) * 0x40, lote))
+        proxima += 4
+    for i, (endereco, lote) in enumerate(paginas):
+        struct.pack_into("<%dH" % len(lote), rom, endereco - 0x08000000, *lote)
+    # as 9 entradas de gDexCategories apontam para tabelas contíguas a partir
+    # de 0x08125000; cada página é um par (ponteiro para as espécies, contagem)
+    por_categoria = (len(paginas) + 8) // 9
+    tabela = 0x08125000
+    cursor = tabela
+    for categoria in range(9):
+        fatia = paginas[categoria * por_categoria:(categoria + 1) * por_categoria]
+        if not fatia:
+            struct.pack_into("<IB", rom, sim["gDexCategories"] - 0x08000000 + categoria * 8,
+                             0, 0)
+            continue
+        struct.pack_into("<IB", rom, sim["gDexCategories"] - 0x08000000 + categoria * 8,
+                         cursor, len(fatia))
+        for endereco, lote in fatia:
+            struct.pack_into("<IB", rom, cursor - 0x08000000, endereco, len(lote))
+            cursor += 8
 
     mistura = [16, 915, 819] + [19] * 9
     for simbolo in ("sRoute1_FireRed_LandMons", "sRoute1_LeafGreen_LandMons"):
@@ -1101,6 +1160,13 @@ def self_test_e7() -> int:
     quebrado = bytearray(rom)
     struct.pack_into("<H", quebrado, sim["gPokedexOrder_Height"] - 0x08000000 + 2048, 7)
     checa("ordem com repetido reprova", bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    # apaga a última página da última categoria: 1..1025 deixa de ser completo
+    struct.pack_into("<B", quebrado, sim["gDexCategories"] - 0x08000000 + 8 * 8 + 4,
+                     len(paginas) - 9 * (por_categoria - 1) - 1)
+    checa("especie faltando nas paginas de habitat reprova",
+          bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
 
     checa("sem o simbolo no .map reprova",
           bool(conferir_e7(bytes(rom), {k: v for k, v in sim.items()
