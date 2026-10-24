@@ -45,6 +45,17 @@ done
 log() { printf '\033[1m==> %s\033[0m\n' "$*"; }
 ok()  { printf '    ok: %s\n' "$*"; }
 
+# ------------------------------- 0. dependencias declaradas x lista do sparse
+# Falha em 1 segundo em vez de em 10 minutos. A E5 morreu no passo 3d com
+# FileNotFoundError porque `src/data/abilities.h` nao estava no sparse-checkout;
+# este cheque pega exatamente esse descompasso entre o que os geradores leem
+# (`RH_*` / `ref / "..."`) e o que o setup baixa (`RHH_ARQUIVOS`).
+log "0/8 conferindo as dependencias dos geradores"
+python3 "$AQUI/checar_dependencias.py" --setup "$AQUI/setup_ambiente.sh" \
+  --pokefirered "$PF" --reference /tmp/fre >/tmp/setup_deps.log 2>&1 \
+  || { tail -20 /tmp/setup_deps.log; exit 1; }
+ok "$(tail -1 /tmp/setup_deps.log)"
+
 # ---------------------------------------------------------------- 1. toolchain
 if [ "$SO_BUILD" -eq 0 ]; then
   if [ -x /tmp/tc/bin/arm-none-eabi-as ] && [ -x /tmp/tc/bin/arm-fake-cc1 ]; then
@@ -71,6 +82,20 @@ else
   ok "clone em $PF ($(git -C "$PF" rev-parse --short HEAD))"
 fi
 
+# O que a referencia do RHH precisa ter. Cada entrada e' consumida por um gerador;
+# tirar uma daqui quebra a etapa correspondente (foi assim que a E5 falhou com
+# FileNotFoundError em src/data/abilities.h). Mantenha esta lista e os caminhos
+# RH_* dos scripts em sincronia.
+RHH_ARQUIVOS=(
+  '/include/'                              # constantes de especie/golpe/habilidade (E1-E5)
+  '/src/data/pokemon/species_info/'        # gSpeciesInfo -> stats/tipos/dex/evolucao (E2)
+  '/src/data/pokemon/level_up_learnsets/'  # golpes por nivel (E2)
+  '/src/data/moves_info.h'                 # gMovesInfo -> 442 golpes (E4)
+  '/src/data/abilities.h'                  # gAbilitiesInfo -> nomes/descricoes (E5)
+  '/graphics/pokemon/'                     # sprites, icones, pegadas e paletas (E6)
+  '/src/pokemon_icon.c'                    # gMonIconTable / gMonIconPaletteIndices (E6)
+)
+
 # referencia: so os headers de constantes do RHH (fonte dos nomes 387-1025)
 if [ -f /tmp/fre/include/constants/pokedex.h ]; then
   ok "referencia RHH ja existe em /tmp/fre"
@@ -81,20 +106,17 @@ else
       https://github.com/rh-hideout/pokeemerald-expansion /tmp/fre >/tmp/setup_fre.log 2>&1 \
     && ( cd /tmp/fre && git fetch --depth 1 origin "$RHH_COMMIT" >>/tmp/setup_fre.log 2>&1 \
           && git checkout -q "$RHH_COMMIT" \
-          && git sparse-checkout set --no-cone '/include/' \
-          '/src/data/pokemon/species_info/' '/src/data/pokemon/level_up_learnsets/' \
-          '/src/data/moves_info.h' >/dev/null 2>&1 ) \
+          && git sparse-checkout set --no-cone "${RHH_ARQUIVOS[@]}" >/dev/null 2>&1 ) \
     || { tail -10 /tmp/setup_fre.log; exit 1; }
   ok "referencia em /tmp/fre ($(git -C /tmp/fre rev-parse --short HEAD))"
 fi
 
 # clone antigo pode ter so `include` no sparse-checkout: completa sem re-clonar
 if [ -d /tmp/fre/.git ] && { [ ! -d /tmp/fre/src/data/pokemon/species_info ] || \
-     [ ! -f /tmp/fre/src/data/moves_info.h ]; }; then
-  log "completando a referencia RHH (species_info + learnsets + moves_info.h)"
-  ( cd /tmp/fre && git sparse-checkout set --no-cone '/include/' \
-      '/src/data/pokemon/species_info/' '/src/data/pokemon/level_up_learnsets/' \
-      '/src/data/moves_info.h' >/tmp/setup_fre.log 2>&1 ) \
+     [ ! -f /tmp/fre/src/data/moves_info.h ] || [ ! -f /tmp/fre/src/data/abilities.h ]; }; then
+  log "completando a referencia RHH (species_info + learnsets + moves_info + abilities)"
+  ( cd /tmp/fre && git sparse-checkout set --no-cone "${RHH_ARQUIVOS[@]}" \
+      >/tmp/setup_fre.log 2>&1 ) \
     || { tail -10 /tmp/setup_fre.log; exit 1; }
 fi
 
@@ -147,6 +169,21 @@ python3 "$RAIZ/scripts/firered/apply_e5_port.py" --pokefirered "$PF" \
   >/tmp/setup_e5c.log 2>&1 \
   || { tail -20 /tmp/setup_e5c.log; exit 1; }
 ok "$(grep -E 'aplicado|nada a fazer' /tmp/setup_e5c.log | tail -1)"
+
+# ------------------------------------------------ 3g. ID de habilidade u16 (E6)
+# ordem: o port do u16 vem ANTES dos geradores? não precisa — ele só muda o
+# tipo do campo; mas tem de vir antes do build.
+log "3g/8 alargando o ID de habilidade para u16 (E6)"
+python3 "$RAIZ/scripts/firered/apply_e6_port.py" --pokefirered "$PF" \
+  >/tmp/setup_e6a.log 2>&1 \
+  || { tail -20 /tmp/setup_e6a.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e6a.log)"
+
+log "3h/8 copiando sprites, icones, pegadas e cries das 639 novas (E6)"
+python3 "$RAIZ/scripts/firered/gen_sprite_data.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e6b.log 2>&1 \
+  || { tail -20 /tmp/setup_e6b.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e6b.log)"
 
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then
@@ -219,10 +256,27 @@ if [ "$SEM_MGBA" -eq 0 ]; then
                -DUSE_LIBZIP=OFF -DUSE_ELF=OFF -DUSE_PNG=OFF -DUSE_ZLIB=OFF \
                -DUSE_SQLITE3=OFF -DUSE_FFMPEG=OFF -DUSE_MINIZIP=OFF \
                >/tmp/setup_mgba_cmake.log 2>&1
-      make -j2 >/tmp/setup_mgba_make.log 2>&1
-    ) || { tail -20 /tmp/setup_mgba_make.log 2>/dev/null; exit 1; }
+      # `make` (todos os alvos) falha em `epoxy/gl.h`: o alvo `mgba` (Qt/SDL
+      # desligados, mas o frontend de terminal pede OpenGL) nao compila no
+      # sandbox. O que importa e' o core libretro, que e' construido ANTES e nao
+      # depende de GL. Por isso: compila o alvo especifico e confere o arquivo.
+      make -j2 mgba_libretro >/tmp/setup_mgba_make.log 2>&1 \
+        || { tail -20 /tmp/setup_mgba_make.log 2>/dev/null; exit 1; }
+    ) || exit 1
+    [ -s /tmp/mgba-0.10.5/build/mgba_libretro.so ] \
+      || { echo "o core nao foi gerado"; exit 1; }
     ok "core em /tmp/mgba-0.10.5/build/mgba_libretro.so"
   fi
+fi
+
+# ------------------------------------- 7b. o sparse baixou tudo que falta?
+# Segundo cheque: agora com os dois clones no disco, confirma que nenhum arquivo
+# declarado ficou de fora (pegadinha do sparse ja' existente de sessao anterior).
+if python3 "$AQUI/checar_dependencias.py" --pokefirered "$PF" --reference /tmp/fre \
+     >/tmp/setup_deps2.log 2>&1; then
+  ok "dependencias presentes no disco"
+else
+  tail -20 /tmp/setup_deps2.log; exit 1
 fi
 
 # --------------------------------------------------------------- 6. offsets
