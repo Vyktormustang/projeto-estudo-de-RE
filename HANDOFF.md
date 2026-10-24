@@ -7,6 +7,22 @@
 
 ---
 
+## 0.00 ⚠️ PRIMEIRO PASSO DE TODA SESSÃO: sincronizar o Git
+
+O workspace é **reclonado do `main`** quando a sessão começa: os arquivos das etapas
+aparecem no disco, mas o **histórico da branch não vem junto**. Se você commitar sem
+sincronizar, cria um commit paralelo em cima do `main` que "readiciona" o projeto inteiro
+(aconteceu na sessão da E5 e custou um `fetch` + `reset --soft` para consertar).
+
+```bash
+git fetch origin arena/6a4e34a0-projeto-estudo-de-re
+git reset --mixed origin/arena/6a4e34a0-projeto-estudo-de-re   # worktree intacto
+git status --porcelain    # agora só aparece o que é realmente novo
+```
+
+`git log --oneline -1` tem que mostrar a última etapa (não `eabe82b`). Só então commitar.
+Nunca `push --force`: se o histórico divergir, o problema é o local, não o remoto.
+
 ## 0.0 ⚠️ Direção atual (2026-10-23) — leia antes do resto
 
 O trabalho agora é: **FireRed de verdade (`pret/pokefirered`) + as 9 gerações**, alterando
@@ -45,11 +61,20 @@ como registro histórico.
   `ABILITY_NONE`. ROM `0faf4181…`. Prova em `reports/firered_e5/`: Orthworm selvagem nível 30
   toma Tackle (84→72), **não** toma Bulldoze com Earth Eater (84→84) e **nocauteia** com o
   mesmo Bulldoze quando a habilidade é zerada (84→0).
-  ⚠️ `abilities[2]` é `u8`: as IDs das habilidades **usadas** ficam em 78-249, as que
-  nenhuma espécie usa vão para 250-320. O gerador aborta se não couber — não alargue o
-  campo sem revisar `GetBattlerAbility`.
   **O que ficou para a onda 2:** 242 habilidades são só dado (o motor não as trata).
-- **Próximo passo:** E6 (`VYK-34`) — sprites, ícones e cries das 639 espécies novas.
+- **E6 CONCLUÍDA (onda 1):** as **639 espécies novas têm sprite** de frente e costas, paleta
+  normal e shiny, ícone no menu do time, pegada na ficha e cry provisório. ROM
+  `60b49820…` (11 429 664 B = 34,06 %); EWRAM 98,94 % (**restam ~2,7 KB** — olhar antes da E7).
+  Prova em `reports/firered_e6/LEIA-ME.md` (9 capturas: Orthworm em batalha, Sylveon de costas,
+  Earth Eater com sprite, ícones, fichas de Orthworm/Turtwig/Garchomp).
+  `verificar_rom.py` → `E6 ok: 639 … (passo 4 B)`: lê o ponteiro de cada entrada das 6 tabelas.
+  ⚠️ **O ID de habilidade agora é `u16`** (`apply_e6_port.py`, 15 pontos do motor, incluindo o
+  parâmetro de `AbilityBattleEffects()`). A ordem dos IDs voltou a ser a canônica do RHH — não
+  precisa mais caber em 256. Se mexer em `SpeciesInfo`, `BattlePokemon` ou `BattleMsgData`,
+  rode `scripts/firered/offsets.py` de novo: o `nav.py` lê o HP por ali (`PF_OFFSETS`).
+  **O que ficou para a onda 2:** cries oficiais, animação própria de ataque, formas alternativas.
+- **Próximo passo:** E7 (`VYK-35`) — encontros, treinadores e UI (espécies novas na Rota 1;
+  Pokédex até #1025). Antes: conferir a folga de EWRAM (~2,7 KB).
 
 ### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
 

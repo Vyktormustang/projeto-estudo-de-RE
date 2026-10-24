@@ -45,7 +45,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E3 | Tipo Fada + split físico/especial | **CONCLUÍDA** (2026-10-23) |
 | E4 | Movimentos | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E5 | Habilidades | **CONCLUÍDA — onda 1** (2026-10-23) |
-| E6 | Sprites, ícones e cries | a fazer |
+| E6 | Sprites, ícones e cries | **CONCLUÍDA — onda 1** (2026-10-24) |
 | E7 | Encontros, treinadores e UI | a fazer |
 | E8 | Testes automatizados e regressão | a fazer (testes pontuais já existem) |
 | E9 | Entrega: ROM final, Drive e documentação | a fazer |
@@ -340,9 +340,24 @@ risco de travar é baixo; o risco é ficar "sem efeito" sem que ninguém perceba
 
 ---
 
-### E6 — Sprites, ícones e cries
+### E6 — Sprites, ícones e cries — **CONCLUÍDA (onda 1)**
 
-**Objetivo:** as 1025 espécies visíveis.
+**Estado (2026-10-24): onda 1 concluída (sprites, ícones, pegadas e cries provisórios).**
+
+| item | número |
+|---|---|
+| espécies com sprite de frente e costas | **639 / 639** (antes: 0) |
+| espécies com paleta normal e shiny | 639 / 639 |
+| ícones no menu do time | 639 (12 remapeadas de paleta) |
+| pegadas na ficha | 639 |
+| cries | 639 — **provisórios** (por tipo primário) |
+| ROM | `60b49820…`, 11 429 664 B (34,06 %) |
+
+ROM `60b49820…`; prova em `reports/firered_e6/LEIA-ME.md` (9 capturas).
+
+**A dívida que a etapa quitou sem querer:** o `u8` do ID de habilidade. Alargar
+`SpeciesInfo.abilities[2]` para `u16` exigiu alinhar **15 pontos** do motor, incluindo o
+parâmetro de `AbilityBattleEffects()`. Depois disso os IDs não precisam mais caber em 256.
 
 **Escopo**
 
@@ -442,35 +457,78 @@ E7 só faz sentido depois de E2, E3, E4 e E6.
 
 ## Como reproduzir
 
-### Linux / WSL
+### Linux / WSL — o jeito rápido (recomendado)
+
+Um comando refaz o ambiente **inteiro** (toolchain, clone fixado no commit, referência do RHH,
+E1 → E5, `make tools`, build e o core do mGBA):
+
+```bash
+bash scripts/firered/setup_ambiente.sh      # ~20 min
+# ROM: /tmp/pokefirered/pokefirered_modern.gba
+```
+
+Ele é idempotente: rodar de novo não reaplica nada que já esteja aplicado. `--sem-mgba` pula o
+emulador, `--so-build` só reaplica os ports e compila.
+
+**Ordem dos passos (importa):**
+
+| passo | script | o que faz |
+|---|---|---|
+| 1 | `apply_e1_port.py` | 1025 espécies, Pokédex nacional, `struct Pokedex` maior |
+| 2 | `gen_species_data.py --write` | 639 espécies novas (stats, tipos, dex, learnset, evolução) |
+| 3 | `apply_e3_port.py` | tipo Fada (19º) + split físico/especial por golpe |
+| 4 | `gen_move_data.py --write` | 442 golpes das Gen 4–9, nomes, descrições, categorias |
+| 5 | `gen_ability_data.py --write` | 243 habilidades novas (321 no total) |
+| 6 | `gen_species_data.py --write` **de novo** | resolve os nomes de habilidade que o passo 5 criou |
+| 7 | `apply_e5_port.py` | gancho de motor (Earth Eater) |
+
+O passo 6 parece redundante e não é: no passo 2 as habilidades das Gen 4–9 ainda não existem, então
+a espécie sai com `ABILITY_NONE`. O passo 5 precisa desse arquivo para saber **quais** habilidades
+são usadas (só essas precisam de ID abaixo de 256, por causa do `u8 abilities[2]`) e o passo 6
+regera tudo já com os nomes certos.
+
+### Linux / WSL — na mão
 
 ```bash
 git clone https://github.com/pret/pokefirered
 cd pokefirered
+git checkout ce6406d8c2eaf46d543c8a2606de0c3cb1951982   # commit fixado (build reproduzível)
 make tools -j2
 make -j2 MODERN=1 CC1_DAEMONS=2
 # ROM: pokefirered_modern.gba
 ```
 
 Precisa de `arm-none-eabi-gcc` no PATH (devkitARM serve) e de `libpng`/`zlib` para as ferramentas.
+Sem pinar o commit e o do RHH (`f594a462…`), dois builds "iguais" dão hash diferente.
 
 ### Windows
 
-O `pret` não tem build nativo no Windows. O caminho recomendado é **WSL**:
+O `pret` não tem build nativo no Windows: o `make` e o `arm-none-eabi-gcc` são de Linux.
+O caminho recomendado é **WSL**. Aqui o `bash` do Linux passa a existir dentro do PowerShell.
 
 ```powershell
+# 1. instalar o Ubuntu dentro do Windows (uma vez; pede reinício)
 wsl --install -d Ubuntu
+
+# 2. conferir que o bash responde
+wsl bash -lc "uname -a"
+
+# 3. do Windows, rodar o setup do projeto dentro do WSL
+wsl bash -lc "cd /mnt/c/Users/<SEU_USUARIO>/projeto-estudo-de-RE && sudo apt update && sudo apt install -y build-essential git libpng-dev && bash scripts/firered/setup_ambiente.sh"
 ```
 
-Depois, dentro do Ubuntu, os mesmos comandos acima:
+Se preferir entrar no Ubuntu e digitar lá dentro (`wsl` e depois os comandos), o resultado é o mesmo:
 
 ```bash
-sudo apt update
-sudo apt install -y build-essential git libpng-dev
-git clone https://github.com/pret/pokefirered
-cd pokefirered
-make tools -j2 && make -j2 MODERN=1 CC1_DAEMONS=2
+cd /mnt/c/Users/<SEU_USUARIO>/projeto-estudo-de-RE    # ou ~/projeto-estudo-de-RE
+bash scripts/firered/setup_ambiente.sh
 ```
+
+A ROM fica em `/tmp/pokefirered/pokefirered_modern.gba` **dentro do WSL**, que o Windows enxerga em
+`\\wsl$\Ubuntu\tmp\pokefirered\pokefirered_modern.gba` — abra esse caminho no mGBA do Windows.
+
+> **Não precisa compilar para jogar.** O build final é entregue pronto (link do Google Drive na E9).
+> Compilar só faz sentido para reproduzir as provas ou mexer no código.
 
 A ROM sai em `pokefirered/pokefirered_modern.gba` e pode ser aberta no mGBA do Windows
 (`\\wsl$\Ubuntu\home\<usuario>\pokefirered\pokefirered_modern.gba`).
@@ -624,6 +682,51 @@ o menu START esconde o item POKéMON se você escrever o time direto na RAM.
 
 **Próximo passo:** E4 (movimentos: 3123 golpes filtrados voltam, dos quais ~150 com efeito
 próprio).
+
+### 2026-10-24 — E6 CONCLUÍDA (onda 1: sprites, ícones, pegadas e cries)
+
+**Resultado:** as **639 espécies novas deixaram de ser um espaço vazio na tela**. Agora
+elas têm sprite de frente e de costas, paleta normal e shiny, ícone no menu do time,
+pegada na ficha e cry (provisório). Antes desta etapa, a batalha da E5 mostrava a
+mensagem *"Wild ORTHWORM's EARTH EATER made BULLDOZE useless!"* com **nada** desenhado.
+
+- ROM: `60b49820a269a8b94f46702f702dd337` (16 777 216 B; usados 11 429 664 B = 34,06 %)
+- Conferência no binário: `verificar_rom.py` → `E6 ok: 639 espécies com sprite, costas,
+  paleta, shiny, ícone, pegada e coordenada (passo 4 B)`. Ela lê o **ponteiro de cada
+  entrada das 6 tabelas** e exige endereço em `0x08xxxxxx` — antes eram todos `NULL`.
+- Provas em jogo: `reports/firered_e6/` (9 capturas) + `LEIA-ME.md`
+- ROM cresceu **+2,8 MB** (11,4 MB de 32 MB). EWRAM +4 B → 98,94 % (restam ~2,7 KB).
+
+**O achado que não era sobre sprites:** o ID de habilidade não cabia mais em `u8`. Com 321
+habilidades e 229 em uso, 18 espécies gravavam o byte truncado (PALAFIN `ZERO_TO_HERO`
+299 → 43). Alargar `SpeciesInfo.abilities[2]` não bastou: havia uma corrente de `u8` em
+**15 pontos** do motor — o pior deles o parâmetro de `AbilityBattleEffects()`, que é o
+`switch` onde o Earth Eater é procurado. Enquanto ele era `u8`, a prova da E5 reprovava
+(84→0 em vez de 84→84) **mesmo com o dado certo no ROM**.
+
+**Erro de método registrado:** a primeira reação foi culpar o gerador de sprites, porque a
+prova da E5 passava antes dele. Custou 2 builds. Regra nova: *quando uma prova antiga
+quebra depois de uma etapa, o suspeito nº 1 é o que a etapa mexeu no motor — não o que a
+etapa estava tentando fazer.*
+
+**Armadilha de build:** o `make` terminou `EXIT=0` com `data.o` de **664 bytes**. A regra
+do `Makefile` termina em `| cat -`, e o `cat` devolve 0 mesmo com o `cc1` morrendo. O
+sintoma é um link com 7 403 `undefined reference` a símbolos `gMon*`. **Sempre conferir o
+tamanho do `data.o`** (~377 KB).
+
+**Pendências (onda 2 da E6):** cries oficiais das 639 (hoje: cry da espécie de mesmo tipo
+primário com dex mais próxima), animação de ataque própria (hoje: 1º quadro do `anim_front`),
+formas alternativas (Alolan/Hisuian/Mega).
+
+**Aprendizados de método (novos):** o `sizeof` do *host* mentiu — `struct MonCoords` dá 2 B
+no `clang` e **4 B** no ROM (`-mabi=apcs-gnu` arredonda struct para múltiplo de 4). A
+verificação agora **mede o passo no ROM** (2/4/8) e exige que **todas** as entradas batam;
+com uma única amostra dois passos empatavam e o primeiro ganhava. `anim_front.png` do RHH é
+64×**128** (dois quadros) — cortar o `.4bpp` depois não funciona, porque o build reconverte
+o PNG a cada vez: o corte tem de ser no PNG.
+
+**Próximo passo:** E7 (encontros, treinadores e UI) — colocar as espécies novas na Rota 1
+e destravar a Pokédex até #1025. **Antes da E7, olhar a EWRAM:** 98,94 % com ~2,7 KB livres.
 
 ## Registro de decisões
 
