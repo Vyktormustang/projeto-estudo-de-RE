@@ -276,6 +276,20 @@ class Estado:
             raise SystemExit(f"var 0x{var_id:04X} fora da faixa de evento (0x4000+)")
         struct.pack_into("<H", self.d, self.s1 + off["s1_vars"] + (var_id - 0x4000) * 2, valor)
 
+    def set_item(self, pocket: str, slot: int, item_id: int, qtd: int, off: dict) -> None:
+        """Escreve um `struct ItemSlot` (u16 id, u16 quantidade) na pocket.
+
+        As pockets têm tamanho fixo e a lista é terminada por ITEM_NONE; escrever
+        no slot 0 é o que a tela da bolsa lê primeiro. Não mexe nas outras.
+        """
+        campo = {"items": "s1_bagItems", "pokeballs": "s1_bagPokeBalls",
+                 "tmhm": "s1_bagTMHM", "berries": "s1_bagBerries"}[pocket]
+        passo = off["itemslot_size"]
+        if passo != 4:
+            raise SystemExit(f"ItemSlot com {passo} B (esperado 4)")
+        base = self.s1 + off[campo] + slot * passo
+        struct.pack_into("<HH", self.d, base, item_id, qtd)
+
     def set_nacional(self, off: dict) -> None:
         """Liga a Pokédex nacional: as três condições de IsNationalPokedexEnabled.
 
@@ -331,6 +345,13 @@ def main() -> int:
     p_var = sub.add_parser("var", help="escreve uma variável de script")
     p_var.add_argument("--id", type=lambda s: int(s, 0), required=True)
     p_var.add_argument("--valor", type=lambda s: int(s, 0), required=True)
+
+    p_item = sub.add_parser("item", help="põe um item numa pocket da bolsa")
+    p_item.add_argument("--pocket", choices=("items", "pokeballs", "tmhm", "berries"),
+                        default="pokeballs")
+    p_item.add_argument("--slot", type=int, default=0)
+    p_item.add_argument("--id", dest="item_id", type=lambda s: int(s, 0), required=True)
+    p_item.add_argument("--qtd", type=int, default=1)
 
     p_mon = sub.add_parser("pokemon", help="cria/sobrescreve um Pokémon do time")
     p_mon.add_argument("--slot", type=int, default=0)
@@ -415,6 +436,9 @@ def main() -> int:
     elif a.cmd == "nacional":
         est.set_nacional(off)
         print("Pokédex nacional ligada (flag 0x829/0x840, nationalMagic 0xB9, VAR 0x404E=0x6258)")
+    elif a.cmd == "item":
+        est.set_item(a.pocket, a.slot, a.item_id, a.qtd, off)
+        print(f"{a.pocket}[{a.slot}] = item {a.item_id} x{a.qtd}")
     elif a.cmd == "var":
         est.set_var(a.id, a.valor, off)
         print(f"VAR 0x{a.id:04X} = 0x{a.valor:04X}")

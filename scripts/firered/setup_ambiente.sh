@@ -185,6 +185,27 @@ python3 "$RAIZ/scripts/firered/gen_sprite_data.py" --pokefirered "$PF" \
   || { tail -20 /tmp/setup_e6b.log; exit 1; }
 ok "$(tail -1 /tmp/setup_e6b.log)"
 
+# ------------------------------------------------------- 3i. encontros (E7)
+# Precisa da species.h da E1 (ja aplicada) e do RHH. Fica ANTES do build: o
+# `wild_encounters.json` vira `src/data/wild_encounters.h` em tempo de build.
+log "3i/8 misturando as Gen 4-9 nas tabelas de encontro (E7)"
+python3 "$RAIZ/scripts/firered/gen_wild_encounters.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e7a.log 2>&1 \
+  || { tail -20 /tmp/setup_e7a.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e7a.log)"
+
+log "3j/8 Pokedex nacional desde o inicio + numeros de 4 digitos (E7)"
+python3 "$RAIZ/scripts/firered/apply_e7_port.py" --pokefirered "$PF" \
+  >/tmp/setup_e7b.log 2>&1 \
+  || { tail -20 /tmp/setup_e7b.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e7b.log)"
+
+log "3k/8 ordens da Pokedex (A-Z, tipo, altura, peso) ate #1025 (E7)"
+python3 "$RAIZ/scripts/firered/gen_pokedex_orders.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e7c.log 2>&1 \
+  || { tail -20 /tmp/setup_e7c.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e7c.log)"
+
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then
   log "4/8 headers libpng/zlib p/ compilar as ferramentas ~1 min"

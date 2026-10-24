@@ -975,6 +975,141 @@ def conferir_e6(rom: bytes, simbolos: dict[str, int], poke: Path,
     return falhas
 
 
+# --------------------------------------------------------------------------- #
+# E7 — encontros selvagens e ordens da Pokedex
+# --------------------------------------------------------------------------- #
+ORDENS_DEX = ("gPokedexOrder_Alphabetical", "gPokedexOrder_Type",
+              "gPokedexOrder_Height", "gPokedexOrder_Weight")
+
+
+def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
+                verboso: bool = True) -> list[str]:
+    """Confere no ROM a mistura de encontros e o tamanho das ordens da dex.
+
+    Duas coisas que o compilador nao pega:
+
+    1. **Encontros**: a tabela da Rota 1 tem de ter o slot 0 intacto (a rota
+       continua sendo a rota) e os slots trocados com especie >= 387. Se o JSON
+       nao fosse compilado (ou fosse compilado pela metade), o ROM provaria.
+    2. **Ordens da dex**: os 4 arrays tem de ter 1025 entradas e ser permutacao
+       de 1..1025. Com 386 (vanilla) o motor le 639 posicoes alem do fim —
+       `-Waggressive-loop-optimizations` avisa, mas o build nao falha.
+    """
+    falhas: list[str] = []
+    numeros = {}
+    for m in re.finditer(r"^#define (SPECIES_\w+) (\d+)$",
+                         (poke / "include/constants/species.h").read_text(errors="replace"), re.M):
+        numeros[m.group(1)[len("SPECIES_"):]] = int(m.group(2))
+
+    # --- 1. encontros da Rota 1 (FireRed e LeafGreen tem de ser iguais)
+    tabelas_rota1 = {}
+    for versao in ("FireRed", "LeafGreen"):
+        simbolo = f"sRoute1_{versao}_LandMons"
+        if simbolo not in simbolos:
+            # o ROM compila UMA versao: a tabela da outra nao entra no .map.
+            # Só a FireRed é obrigatória; a LeafGreen, se existir, tem de bater.
+            if versao == "FireRed":
+                falhas.append(f"{simbolo} fora do .map")
+            continue
+        o = simbolos[simbolo] - 0x08000000
+        especies = []
+        for i in range(12):
+            _min, _max, esp = struct.unpack_from("<BBH", rom, o + 4 * i)
+            especies.append(esp)
+        tabelas_rota1[versao] = especies
+        if especies[0] != numeros.get("PIDGEY", 16):
+            falhas.append(f"Rota 1 ({versao}): slot 0 = {especies[0]} (esperado PIDGEY)")
+        novas = [e for e in especies if e >= 387]
+        if len(novas) != 2:
+            falhas.append(f"Rota 1 ({versao}): {len(novas)} slots com especie nova, esperado 2")
+    fr = tabelas_rota1.get("FireRed")
+    if fr is not None:
+        lg = tabelas_rota1.get("LeafGreen")
+        if lg is not None and lg != fr:
+            falhas.append(f"Rota 1: FireRed {fr} != LeafGreen {lg}")
+        if fr[1] < 906:
+            falhas.append(f"Rota 1: slot 1 = {fr[1]} nao e Gen 9 (>= 906)")
+    if len(tabelas_rota1) == 2:
+        fr, lg = tabelas_rota1["FireRed"], tabelas_rota1["LeafGreen"]
+        if fr != lg:
+            falhas.append(f"Rota 1: FireRed {fr} != LeafGreen {lg}")
+
+    # --- 2. ordens da dex
+    for nome in ORDENS_DEX:
+        if nome not in simbolos:
+            falhas.append(f"{nome} fora do .map")
+            continue
+        o = simbolos[nome] - 0x08000000
+        vals = list(struct.unpack_from("<1025H", rom, o))
+        if sorted(vals) != list(range(1, 1026)):
+            fora = [v for v in vals if not 1 <= v <= 1025]
+            repetidos = len(vals) - len(set(vals))
+            falhas.append(f"{nome}: nao e permutacao de 1..1025 "
+                          f"({len(fora)} fora da faixa, {repetidos} repetidos)")
+
+    if verboso and not falhas:
+        print(f"  E7 ok: Rota 1 = {fr[0]}, {fr[1]}, {fr[2]} (2 slots novos, Gen 9 no 1o) "
+              f"e as 4 ordens da dex com 1025 entradas")
+    return falhas
+
+
+def self_test_e7() -> int:
+    """ROM sintetica: aprova a mistura certa e reprova slot 0 trocado e ordem curta."""
+    import tempfile
+    tmp = Path(tempfile.mkdtemp())
+    (tmp / "include/constants").mkdir(parents=True)
+    (tmp / "include/constants/species.h").write_text(
+        "#define SPECIES_PIDGEY 16\n#define SPECIES_LECHONK 915\n"
+        "#define SPECIES_SKWOVET 819\n#define SPECIES_RATTATA 19\n")
+
+    rom = bytearray(0x200000)
+    sim = {"sRoute1_FireRed_LandMons": 0x08100000, "sRoute1_LeafGreen_LandMons": 0x08100200}
+    ordem = list(range(1, 1026))
+    for i, nome in enumerate(ORDENS_DEX):
+        sim[nome] = 0x08110000 + i * 0x2000
+        struct.pack_into("<1025H", rom, sim[nome] - 0x08000000, *ordem)
+
+    mistura = [16, 915, 819] + [19] * 9
+    for simbolo in ("sRoute1_FireRed_LandMons", "sRoute1_LeafGreen_LandMons"):
+        o = sim[simbolo] - 0x08000000
+        for i, esp in enumerate(mistura):
+            struct.pack_into("<BBH", rom, o + 4 * i, 3, 3, esp)
+
+    ok_total = falhas = 0
+
+    def checa(nome, cond):
+        nonlocal ok_total, falhas
+        if cond:
+            ok_total += 1
+            print(f"  ok: {nome}")
+        else:
+            falhas += 1
+            print(f"  FALHA: {nome}")
+
+    checa("ROM misturada passa", conferir_e7(bytes(rom), sim, tmp, verboso=False) == [])
+
+    quebrado = bytearray(rom)
+    o = sim["sRoute1_FireRed_LandMons"] - 0x08000000
+    struct.pack_into("<BBH", quebrado, o, 3, 3, 915)      # slot 0 trocado
+    checa("slot 0 trocado reprova", bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    # slot 1 = o+4 (min), o+5 (max), o+6 (especie u16)
+    struct.pack_into("<H", quebrado, o + 6, 819)          # slot 1 deixa de ser Gen 9
+    checa("slot 1 sem Gen 9 reprova", bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    struct.pack_into("<H", quebrado, sim["gPokedexOrder_Height"] - 0x08000000 + 2048, 7)
+    checa("ordem com repetido reprova", bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    checa("sem o simbolo no .map reprova",
+          bool(conferir_e7(bytes(rom), {k: v for k, v in sim.items()
+                                        if k != "gPokedexOrder_Type"}, tmp, verboso=False)))
+
+    print(f"\nE7: {ok_total}/{ok_total + falhas} casos ok")
+    return 0 if falhas == 0 else 1
+
+
 def self_test_e6() -> int:
     """ROM sintética: aprova ponteiros válidos e reprova NULL/coordenada errada."""
     import tempfile
@@ -1128,7 +1263,8 @@ def main() -> int:
 
     if a.self_test:
         print("self-test: verificador de dados no ROM")
-        return self_test() | self_test_e4() | self_test_e5() | self_test_e6()
+        return (self_test() | self_test_e4() | self_test_e5() | self_test_e6()
+                | self_test_e7())
 
     poke = a.pokefirered
     rom_path = a.rom or (poke / "pokefirered_modern.gba")
@@ -1169,6 +1305,8 @@ def main() -> int:
           f"{len(evolucoes)} evoluções")
     rel = conferir(rom, simbolos, especies, dex, learnsets, evolucoes, numeros,
                    constantes, amostras=a.amostras)
+    if "gPokedexOrder_Height" in simbolos:
+        rel["falhas"] += conferir_e7(rom, simbolos, poke)
     if (poke / "src/data/battle_moves_category.h").exists():
         rel["falhas"] += conferir_e3(rom, simbolos, numeros, constantes, poke)
     if (poke / "src/data/text/move_names.h").exists():

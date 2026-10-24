@@ -46,7 +46,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E4 | Movimentos | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E5 | Habilidades | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E6 | Sprites, ícones e cries | **CONCLUÍDA — onda 1** (2026-10-24) |
-| E7 | Encontros, treinadores e UI | a fazer |
+| E7 | Encontros, treinadores e UI | **CONCLUÍDA — onda 1** (2026-10-24) |
 | E8 | Testes automatizados e regressão | a fazer (testes pontuais já existem) |
 | E9 | Entrega: ROM final, Drive e documentação | a fazer |
 
@@ -376,7 +376,32 @@ parâmetro de `AbilityBattleEffects()`. Depois disso os IDs não precisam mais c
 
 ---
 
-### E7 — Encontros, treinadores e UI
+### E7 — Encontros, treinadores e UI — **CONCLUÍDA (onda 1)**
+
+**Estado (2026-10-24): onda 1 concluída (encontros + Pokédex utilizável).**
+
+| item | número |
+|---|---|
+| slots de encontro trocados | **680 em 454 tabelas** (todas as rotas, cavernas e ilhas) |
+| candidatos (forma base, Gen 4-9, não mítica) | **620** |
+| distribuição | Gen 4 = 119 · Gen 5 = 194 · Gen 6 = 71 · Gen 7 = 110 · Gen 8 = 85 · Gen 9 = 101 |
+| Rota 1 (grama) | PIDGEY, **LECHONK**, **SKWOVET**, RATTATA, … (slot 0 intacto) |
+| ordens da Pokédex | 4 × **1025** entradas (antes 386 — lia 639 posições além do fim) |
+| Pokédex nacional | ativa desde o início (antes: só depois da Elite 4) |
+
+**O bug que só apareceu agora:** as quatro ordens da Pokédex (`gPokedexOrder_*`)
+continuavam com **386** entradas enquanto `NUM_SPECIES` já era 1026 desde a E1.
+O compilador avisava — `iteration 386 invokes undefined behavior
+[-Waggressive-loop-optimizations]` — e o aviso passou batido em três etapas.
+Abrir a Pokédex em A-Z/TIPO/ALTURA/PESO lia ~1,2 KB de memória alheia por
+array e usava o que achasse como número de dex. Corrigido com inserção ordenada
+(as 386 vanilla ficam onde estavam; as 639 novas entram na posição certa).
+
+**A outra decisão:** `IsNationalPokedexEnabled()` passou a devolver `TRUE`
+sempre. Sem isso, num jogo com as 9 gerações, a dex lista 151, a ficha de
+qualquer espécie fora de Kanto mostra `No ???`, a pedra de evolução é recusada
+(`MonCanEvolve`) e a espécie capturada não é registrada. É uma função, num
+arquivo — o resto da progressão vanilla não muda.
 
 **Objetivo:** as espécies novas **aparecem no jogo**.
 
@@ -727,6 +752,55 @@ o PNG a cada vez: o corte tem de ser no PNG.
 
 **Próximo passo:** E7 (encontros, treinadores e UI) — colocar as espécies novas na Rota 1
 e destravar a Pokédex até #1025. **Antes da E7, olhar a EWRAM:** 98,94 % com ~2,7 KB livres.
+
+### 2026-10-24 — E7 CONCLUÍDA (onda 1: encontros e Pokédex)
+
+**Resultado:** as espécies das Gen 4-9 **saem da tabela**, não só do arquivo. A Rota 1
+passou a ter **Lechonk (Gen 9, 20%)** e **Skwovet (Gen 8, 10%)** na grama, com o slot 0
+(Pidgey) intacto para a rota continuar sendo a Rota 1. Foram 680 slots trocados em 454
+tabelas, cobrindo Kanto e as Sete Ilhas.
+
+- ROM: md5 **`fb49a1ac2c466b71504a9d7978391165`** (16 777 216 B)
+- Conferência no binário: `verificar_rom.py` → `E7 ok: Rota 1 = 16, 915, 819 (2 slots
+  novos, Gen 9 no 1o) e as 4 ordens da dex com 1025 entradas`
+- Prova em jogo: `prova_encontros_e7.py --prova` — anda na grama da Rota 1 **sem
+  alterar a ROM** e lê a espécie do inimigo em `gBattleMons[1]`
+- Capturas: `reports/firered_e7/` (5 imagens + LEIA-ME)
+- **Captura provada em jogo** (não só o encontro): o roteiro
+  `prova_encontros_e7.py --capturar` põe 20 Poké Balls na bolsa do savestate, joga a
+  bola e lê o time de `gPlayerParty`: `time antes: 1 -> depois: 2`, `time final:
+  [700, 915]` (Sylveon + Lechonk) → **APROVADO**.
+
+**Três decisões que custaram discussão:**
+
+1. **Só Gen 4-9 entram na mistura**, não Gen 2-9: o pokefirered **já tem** as Gen 1-3
+   (IDs 1-386, dados vanilla). O que este projeto acrescentou é 387-1025. A primeira
+   versão do gerador usava `>= 152` e teria trocado slots por espécies que já estavam lá.
+2. **Slot 0 nunca muda.** É o mais comum (20%) e é o que dá identidade à rota. Trocar
+   também o slot 0 faria "Rota 1" virar qualquer coisa.
+3. **`MAP_ROUTE1` aparece duas vezes** no JSON (FireRed e LeafGreen). A semente do sorteio
+   é `mapa|tabela|slot`, **sem** o `base_label`, então as duas versões recebem a mesma
+   mistura. A versão anterior deste projeto escolhia "a última" e alterava só a LeafGreen.
+
+**O bug que estava escondido desde a E1:** as quatro ordens da Pokédex tinham 386
+entradas e o motor percorre 1025. O compilador avisou
+(`iteration 386 invokes undefined behavior`) e o aviso passou por três etapas sem ser
+lido. Não trava: abre a Pokédex em A-Z/TIPO/ALTURA/PESO e lê 639 posições além do fim de
+cada array. **Lição:** aviso de compilação que aponta índice fora do array é bug, não ruído.
+
+**Pendências (onda 2 da E7):** times de treinadores com espécies novas (hoje só os
+encontros selvagens), evoluções por método moderno além de nível, e a lista da Pokédex
+mostrando o ícone/nome das 1025 (a navegação funciona; a ordem A-Z usa o nome em inglês
+do RHH).
+
+**Defeito aberto com causa identificada (2026-10-24):** ao capturar uma espécie Gen 4-9
+a ficha da dex mostra `No800`, nome `??????????` e `HT/WT ???`. Não é a `gPokedexEntries`
+(essa já tem #915 = "Hog", 5 dm, 102 hg): é `src/data/pokemon/pokedex_categories.h`,
+as páginas de **habitat** da dex, que continuam com as 386 espécies vanilla. A ficha
+pós-captura é aberta por `DexScreen_LookUpCategoryBySpecies()`; espécie que não está em
+nenhuma página deixa `category`/`pageNum`/`categoryCursorPosInPage` com o valor anterior
+e a tela imprime outra espécie. Conserto: gerar a tabela de habitats para 1-1025
+(precisa do habitat de cada espécie) e conferir a ficha por captura em jogo.
 
 ## Registro de decisões
 

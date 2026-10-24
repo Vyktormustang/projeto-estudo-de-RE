@@ -78,6 +78,13 @@ CAMPOS = {
     "compressed_spritesheet_size": ("struct CompressedSpriteSheet", None),
     "compressed_spritepalette_size": ("struct CompressedSpritePalette", None),
     "speciesname_len": ("struct SpeciesInfo", "baseHP"),   # só p/ ancorar o include
+    # E7: a bolsa. Precisa da posição de cada pocket dentro do SaveBlock1 para
+    # dar Poké Bolas ao jogador sem passar pelo menu (prova de captura).
+    "itemslot_size": ("struct ItemSlot", None),
+    "s1_bagItems": ("struct SaveBlock1", "bagPocket_Items"),
+    "s1_bagPokeBalls": ("struct SaveBlock1", "bagPocket_PokeBalls"),
+    "s1_bagTMHM": ("struct SaveBlock1", "bagPocket_TMHM"),
+    "s1_bagBerries": ("struct SaveBlock1", "bagPocket_Berries"),
 }
 
 TEMPLATE = """#include "global.h"
