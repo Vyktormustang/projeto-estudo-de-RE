@@ -8,8 +8,41 @@ Data: 2026-10-24 · Etapa T7 (VYK-44) · Base: `pret/pokefirered` MODERN=1
 - **Bloco B (FECHADO)**: `trainers.inc` — 237 labels de revanche do
   VS SEEKER aplicados (dicionário total da onda: 448). Único pulado:
   `Route21_North_Text_CueBallRematchIntro` (100% JP, unused).
-- **Bloco C (PENDENTE)**: `fame_checker.inc` (334) e `help_system.inc`
-  (369) — próximos sub-blocos desta onda.
+- **Bloco C (FECHADO)**: `fame_checker.inc` (127 labels) +
+  `help_system.inc` (359 labels) — **ONDA 6 COMPLETA** (dicionário final:
+  934 labels).
+
+## Bloco C — fame_checker.inc + help_system.inc
+
+**fame_checker.inc** (205 blocos; 127 traduzidos, 78 = nomes próprios de
+cidade/pessoa que ficam em EN e não precisam de entrada):
+
+- 95 locais de origem (campo centralizado de 84 px, FONT_SMALL):
+  LABORATÓRIO, LIGA POKéMON, GINÁSIO PEWTER/CERULEAN/…, MONTE LUA,
+  MUSEU DE PEWTER, ZONA DO SAFÁRI, PLATÔ ÍNDIGO, TORRE POKéMON,
+  ESCONDERIJO, DEPÓSITO ROCKET, CÂNION SEVAULT etc.
+- 96 fontes da informação: PLACA, ASSISTENTE, JORNAL POKéMON, MULHER,
+  HOMEM, SENHOR(A), RAPAZ, GAROTINHA/GAROTINHO, LUTADOR, EQUIPE ROCKET,
+  REVISTA, CIENTISTA, FOTO (nomes próprios mantidos).
+- 14 matérias do JORNAL POKéMON (BROCK…SR. FUJI) em PT-BR.
+
+**help_system.inc** (369 blocos; 359 traduzidos, 1 JP pulado, 9
+mantidos idênticos: OT, ITEM, PP, FNT, POKé BALLS, POKéDEX, TM, HM,
+POKéMON): saudação, menus, 60+ perguntas/respostas, instruções passo a
+passo ({CIRCLE_n}), glossário de termos e a Tabela de Tipos completa
+(68 blocos gerados programaticamente; listas de tipos em EN, como a UI).
+Nomes de menu citados conferidos no `strings.c` traduzido (RESUMO,
+TROCAR, GUARDA-ITENS, CORREIO, DESISTIR, ATRIBUTOS, LENTA/MÉDIA/RÁPIDA,
+TROCA/FIXO, “HELP”/“LR”/“L=A” etc.).
+
+Provas em jogo (CONFIRMADO): botão R na Rota 1 →
+“Saudações! Este é o Sistema de AJUDA…” (`prova_help_saudacao.png`) e
+menu “O que devo fazer nesta situação?/Como faço isto?/O que significa
+este termo?/SAIR” + descrição (`prova_help_menu.png`).
+fame_checker: strings PT-BR localizadas nos bytes da ROM compilada
+(JORNAL POK…, MUSEU DE PEWTER, LUTADOR, ASSISTENTE) — a UI do FAME
+CHECKER exige entradas desbloqueadas por eventos; prova visual fica
+para a varredura T8.
 
 ## Bloco B — trainers.inc (revanches do VS SEEKER)
 
@@ -78,3 +111,8 @@ Rota 1 → Pallet Town, placa de DICAS DE TREINADOR (labels do
 ## Regressão E8
 
 `rodar_regressao.sh` na ROM nova: **PASS em todas as etapas**.
+
+## Fechamento da Onda 6
+
+ROM final da onda: md5 `ef6e69335df6a4b8a8ec77d80986203d` (T1-T6 + Ondas
+1-6). Regressão E8 **PASS em todas as etapas** nesta ROM após o Bloco C.
