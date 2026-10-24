@@ -216,6 +216,14 @@ python3 "$RAIZ/scripts/firered/gen_pokedex_categories.py" --pokefirered "$PF" --
   || { tail -20 /tmp/setup_e7d.log; exit 1; }
 ok "$(grep -c . /tmp/setup_e7d.log) linhas: $(sed -n '2p' /tmp/setup_e7d.log | sed 's/^ *//')"
 
+# Treinadores: sem isso os times sao 100% Gen 1-3. So os times de golpes
+# padrao mudam (lideres/rival/Elite 4 usam golpes a mao e ficam intactos).
+log "3m/8 espécies Gen 4-9 nos times de treinadores (E7 onda 2b)"
+python3 "$RAIZ/scripts/firered/gen_trainer_parties.py" --pokefirered "$PF" --write \
+  >/tmp/setup_e7e.log 2>&1 \
+  || { tail -20 /tmp/setup_e7e.log; exit 1; }
+ok "$(head -1 /tmp/setup_e7e.log)"
+
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then
   log "4/8 headers libpng/zlib p/ compilar as ferramentas ~1 min"

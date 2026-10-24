@@ -1004,6 +1004,34 @@ def especies_nas_categorias(rom: bytes, simbolos: dict[str, int]) -> list[int]:
     return saida
 
 
+def especies_dos_treinadores(rom: bytes, simbolos: dict[str, int],
+                             quantos: int) -> list[int]:
+    """Todas as espécies dos times de `gTrainers` lidas do ROM.
+
+    struct Trainer (40 B): partyFlags u8 em 0x00, partySize u8 em 0x20,
+    ponteiro do time em 0x24. O tamanho de cada entrada do time depende das
+    flags (F_TRAINER_PARTY_CUSTOM_MOVESET=1, F_TRAINER_PARTY_HELD_ITEM=2).
+    MEDIDO no ROM (não confiar no sizeof da cabeça): o build MODERN alinha
+    os structs a 4 B, então é 8 B (padrão e item) e 16 B (golpes à mão,
+    com e sem item) — e NÃO 6/8/14/16. A espécie fica no offset 4.
+    """
+    base = simbolos["gTrainers"] - 0x08000000
+    tamanhos = {0: 8, 1: 16, 2: 8, 3: 16}
+    saida: list[int] = []
+    for i in range(quantos):
+        o = base + i * 40
+        flags = rom[o]
+        n = rom[o + 0x20]
+        ponteiro = struct.unpack_from("<I", rom, o + 0x24)[0]
+        if not n or not (0x08000000 <= ponteiro < 0x0A000000):
+            continue
+        passo = tamanhos[flags & 3]
+        for j in range(n):
+            saida.append(struct.unpack_from(
+                "<H", rom, ponteiro - 0x08000000 + j * passo + 4)[0])
+    return saida
+
+
 def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
                 verboso: bool = True) -> list[str]:
     """Confere no ROM a mistura de encontros e o tamanho das ordens da dex.
@@ -1069,7 +1097,22 @@ def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
             falhas.append(f"{nome}: nao e permutacao de 1..1025 "
                           f"({len(fora)} fora da faixa, {repetidos} repetidos)")
 
-    # --- 3. páginas de habitat: toda espécie 1..1025 tem de estar em uma
+    # --- 3. times de treinadores: espécies válidas e as trocas da onda 2b
+    if "gTrainers" in simbolos:
+        trocas_no_fonte = (poke / "src/data/trainer_parties.h").read_text(
+            errors="replace").count("GERADO(e7-treinadores)")
+        tudo = especies_dos_treinadores(rom, simbolos, 743)
+        invalidas = [e for e in tudo if not 0 < e <= 1025]
+        novas_t = sum(1 for e in tudo if e >= 387)
+        if invalidas:
+            falhas.append(f"gTrainers: {len(invalidas)} espécies fora de 1..1025")
+        if trocas_no_fonte and novas_t != trocas_no_fonte:
+            falhas.append(f"gTrainers: {novas_t} espécies novas no ROM, "
+                          f"{trocas_no_fonte} marcadas no fonte")
+    else:
+        falhas.append("gTrainers fora do .map")
+
+    # --- 4. páginas de habitat: toda espécie 1..1025 tem de estar em uma
     if "gDexCategories" in simbolos:
         cats = especies_nas_categorias(rom, simbolos)
         if sorted(cats) != list(range(1, 1026)):
@@ -1080,8 +1123,11 @@ def conferir_e7(rom: bytes, simbolos: dict[str, int], poke: Path,
         falhas.append("gDexCategories fora do .map")
 
     if verboso and not falhas:
+        extra_t = ""
+        if "gTrainers" in simbolos and trocas_no_fonte:
+            extra_t = f" e {novas_t} slots de treinador com espécie nova"
         print(f"  E7 ok: Rota 1 = {fr[0]}, {fr[1]}, {fr[2]} (2 slots novos, Gen 9 no 1o), "
-              f"as 4 ordens da dex e as 9 páginas de habitat com 1025 entradas")
+              f"as 4 ordens da dex, as 9 páginas de habitat com 1025 entradas{extra_t}")
     return falhas
 
 
@@ -1093,6 +1139,10 @@ def self_test_e7() -> int:
     (tmp / "include/constants/species.h").write_text(
         "#define SPECIES_PIDGEY 16\n#define SPECIES_LECHONK 915\n"
         "#define SPECIES_SKWOVET 819\n#define SPECIES_RATTATA 19\n")
+    (tmp / "src/data").mkdir(parents=True)
+    (tmp / "src/data/trainer_parties.h").write_text(
+        ".species = SPECIES_KRICKETOT, // GERADO(e7-treinadores): era SPECIES_CATERPIE\n"
+        ".species = SPECIES_LECHONK, // GERADO(e7-treinadores): era SPECIES_RATTATA\n")
 
     rom = bytearray(0x200000)
     sim = {"sRoute1_FireRed_LandMons": 0x08100000, "sRoute1_LeafGreen_LandMons": 0x08100200}
@@ -1128,6 +1178,16 @@ def self_test_e7() -> int:
             struct.pack_into("<IB", rom, cursor - 0x08000000, endereco, len(lote))
             cursor += 8
 
+    # treinadores: 1 treinador, time padrão (flags 0) com 2 espécies novas
+    # (bate com as 2 marcas GERADO(e7-treinadores) do fonte sintético)
+    sim["gTrainers"] = 0x08150000
+    o = sim["gTrainers"] - 0x08000000
+    rom[o] = 0                                   # partyFlags
+    rom[o + 0x20] = 2                            # partySize
+    struct.pack_into("<I", rom, o + 0x24, 0x08151000)
+    struct.pack_into("<H", rom, 0x151000 + 4, 401)       # slot 0: Kricketot
+    struct.pack_into("<H", rom, 0x151000 + 8 + 4, 915)   # slot 1: Lechonk (passo 8)
+
     mistura = [16, 915, 819] + [19] * 9
     for simbolo in ("sRoute1_FireRed_LandMons", "sRoute1_LeafGreen_LandMons"):
         o = sim[simbolo] - 0x08000000
@@ -1160,6 +1220,16 @@ def self_test_e7() -> int:
     quebrado = bytearray(rom)
     struct.pack_into("<H", quebrado, sim["gPokedexOrder_Height"] - 0x08000000 + 2048, 7)
     checa("ordem com repetido reprova", bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    struct.pack_into("<H", quebrado, 0x151000 + 4, 2000)  # espécie impossível
+    checa("especie de treinador fora de 1..1025 reprova",
+          bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
+
+    quebrado = bytearray(rom)
+    struct.pack_into("<H", quebrado, 0x151000 + 8 + 4, 19)  # tira a espécie nova
+    checa("menos especies novas que marcas no fonte reprova",
+          bool(conferir_e7(bytes(quebrado), sim, tmp, verboso=False)))
 
     quebrado = bytearray(rom)
     # apaga a última página da última categoria: 1..1025 deixa de ser completo

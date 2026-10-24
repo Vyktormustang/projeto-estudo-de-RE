@@ -456,6 +456,16 @@ def main():
             else:
                 raise SystemExit(f"ponto de rota invalido: {parte!r}")
         rota = {"pontos": pontos, "i": 0, "parado": 0, "ult": None, "espera": 0}
+        # Com --map, a rota foge sozinha de batalha selvagem (B,DOWN,RIGHT,A
+        # em ciclo). O criterio e' gMain.inBattle (bit 1 de gMain+0x439):
+        # gBattleTypeFlags NAO serve porque so e' zerada no setup da batalha
+        # seguinte — com ela a fuga ficava ligada para sempre (tela preta).
+        if a.map:
+            try:
+                rota["fuga_sym"] = simbolo_em_memoria(Path(a.map), "gMain") + 0x438
+                print("rota: fuga automatica de batalha ligada (gMain.inBattle)")
+            except SystemExit:
+                rota["fuga_sym"] = None
         def _nome(p):
             if p[0] is None:
                 return f"({p[2]},{p[3]})"
@@ -486,6 +496,28 @@ def main():
                     print(f"  frame {f:5d}: ({est['x']},{est['y']}) mapa {est['grupo']}:{est['mapa']}")
         if rota:
             est = ler_estado(lib)
+            if rota.get("fuga_sym") is not None:
+                if f % 4 == 0:
+                    # u32 em gMain+0x438: byte 0x439 e' o segundo; inBattle e' o
+                    # bit 1 desse byte -> bit 9 da palavra
+                    rota["em_batalha"] = bool(ler_u32(lib, rota["fuga_sym"]) & (1 << 9))
+                if rota.get("em_batalha"):
+                    # ciclo B,B -> DOWN -> RIGHT -> A: do menu FIGHT cai no
+                    # RUN; em texto ("Got away safely!") o A dispensa. Fases de
+                    # 24 frames e B dobrado: com 18 o A abria a BAG e o fecha/
+                    # abre engolia o DOWN/RIGHT -> laco estavel sem nunca fugir.
+                    rota["fuga_f"] = rota.get("fuga_f", 0) + 1
+                    fase = (rota["fuga_f"] // 24) % 5
+                    if rota["fuga_f"] % 24 < 7:
+                        bot = bot | {BTN[("B", "B", "DOWN", "RIGHT", "A")[fase]]}
+                    rota["parado"] = 0
+                    rota["ult"] = None
+                    if rota["fuga_f"] == 1:
+                        print(f"  rota: batalha no f{f} -> fugindo")
+                    est = None          # nao anda enquanto foge
+                elif rota.get("fuga_f"):
+                    rota["fuga_f"] = 0
+                    rota["espera"] = 30  # fade-in de volta ao overworld
             if est and rota.get("empurrar"):
                 d, n = rota["empurrar"]
                 bot = bot | {BTN[d]}

@@ -59,3 +59,35 @@ não tem habitat oficial depois da Gen 3). Lechonk caiu em Grassland, junto de F
 Conferência no binário: `verificar_rom.py` agora percorre os ponteiros de
 `gDexCategories` no ROM e exige as 1025 espécies:
 `E7 ok: ... as 4 ordens da dex e as 9 páginas de habitat com 1025 entradas`.
+
+
+---
+
+## Onda 2b — treinadores com espécies Gen 4-9 (2026-10-24)
+
+ROM: md5 **`a44251245f49682a6c56396f32d90b14`** (inclui também os habitats da onda 2a).
+
+`scripts/firered/gen_trainer_parties.py` (self-test 7 casos) troca **481 dos 1650
+slots** de treinador por espécies novas (Gen 4: 108, 5: 163, 6: 59, 7: 58, 8: 20,
+9: 73). Política: slot 0 nunca muda; times de golpes à mão (líderes, rival,
+Elite 4) ficam intactos; a substituta tem o mesmo tipo primário e o BST mais
+próximo (teto 570), escolhida por hash determinístico. A semelhança de
+tipo/força é HIPÓTESE de balanceamento; o funcionamento em jogo é CONFIRMADO:
+
+| arquivo | frame | o que mostra |
+|---|---|---|
+| `07_rick_enviou_kricketot.png` | 1400 | **"BUG CATCHER RICK sent out KRICKETOT!"** na Floresta de Viridian |
+| `08_batalha_kricketot_gen4.png` | 1600 | batalha contra KRICKETOT (#401, Gen 4) nível 6 |
+| `09_floresta_apos_vitoria.png` | 3000 | de volta ao overworld ao lado do Rick depois da vitória |
+
+Log da RAM durante a luta: `b1 esp= 13` (Weedle, 1º mon vanilla intacto) e depois
+`b1 esp= 401 nv= 6 tipos=(6, 6)` — KRICKETOT entregue pelo próprio jogo.
+
+Conferência no binário: `verificar_rom.py` percorre `gTrainers` (passo medido no
+ROM: entradas de 8 B/16 B, espécie no offset 4) e exige espécies válidas e o
+mesmo número de trocas marcado no fonte (`GERADO(e7-treinadores)` = 481).
+
+Como chegou lá (reprodutível): `nav.py --rota` com fuga automática de batalha
+(`gMain.inBattle`, ciclo B,B,DOWN,RIGHT,A) — Rota 1 → Viridian (var `0x4051`=2
+destrava o velhinho) → Rota 2 → Floresta, 38 waypoints, e a visão do Rick
+dispara a batalha de treinador de verdade (nada é injetado no time dele).

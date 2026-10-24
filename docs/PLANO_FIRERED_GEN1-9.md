@@ -46,7 +46,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E4 | Movimentos | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E5 | Habilidades | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E6 | Sprites, ícones e cries | **CONCLUÍDA — onda 1** (2026-10-24) |
-| E7 | Encontros, treinadores e UI | **CONCLUÍDA — ondas 1 e 2a** (2026-10-24) |
+| E7 | Encontros, treinadores e UI | **CONCLUÍDA — ondas 1, 2a e 2b** (2026-10-24) |
 | E8 | Testes automatizados e regressão | a fazer (testes pontuais já existem) |
 | E9 | Entrega: ROM final, Drive e documentação | **parcial** — build E7 já no Drive (2026-10-24) |
 
@@ -376,7 +376,7 @@ parâmetro de `AbilityBattleEffects()`. Depois disso os IDs não precisam mais c
 
 ---
 
-### E7 — Encontros, treinadores e UI — **CONCLUÍDA (ondas 1 e 2a)**
+### E7 — Encontros, treinadores e UI — **CONCLUÍDA (ondas 1, 2a e 2b)**
 
 **Estado (2026-10-24): onda 1 concluída (encontros + captura + Pokédex utilizável) e
 onda 2a concluída (páginas de habitat: a ficha da dex das espécies novas está correta).**
@@ -799,10 +799,19 @@ entradas e o motor percorre 1025. O compilador avisou
 lido. Não trava: abre a Pokédex em A-Z/TIPO/ALTURA/PESO e lê 639 posições além do fim de
 cada array. **Lição:** aviso de compilação que aponta índice fora do array é bug, não ruído.
 
-**Pendências (onda 2 da E7):** times de treinadores com espécies novas (hoje só os
-encontros selvagens) e evoluções por método moderno além de nível. A **ficha da dex de
-espécie nova já está correta** (habitats gerados); a lista da Pokédex mostra as 1025 e a
-ordem A-Z usa o nome em inglês do RHH.
+**Onda 2b (2026-10-24): treinadores feitos.** `gen_trainer_parties.py` põe espécie nova
+em 481 dos 1650 slots (slot 0 e times de golpes à mão intactos; tipo primário igual e
+BST mais próximo, teto 570). Provado em jogo: Bug Catcher Rick na Floresta de Viridian
+enviou **KRICKETOT #401** (`reports/firered_e7/07_rick_enviou_kricketot.png`), com
+navegação real Rota 1 → Viridian → Rota 2 → Floresta e fuga automática de batalha no
+`nav.py` (`--rota` agora foge sozinho via `gMain.inBattle`; `gBattleTypeFlags` não
+serve — só zera no setup da batalha seguinte). ROM md5
+`a44251245f49682a6c56396f32d90b14`.
+
+**Pendência (onda 2c):** evoluções por método moderno além de nível (amizade, item,
+troca → mapeadas para o motor vanilla). A **ficha da dex de espécie nova já está
+correta** (habitats gerados); a lista da Pokédex mostra as 1025 e a ordem A-Z usa o
+nome em inglês do RHH.
 
 **Defeito da ficha da dex — CORRIGIDO (2026-10-24, mesma rodada):** ao capturar uma espécie Gen 4-9
 a ficha da dex mostrava `No800`, nome `??????????` e `HT/WT ???`. Não era a `gPokedexEntries`
