@@ -61,7 +61,10 @@ OFF_STATS = 0
 OFF_TIPOS = 6
 OFF_CATCH = 8
 OFF_EXP = 9
-OFF_HABILIDADES = 0x16      # u8 abilities[2]
+# `abilities[2]`: era u8 (0x16..0x17) e desde a E6 e' u16 (0x16..0x19), porque o
+# ID de habilidade passa de 255. Os dois casos sao conferidos pelo tamanho: quem
+# manda e' o campo declarado no `include/pokemon.h` do clone.
+OFF_HABILIDADES = 0x16
 # offsets dentro de struct PokedexEntry
 OFF_CATEGORIA = 0
 OFF_ALTURA = 12
@@ -619,6 +622,9 @@ def conferir_e5(rom: bytes, simbolos: dict[str, int], constantes: dict[str, int]
                 verboso: bool = True) -> list[str]:
     """Confere no ROM: nomes, descrições e as habilidades de cada espécie nova."""
     falhas: list[str] = []
+    # o campo `abilities[2]` e' u8 ou u16 conforme o clone (u16 desde a E6)
+    texto_poke = (poke / "include/pokemon.h").read_text(errors="replace")
+    habilidade_u16 = "u16 abilities[2]" in texto_poke
     if "gAbilityNames" not in simbolos or "gAbilityDescriptionPointers" not in simbolos:
         return ["gAbilityNames/gAbilityDescriptionPointers fora do .map"]
     total = constantes.get("ABILITIES_COUNT", 0)
@@ -683,7 +689,10 @@ def conferir_e5(rom: bytes, simbolos: dict[str, int], constantes: dict[str, int]
                 continue
             esperado = [constantes.get(m.group(1), -1), constantes.get(m.group(2), -1)]
             o = base_esp + TAM_ESPECIE * numeros[nome_curto] + OFF_HABILIDADES
-            lido = [rom[o], rom[o + 1]]
+            if habilidade_u16:
+                lido = list(struct.unpack_from("<2H", rom, o))
+            else:
+                lido = [rom[o], rom[o + 1]]
             if lido != esperado:
                 falhas.append(f"{nome_curto}: habilidades {lido} != {esperado}")
             conferidas += 1
@@ -858,6 +867,175 @@ def self_test() -> int:
 
 
 # ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# E6: sprites, ícones, pegadas e cries
+# ---------------------------------------------------------------------------
+# `struct MonCoords` tem 2 bytes de campos mas **4 no ROM**: o GCC do build usa
+# `-mabi=apcs-gnu`, cuja regra é "struct ocupa múltiplo de 4". O `offsets.py`
+# compila com outro compilador (clang via zig) e responde 2 — por isso o passo é
+# MEDIDO aqui, como já se faz com os golpes. Medir evita os dois jeitos de errar.
+PASSOS_COORDS = (2, 4, 8)
+
+
+def _esperado_e6(poke: Path) -> list[tuple[str, dict[str, str]]]:
+    """O que o gerador de sprites escreveu, por espécie (nome, símbolos)."""
+    texto = (poke / "src/data/pokemon_graphics/front_pic_table.h").read_text(errors="replace")
+    saida = []
+    for m in re.finditer(r"^    SPECIES_SPRITE\(([A-Z0-9_]+), (g\w+)\),$", texto, re.M):
+        saida.append((m.group(1), {"front": m.group(2)}))
+    return saida
+
+
+def conferir_e6(rom: bytes, simbolos: dict[str, int], poke: Path,
+                verboso: bool = True) -> list[str]:
+    """Confere no ROM que as 639 espécies novas apontam para gráfico de verdade.
+
+    Até a E5 elas tinham `{NULL, 0, 0}` nas tabelas: em batalha apareciam o nome
+    e a barra de HP, sem o Pokémon. O que se confere aqui é o **ponteiro**:
+    tem de cair dentro da ROM (0x08000000-0x09FFFFFF) e não pode ser NULL.
+    """
+    falhas: list[str] = []
+    obrigatorios = ("gMonFrontPicTable", "gMonBackPicTable", "gMonPaletteTable",
+                    "gMonShinyPaletteTable", "gMonIconTable", "gMonFootprintTable",
+                    "gMonFrontPicCoords")
+    faltando = [x for x in obrigatorios if x not in simbolos]
+    if faltando:
+        return [f"{x} fora do .map" for x in faltando]
+
+    # índices das espécies novas, em nome -> número
+    numeros = {}
+    for m in re.finditer(r"^#define (SPECIES_\w+) (\d+)$",
+                         (poke / "include/constants/species.h").read_text(errors="replace"), re.M):
+        numeros[m.group(1)] = int(m.group(2))
+
+    tabelas = {k: simbolos[k] - 0x08000000 for k in obrigatorios}
+
+    def valido(p: int) -> bool:
+        return 0x08000000 <= p < 0x0A000000
+
+    def ler_ptr(tabela: str, esp: int, passo: int) -> int:
+        o = tabelas[tabela] + passo * esp
+        return struct.unpack_from("<I", rom, o)[0]
+
+    # --- passo das coordenadas, medido contra o header gerado
+    texto_coords = (poke / "src/data/pokemon_graphics/front_pic_coordinates.h").read_text(errors="replace")
+    esperado_coords: dict[str, tuple[int, int]] = {}
+    for m in re.finditer(
+            r"\[SPECIES_([A-Z0-9_]+)\] =\s*\{\s*\.size = MON_COORDS_SIZE\((\d+), (\d+)\),\s*"
+            r"\.y_offset = (\d+),", texto_coords):
+        larg, alt, y = int(m.group(2)), int(m.group(3)), int(m.group(4))
+        esperado_coords[m.group(1)] = (((larg + 7) // 8) << 4 | ((alt + 7) // 8), y)
+
+    # usa TODAS as espécies, não uma amostra: com uma só, dois passos empatam
+    # (o primeiro testado fica) e a medida sai errada em silêncio.
+    amostra = [(n, v) for n, v in esperado_coords.items()
+               if ("SPECIES_" + n) in numeros]
+    melhor_passo, melhor_acertos = 0, -1
+    for passo in PASSOS_COORDS:
+        acertos = 0
+        for nome, (tam, y) in amostra:
+            o = tabelas["gMonFrontPicCoords"] + passo * numeros["SPECIES_" + nome]
+            if o + 1 < len(rom) and rom[o] == tam and rom[o + 1] == y:
+                acertos += 1
+        if acertos > melhor_acertos:
+            melhor_passo, melhor_acertos = passo, acertos
+        elif acertos == melhor_acertos and passo < melhor_passo:
+            melhor_passo = passo
+    if melhor_acertos < len(amostra) * 0.9:
+        falhas.append(f"coordenadas: melhor passo {melhor_passo} acertou "
+                      f"{melhor_acertos}/{len(amostra)} — tabela deslocada?")
+    passo_coords = melhor_passo
+
+    # --- ponteiros e coordenadas de todas as novas
+    conferidas = 0
+    for nome, valor in numeros.items():
+        if valor < 387 or nome == "SPECIES_EGG":
+            continue
+        curto = nome[len("SPECIES_"):]
+        for tabela, passo in (("gMonFrontPicTable", 8), ("gMonBackPicTable", 8),
+                              ("gMonPaletteTable", 8), ("gMonShinyPaletteTable", 8),
+                              ("gMonIconTable", 4), ("gMonFootprintTable", 4)):
+            p = ler_ptr(tabela, valor, passo)
+            if not valido(p):
+                falhas.append(f"{curto}: {tabela} = 0x{p:08X} (não aponta para a ROM)")
+        if curto in esperado_coords and passo_coords:
+            tam, y = esperado_coords[curto]
+            o = tabelas["gMonFrontPicCoords"] + passo_coords * valor
+            if rom[o] != tam or rom[o + 1] != y:
+                falhas.append(f"{curto}: coordenada {rom[o]:#04x}/{rom[o+1]} "
+                              f"!= {tam:#04x}/{y}")
+        conferidas += 1
+
+    if verboso:
+        print(f"  E6 ok: {conferidas} espécies com sprite, costas, paleta, shiny, "
+              f"ícone, pegada e coordenada (passo {passo_coords} B)")
+    if conferidas == 0:
+        falhas.append("não conferi sprite de nenhuma espécie")
+    return falhas
+
+
+def self_test_e6() -> int:
+    """ROM sintética: aprova ponteiros válidos e reprova NULL/coordenada errada."""
+    import tempfile
+    tmp = Path(tempfile.mkdtemp())
+    (tmp / "include/constants").mkdir(parents=True)
+    (tmp / "src/data/pokemon_graphics").mkdir(parents=True)
+    (tmp / "include/constants/species.h").write_text(
+        "#define SPECIES_NONE 0\n#define SPECIES_BULBASAUR 1\n"
+        "#define SPECIES_TURTWIG 387\n#define NUM_SPECIES 388\n#define SPECIES_EGG 388\n")
+    (tmp / "src/data/pokemon_graphics/front_pic_table.h").write_text(
+        "const x[] = {\n    SPECIES_SPRITE(TURTWIG, gMonFrontPic_Turtwig),\n};\n")
+    (tmp / "src/data/pokemon_graphics/front_pic_coordinates.h").write_text(
+        "const x[] = {\n    [SPECIES_TURTWIG] =\n    {\n"
+        "        .size = MON_COORDS_SIZE(40, 48),\n        .y_offset = 11,\n    },\n};\n")
+
+    rom = bytearray(0x120000)
+    sim = dict(gMonFrontPicTable=0x08100000, gMonBackPicTable=0x08101000,
+               gMonPaletteTable=0x08102000, gMonShinyPaletteTable=0x08103000,
+               gMonIconTable=0x08104000, gMonFootprintTable=0x08105000,
+               gMonFrontPicCoords=0x08106000)
+    base = {k: v - 0x08000000 for k, v in sim.items()}
+
+    def montar(ptr=0x08200000, tam=0x56, y=11):
+        for tabela in ("gMonFrontPicTable", "gMonBackPicTable",
+                       "gMonPaletteTable", "gMonShinyPaletteTable"):
+            struct.pack_into("<I", rom, base[tabela] + 8 * 387, ptr)
+        for tabela in ("gMonIconTable", "gMonFootprintTable"):
+            struct.pack_into("<I", rom, base[tabela] + 4 * 387, ptr)
+        # passo 4 (apcs-gnu): tamanho e y_offset nos 2 primeiros bytes da entrada
+        struct.pack_into("<BB", rom, base["gMonFrontPicCoords"] + 4 * 387, tam, y)
+
+    ok_total = falhas = 0
+
+    def checa(nome, cond):
+        nonlocal ok_total, falhas
+        if cond:
+            ok_total += 1
+            print(f"  ok: {nome}")
+        else:
+            falhas += 1
+            print(f"  FALHA: {nome}")
+
+    montar()
+    problemas = conferir_e6(bytes(rom), sim, tmp, verboso=False)
+    checa("ROM com sprite correto e' aprovada", not problemas)
+
+    montar(ptr=0)                       # NULL: era o estado de antes da E6
+    problemas = conferir_e6(bytes(rom), sim, tmp, verboso=False)
+    checa("ponteiro NULL e' reprovado", len(problemas) >= 5)
+
+    montar(tam=0x55)                    # tamanho errado
+    problemas = conferir_e6(bytes(rom), sim, tmp, verboso=False)
+    checa("coordenada errada e' reprovada", any("coordenada" in p for p in problemas))
+
+    montar(ptr=0x02000000)              # EWRAM: não é gráfico
+    problemas = conferir_e6(bytes(rom), sim, tmp, verboso=False)
+    checa("ponteiro fora da ROM e' reprovado", any("não aponta" in p for p in problemas))
+    return falhas
+
+
+
 def self_test_e5() -> int:
     """ROM sintética: confere que a conferência de habilidades aprova e reprova."""
     global CHARMAP
@@ -883,6 +1061,8 @@ def self_test_e5() -> int:
         '    [ABILITY_NONE] = _("-------"),\n'
         '    [ABILITY_STENCH] = _("STENCH"),\n'
         '    [ABILITY_EARTH_EATER] = _("EARTH EATER"),\n};\n')
+    (tmp / "include/pokemon.h").write_text(
+        "struct SpeciesInfo\n{\n /* 0x16 */ u16 abilities[2];\n};\n")
     (tmp / "src/data/pokemon/species_info_gen4_9.h").write_text(
         "    [SPECIES_ORTHWORM] =\n    {\n        .baseHP        = 70,\n"
         "        .abilities = { ABILITY_EARTH_EATER, ABILITY_NONE },\n    },\n")
@@ -908,8 +1088,11 @@ def self_test_e5() -> int:
             rom[o:o + len(texto)] = bytes([0xBB + ord(c) - 65 if c.isalpha() else (0x00 if c == " " else 0xAD)
                                            for c in texto.upper()])
         o = 0x30000 + TAM_ESPECIE * 968 + OFF_HABILIDADES
-        rom[o] = 2 if not quebrar else 0
-        rom[o + 1] = 0
+        if "u16 abilities[2]" in (tmp / "include/pokemon.h").read_text(errors="replace"):
+            struct.pack_into("<2H", rom, o, 2 if not quebrar else 0, 0)
+        else:
+            rom[o] = 2 if not quebrar else 0
+            rom[o + 1] = 0
 
     escrever()
     bom = conferir_e5(bytes(rom), simbolos, const, tmp, numeros, verboso=False)
@@ -945,7 +1128,7 @@ def main() -> int:
 
     if a.self_test:
         print("self-test: verificador de dados no ROM")
-        return self_test() | self_test_e4() | self_test_e5()
+        return self_test() | self_test_e4() | self_test_e5() | self_test_e6()
 
     poke = a.pokefirered
     rom_path = a.rom or (poke / "pokefirered_modern.gba")
@@ -992,6 +1175,8 @@ def main() -> int:
         rel["falhas"] += conferir_e4(rom, simbolos, constantes, poke)
     if (poke / "src/data/text/abilities.h").exists():
         rel["falhas"] += conferir_e5(rom, simbolos, constantes, poke)
+    if (poke / "src/data/graphics/pokemon_gen4_9.h").exists():
+        rel["falhas"] += conferir_e6(rom, simbolos, poke)
 
     for falha in rel["falhas"]:
         print(f"  FALHA: {falha}")
