@@ -1,10 +1,10 @@
 # T2 — Interface em PT-BR (onda 1) — provas em jogo
 
-Data: 2026-10-24 · Issue: VYK-39 · ROM: `pokefirered_modern.gba` md5 `0d1dfff71bbfdffa180f9516c8fc631b`
+Data: 2026-10-24 · Issue: VYK-39 · ROM (onda 2): `pokefirered_modern.gba` md5 `69f7f9e4874db2bfdff214bcb598910d`
 
 ## O que foi traduzido nesta onda (CONFIRMADO em jogo)
 
-- **255 strings de `src/strings.c`** via dicionário novo
+- **602 strings de `src/strings.c`** (onda 1: 255; onda 2: +347) via dicionário
   `scripts/firered/traducao_strings_ptbr.py` (chave = nome da variável C,
   aplicado/validado pelo `aplicar_traducao.py`, que agora também trata `.c`).
 - **`data/text/save.inc`** completo (diálogo de salvar) via árvore
@@ -28,14 +28,26 @@ teclado de apelido, cassino. Nomes de ATAQUES e ITENS ficam em inglês
 | `06_salvou_o_jogo.png` | “AAAAAA salvou o jogo.” |
 | `07_opcoes.png` | VELOC. TEXTO/ANIMAÇÃO/ESTILO LUTA/SOM/MODO BOTÃO/MOLDURA/SAIR |
 | `08_bolsa_itens.png` | Bolsa aberta: bolso ITENS, FECHAR BOLSA |
+| `09_pc_menu.png` | PC: GUARDA-ITENS / CORREIO / DESLIGAR + “O que você quer fazer?” |
+| `10_guarda_itens.png` | RETIRAR ITEM / GUARDAR ITEM / SAIR + “Retira itens do PC.” |
+| `11_menino_menina.png` | Escolha MENINO / MENINA na intro |
+| `12_seu_nome_teclado.png` | “SEU NOME?” + barra MOVER/OK/VOLTA |
 
 ## Regressão
 
 `verificar_rom.py --amostras 0`: **ok** — 639 espécies/learnsets, E3-E7
 conferidos na ROM nova (Gen 1-9 intacto).
 
+## Onda 2 (mesmo dia)
+
++347 strings: campo/HMs, menu “escolha um POKéMON”, PC (guarda-itens,
+correio, Boxes com ações e fundos), resumo do Pokémon (páginas, memo do
+treinador, ovos), telas de nome, mapa da região (controles + 21 descrições
+de áreas), trocas, creche/tutor de golpes, pesca, Fame Checker UI, Mystery
+Gift, registros de batalha, easy chat. ROM md5 `69f7f9e4…`, regressão verde.
+
 ## Pendente (próximas ondas da T2)
 
-Restam ~1.000 strings menos visíveis em `src/strings.c` (PC/Box, link,
-Teachy TV, Fame Checker, resumo do Pokémon etc.) e os `.c` auxiliares
-(~40 strings). Serão cobertas nas ondas seguintes junto de T3 (batalha).
+Restam ~700 strings de `src/strings.c`, em grande parte Teachy TV, créditos
+(ficam em inglês), restos JP não usados e textos de link/e-Reader raros.
+O que faltar de visível será varrido junto da T3 (batalha).
