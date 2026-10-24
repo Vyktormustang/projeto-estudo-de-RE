@@ -32,9 +32,15 @@ como registro histórico.
   effective!” contra Dragão, “It doesn't affect” de Dragão em Fada, batalha de Kanto intacta.
   O split foi medido em batalha: dois golpes de 40 BP do mesmo tipo no mesmo alvo deram **29**
   (físico) e **38** (especial) — `scripts/firered/prova_batalha_e3.py` monta/desfaz a ROM de prova.
-- **Próximo passo:** E4 (`VYK-32`) — movimentos: 3123 golpes filtrados voltam, ~150 com efeito
-  próprio. Estratégia em três ondas (dados → motor por classe → casos especiais) descrita em
-  `docs/PLANO_FIRERED_GEN1-9.md`.
+- **E4 CONCLUÍDA (onda 1, dados):** o jogo tem **797 golpes** (355 do FireRed + 442 das Gen 4-9),
+  `MOVES_COUNT` 797, nomes de até 16 colunas, descrições, categoria física/especial e animação
+  para todos. ROM `9bda1da4…` (16 777 216 B), `+39 KB`. 12/12 batalhas com golpes sorteados sem
+  travar. Prova em `reports/firered_e4/`; dados gerados por `scripts/firered/gen_move_data.py`
+  (idempotente, com `--self-test`, `--write` e `--check`).
+  **O que ficou para as ondas 2-3:** 191 golpes ainda caem em fallback (`EFFECT_HIT`/`EFFECT_SPLASH`)
+  — funcionam e não travam, mas não têm o efeito moderno; e os 442 usam a animação genérica de
+  TACKLE.
+- **Próximo passo:** E5 (`VYK-33`) — habilidades (78 → ~310), começando pelas de Kanto.
 
 ### Reconstruir o ambiente (o `/tmp` não sobrevive entre sessões)
 

@@ -28,6 +28,10 @@ set -euo pipefail
 AQUI="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RAIZ="$(cd "$AQUI/../.." && pwd)"
 PF=/tmp/pokefirered
+# Commits fixos: o RHH muda todo dia e isso muda a ROM (dados de especie/golpe).
+# Sem o pino, dois builds "iguais" davam hashes diferentes.
+PF_COMMIT=ce6406d8c2eaf46d543c8a2606de0c3cb1951982   # pret/pokefirered 2026-10-20
+RHH_COMMIT=f594a462d7e756b25727d676e34829f63c053d13  # rh-hideout/pokeemerald-expansion 2026-10-23
 SEM_MGBA=0
 SO_BUILD=0
 for arg in "$@"; do
@@ -61,7 +65,10 @@ else
   log "2/8 clonando pret/pokefirered ~30 s"
   rm -rf "$PF"
   git clone --depth 1 https://github.com/pret/pokefirered "$PF" >/tmp/setup_clone.log 2>&1
-  ok "clone em $PF"
+  git -C "$PF" fetch --depth 1 origin "$PF_COMMIT" >>/tmp/setup_clone.log 2>&1 \
+    && git -C "$PF" checkout -q "$PF_COMMIT" \
+    || { tail -10 /tmp/setup_clone.log; exit 1; }
+  ok "clone em $PF ($(git -C "$PF" rev-parse --short HEAD))"
 fi
 
 # referencia: so os headers de constantes do RHH (fonte dos nomes 387-1025)
@@ -72,17 +79,22 @@ else
   rm -rf /tmp/fre
   git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/rh-hideout/pokeemerald-expansion /tmp/fre >/tmp/setup_fre.log 2>&1 \
-    && ( cd /tmp/fre && git sparse-checkout set include \
-          src/data/pokemon/species_info src/data/pokemon/level_up_learnsets >/dev/null 2>&1 ) \
+    && ( cd /tmp/fre && git fetch --depth 1 origin "$RHH_COMMIT" >>/tmp/setup_fre.log 2>&1 \
+          && git checkout -q "$RHH_COMMIT" \
+          && git sparse-checkout set --no-cone '/include/' \
+          '/src/data/pokemon/species_info/' '/src/data/pokemon/level_up_learnsets/' \
+          '/src/data/moves_info.h' >/dev/null 2>&1 ) \
     || { tail -10 /tmp/setup_fre.log; exit 1; }
-  ok "referencia em /tmp/fre"
+  ok "referencia em /tmp/fre ($(git -C /tmp/fre rev-parse --short HEAD))"
 fi
 
 # clone antigo pode ter so `include` no sparse-checkout: completa sem re-clonar
-if [ -d /tmp/fre/.git ] && [ ! -d /tmp/fre/src/data/pokemon/species_info ]; then
-  log "completando a referencia RHH (species_info + learnsets)"
-  ( cd /tmp/fre && git sparse-checkout add src/data/pokemon/species_info \
-      src/data/pokemon/level_up_learnsets >/tmp/setup_fre.log 2>&1 ) \
+if [ -d /tmp/fre/.git ] && { [ ! -d /tmp/fre/src/data/pokemon/species_info ] || \
+     [ ! -f /tmp/fre/src/data/moves_info.h ]; }; then
+  log "completando a referencia RHH (species_info + learnsets + moves_info.h)"
+  ( cd /tmp/fre && git sparse-checkout set --no-cone '/include/' \
+      '/src/data/pokemon/species_info/' '/src/data/pokemon/level_up_learnsets/' \
+      '/src/data/moves_info.h' >/tmp/setup_fre.log 2>&1 ) \
     || { tail -10 /tmp/setup_fre.log; exit 1; }
 fi
 
@@ -97,6 +109,20 @@ python3 "$RAIZ/scripts/firered/gen_species_data.py" --pokefirered "$PF" \
   --reference /tmp/fre --write >/tmp/setup_e2.log 2>&1 \
   || { tail -20 /tmp/setup_e2.log; exit 1; }
 ok "$(tail -1 /tmp/setup_e2.log)"
+
+# --------------------------------------- 2c. tipo Fada + split por golpe (E3)
+log "3b/8 aplicando o port da E3 (tipo Fada + split fisico/especial)"
+python3 "$RAIZ/scripts/firered/apply_e3_port.py" --pokefirered "$PF" \
+  >/tmp/setup_e3.log 2>&1 \
+  || { tail -20 /tmp/setup_e3.log; exit 1; }
+ok "$(grep -E 'aplicado|nada a fazer' /tmp/setup_e3.log | tail -1)"
+
+# ---------------------------------------- 2d. golpes das Gen 4-9 (E4)
+log "3c/8 gerando os golpes das Gen 4-9 (E4)"
+python3 "$RAIZ/scripts/firered/gen_move_data.py" --pokefirered "$PF" \
+  --reference /tmp/fre --write >/tmp/setup_e4.log 2>&1 \
+  || { tail -20 /tmp/setup_e4.log; exit 1; }
+ok "$(tail -1 /tmp/setup_e4.log)"
 
 # --------------------------------------------------- 3. shim p/ `make tools`
 if [ ! -f /tmp/local/include/png.h ]; then

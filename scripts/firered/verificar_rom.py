@@ -123,7 +123,8 @@ def ler_constantes(poke: Path) -> dict[str, int]:
     """`#define NOME valor` dos headers de constantes (golpes, espécies, tipos)."""
     valores: dict[str, int] = {}
     for rel in ("include/constants/moves.h", "include/constants/species.h",
-                "include/constants/pokedex.h", "include/constants/pokemon.h"):
+                "include/constants/pokedex.h", "include/constants/pokemon.h",
+                "include/battle.h"):        # MOVE_TARGET_* moram aqui
         caminho = poke / rel
         if not caminho.exists():
             continue
@@ -377,8 +378,10 @@ def conferir_e3(rom: bytes, simbolos: dict[str, int], numeros: dict[str, int],
             elif categorias[constantes[golpe]] != valor:
                 falhas.append(f"{golpe}: categoria {categorias[constantes[golpe]]} != {valor}")
         fisicos = sum(1 for c in categorias if c == 0)
-        if not 80 <= fisicos <= 200:
-            falhas.append(f"{fisicos} golpes fisicos (esperava 80..200)")
+        esperado_fisicos = (poke / "src/data/battle_moves_category.h").read_text().count(
+            "MOVE_CATEGORY_PHYSICAL")
+        if fisicos != esperado_fisicos:
+            falhas.append(f"{fisicos} golpes fisicos no ROM, {esperado_fisicos} na tabela gerada")
     else:
         falhas.append("gMoveCategories fora do .map")
 
@@ -386,6 +389,284 @@ def conferir_e3(rom: bytes, simbolos: dict[str, int], numeros: dict[str, int],
         print(f"  E3 ok: {len(esperado)} regras de Fada, {len(com_fada)} especies com Fada, "
               "categorias de golpe no ROM")
     return falhas
+
+
+
+
+# ---------------------------------------------------------------------------
+# E4: golpes das Gen 4-9
+# ---------------------------------------------------------------------------
+# `struct BattleMove` no FireRed: 9 bytes, todos u8 (priority e' s8).
+OFF_GOLPE = {"effect": 0, "power": 1, "type": 2, "accuracy": 3, "pp": 4,
+             "secondaryEffectChance": 5, "target": 6, "priority": 7, "flags": 8}
+TAM_GOLPE = 9
+
+
+def esperado_golpes(poke: Path, constantes: dict[str, int] | None = None) -> dict[str, dict]:
+    """Le `src/data/battle_moves.h` -> {MOVE_X: {campo: valor}}.
+
+    Campos simbólicos (`TYPE_FIRE`, `MOVE_TARGET_BOTH`) são resolvidos pelos
+    `#define`s do próprio jogo; o que não der para resolver fica de fora.
+    """
+    constantes = constantes or {}
+    texto = (poke / "src/data/battle_moves.h").read_text()
+    saida: dict[str, dict] = {}
+    for nome, corpo in re.findall(r"\[(MOVE_[A-Z0-9_]+)\] =\s*\n\s*\{(.*?)\n    \},",
+                                  texto, re.S):
+        d = {}
+        for campo in OFF_GOLPE:
+            m = re.search(r"\." + campo + r"\s*=\s*([^,\n]+)", corpo)
+            if not m:
+                continue
+            bruto = m.group(1).strip()
+            if campo == "flags":
+                valor = 0
+                for bit, nomeflag in enumerate(("FLAG_MAKES_CONTACT", "FLAG_PROTECT_AFFECTED",
+                                                "FLAG_MAGIC_COAT_AFFECTED", "FLAG_SNATCH_AFFECTED",
+                                                "FLAG_MIRROR_MOVE_AFFECTED",
+                                                "FLAG_KINGS_ROCK_AFFECTED")):
+                    if nomeflag in bruto:
+                        valor |= 1 << bit
+                d[campo] = valor
+            elif bruto.isdigit() or (bruto.startswith("-") and bruto[1:].isdigit()):
+                d[campo] = int(bruto)
+            elif bruto in constantes:
+                d[campo] = constantes[bruto]
+        saida[nome] = d
+    return saida
+
+
+def esperado_nomes_golpe(poke: Path) -> dict[str, str]:
+    """Le `src/data/text/move_names.h` -> {MOVE_X: "NOME"}."""
+    texto = (poke / "src/data/text/move_names.h").read_text()
+    return dict(re.findall(r'\[(MOVE_[A-Z0-9_]+)\] = _\("((?:[^"\\]|\\.)*)"\)', texto))
+
+
+def _melhor_passo(rom: bytes, base: int, constantes: dict[str, int],
+                  golpes: dict[str, dict]) -> tuple[int, int]:
+    """Descobre de quantos em quantos bytes as entradas aparecem no ROM.
+
+    O compilador de teste e o `make` usam ABIs diferentes (apcs-gnu x eabi), entao
+    o passo e' medido contra golpes conhecidos em vez de suposto.
+    """
+    amostra = [(constantes[n], d) for n, d in golpes.items()
+               if n in constantes and "power" in d and "type" in d][:40]
+    melhor, pontos = TAM_GOLPE, -1
+    for passo in (8, 9, 10, 12, 16):
+        acertos = 0
+        for idx, d in amostra:
+            o = base + passo * idx
+            if rom[o + OFF_GOLPE["power"]] == d["power"] and \
+               rom[o + OFF_GOLPE["type"]] == d["type"]:
+                acertos += 1
+        if acertos > pontos:
+            melhor, pontos = passo, acertos
+    return melhor, pontos
+
+
+def conferir_e4(rom: bytes, simbolos: dict[str, int], constantes: dict[str, int],
+                poke: Path, verboso: bool = True) -> list[str]:
+    """Confere no ROM: tabela de golpes, nomes, descricoes e MOVES_COUNT."""
+    falhas: list[str] = []
+    if "gBattleMoves" not in simbolos or "gMoveNames" not in simbolos:
+        return ["gBattleMoves/gMoveNames fora do .map"]
+
+    golpes = esperado_golpes(poke, constantes)
+    nomes = esperado_nomes_golpe(poke)
+    total = constantes.get("MOVES_COUNT", 0)
+    if not total:
+        return ["MOVES_COUNT nao encontrado em moves.h"]
+    if len(golpes) != total:
+        falhas.append(f"{len(golpes)} golpes em battle_moves.h, MOVES_COUNT {total}")
+    if len(nomes) != total:
+        falhas.append(f"{len(nomes)} nomes em move_names.h, MOVES_COUNT {total}")
+
+    # --- tabela de golpes
+    base = simbolos["gBattleMoves"] - 0x08000000
+    passo, pontos = _melhor_passo(rom, base, constantes, golpes)
+    amostra = min(40, sum(1 for n, d in golpes.items()
+                          if n in constantes and "power" in d and "type" in d))
+    if pontos < max(3, amostra):
+        falhas.append(f"gBattleMoves: so {pontos}/{amostra} golpes conhecidos casam "
+                      f"(passo medido {passo}); campos divergentes abaixo")
+    erros = 0
+    for nome, d in golpes.items():
+        if nome not in constantes:
+            continue
+        o = base + passo * constantes[nome]
+        for campo, valor in d.items():
+            lido = rom[o + OFF_GOLPE[campo]]
+            if campo == "priority" and lido > 127:
+                lido -= 256
+            if lido != valor:
+                erros += 1
+                if erros <= 5:
+                    falhas.append(f"{nome}.{campo} no ROM = {lido}, esperava {valor}")
+    if erros > 5:
+        falhas.append(f"... e mais {erros - 5} campos de golpe divergentes")
+
+    # --- nomes
+    base_nomes = simbolos["gMoveNames"] - 0x08000000
+    # MOVE_NONE e' "$" (0xFF) — o proprio terminador, nao da' para decodificar
+    verificaveis = [(n, t) for n, t in nomes.items() if n in constantes and n != "MOVE_NONE"]
+    passo_nome, melhor_pontos = 0, -1
+    for candidato in (17, 13, 16, 12, 18):      # MOVE_NAME_LENGTH + 1 = 17 com a E4
+        acertos = sum(1 for n, t in verificaveis
+                      if decodificar(rom, base_nomes + candidato * constantes[n], 24) == t)
+        if acertos > melhor_pontos:
+            passo_nome, melhor_pontos = candidato, acertos
+    if melhor_pontos < len(verificaveis):
+        falhas.append(f"gMoveNames: so {melhor_pontos}/{len(verificaveis)} nomes casam "
+                      f"(passo medido {passo_nome}); divergentes abaixo")
+    errados = 0
+    for nome, texto in verificaveis:
+        lido = decodificar(rom, base_nomes + passo_nome * constantes[nome], 24)
+        if lido != texto:
+            errados += 1
+            if errados <= 5:
+                falhas.append(f"nome de {nome} no ROM = {lido!r}, esperava {texto!r}")
+    if errados > 5:
+        falhas.append(f"... e mais {errados - 5} nomes divergentes")
+
+    # --- descricoes (ponteiros por indice [MOVE_X - 1])
+    if "gMoveDescriptionPointers" in simbolos:
+        base_desc = simbolos["gMoveDescriptionPointers"] - 0x08000000
+        vazias = fora = 0
+        for nome, idx in constantes.items():
+            if not nome.startswith("MOVE_"):
+                continue            # SPECIES_*/ITEM_* tambem estao em `constantes`
+            # MOVE_UNAVAILABLE = 0xFFFF e MOVE_RANDOM_TEACHABLE nao sao golpes
+            if nome == "MOVE_NONE" or idx < 355 or idx >= constantes.get("MOVES_COUNT", 1 << 30):
+                continue
+            ptr = struct.unpack_from("<I", rom, base_desc + 4 * (idx - 1))[0]
+            if not 0x08000000 <= ptr < 0x08000000 + len(rom):
+                fora += 1
+                continue
+            if not decodificar(rom, ptr - 0x08000000, 60).strip():
+                vazias += 1
+        if fora:
+            falhas.append(f"{fora} descricoes com ponteiro invalido")
+        if vazias:
+            falhas.append(f"{vazias} descricoes vazias")
+    else:
+        falhas.append("gMoveDescriptionPointers fora do .map")
+
+    # --- animacoes: a tabela em assembly precisa ter TODOS os golpes
+    if "gBattleAnims_Moves" in simbolos:
+        base_anim = simbolos["gBattleAnims_Moves"] - 0x08000000
+        ponteiros = struct.unpack_from(f"<{total}I", rom, base_anim)
+        invalidos = [i for i, ptr in enumerate(ponteiros)
+                     if not 0x08000000 <= ptr < 0x08000000 + len(rom)]
+        if invalidos:
+            falhas.append(f"gBattleAnims_Moves: {len(invalidos)} ponteiros fora do ROM "
+                          f"(ex.: golpe {invalidos[0]}) — animacao indefinida")
+        tackle = constantes.get("MOVE_TACKLE")
+        if tackle is not None and tackle < total:
+            novos = ponteiros[355:]
+            genericos = sum(1 for p in novos if p == ponteiros[tackle])
+            if genericos != len(novos):
+                falhas.append(f"gBattleAnims_Moves: {len(novos) - genericos}/{len(novos)} "
+                              "golpes novos sem a animacao generica (TACKLE)")
+    else:
+        falhas.append("gBattleAnims_Moves fora do .map")
+
+    if not falhas and verboso:
+        print(f"  E4 ok: {total} golpes, passo {passo} B, nomes de {passo_nome} B, "
+              "descricoes, categorias e animacoes conferidas")
+    return falhas
+
+
+def self_test_e4() -> int:
+    """ROM sintetica: confere que o verificador de golpes aprova e reprova."""
+    global CHARMAP
+    guardado = CHARMAP
+    # A-Z em sequência a partir de 0xBB, como no charmap do FireRed
+    CHARMAP = {0x00: " ", **{0xBB + i: c for i, c in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZ")}}
+    falhas = 0
+    tmp = Path(tempfile.mkdtemp())
+    (tmp / "src/data/text").mkdir(parents=True)
+    (tmp / "include/constants").mkdir(parents=True)
+    (tmp / "src").mkdir(exist_ok=True)
+    (tmp / "include/constants/moves.h").write_text(
+        "#define MOVE_NONE 0\n#define MOVE_POUND 1\n#define MOVE_AURA_SPHERE 2\n"
+        "#define MOVES_COUNT 3\n")
+    (tmp / "src/data/battle_moves.h").write_text(
+        "const struct BattleMove gBattleMoves[MOVES_COUNT] =\n{\n"
+        "    [MOVE_NONE] =\n    {\n        .effect = EFFECT_HIT,\n        .power = 0,\n"
+        "        .type = TYPE_MYSTERY,\n        .accuracy = 0,\n        .pp = 0,\n"
+        "        .secondaryEffectChance = 0,\n        .target = MOVE_TARGET_SELECTED,\n"
+        "        .priority = 0,\n        .flags = 0,\n    },\n"
+        "    [MOVE_POUND] =\n    {\n        .effect = EFFECT_HIT,\n        .power = 40,\n"
+        "        .type = TYPE_NORMAL,\n        .accuracy = 100,\n        .pp = 35,\n"
+        "        .secondaryEffectChance = 0,\n        .target = MOVE_TARGET_SELECTED,\n"
+        "        .priority = 0,\n        .flags = FLAG_MAKES_CONTACT | FLAG_PROTECT_AFFECTED,\n"
+        "    },\n"
+        "    [MOVE_AURA_SPHERE] =\n    {\n        .effect = EFFECT_HIT,\n        .power = 80,\n"
+        "        .type = TYPE_FIGHTING,\n        .accuracy = 0,\n        .pp = 20,\n"
+        "        .secondaryEffectChance = 0,\n        .target = MOVE_TARGET_SELECTED,\n"
+        "        .priority = 0,\n        .flags = FLAG_PROTECT_AFFECTED,\n    },\n};\n")
+    (tmp / "src/data/text/move_names.h").write_text(
+        "const u8 gMoveNames[MOVES_COUNT][MOVE_NAME_LENGTH + 1] = {\n"
+        '    [MOVE_NONE] = _(""),\n    [MOVE_POUND] = _("POUND"),\n'
+        '    [MOVE_AURA_SPHERE] = _("AURA SPHERE"),\n};\n')
+
+    rom = bytearray(0x100000)
+    simbolos = dict(gBattleMoves=0x08010000, gMoveNames=0x08020000,
+                    gMoveDescriptionPointers=0x08030000, gBattleAnims_Moves=0x08040000)
+    constantes = dict(MOVE_NONE=0, MOVE_POUND=1, MOVE_AURA_SPHERE=2, MOVES_COUNT=3,
+                      TYPE_NORMAL=0, TYPE_FIGHTING=1, TYPE_MYSTERY=9, MOVE_TACKLE=1)
+
+    def gravar(nome_pound: bytes, power: int) -> None:
+        base = 0x10000
+        bytes_nome = {v: k for k, v in CHARMAP.items()}
+        for idx, (nome, power_v, tipo, pp, acc, flags) in enumerate([
+                ("", 0, 9, 0, 0, 0), ("POUND", 40, 0, 35, 100, 0x03),
+                ("AURA SPHERE", power, 1, 20, 0, 0x02)]):
+            o = base + TAM_GOLPE * idx
+            rom[o:o + TAM_GOLPE] = bytes([1, power_v, tipo, acc, pp, 0, 0, 0, flags])
+            n = nome_pound if idx == 1 else nome.encode()
+            rom[0x20000 + 17 * idx:0x20000 + 17 * idx + len(n)] = bytes(
+                bytes_nome.get(c, 0xBB) for c in n.decode())
+            rom[0x20000 + 17 * idx + len(n)] = 0xFF
+        struct.pack_into("<I", rom, 0x40000, 0x08050000)
+        struct.pack_into("<I", rom, 0x40004, 0x08050020)     # Move_POUND/TACKLE
+        struct.pack_into("<I", rom, 0x40008, 0x08050020)     # golpe novo: generica
+
+    gravar(b"POUND", 80)
+    bom = conferir_e4(bytes(rom), simbolos, constantes, tmp, verboso=False)
+    if bom:
+        print(f"  FALHA: ROM sintetica correta reprovada: {bom[:2]}")
+        falhas += 1
+    else:
+        print("  ok: golpes/nomes sinteticos aprovados")
+
+    gravar(b"POUND", 60)          # power errado no ROM
+    ruim = conferir_e4(bytes(rom), simbolos, constantes, tmp, verboso=False)
+    if not any("power" in f for f in ruim):
+        print("  FALHA: poder errado nao foi detectado")
+        falhas += 1
+    else:
+        print("  ok: poder errado detectado")
+
+    gravar(b"PAUND", 80)          # nome errado no ROM
+    ruim = conferir_e4(bytes(rom), simbolos, constantes, tmp, verboso=False)
+    if not any("nome de MOVE_POUND" in f for f in ruim):
+        print("  FALHA: nome errado nao foi detectado")
+        falhas += 1
+    else:
+        print("  ok: nome errado detectado")
+
+    gravar(b"POUND", 80)
+    struct.pack_into("<I", rom, 0x40008, 0x12345678)         # ponteiro de animacao invalido
+    ruim = conferir_e4(bytes(rom), simbolos, constantes, tmp, verboso=False)
+    if not any("gBattleAnims_Moves" in f for f in ruim):
+        print("  FALHA: animacao invalida nao foi detectada")
+        falhas += 1
+    else:
+        print("  ok: animacao invalida detectada")
+
+    CHARMAP = guardado
+    return 1 if falhas else 0
 
 
 def self_test() -> int:
@@ -470,7 +751,7 @@ def main() -> int:
 
     if a.self_test:
         print("self-test: verificador de dados no ROM")
-        return self_test()
+        return self_test() | self_test_e4()
 
     poke = a.pokefirered
     rom_path = a.rom or (poke / "pokefirered_modern.gba")
@@ -513,6 +794,8 @@ def main() -> int:
                    constantes, amostras=a.amostras)
     if (poke / "src/data/battle_moves_category.h").exists():
         rel["falhas"] += conferir_e3(rom, simbolos, numeros, constantes, poke)
+    if (poke / "src/data/text/move_names.h").exists():
+        rel["falhas"] += conferir_e4(rom, simbolos, constantes, poke)
 
     if a.json:
         print(json.dumps(dict(falhas=rel["falhas"], conferidos=rel["conferidos"]),

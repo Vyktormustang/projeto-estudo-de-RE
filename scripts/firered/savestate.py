@@ -306,8 +306,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--rom", default="", help="ROM (para pokemon: stats base/nome)")
     ap.add_argument("--self-test", dest="self_test", action="store_true")
-    ap.add_argument("--map", required=True)
-    ap.add_argument("--offsets", required=True, help="JSON gerado por offsets.py")
+    # não são required no argparse: --self-test precisa rodar sem eles
+    ap.add_argument("--map", default="")
+    ap.add_argument("--offsets", default="", help="JSON gerado por offsets.py")
     ap.add_argument("--in", dest="entrada", default="")
     ap.add_argument("--out", dest="saida", default="")
     sub = ap.add_subparsers(dest="cmd", required=False)
@@ -345,6 +346,8 @@ def main() -> int:
         return self_test()
     if not a.entrada or not a.cmd:
         raise SystemExit("precisa de --in e de um comando (ou use --self-test)")
+    if not a.map or not a.offsets:
+        raise SystemExit("precisa de --map e --offsets (ou use --self-test)")
     off = json.loads(Path(a.offsets).read_text())
     est = Estado(Path(a.entrada).read_bytes(), Path(a.map))
 

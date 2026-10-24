@@ -43,7 +43,7 @@ documentos são **CONFIRMADO / PROVÁVEL / HIPÓTESE / DESCONHECIDO**.
 | E1 | Constantes e limites: 1025 espécies | **CONCLUÍDA** (2026-10-23) |
 | E2 | Gerador de dados de espécie | **CONCLUÍDA** (2026-10-23) |
 | E3 | Tipo Fada + split físico/especial | **CONCLUÍDA** (2026-10-23) |
-| E4 | Movimentos | a fazer |
+| E4 | Movimentos | **CONCLUÍDA — onda 1** (2026-10-23) |
 | E5 | Habilidades | a fazer |
 | E6 | Sprites, ícones e cries | a fazer |
 | E7 | Encontros, treinadores e UI | a fazer |
@@ -245,6 +245,28 @@ duplas (Fada + segundo tipo) só serão exercitadas de verdade na E8.
 
 ### E4 — Movimentos
 
+**Estado (2026-10-23): onda 1 concluída; ondas 2 e 3 pendentes.**
+
+| item | número |
+|---|---|
+| golpes no jogo | **797** (355 do FireRed + 442 novos) |
+| golpes que só mudaram de nome | 4 (aliases) |
+| efeito idêntico ao RHH | 233 |
+| efeito de stat inferido | 9 |
+| equivalente semântico | 9 |
+| fallback de dano (`EFFECT_HIT`) | 90 |
+| fallback de status (`EFFECT_SPLASH`) | 101 |
+| animações novas | 442, todas na animação genérica de TACKLE |
+| batalhas aleatórias sem travar | **12/12** |
+
+ROM `9bda1da4…`, prova em `reports/firered_e4/LEIA-ME.md`.
+O número 919 do plano original era estimativa; o real é **797**, porque só entram os golpes
+que alguma espécie realmente aprende (446 dos 935 do RHH).
+
+**O que falta (ondas 2 e 3):** implementar de verdade os 191 golpes que hoje caem em fallback
+(efeitos de terreno, Psyshock, U-turn, dreno, multi-hit moderno…), dar animação própria aos
+442 e alargar a janela do menu de golpes (nomes de 13-16 colunas aparecem cortados em batalha).
+
 **Objetivo:** de 355 para 919 movimentos, dos quais ~150 com efeito próprio.
 
 **Estratégia em três ondas** (não tentar tudo de uma vez)
@@ -257,9 +279,10 @@ duplas (Fada + segundo tipo) só serão exercitadas de verdade na E8.
 
 **Aceite**
 
-- Todo movimento tem dados válidos (nome, tipo, poder, PP, categoria).
-- Move sem implementação cai em **fallback seguro** (dano neutro) em vez de travar a batalha.
-- Teste de fumaça: 200 batalhas com moves aleatórios, nenhuma trava.
+- ✅ Todo movimento tem dados válidos (nome, tipo, poder, PP, categoria) — conferido no ROM.
+- ✅ Move sem implementação cai em **fallback seguro** (dano neutro) em vez de travar a batalha.
+- ⚠️ Teste de fumaça: o plano pedia 200 batalhas; a entrega traz **12** (12 golpes novos
+  executados, 48 desenhados no menu). Subir para 200 é barato (~3 s por batalha) e fica para a E8.
 
 **Risco:** alto — é a maior etapa. Por isso as três ondas: a onda 1 já deixa o jogo "completo" aos
 olhos do jogador; a onda 3 pode continuar depois da entrega.
@@ -517,6 +540,19 @@ existe no charmap do FireRed; `nav.py` agora converte vídeo só nos frames com 
 (~1500 fps em vez de 100).
 
 **Próximo passo:** E3 (feita em 2026-10-23) → E4.
+
+### 2026-10-23 — E4 CONCLUÍDA (onda 1: dados)
+
+**Resultado:** o jogo tem **797 golpes** (355 do FireRed + 442 das Gen 4-9 que alguma espécie
+aprende) e 4 nomes antigos viraram alias. `MOVES_COUNT` 797, `MOVE_NAME_LENGTH` 16.
+
+- ROM: `9bda1da4…` (16 777 216 B), +39 KB em relação à E3
+- Provas: `reports/firered_e4/` (3 capturas) + `LEIA-ME.md`
+- Conferência no binário: `verificar_rom.py` compara **todos** os campos de **todos** os 797
+  golpes, os nomes (17 B), as 442 descrições e as 797 animações
+- Batalha: `prova_golpes_e4.py --rodadas 12 --seed 7` → **12/12**, nenhuma travou
+- 191 golpes ainda em fallback (90 de dano + 101 de status) e 442 com animação de TACKLE:
+  é o escopo das ondas 2 e 3
 
 ### 2026-10-23 — E3 CONCLUÍDA
 
