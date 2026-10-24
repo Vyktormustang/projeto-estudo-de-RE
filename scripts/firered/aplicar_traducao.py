@@ -43,6 +43,93 @@ DICIONARIOS_C = [
     (AQUI / "traducao_dex_gen49_ptbr.py", "src/data/pokemon/pokedex_text_gen4_9.h"),
 ]
 
+# diálogos dos mapas (T7): dicts label -> [(linha, sep)] aplicados aos
+# data/maps/*/text.inc; sep: "n"=\n, "p"=\p, "l"=\l, "$"=fim.
+# Guardar como tuplas evita o inferno de escapes de barra invertida.
+DICIONARIOS_MAPAS = sorted(AQUI.glob("traducao_mapas_*_ptbr.py"))
+LIMITE_LINHA_MAPA = 36          # aviso acima disso (p95 do inglês = 34)
+_RE_PLACEHOLDER_MAPA = re.compile(r"\{[^{}]+\}")
+_LARGURA_PLACEHOLDER = {"{PLAYER}": 7, "{RIVAL}": 7, "{STR_VAR_1}": 10,
+                        "{STR_VAR_2}": 10, "{STR_VAR_3}": 10, "{KUN}": 0}
+
+
+def _largura_visivel_mapa(linha: str) -> int:
+    """Conta chars visíveis: placeholders de nome valem o tamanho máximo."""
+    total = 0
+    pos = 0
+    for m in _RE_PLACEHOLDER_MAPA.finditer(linha):
+        total += len(linha[pos:m.start()])
+        total += _LARGURA_PLACEHOLDER.get(m.group(0), 0)
+        pos = m.end()
+    return total + len(linha[pos:])
+
+
+def aplicar_mapas(clone: Path, charmap: set[str], escrever: bool) -> int:
+    """Aplica os dicionários de diálogo aos text.inc dos mapas."""
+    problemas = 0
+    for dic_path in DICIONARIOS_MAPAS:
+        ns: dict = {}
+        exec(dic_path.read_text(encoding="utf-8"), ns)  # noqa: S102
+        traducoes: dict[str, list[tuple[str, str]]] = ns["TRADUCOES"]
+        por_label = dict(traducoes)
+        aplicadas = ja_ok = 0
+        labels_vistos: set[str] = set()
+        for inc in sorted((clone / "data/maps").glob("*/text.inc")):
+            texto = inc.read_text(encoding="utf-8")
+            mudou = False
+            def trocar(m: re.Match) -> str:
+                nonlocal mudou, aplicadas, ja_ok, problemas
+                label = m.group(1)
+                if label not in por_label:
+                    return m.group(0)
+                labels_vistos.add(label)
+                linhas = por_label[label]
+                corpo_novo = []
+                for txt, sep in linhas:
+                    fim = {"n": "\\n", "p": "\\p", "l": "\\l", "$": "$"}[sep]
+                    corpo_novo.append(f'    .string "{txt}{fim}"')
+                bloco_novo = m.group(1) + "::\n" + "\n".join(corpo_novo) + "\n"
+                # validações
+                orig = "".join(re.findall(r'\.string "(.*)"', m.group(0)))
+                novo_txt = "".join(t for t, _ in linhas)
+                if sorted(_RE_PLACEHOLDER_MAPA.findall(orig)) != \
+                        sorted(_RE_PLACEHOLDER_MAPA.findall(novo_txt)):
+                    print(f"ERRO  {dic_path.name}:{label}: placeholders diferentes")
+                    problemas += 1
+                    return m.group(0)
+                for t, sep in linhas:
+                    for ch in _RE_PLACEHOLDER_MAPA.sub("", t):
+                        if ch not in charmap:
+                            print(f"ERRO  {dic_path.name}:{label}: char fora do charmap: {ch!r}")
+                            problemas += 1
+                            return m.group(0)
+                    lv = _largura_visivel_mapa(t)
+                    if lv > LIMITE_LINHA_MAPA + 4:
+                        print(f"ERRO  {dic_path.name}:{label}: linha com {lv} chars: {t[:40]}…")
+                        problemas += 1
+                        return m.group(0)
+                    if lv > LIMITE_LINHA_MAPA:
+                        print(f"aviso  {dic_path.name}:{label}: linha com {lv} chars: {t[:40]}…")
+                if m.group(0) == bloco_novo:
+                    ja_ok += 1
+                    return m.group(0)
+                mudou = True
+                aplicadas += 1
+                return bloco_novo
+            padrao = r'^(\w+)::\n((?:[ \t]+\.string "(?:[^"\\]|\\.)*"\n)+)'
+            texto_novo = re.sub(padrao, trocar, texto, flags=re.M)
+            if escrever and mudou:
+                inc.write_text(texto_novo, encoding="utf-8")
+        faltando = set(por_label) - labels_vistos
+        for lbl in sorted(faltando):
+            print(f"ERRO  {dic_path.name}:{lbl}: label não encontrado nos mapas")
+            problemas += len(faltando)
+            break
+        print(f"{dic_path.name}: {aplicadas} aplicadas, {ja_ok} já ok, "
+              f"{len(faltando)} labels não encontrados (de {len(por_label)})")
+    return problemas
+
+
 # categorias da Pokédex: dicionário EN -> PT aplicado aos .categoryName
 # dos dois pokedex_entries*.h (campo u8[12] => máx 11 chars visíveis)
 DICIONARIO_CATEGORIAS = AQUI / "traducao_categorias_ptbr.py"
@@ -351,6 +438,7 @@ def aplicar(clone: Path, escrever: bool) -> int:
     problemas = aplicar_strings_c(clone, charmap, escrever)
     problemas += aplicar_json(clone, charmap, escrever)
     problemas += aplicar_categorias(clone, charmap, escrever)
+    problemas += aplicar_mapas(clone, charmap, escrever)
     problemas += aplicar_ajustes_codigo(clone, escrever)
     arquivos = sorted(p for p in RAIZ_TRADUCAO.rglob("*") if p.is_file())
     if not arquivos:
