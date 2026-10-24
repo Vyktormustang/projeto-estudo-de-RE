@@ -107,8 +107,10 @@ def ler_charmap(poke: Path) -> dict[int, str]:
     if not caminho.exists():
         return mapa
     for linha in caminho.read_text(errors="replace").splitlines():
-        m = re.match(r"'(.)'\s*=\s*([0-9A-Fa-f]{2})\s*$", linha)
-        if m and m.group(1) != "\\":
+        m = re.match(r"'(.)'\s*=\s*([0-9A-Fa-f]{2})\s*(?:@.*)?$", linha)
+        # primeira ocorrência vence: a seção latina (com os acentos PT-BR da T1)
+        # vem antes da seção kana, que reutiliza os mesmos bytes
+        if m and m.group(1) != "\\" and int(m.group(2), 16) not in mapa:
             mapa[int(m.group(2), 16)] = m.group(1)
     return mapa
 
@@ -305,7 +307,8 @@ def conferir(rom: bytes, simbolos: dict[str, int], especies: dict[str, dict],
             else:
                 texto_rom = decodificar(rom, ponteiro - 0x08000000, 240)
                 esperado_txt = alvo.get("texto", "")
-                limpar = lambda t: re.sub(r"\s+", "", t)  # noqa: E731
+                # aspas curvas: o _ALIAS achata o lado da ROM; achatar o esperado também
+                limpar = lambda t: re.sub(r"\s+", "", t).replace("\u201c", '"').replace("\u201d", '"')  # noqa: E731
                 if limpar(texto_rom) != limpar(esperado_txt):
                     falhas.append(f"{nome}: texto {texto_rom[:40]!r} != "
                                   f"{esperado_txt[:40]!r}")

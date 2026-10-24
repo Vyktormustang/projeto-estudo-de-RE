@@ -39,7 +39,18 @@ DICIONARIOS_C = [
     (AQUI / "traducao_batalha_ptbr.py", "src/battle_message.c"),
     (AQUI / "traducao_golpes_ptbr.py", "src/move_descriptions.c"),
     (AQUI / "traducao_habilidades_ptbr.py", "src/data/text/abilities.h"),
+    (AQUI / "traducao_dex_fr_ptbr.py", "src/data/pokemon/pokedex_text_fr.h"),
+    (AQUI / "traducao_dex_gen49_ptbr.py", "src/data/pokemon/pokedex_text_gen4_9.h"),
 ]
+
+# categorias da Pokédex: dicionário EN -> PT aplicado aos .categoryName
+# dos dois pokedex_entries*.h (campo u8[12] => máx 11 chars visíveis)
+DICIONARIO_CATEGORIAS = AQUI / "traducao_categorias_ptbr.py"
+ALVOS_CATEGORIAS = [
+    "src/data/pokemon/pokedex_entries.h",
+    "src/data/pokemon/pokedex_entries_gen4_9.h",
+]
+LIMITE_CATEGORIA = 11
 
 
 # dicionários itemId -> [linhas] aplicados a campos de arquivos .json
@@ -108,9 +119,12 @@ def validar(rel: Path, traduzido: str, original: str, charmap: set[str]) -> list
 
 
 RE_VAR_C = r'((?:static\s+)?(?:ALIGNED\(4\)\s+)?const u8 {var}\[\]\s*=\s*_\(")((?:[^"\\]|\\.)*)("\))'
+# formato multilinha de pokedex_text_fr.h:  _( "a\n" "b\n" "c");
+RE_VAR_C_ML = r'((?:static\s+)?(?:ALIGNED\(4\)\s+)?const u8 {var}\[\]\s*=\s*_\()((?:\s|#[^\n]*\n|"(?:[^"\\]|\\.)*")+)(\))'
 
 
-def _validar_corpo(rotulo: str, novo: str, velho: str, charmap: set[str]) -> list[str]:
+def _validar_corpo(rotulo: str, novo: str, velho: str, charmap: set[str],
+                   limite: int = LIMITE_LINHA) -> list[str]:
     erros = []
     if sorted(RE_PLACEHOLDER.findall(novo)) != sorted(RE_PLACEHOLDER.findall(velho)):
         erros.append(f"{rotulo}: placeholders mudaram")
@@ -121,7 +135,7 @@ def _validar_corpo(rotulo: str, novo: str, velho: str, charmap: set[str]) -> lis
         # tokens sem largura visível não contam
         linha = re.sub(r"\{(PAUSE[^{}]*|PLAY_[^{}]*|COLOR [^{}]*|SHADOW [^{}]*|HIGHLIGHT [^{}]*|FONT_[^{}]*|CLEAR[^{}]*|ESCAPE [^{}]*)\}", "", linha)
         pura = RE_PLACEHOLDER.sub("XXXXXXX", linha)
-        if len(pura) > LIMITE_LINHA:
+        if len(pura) > limite:
             erros.append(f"{rotulo}: AVISO linha com {len(pura)} chars")
     return erros
 
@@ -147,15 +161,22 @@ def aplicar_strings_c(clone: Path, charmap: set[str], escrever: bool) -> int:
                     continue
                 novo = (chr(92) + "n").join(novo)
             m = re.search(RE_VAR_C.format(var=re.escape(var)), texto)
-            if not m:
-                print(f"ERRO  {rotarq}:{var}: variável não encontrada")
-                problemas += 1
-                continue
-            atual = m.group(2)
+            multilinha = False
+            if m:
+                atual = m.group(2)
+            else:
+                m = re.search(RE_VAR_C_ML.format(var=re.escape(var)), texto)
+                if not m:
+                    print(f"ERRO  {rotarq}:{var}: variável não encontrada")
+                    problemas += 1
+                    continue
+                multilinha = True
+                atual = "".join(re.findall(r'"((?:[^"\\]|\\.)*)"', m.group(2)))
             if atual == novo:
                 ja_ok += 1
                 continue
-            erros = _validar_corpo(f"{rotarq}:{var}", novo, atual, charmap)
+            limite = 42 if "pokedex_text" in alvo else LIMITE_LINHA
+            erros = _validar_corpo(f"{rotarq}:{var}", novo, atual, charmap, limite)
             avisos = [e for e in erros if "AVISO" in e]
             erros = [e for e in erros if "AVISO" not in e]
             for a in avisos:
@@ -165,7 +186,10 @@ def aplicar_strings_c(clone: Path, charmap: set[str], escrever: bool) -> int:
                     print(f"ERRO  {e}")
                 problemas += len(erros)
                 continue
-            texto = texto[:m.start(2)] + novo + texto[m.end(2):]
+            if multilinha:
+                texto = texto[:m.start(2)] + '"' + novo + '"' + texto[m.end(2):]
+            else:
+                texto = texto[:m.start(2)] + novo + texto[m.end(2):]
             aplicados += 1
         if escrever and aplicados:
             destino.write_text(texto, encoding="utf-8")
@@ -238,10 +262,96 @@ def aplicar_json(clone: Path, charmap: set[str], escrever: bool) -> int:
     return total
 
 
+def aplicar_categorias(clone: Path, charmap: set[str], escrever: bool) -> int:
+    """Aplica o dicionário EN->PT nos .categoryName dos pokedex_entries*.h."""
+    if not DICIONARIO_CATEGORIAS.exists():
+        return 0
+    ns: dict = {}
+    exec(DICIONARIO_CATEGORIAS.read_text(encoding="utf-8"), ns)
+    trad: dict[str, str] = ns["TRADUCOES"]
+    problemas = 0
+    rx = re.compile(r'(\.categoryName = _\(")([^"]*)("\))')
+    for alvo in ALVOS_CATEGORIAS:
+        destino = clone / alvo
+        rotarq = alvo.split("/")[-1]
+        texto = destino.read_text(encoding="utf-8")
+        aplicados = ja_ok = sem_trad = 0
+        faltantes: set[str] = set()
+
+        def troca(m: re.Match) -> str:
+            nonlocal aplicados, ja_ok, sem_trad, problemas
+            atual = m.group(2)
+            if atual in trad.values():
+                ja_ok += 1
+                return m.group(0)
+            novo = trad.get(atual)
+            if novo is None:
+                sem_trad += 1
+                faltantes.add(atual)
+                return m.group(0)
+            ok = True
+            if len(novo) > LIMITE_CATEGORIA:
+                print(f"ERRO  {rotarq}: categoria {novo!r} com {len(novo)} chars (máx {LIMITE_CATEGORIA})")
+                problemas += 1
+                ok = False
+            for ch in novo:
+                if ch not in charmap:
+                    print(f"ERRO  {rotarq}: categoria {novo!r} com char fora do charmap: {ch!r}")
+                    problemas += 1
+                    ok = False
+            if not ok:
+                return m.group(0)
+            aplicados += 1
+            return m.group(1) + novo + m.group(3)
+
+        novo_texto = rx.sub(troca, texto)
+        if escrever and aplicados:
+            destino.write_text(novo_texto, encoding="utf-8")
+        print(f"{rotarq}: categorias: {aplicados} aplicadas, {ja_ok} já ok, "
+              f"{sem_trad} sem tradução, {problemas} problemas")
+        if faltantes:
+            for c in sorted(faltantes)[:10]:
+                print(f"  sem tradução: {c!r}")
+    return problemas
+
+
+AJUSTES_CODIGO = [
+    # A caixa de descricao da Pokedex (janela de 56 px, FONT_NORMAL de 14 px/linha)
+    # imprimia a partir de y=8 e cortava a 4a linha (8 + 4*14 = 64 > 56). Os textos
+    # das especies gen 4-9 tem 4 linhas por padrao; com y=0 as 4 linhas cabem exatas
+    # (4*14 = 56). Bug herdado do port RHH, visivel tambem em ingles.
+    ("src/pokedex_screen.c",
+     "DexScreen_PrintMonFlavorText(sPokedexScreenData->windowIds[2], sPokedexScreenData->dexSpecies, 0, 8);",
+     "DexScreen_PrintMonFlavorText(sPokedexScreenData->windowIds[2], sPokedexScreenData->dexSpecies, 0, 0);"),
+]
+
+
+def aplicar_ajustes_codigo(clone: Path, escrever: bool) -> int:
+    problemas = 0
+    for rel, velho, novo in AJUSTES_CODIGO:
+        destino = clone / rel
+        texto = destino.read_text(encoding="utf-8")
+        if novo in texto:
+            print(f"{rel}: ajuste de código já aplicado")
+            continue
+        if velho not in texto:
+            print(f"ERRO  {rel}: trecho do ajuste de código não encontrado")
+            problemas += 1
+            continue
+        if escrever:
+            destino.write_text(texto.replace(velho, novo, 1), encoding="utf-8")
+            print(f"{rel}: ajuste de código aplicado")
+        else:
+            print(f"{rel}: ajuste de código pendente (dry-run)")
+    return problemas
+
+
 def aplicar(clone: Path, escrever: bool) -> int:
     charmap = chars_do_charmap(clone)
     problemas = aplicar_strings_c(clone, charmap, escrever)
     problemas += aplicar_json(clone, charmap, escrever)
+    problemas += aplicar_categorias(clone, charmap, escrever)
+    problemas += aplicar_ajustes_codigo(clone, escrever)
     arquivos = sorted(p for p in RAIZ_TRADUCAO.rglob("*") if p.is_file())
     if not arquivos:
         print("nada em traducao/ para aplicar")
