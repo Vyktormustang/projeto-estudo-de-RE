@@ -85,6 +85,12 @@ CAMPOS = {
     "s1_bagPokeBalls": ("struct SaveBlock1", "bagPocket_PokeBalls"),
     "s1_bagTMHM": ("struct SaveBlock1", "bagPocket_TMHM"),
     "s1_bagBerries": ("struct SaveBlock1", "bagPocket_Berries"),
+    # T7 Onda 6b: VS SEEKER. Para provar os textos de revanche em jogo é
+    # preciso (a) pôr o VS SEEKER na pocket de KEY ITEMS, (b) registrá-lo no
+    # SELECT e (c) encher o contador de passos (byte baixo == 100).
+    "s1_bagKeyItems": ("struct SaveBlock1", "bagPocket_KeyItems"),
+    "s1_registeredItem": ("struct SaveBlock1", "registeredItem"),
+    "s1_rematchStepCounter": ("struct SaveBlock1", "trainerRematchStepCounter"),
 }
 
 TEMPLATE = """#include "global.h"

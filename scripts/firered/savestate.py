@@ -283,7 +283,8 @@ class Estado:
         no slot 0 é o que a tela da bolsa lê primeiro. Não mexe nas outras.
         """
         campo = {"items": "s1_bagItems", "pokeballs": "s1_bagPokeBalls",
-                 "tmhm": "s1_bagTMHM", "berries": "s1_bagBerries"}[pocket]
+                 "tmhm": "s1_bagTMHM", "berries": "s1_bagBerries",
+                 "keyitems": "s1_bagKeyItems"}[pocket]
         passo = off["itemslot_size"]
         if passo != 4:
             raise SystemExit(f"ItemSlot com {passo} B (esperado 4)")
@@ -352,11 +353,17 @@ def main() -> int:
     p_var.add_argument("--valor", type=lambda s: int(s, 0), required=True)
 
     p_item = sub.add_parser("item", help="põe um item numa pocket da bolsa")
-    p_item.add_argument("--pocket", choices=("items", "pokeballs", "tmhm", "berries"),
+    p_item.add_argument("--pocket",
+                        choices=("items", "pokeballs", "tmhm", "berries", "keyitems"),
                         default="pokeballs")
     p_item.add_argument("--slot", type=int, default=0)
     p_item.add_argument("--id", dest="item_id", type=lambda s: int(s, 0), required=True)
     p_item.add_argument("--qtd", type=int, default=1)
+
+    p_campo = sub.add_parser("campo", help="escreve um u16 num campo do SaveBlock1 "
+                                           "(nome = chave s1_* do JSON de offsets)")
+    p_campo.add_argument("--nome", required=True)
+    p_campo.add_argument("--valor", type=lambda s: int(s, 0), required=True)
 
     p_mon = sub.add_parser("pokemon", help="cria/sobrescreve um Pokémon do time")
     p_mon.add_argument("--slot", type=int, default=0)
@@ -447,6 +454,11 @@ def main() -> int:
     elif a.cmd == "item":
         est.set_item(a.pocket, a.slot, a.item_id, a.qtd, off)
         print(f"{a.pocket}[{a.slot}] = item {a.item_id} x{a.qtd}")
+    elif a.cmd == "campo":
+        if a.nome not in off or not a.nome.startswith("s1_"):
+            raise SystemExit(f"campo {a.nome!r} não está no JSON de offsets (esperado s1_*)")
+        struct.pack_into("<H", est.d, est.s1 + off[a.nome], a.valor)
+        print(f"SaveBlock1.{a.nome[3:]} (+0x{off[a.nome]:X}) = 0x{a.valor:04X}")
     elif a.cmd == "var":
         est.set_var(a.id, a.valor, off)
         print(f"VAR 0x{a.id:04X} = 0x{a.valor:04X}")

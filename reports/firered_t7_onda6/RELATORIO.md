@@ -5,8 +5,31 @@ Data: 2026-10-24 · Etapa T7 (VYK-44) · Base: `pret/pokefirered` MODERN=1
 ## Status
 
 - **Bloco A (FECHADO)**: 211 labels de sistema aplicados.
-- **Bloco B (PENDENTE)**: `trainers.inc` (238), `fame_checker.inc` (334),
-  `help_system.inc` (369) — próximos sub-blocos desta onda.
+- **Bloco B (FECHADO)**: `trainers.inc` — 237 labels de revanche do
+  VS SEEKER aplicados (dicionário total da onda: 448). Único pulado:
+  `Route21_North_Text_CueBallRematchIntro` (100% JP, unused).
+- **Bloco C (PENDENTE)**: `fame_checker.inc` (334) e `help_system.inc`
+  (369) — próximos sub-blocos desta onda.
+
+## Bloco B — trainers.inc (revanches do VS SEEKER)
+
+Todos os `*RematchIntro` de Rotas 3-25, PONTE NUGGET (Rota 24) e Ilhas
+Sevii (Kindle Road, Treasure Beach, Bond Bridge, Water Labyrinth, Resort
+Gorgeous, Memorial Pillar, Outcast Island, Green Path, Water Path, Ruin
+Valley, Trainer Tower externa, Canyon Sevault e Ruínas Tanoby).
+
+Prova em jogo (CONFIRMADO): receita nova de VS SEEKER —
+`savestate.py` agora escreve a pocket de KEY ITEMS, o item registrado no
+SELECT (`campo --nome s1_registeredItem`) e o contador
+`s1_rematchStepCounter=100`; flag 0x602 = GAMER HUGO (id 258) derrotado;
+voo p/ VERMILION, Rota 11 (16,16), SELECT → animação do VS SEEKER
+(Hugo passa a `MOVEMENT_TYPE_RAISE_HAND_AND_STOP`), A →
+“Vitória, derrota ou empate! / Hora da nossa revanche!”
+(`prova_vsseeker_hugo_rota11.png`).
+
+Observação de método (medido, não presumido): o comentário `/*0x638*/`
+de `trainerRematchStepCounter` no `global.h` está desatualizado após a
+Pokédex Gen 9 — o offset real medido pelo `offsets.py` é **0x686**.
 
 ## Mudança de ferramenta
 
