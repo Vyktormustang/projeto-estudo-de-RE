@@ -1,14 +1,9 @@
-# ---- binários de jogo / apps: nunca versionar (regra do projeto) ----
+# ---- binários de jogo: nunca versionar (regra do projeto) ----
 *.gba
 *.agb
 *.sav
 rom/
 rom_mod/
-*.apk
-*.aab
-*.apks
-*.xapk
-google_drive/
 
 # ---- ambientes e caches ----
 .venv/
@@ -18,8 +13,3 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-
-# ---- artefatos pesados de análise ----
-android_re/ghidra_proj/
-*.decomp.c
-*.bin

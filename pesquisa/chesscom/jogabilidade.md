@@ -318,7 +318,7 @@ Regras que **alteram o que você pode fazer durante a partida** `CONFIRMADO` (`/
 ## 12. Leitura técnica (o que a jogabilidade revela da implementação)
 
 Rótulo geral: **INFERIDO** (dedução a partir de documentos oficiais; sem inspeção do cliente nesta
-coleta — isso fica para a fase de RE do APK, §14).
+coleta). Para o modo solo e contra bots, ver [`solo-e-bots.md`](solo-e-bots.md).
 
 1. **Servidor autoritativo** para legalidade, relógio e resultado: o texto de abandono diz que um lance
    que não chegou ao servidor "nunca aconteceu" e o relógio continuou. Logo, o cliente é renderizador +
@@ -352,47 +352,7 @@ coleta — isso fica para a fase de RE do APK, §14).
 
 ---
 
-## 14. Checklist de jogabilidade para o **APK de xadrez** (ponte com a fase de RE binária)
-
-Como o objetivo do projeto é *compreender funcionalidades de um app de xadrez*, esta análise do site
-serve de **especificação de referência**. Ao analisar o APK (pipeline `android_re/`, ver
-`android_re/README.md`), procurar nesta ordem:
-
-**A. Regras e motor**
-- [ ] Existe motor próprio (`.so` com nomes tipo `stockfish`, `engine`, `eval`)? UCI? `bestmove`, `go depth`?
-- [ ] Ou é motor remoto (URLs/WebSocket de análise)?
-- [ ] Notação FEN/PGN implementada? (indício: strings `fen`, `pgn`, `[Event `)
-- [ ] Perft/testes de legalidade embutidos? (`perft`, `CastlingRights`)
-
-**B. Relógio e ciclo de partida**
-- [ ] Classes de clock (`Clock`, `TimeControl`, `Increment`), onde o clock vive (foreground service?)
-- [ ] Pre-move local (`premove`) e rollback
-- [ ] Estado de abandono/`resign`/`draw`/`rematch` — mapear máquina de estados
-
-**C. Interface de tabuleiro**
-- [ ] `BoardView`/Canvas próprio, temas, coordenadas, setas/destaques
-- [ ] Acessibilidade (TalkBack, controle por voz, atalhos de teclado)
-
-**D. Modos e monetização**
-- [ ] Puzzles/rush/battle, lições, análise pós-jogo (ProGuard-obfuscado?)
-- [ ] Billing/IAP, ads, telemetria (rede + IDs)
-
-**E. Confiança/integridade**
-- [ ] Detecção de root/emulador, integridade de APK, ofuscação (mover para Ghidra nos `.so`)
-
-**Comandos (pipeline já pronto neste repo):**
-
-```bash
-python3 android_re/scripts/apkre.py self-test
-python3 android_re/scripts/apkre.py all   --apk <seu_xadrez>.apk --out android_re/reports
-python3 android_re/scripts/apkre.py features --apk <...> --rules android_re/rules   # inclui ruleset "chess"
-# decompilação nativa real (quando houver Java+Ghidra no ambiente):
-bash android_re/ghidra/headless_run.sh <lib.so|classes.dex>
-```
-
----
-
-## 15. Fontes (coletadas 2026-10-25)
+## 14. Fontes (coletadas 2026-10-25)
 
 **Produto**
 - https://www.chess.com/play/online · https://www.chess.com/play/computer ·

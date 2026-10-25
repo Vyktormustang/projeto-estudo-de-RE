@@ -1,15 +1,18 @@
 # pesquisa/ — base de conhecimento das trilhas
 
-Índice das análises de produto/referência que alimentam a engenharia reversa deste repositório.
+Índice das análises de referência do repositório.
 
 | Trilha | Documento | O que contém | Data |
 |---|---|---|---|
-| **chess.com (site)** | [`chesscom/jogabilidade.md`](chesscom/jogabilidade.md) | Jogabilidade: regimes de jogo, ciclo da partida, relógio, pre-move × lance condicional, matriz de fins/empates, variantes, rating, fair play, acessibilidade, divergências e checklist para RE do APK | 2026-10-25 |
+| **chess.com — solo e bots** | [`chesscom/solo-e-bots.md`](chesscom/solo-e-bots.md) | Jogar sozinho: bots (Komodo, personalidades, níveis, adaptive, modo Engine 250–3200), Play Coach, coroas/assistência, puzzles, Solo Chess, Lessons, Practice/Endgames, Vision, Analysis, Game Review, fair play e lacunas | 2026-10-25 |
+| **chess.com — contra pessoas** | [`chesscom/jogabilidade.md`](chesscom/jogabilidade.md) | Regimes live/daily, time controls, ciclo da partida, relógio, pre-move × lance condicional, matriz de fins/empates, variantes, rating, fair play, acessibilidade | 2026-10-25 |
 
-## Como estas notas se relacionam com o código
+## Contrato de verdade
 
-- `android_re/` — pipeline que **extrai** as funcionalidades de um APK (manifest, DEX, strings, ELF/JNI).
-  O ruleset `android_re/rules/chess.json` é a tradução direta do checklist do §14 do documento de
-  jogabilidade: cada teoria sobre "como o app se comporta" vira um padrão verificável no binário.
-- Contrato de verdade: `CONFIRMADO` / `PROVÁVEL` / `INFERIDO` / `DESCONHECIDO`, sempre com fonte e data.
-- Nada aqui contém asset protegido: só análise, links e medições.
+`CONFIRMADO` (fonte oficial explícita) · `PROVÁVEL` (fonte secundária consistente) · `INFERIDO`
+(dedução) · `DESCONHECIDO` (não publicado). Toda afirmação vem com data e, quando aplicável, link.
+
+Divergências entre fontes **não** são escondidas: ficam registradas com o teste que as resolveria
+(ver §8 de `solo-e-bots.md` e §13 de `jogabilidade.md`).
+
+> Nada aqui contém asset protegido: só análise, links e medições feitas em sessão.
