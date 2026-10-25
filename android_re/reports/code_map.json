@@ -1,0 +1,143 @@
+{
+  "totals": {
+    "classes": 22373,
+    "methods": 184420,
+    "dex_files": 4
+  },
+  "per_dex": [
+    {
+      "dex": "classes.dex",
+      "classes": 7722,
+      "methods": 64615
+    },
+    {
+      "dex": "classes2.dex",
+      "classes": 587,
+      "methods": 5624
+    },
+    {
+      "dex": "classes3.dex",
+      "classes": 6815,
+      "methods": 64357
+    },
+    {
+      "dex": "classes4.dex",
+      "classes": 7249,
+      "methods": 49824
+    }
+  ],
+  "top_packages": {
+    "androidx.compose": 7482,
+    "com.google": 1308,
+    "androidx.core": 1066,
+    "androidx.leanback": 837,
+    "androidx.datastore": 732,
+    "androidx.credentials": 441,
+    "androidx.appcompat": 440,
+    "androidx.work": 421,
+    "androidx.constraintlayout": 415,
+    "j$.util": 399,
+    "androidx.room": 375,
+    "androidx.window": 285,
+    "androidx.lifecycle": 254,
+    "androidx.recyclerview": 210,
+    "androidx.activity": 196,
+    "androidx.privacysandbox": 186,
+    "androidx.fragment": 178,
+    "androidx.browser": 168,
+    "androidx.collection": 162,
+    "j$.time": 142,
+    "androidx.transition": 140,
+    "androidx.emoji2": 134,
+    "androidx.preference": 120,
+    "com.uptodown": 109,
+    "androidx.media": 94,
+    "androidx.biometric": 83,
+    "androidx.annotation": 82,
+    "androidx.savedstate": 82,
+    "androidx.sqlite": 56,
+    "androidx.graphics": 55
+  },
+  "sdk_fingerprint": {},
+  "hot_area_class_counts": {
+    "conta/auth": 225,
+    "rede/API": 788,
+    "atualização/updater": 84,
+    "download": 59,
+    "anti-análise/proteção": 26,
+    "licença/compra": 14,
+    "instalação de APK": 42
+  },
+  "hot_area_examples": {
+    "instalação de APK": [
+      "Landroid/content/pm/IPackageInstallObserver$Stub;",
+      "Landroid/content/pm/IPackageInstallObserver;",
+      "Landroidx/compose/ui/platform/ViewCompositionStrategy$DisposeOnDetachedFromWindow$installFor$listener$1;",
+      "Landroidx/compose/ui/platform/ViewCompositionStrategy$DisposeOnDetachedFromWindowOrReleasedFromPool$installFor$listener$1;",
+      "Landroidx/compose/ui/platform/ViewCompositionStrategy$DisposeOnViewTreeLifecycleDestroyed$installFor$listener$1;",
+      "Landroidx/compose/ui/platform/WindowRecomposerPolicy$createAndInstallWindowRecomposer$1;",
+      "Landroidx/compose/ui/platform/WindowRecomposerPolicy$createAndInstallWindowRecomposer$unsetJob$1;",
+      "Landroidx/profileinstaller/BenchmarkOperation$Api21ContextHelper;"
+    ],
+    "download": [
+      "Landroidx/appcompat/text/TextAppearanceSpanCompat$Companion$DEFAULT_FONT_FETCHER$1;",
+      "Landroidx/appcompat/text/TextAppearanceSpanCompat$Companion$FontFetcher;",
+      "Landroidx/browser/customtabs/ExperimentalPrefetch;",
+      "Landroidx/browser/customtabs/PrefetchOptions$Builder;",
+      "Landroidx/browser/customtabs/PrefetchOptions;",
+      "Landroidx/compose/foundation/lazy/DefaultLazyListPrefetchStrategy;",
+      "Landroidx/compose/foundation/lazy/LazyListPrefetchResultScope;",
+      "Landroidx/compose/foundation/lazy/LazyListPrefetchResultScopeImpl;"
+    ],
+    "atualização/updater": [
+      "Landroidx/compose/animation/SharedElement$updateExitVelocity$1;",
+      "Landroidx/compose/animation/core/DeferredTargetAnimation$updateTarget$1;",
+      "Landroidx/compose/animation/core/TransitionKt$updateTransition$lambda$1$0$$inlined$onDispose$1;",
+      "Landroidx/compose/foundation/lazy/layout/LazyLayoutScrollDeltaBetweenPasses$updateScrollDeltaForApproach$2$1;",
+      "Landroidx/compose/foundation/lazy/layout/LazyLayoutSemanticsModifierNode$updateCachedSemanticsValues$3$2;",
+      "Landroidx/compose/foundation/style/StyleOuterNode$updateInteractionSources$1;",
+      "Landroidx/compose/foundation/style/StyleStateKt$rememberUpdatedStyleState$1;",
+      "Landroidx/compose/foundation/text/TextFieldDelegate$Companion$updateTextLayoutResult$1$1$1;"
+    ],
+    "licença/compra": [
+      "Landroidx/compose/runtime/MultiSubscriptionSnapshotFlowManager$Add;",
+      "Landroidx/compose/runtime/MultiSubscriptionSnapshotFlowManager$RemoveScope;",
+      "Landroidx/compose/runtime/MultiSubscriptionSnapshotFlowManager$SubscriptionChange;",
+      "Landroidx/compose/runtime/MultiSubscriptionSnapshotFlowManager;",
+      "Landroidx/compose/runtime/SingleSubscriptionSnapshotFlowManager;",
+      "Landroidx/core/telephony/SubscriptionManagerCompat$Api29Impl;",
+      "Landroidx/core/telephony/SubscriptionManagerCompat;",
+      "Landroidx/window/core/ConsumerAdapter$Subscription;"
+    ],
+    "conta/auth": [
+      "Landroid/hardware/biometrics/BiometricPrompt$AuthenticationCallback;",
+      "Landroid/support/v4/media/session/MediaSessionCompat$Token;",
+      "Landroidx/biometric/AuthenticationCallbackProvider$1;",
+      "Landroidx/biometric/AuthenticationCallbackProvider$Api28Impl$1;",
+      "Landroidx/biometric/AuthenticationCallbackProvider$Api28Impl;",
+      "Landroidx/biometric/AuthenticationCallbackProvider$Api30Impl;",
+      "Landroidx/biometric/AuthenticationCallbackProvider$Listener;",
+      "Landroidx/biometric/AuthenticationCallbackProvider;"
+    ],
+    "rede/API": [
+      "Landroid/support/v4/media/session/MediaControllerCompat$MediaControllerImplApi21$ExtraBinderRequestResultReceiver;",
+      "Landroidx/activity/Api26Impl;",
+      "Landroidx/activity/Api34Impl;",
+      "Landroidx/activity/ComponentActivity$Api33Impl;",
+      "Landroidx/activity/EdgeToEdgeApi21;",
+      "Landroidx/activity/EdgeToEdgeApi23;",
+      "Landroidx/activity/EdgeToEdgeApi26;",
+      "Landroidx/activity/EdgeToEdgeApi28;"
+    ],
+    "anti-análise/proteção": [
+      "Landroidx/compose/animation/SharedTransitionScopeRootModifierElement;",
+      "Landroidx/compose/animation/SharedTransitionScopeRootModifierNode$measure$1;",
+      "Landroidx/compose/animation/SharedTransitionScopeRootModifierNode$onAttach$1;",
+      "Landroidx/compose/animation/SharedTransitionScopeRootModifierNode;",
+      "Landroidx/compose/foundation/text/input/TextObfuscationMode$Companion;",
+      "Landroidx/compose/foundation/text/input/TextObfuscationMode;",
+      "Landroidx/compose/runtime/composer/gapbuffer/changelist/Operation$EnsureRootGroupStarted;",
+      "Landroidx/compose/ui/layout/RootMeasurePolicy;"
+    ]
+  }
+}

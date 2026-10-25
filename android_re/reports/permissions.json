@@ -1,0 +1,194 @@
+{
+  "permissions": [
+    {
+      "name": "android.permission.ACCESS_ADSERVICES_AD_ID",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.ACCESS_ADSERVICES_ATTRIBUTION",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.ACCESS_NETWORK_STATE",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.ACCESS_SUPERUSER",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.ACCESS_WIFI_STATE",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.AUTHENTICATE_ACCOUNTS",
+      "risk": "medium",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.DELETE_PACKAGES",
+      "risk": "high",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.ENFORCE_UPDATE_OWNERSHIP",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.GET_ACCOUNTS",
+      "risk": "medium",
+      "api_evidence": [
+        "AccountManager cannot be null",
+        "Landroid/accounts/AccountManager;",
+        "Landroid/accounts/AccountManagerCallback;",
+        "Landroid/accounts/AccountManagerFuture;",
+        "getAccountsByType"
+      ]
+    },
+    {
+      "name": "android.permission.GET_PACKAGE_SIZE",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.INSTALL_PACKAGES",
+      "risk": "critical",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.INTERNET",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.MANAGE_ACCOUNTS",
+      "risk": "medium",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.MANAGE_EXTERNAL_STORAGE",
+      "risk": "high",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.PACKAGE_USAGE_STATS",
+      "risk": "high",
+      "api_evidence": [
+        "Landroid/app/usage/UsageStatsManager;"
+      ]
+    },
+    {
+      "name": "android.permission.POST_NOTIFICATIONS",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.QUERY_ALL_PACKAGES",
+      "risk": "high",
+      "api_evidence": [
+        "getInstalledApplications",
+        "queryIntentActivities"
+      ]
+    },
+    {
+      "name": "android.permission.RECEIVE_BOOT_COMPLETED",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.RECORD_AUDIO",
+      "risk": "high",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.REQUEST_DELETE_PACKAGES",
+      "risk": "medium",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.REQUEST_INSTALL_PACKAGES",
+      "risk": "high",
+      "api_evidence": [
+        "ACTION_VIEW_CONSTRUCTOR_SIGNATURE",
+        "ACTION_VIEW_STATES_KEY",
+        "EXPANDED_ACTION_VIEW_ID",
+        "Landroid/content/pm/PackageInstaller$Session;",
+        "Landroid/content/pm/PackageInstaller$SessionInfo;",
+        "Landroid/content/pm/PackageInstaller$SessionParams;",
+        "Landroid/content/pm/PackageInstaller;",
+        "SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW",
+        "STATE_ACTION_VIEWS",
+        "getPackageInstaller"
+      ]
+    },
+    {
+      "name": "android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION",
+      "risk": "critical",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.USE_BIOMETRIC",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.USE_CREDENTIALS",
+      "risk": "medium",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.USE_FINGERPRINT",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.WAKE_LOCK",
+      "risk": "low",
+      "api_evidence": []
+    },
+    {
+      "name": "android.permission.WRITE_EXTERNAL_STORAGE",
+      "risk": "medium",
+      "api_evidence": [
+        "getExternalStorageDirectory"
+      ]
+    },
+    {
+      "name": "com.google.android.c2dm.permission.RECEIVE",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "com.google.android.gms.permission.AD_ID",
+      "risk": "low/unknown",
+      "api_evidence": []
+    },
+    {
+      "name": "com.uptodown.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+      "risk": "low/unknown",
+      "api_evidence": []
+    }
+  ],
+  "declared_permissions": [
+    "com.uptodown.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "protection_level": {
+    "critical": 2
+  }
+}

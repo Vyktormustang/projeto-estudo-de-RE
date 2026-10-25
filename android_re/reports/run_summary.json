@@ -1,0 +1,12 @@
+{
+  "tool": "apkre 1.0.0",
+  "apk": "../google_drive/uptodown-com.chess.apk",
+  "generated_utc": "2026-10-25T15:08:20+00:00",
+  "triage": "ok",
+  "components": "ERRO: KeyError: 'basis'",
+  "permissions": "ok",
+  "code": "ok",
+  "strings": "ok",
+  "native": "ok",
+  "features": "ok"
+}

@@ -1,0 +1,2897 @@
+{
+  "counts": {
+    "activity": 64,
+    "service": 15,
+    "receiver": 11,
+    "provider": 4
+  },
+  "exported_count": 14,
+  "exported_without_permission": [
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.MainActivity",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvMainActivity",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.core.activities.InstallerActivity",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.SearchActivity",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.inmobi.cmp.presentation.components.CmpActivity",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.BootDeviceReceiver",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.MyAppUpdatedReceiver",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.DownloadNotificationReceiver",
+      "basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.DownloadUpdateNotificationReceiver",
+      "basis": "EXPLÍCITO no manifest"
+    }
+  ],
+  "components": [
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.MainActivity",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "www.uptodown.com",
+              "path": null,
+              "pathPrefix": "/preregister-available",
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.MAIN"
+          ],
+          "categories": [
+            "android.intent.category.LAUNCHER"
+          ],
+          "data": []
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "utd",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "market",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "market.android.com",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "play.google.com",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "http",
+              "host": "play.google.com",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "dw.uptodown.com",
+              "path": null,
+              "pathPrefix": "/dwn",
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE",
+            "android.intent.category.OPENABLE"
+          ],
+          "data": [
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "*/*",
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*..*..*.xapk",
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/xapk-package-archive",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.BROWSABLE",
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.xapk",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "file",
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.xapk",
+              "mimeType": "application/*",
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.xapk",
+              "mimeType": "application/*",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "*",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.xapk",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE",
+            "android.intent.category.OPENABLE"
+          ],
+          "data": [
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "*/*",
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*..*..*.apkm",
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/apkm-package-archive",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.BROWSABLE",
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.apkm",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "file",
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.apkm",
+              "mimeType": "application/*",
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.apkm",
+              "mimeType": "application/*",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "*",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.apkm",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE",
+            "android.intent.category.OPENABLE"
+          ],
+          "data": [
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "*/*",
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*..*..*..*..*..*..*..*..*..*..*..*.apks",
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/apks-package-archive",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.BROWSABLE",
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.apks",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT",
+            "android.intent.category.BROWSABLE"
+          ],
+          "data": [
+            {
+              "scheme": "file",
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.apks",
+              "mimeType": "application/*",
+              "port": null
+            },
+            {
+              "scheme": "content",
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": ".*.apks",
+              "mimeType": "application/*",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "*",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": "*",
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.apks",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": null,
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": "application/vnd.android.package-archive",
+              "port": null
+            }
+          ]
+        },
+        {
+          "priority": "999",
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.VIEW"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "content",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "file",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            },
+            {
+              "scheme": "package",
+              "host": null,
+              "path": null,
+              "pathPrefix": null,
+              "pathPattern": null,
+              "mimeType": null,
+              "port": null
+            }
+          ]
+        }
+      ],
+      "deep_links": [
+        {
+          "scheme": "https",
+          "host": "www.uptodown.com",
+          "path": "/preregister-available",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "https",
+          "host": "market.android.com",
+          "path": null,
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "https",
+          "host": "play.google.com",
+          "path": null,
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "http",
+          "host": "play.google.com",
+          "path": null,
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "https",
+          "host": "dw.uptodown.com",
+          "path": "/dwn",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "file",
+          "host": "*",
+          "path": ".*.xapk",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "content",
+          "host": "*",
+          "path": ".*.xapk",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "file",
+          "host": "*",
+          "path": ".*.apkm",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "content",
+          "host": "*",
+          "path": ".*.apkm",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "file",
+          "host": "*",
+          "path": ".*.apks",
+          "action": "android.intent.action.VIEW"
+        },
+        {
+          "scheme": "content",
+          "host": "*",
+          "path": ".*.apks",
+          "action": "android.intent.action.VIEW"
+        }
+      ],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvMainActivity",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.MAIN"
+          ],
+          "categories": [
+            "android.intent.category.LEANBACK_LAUNCHER"
+          ],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvAppDetailActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvMyDownloadsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvMyAppsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvOldVersionsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvSearchActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.ui.activity.TvAppsListActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.tv.preferences.TvPrivacyPreferences",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.core.activities.InstallerActivity",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.core.activities.ConfirmDeleteActivity",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.MyApps",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.Updates",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.FreeUpSpaceActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.RollbackActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.MyDownloads",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.WishlistActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.RecommendedActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.ListsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.PublicListActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.MyStatsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.PreregistrationActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.SecurityActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.core.activities.FileExplorerActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.PasswordRecoveryActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.Gallery",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.ContactUsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.LoginActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UserActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.YouTubeActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.SearchActivity",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.SEARCH"
+          ],
+          "categories": [
+            "android.intent.category.DEFAULT"
+          ],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.OldVersionsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.ReviewsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.RepliesActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.PublicProfileActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UserDevicesActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UserDeviceDetailsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.VirusTotalReport",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.MoreInfo",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.AppInstalledDetailsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.AppFilesActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.CustomWebView",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.GdprPrivacySettings",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.AppDetailActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.NotificationsRegistryActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.LanguageSettingsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UserCommentsActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.FeedActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.FollowListActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.OrganizationActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.InformationActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.core.activities.ConfirmationIntentWrapperActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.PasswordEditActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UsernameEditActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UserEditProfileActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.UserAvatarActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.preferences.PreferencesActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.preferences.MobileDataUsageActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "com.uptodown.activities.preferences.AdvancedPreferencesComposeActivity",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "activity",
+      "name": "androidx.credentials.playservices.controllers.identityauth.HiddenActivity",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.google.android.gms.auth.api.signin.internal.SignInHubActivity",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.google.android.gms.common.api.GoogleApiActivity",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "activity",
+      "name": "com.inmobi.cmp.presentation.components.CmpActivity",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.uptodown.services.AuthenticatorService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.accounts.AccountAuthenticator"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.uptodown.core.service.SplitApksEventsService",
+      "exported_raw": null,
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "INFERIDO (sem android:exported; targetSdk>=31 exige explícito)"
+    },
+    {
+      "type": "service",
+      "name": "com.uptodown.gcm.MyFirebaseMessagingService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "com.google.firebase.MESSAGING_EVENT"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "androidx.credentials.playservices.CredentialProviderMetadataHolder",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.android.gms.auth.api.signin.RevocationBoundService",
+      "exported_raw": "true",
+      "permission": "com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION",
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.firebase.messaging.FirebaseMessagingService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": "-500",
+          "auto_verify": null,
+          "actions": [
+            "com.google.firebase.MESSAGING_EVENT"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": true,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.firebase.components.ComponentDiscoveryService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": true,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.android.gms.measurement.AppMeasurementService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.android.gms.measurement.AppMeasurementJobService",
+      "exported_raw": "false",
+      "permission": "android.permission.BIND_JOB_SERVICE",
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.firebase.sessions.SessionLifecycleService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "androidx.work.impl.background.systemjob.SystemJobService",
+      "exported_raw": "true",
+      "permission": "android.permission.BIND_JOB_SERVICE",
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": false,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "androidx.work.impl.foreground.SystemForegroundService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": false,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "androidx.room.MultiInstanceInvalidationService",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": true,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "service",
+      "name": "com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService",
+      "exported_raw": "false",
+      "permission": "android.permission.BIND_JOB_SERVICE",
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.BootDeviceReceiver",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.BOOT_COMPLETED"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.MyAppUpdatedReceiver",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.MY_PACKAGE_REPLACED"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.DownloadNotificationReceiver",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "CANCEL",
+            "PAUSE",
+            "RESUME"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.uptodown.receivers.DownloadUpdateNotificationReceiver",
+      "exported_raw": "true",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "CANCEL"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.google.firebase.iid.FirebaseInstanceIdReceiver",
+      "exported_raw": "true",
+      "permission": "com.google.android.c2dm.permission.SEND",
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "com.google.android.c2dm.intent.RECEIVE"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.google.android.gms.measurement.AppMeasurementReceiver",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiver",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": false,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.work.impl.background.systemalarm.RescheduleReceiver",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "android.intent.action.BOOT_COMPLETED"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": false,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.work.impl.diagnostics.DiagnosticsReceiver",
+      "exported_raw": "true",
+      "permission": "android.permission.DUMP",
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "androidx.work.diagnostics.REQUEST_DIAGNOSTICS"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": false,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.profileinstaller.ProfileInstallReceiver",
+      "exported_raw": "true",
+      "permission": "android.permission.DUMP",
+      "process": null,
+      "intent_filters": [
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "androidx.profileinstaller.action.INSTALL_PROFILE"
+          ],
+          "categories": [],
+          "data": []
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "androidx.profileinstaller.action.SKIP_FILE"
+          ],
+          "categories": [],
+          "data": []
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "androidx.profileinstaller.action.SAVE_PROFILE"
+          ],
+          "categories": [],
+          "data": []
+        },
+        {
+          "priority": null,
+          "auto_verify": null,
+          "actions": [
+            "androidx.profileinstaller.action.BENCHMARK_OPERATION"
+          ],
+          "categories": [],
+          "data": []
+        }
+      ],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": false,
+      "exported": true,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "receiver",
+      "name": "com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": null,
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "provider",
+      "name": "androidx.core.content.FileProvider",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": "com.uptodown.provider",
+      "grant_uri_permissions": true,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "provider",
+      "name": "com.google.firebase.provider.FirebaseInitProvider",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": "com.uptodown.firebaseinitprovider",
+      "grant_uri_permissions": null,
+      "direct_boot_aware": true,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "provider",
+      "name": "androidx.startup.InitializationProvider",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": "com.uptodown.androidx-startup",
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    },
+    {
+      "type": "provider",
+      "name": "com.squareup.picasso.PicassoProvider",
+      "exported_raw": "false",
+      "permission": null,
+      "process": null,
+      "intent_filters": [],
+      "deep_links": [],
+      "authorities": "com.uptodown.com.squareup.picasso",
+      "grant_uri_permissions": null,
+      "direct_boot_aware": null,
+      "exported": false,
+      "exported_basis": "EXPLÍCITO no manifest"
+    }
+  ],
+  "deep_links": [
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "https",
+      "host": "www.uptodown.com",
+      "path": "/preregister-available",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "https",
+      "host": "market.android.com",
+      "path": null,
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "https",
+      "host": "play.google.com",
+      "path": null,
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "http",
+      "host": "play.google.com",
+      "path": null,
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "https",
+      "host": "dw.uptodown.com",
+      "path": "/dwn",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "file",
+      "host": "*",
+      "path": ".*.xapk",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "content",
+      "host": "*",
+      "path": ".*.xapk",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "file",
+      "host": "*",
+      "path": ".*.apkm",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "content",
+      "host": "*",
+      "path": ".*.apkm",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "file",
+      "host": "*",
+      "path": ".*.apks",
+      "action": "android.intent.action.VIEW"
+    },
+    {
+      "component": "com.uptodown.activities.MainActivity",
+      "type": "activity",
+      "scheme": "content",
+      "host": "*",
+      "path": ".*.apks",
+      "action": "android.intent.action.VIEW"
+    }
+  ],
+  "schemes": {
+    "https": 4,
+    "file": 3,
+    "content": 3,
+    "http": 1
+  },
+  "providers": [
+    {
+      "name": "androidx.core.content.FileProvider",
+      "authorities": "com.uptodown.provider"
+    },
+    {
+      "name": "com.google.firebase.provider.FirebaseInitProvider",
+      "authorities": "com.uptodown.firebaseinitprovider"
+    },
+    {
+      "name": "androidx.startup.InitializationProvider",
+      "authorities": "com.uptodown.androidx-startup"
+    },
+    {
+      "name": "com.squareup.picasso.PicassoProvider",
+      "authorities": "com.uptodown.com.squareup.picasso"
+    }
+  ]
+}
