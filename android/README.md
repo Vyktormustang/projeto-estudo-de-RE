@@ -7,15 +7,15 @@ regras, análise e biblioteca ficam dentro do aparelho.
 
 **O APK fica no Google Drive, não no GitHub.**
 
-- Arquivo: **<https://drive.google.com/file/d/11Cgs3lWhQwpSKQVKvMsdX-C7RA6xu7b5/view>**
+- Arquivo: **<https://drive.google.com/file/d/1kF8RHXx6XwA-m22tZL5xwWotJWzJw3ou/view>**
 - Pasta (APK + checksum): **<https://drive.google.com/drive/folders/1-xOz3IsCInEwniaoNbLWc9XdsYX0_Yen>**
-- Versão atual: **1.6** (`versionCode 7`) — instala **por cima** das anteriores, sem desinstalar
-- `sha256`: `56d74151000f794abfcee8b84db10ae46b2d7c46f5850bd11147db02235035e9`
-- Tamanho: 1.330.074 bytes · 41 entradas no APK
+- Versão atual: **1.7** (`versionCode 8`) — instala **por cima** das anteriores, sem desinstalar
+- `sha256`: `87fd627b781179699c6c05196f3d4a94d5088087fa120270990a02d571e3dfed`
+- Tamanho: 1.325.978 bytes · 41 entradas no APK
 
-1. Baixe `xadrez-studio-1.6.apk`.
+1. Baixe `xadrez-studio-1.7.apk`.
 2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.3.apk.sha256` e compare —
-   `sha256sum xadrez-studio-1.6.apk`. O hash muda a cada build; o valor válido é sempre o
+   `sha256sum xadrez-studio-1.7.apk`. O hash muda a cada build; o valor válido é sempre o
    do `.sha256` que está na mesma pasta do Drive.
 3. No aparelho, abra o arquivo baixado e permita **"instalar de fontes desconhecidas"**
    para o navegador/gerenciador de arquivos.
@@ -34,7 +34,7 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 `apk-keystore-v2`), então versões novas instalam por cima sem desinstalar.
 
 Para conferir no aparelho (ou no PC, com `apksigner`):
-`apksigner verify --print-certs xadrez-studio-1.6.apk`.
+`apksigner verify --print-certs xadrez-studio-1.7.apk`.
 
 ## O que mudou na 1.7 (peças desenhadas aqui)
 

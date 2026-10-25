@@ -5,7 +5,7 @@
 >   explicar cada lance em português. Roda com `cd app && npm install && npm start`.
 > * [`android/`](android/) — o **APK** do mesmo app para Android (offline, sem Play Store):
 >   build sem Gradle em [`android/build.sh`](android/build.sh). O arquivo fica no **Google Drive**
->   (não no GitHub): <https://drive.google.com/file/d/11Cgs3lWhQwpSKQVKvMsdX-C7RA6xu7b5/view>
+>   (não no GitHub): <https://drive.google.com/file/d/1kF8RHXx6XwA-m22tZL5xwWotJWzJw3ou/view>
 >   — versão **1.7**, com interface no padrão chess.com, arrastar peças no dedo/mouse,
 >   cartão de fim de jogo, análise em paralelo (bem mais rápida) e tabuleiro ocupando a tela
 >   (classificação do lance sobre a peça); instala por cima das anteriores.
