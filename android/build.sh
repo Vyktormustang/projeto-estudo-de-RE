@@ -110,7 +110,10 @@ ls -la "$CONSTRUCAO/dex"
 log "empacotando dex e assets"
 cp "$CONSTRUCAO/base.apk" "$CONSTRUCAO/nao-alinhado.apk"
 (cd "$CONSTRUCAO/dex" && zip -q -X "$CONSTRUCAO/nao-alinhado.apk" classes.dex)
-(cd "$CONSTRUCAO/assets" && zip -q -X -r "$CONSTRUCAO/nao-alinhado.apk" www)
+# os assets já entraram no aapt2 link (-A): não re-empacotar (evita duplicar www/)
+if ! unzip -l "$CONSTRUCAO/nao-alinhado.apk" | grep -q "assets/www/index.html"; then
+  erro "assets/www não entraram no APK"
+fi
 
 # ----------------------------------------------------------- 6) alinhar e assinar
 log "alinhando (zipalign) e assinando (apksigner)"
@@ -143,11 +146,13 @@ INFO="$RAIZ/build/apk-info.txt"
   echo "APK: $NOME.apk ($TAMANHO, $(( $(stat -c%s "$DIST/$NOME.apk") / 1024 )) KB)"
   echo "sha256: $(cut -d' ' -f1 "$DIST/$NOME.apk.sha256")"
   echo "SDK: build-tools $BUILD_TOOLS · $PLATAFORMA · minSdk $MIN_SDK alvo $ALVO_SDK"
-  echo "--- conteúdo principal ---"
-  unzip -l "$DIST/$NOME.apk" | grep -E "classes.dex|index.html|styles.css|stockfish|chess.js|wallpaper|ic_launcher" | awk '{print $1, $4}'
+  echo "--- conteúdo ---"
+  unzip -l "$DIST/$NOME.apk" | awk 'NR>3 && $4 != "" {print $1, $4}' | grep -vE "^$" | head -25 || true
+  echo "entradas no APK: $(unzip -l "$DIST/$NOME.apk" | tail -1 | awk '{print $2}')"
   echo "--- badging ---"
-  "$BT/aapt2" dump badging "$DIST/$NOME.apk" 2>/dev/null | grep -E "^package|launchable-activity|sdkVersion|targetSdkVersion|application-label:" | head -6
+  "$BT/aapt2" dump badging "$DIST/$NOME.apk" 2>/dev/null | grep -E "^(package|sdkVersion|targetSdkVersion|application-label|launchable-activity):" || true
   echo "--- assinatura ---"
-  "$BT/apksigner" verify --print-certs "$DIST/$NOME.apk" 2>&1 | grep -E "Signer #1 certificate (DN|SHA-256)" | head -2
-  echo "total de entradas: $(unzip -l "$DIST/$NOME.apk" | tail -1 | awk '{print $2}')"
+  "$BT/apksigner" verify --print-certs "$DIST/$NOME.apk" 2>&1 | head -8 || true
 } | tee "$INFO"
+echo
+echo "resumo gravado em build/apk-info.txt"
