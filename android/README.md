@@ -7,15 +7,15 @@ regras, análise e biblioteca ficam dentro do aparelho.
 
 **O APK fica no Google Drive, não no GitHub.**
 
-- Arquivo: **<https://drive.google.com/file/d/1oot2gyXsiMcHMAtXvy6stbcXINCW23ZV/view>**
+- Arquivo: **<https://drive.google.com/file/d/1AGk3l-hR-XO_dzTOjPx767aNNE0UtcfD/view>**
 - Pasta (APK + checksum): **<https://drive.google.com/drive/folders/1-xOz3IsCInEwniaoNbLWc9XdsYX0_Yen>**
-- Versão atual: **1.2** (`versionCode 3`) — instala **por cima** da 1.0/1.1, sem desinstalar
-- `sha256`: `7d0db110e266ada9ae03de511cb89488584e1d0c800c65cbf9be878e0627a355`
-- Tamanho: 1.321.882 bytes · 41 entradas no APK
+- Versão atual: **1.3** (`versionCode 4`) — instala **por cima** das anteriores, sem desinstalar
+- `sha256`: `a85c4279d5030b20c4814bf447d0d483d0bbe334cedc32fdc8232a36882a76c0`
+- Tamanho: 1.325.978 bytes · 41 entradas no APK
 
-1. Baixe `xadrez-studio-1.2.apk`.
-2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.2.apk.sha256` e compare —
-   `sha256sum xadrez-studio-1.2.apk`. O hash muda a cada build; o valor válido é sempre o
+1. Baixe `xadrez-studio-1.3.apk`.
+2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.3.apk.sha256` e compare —
+   `sha256sum xadrez-studio-1.3.apk`. O hash muda a cada build; o valor válido é sempre o
    do `.sha256` que está na mesma pasta do Drive.
 3. No aparelho, abra o arquivo baixado e permita **"instalar de fontes desconhecidas"**
    para o navegador/gerenciador de arquivos.
@@ -34,7 +34,24 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 `apk-keystore-v2`), então versões novas instalam por cima sem desinstalar.
 
 Para conferir no aparelho (ou no PC, com `apksigner`):
-`apksigner verify --print-certs xadrez-studio-1.2.apk`.
+`apksigner verify --print-certs xadrez-studio-1.3.apk`.
+
+## O que mudou na 1.3 (velocidade da análise)
+
+* **Revisão em paralelo**: até 3 Stockfish em Web Workers (`PoolAnalise`), um por núcleo livre,
+  limitado pela memória do aparelho (`hardwareConcurrency`/`deviceMemory`).
+* **2 linhas por posição em vez de 3**: medido com o mesmo build no PC, depth 14 custa ~389 ms
+  com MultiPV 3 e ~55 ms com MultiPV 2 — o Stockfish refaz a busca para cada linha, e a 3ª linha
+  só era exibida no relatório.
+* **Cache em memória** por FEN: revisar de novo a mesma partida (ou outra com a mesma abertura)
+  não consulta o motor.
+* **Perfis**: Automática (depth 14, desce para 12 em partidas longas), Rápida (12),
+  Profunda (16), Máxima (18) — com teto de tempo por posição e partida longa distribuída
+  no orçamento. A tela mostra núcleos usados, ETA e o tempo final da revisão.
+* **Motor separado para as assistências** do modo Jogar: antes a análise da sua vez entrava na
+  mesma fila do lance do bot, e o bot só respondia depois dela — agora não atrapalha mais.
+  A assistência também só roda se a barra de avaliação ou o feedback estiverem ligados.
+* Hash enxuto por worker (12–24 MB) para caber em celular.
 
 ## O que mudou na 1.2
 
