@@ -158,3 +158,5 @@ INFO="$RAIZ/build/apk-info.txt"
 } | tee "$INFO"
 echo
 echo "resumo gravado em build/apk-info.txt"
+
+# nota: a keystore de assinatura é gerada uma vez e reaproveitada (cache do CI).
