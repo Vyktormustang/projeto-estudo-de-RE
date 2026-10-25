@@ -4,9 +4,12 @@ name: APK
 # desenvolvimento não tem JDK/Android SDK).
 #
 # Saídas:
-#   - Release "apk-v1.0" com o .apk + .sha256 (download permanente)
-#   - artifact "xadrez-studio-apk" (30 dias)
+#   - dist/xadrez-studio-<versão>.apk + .sha256 (efêmero: o runner descarta)
+#   - artifact "log-do-build" (só logs/tabela de verificação, 7 dias)
 #   - comentário na PR #5 com o resumo do build (ou o erro, se falhar)
+#
+# O binário NÃO fica no GitHub: o arquivo final vai para o Google Drive
+# (ver android/README.md). Nada de Release nem artifact com APK.
 
 on:
   workflow_dispatch:
@@ -86,7 +89,8 @@ jobs:
       - name: Conferir o APK
         run: |
           set -o pipefail
-          APK="dist/xadrez-studio-1.0.apk"
+          APK="$(ls dist/xadrez-studio-*.apk | head -1)"
+          echo "APK: $APK"
           unzip -l "$APK" | grep -q "classes.dex"
           unzip -l "$APK" | grep -q "assets/www/index.html"
           unzip -l "$APK" | grep -q "stockfish-19-lite-single.wasm"

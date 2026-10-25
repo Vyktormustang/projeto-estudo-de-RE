@@ -2,25 +2,38 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#312E2B">
   <title>Xadrez Studio — jogar, analisar e entender</title>
   <meta name="description" content="App pessoal de xadrez: bots com nível ajustável, análise de partidas e explicação de cada lance em português.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2381b64c'/><text y='.92em' x='50' text-anchor='middle' font-size='76'>♞</text></svg>">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <noscript><div class="aviso-navegador">Este app precisa de JavaScript ligado.</div></noscript>
+  <script nomodule>
+    document.write('<div class="aviso-navegador">Seu navegador/WebView é antigo demais: atualize o Android System WebView para usar o Xadrez Studio.</div>');
+  </script>
+
   <header class="topo">
     <div class="marca">
       <span class="marca-icone">♞</span>
-      <span>Xadrez Studio</span>
-      <span class="sub">jogar · analisar · entender</span>
+      <span class="marca-nome">Xadrez Studio</span>
     </div>
+
     <nav class="abas" role="tablist" aria-label="Seções">
-      <button class="aba ativa" data-aba="jogar" role="tab" aria-selected="true">Jogar</button>
-      <button class="aba" data-aba="analisar" role="tab" aria-selected="false">Analisar</button>
-      <button class="aba" data-aba="biblioteca" role="tab" aria-selected="false">Biblioteca</button>
+      <button class="aba ativa" data-aba="jogar" role="tab" aria-selected="true">
+        <span class="aba-icone">♟</span><span class="aba-texto">Jogar</span>
+      </button>
+      <button class="aba" data-aba="analisar" role="tab" aria-selected="false">
+        <span class="aba-icone">⌕</span><span class="aba-texto">Analisar</span>
+      </button>
+      <button class="aba" data-aba="biblioteca" role="tab" aria-selected="false">
+        <span class="aba-icone">▤</span><span class="aba-texto">Biblioteca</span>
+      </button>
     </nav>
-    <div class="status-motor" id="status-motor" title="Estado do Stockfish (roda no seu navegador)">
+
+    <div class="status-motor" id="status-motor" title="Estado do Stockfish (roda no seu aparelho)">
       <span class="ponto"></span><span class="texto">motor: iniciando…</span>
     </div>
   </header>
@@ -29,51 +42,75 @@
     <!-- ============================================================ JOGAR -->
     <section class="view" id="view-jogar">
       <div class="palco">
-        <div class="area-tabuleiro">
-          <div class="barra-aval" id="aval-jogar" aria-hidden="true">
-            <div class="preenchimento" style="height:50%"></div>
-          </div>
-          <div class="tabuleiro-wrap">
-            <div class="tabuleiro" id="tab-jogar" role="grid" aria-label="Tabuleiro"></div>
-            <svg class="setas" id="setas-jogar" viewBox="0 0 8 8" preserveAspectRatio="none"></svg>
-            <div class="promocao" id="promo-jogar" hidden></div>
-          </div>
-          <div class="placar" id="placar-jogar">
-            <div class="jogador" data-lado="b">
-              <span class="nome" id="nome-b">Pretas</span>
+
+        <div class="coluna-tabuleiro">
+          <div class="tabuleiro-area">
+            <div class="barra-aval" id="aval-jogar" aria-hidden="true">
+              <div class="preenchimento" style="height:50%"></div>
+            </div>
+
+            <div class="jogador-linha" id="jogador-topo" data-lado="b">
+              <span class="avatar" id="avatar-topo"><img src="pecas/bk.svg" alt=""></span>
+              <span class="dados">
+                <b id="nome-b">Stockfish</b>
+                <span class="rating" id="rating-b">1200</span>
+              </span>
               <span class="relogio" id="relogio-b">—</span>
             </div>
-            <div class="jogador" data-lado="w">
-              <span class="nome" id="nome-w">Brancas</span>
+
+            <div class="tabuleiro-wrap">
+              <div class="tabuleiro" id="tab-jogar" role="grid" aria-label="Tabuleiro"></div>
+              <svg class="setas" id="setas-jogar" viewBox="0 0 8 8" preserveAspectRatio="none" aria-hidden="true"></svg>
+              <div class="promocao" id="promo-jogar" hidden></div>
+            </div>
+
+            <div class="jogador-linha" id="jogador-base" data-lado="w">
+              <span class="avatar" id="avatar-base"><img src="pecas/wk.svg" alt=""></span>
+              <span class="dados">
+                <b id="nome-w">Você</b>
+                <span class="rating">convidado</span>
+              </span>
               <span class="relogio" id="relogio-w">—</span>
+            </div>
+
+            <div class="acoes-tabuleiro" id="acoes-tabuleiro" hidden>
+              <button class="btn-icone" id="btn-girar" title="Girar o tabuleiro" aria-label="Girar o tabuleiro">⇅</button>
+              <button class="btn-icone" id="btn-desfazer" title="Desfazer lance">↶</button>
+              <button class="btn-icone" id="btn-dica" title="Dica: melhor lance">💡</button>
+              <button class="btn-icone" id="btn-desistir" title="Desistir">🏳</button>
+              <span class="selo" id="selo-status">—</span>
             </div>
           </div>
         </div>
 
         <aside class="painel">
+          <div class="painel-topo">
+            <span class="painel-titulo" id="titulo-jogo">Nova partida</span>
+            <button class="btn-cinza btn-pequeno" id="btn-novo-jogo">Novo jogo</button>
+          </div>
+
           <!-- configuração -->
           <div id="config-jogo">
-            <h2>Novo jogo</h2>
             <label class="campo">
               <span class="rotulo">Nível do bot <b id="nivel-texto">1 200</b></span>
               <input type="range" id="nivel" min="250" max="3200" step="50" value="1200">
               <span class="dica" id="nivel-desc"></span>
             </label>
             <div class="chips" id="presets-nivel">
-              <button data-nivel="400">Iniciante 400</button>
-              <button data-nivel="800">Casual 800</button>
-              <button data-nivel="1200" class="ativo">Intermediário 1200</button>
-              <button data-nivel="1600">Clube 1600</button>
-              <button data-nivel="2000">Avançado 2000</button>
-              <button data-nivel="2500">Mestre 2500</button>
-              <button data-nivel="3000">Motor 3000</button>
+              <button data-nivel="400">400</button>
+              <button data-nivel="800">800</button>
+              <button data-nivel="1200" class="ativo">1 200</button>
+              <button data-nivel="1600">1 600</button>
+              <button data-nivel="2000">2 000</button>
+              <button data-nivel="2500">2 500</button>
+              <button data-nivel="3000">3 000</button>
             </div>
 
             <h3>Cor</h3>
             <div class="chips" id="cor-jogo">
-              <button data-cor="w" class="ativo">Brancas</button>
-              <button data-cor="b">Pretas</button>
-              <button data-cor="r">Aleatório</button>
+              <button data-cor="w" class="ativo">♔ Brancas</button>
+              <button data-cor="b">♚ Pretas</button>
+              <button data-cor="r">⚄ Aleatório</button>
             </div>
 
             <h3>Tempo</h3>
@@ -93,30 +130,27 @@
               <label class="toggle"><input type="checkbox" id="ass-feedback" checked><span>Feedback a cada lance</span></label>
             </div>
 
-            <button class="principal" id="btn-comecar">Começar partida</button>
-            <p class="dica">Partidas contra o bot não valem rating: são para treinar. O motor roda no seu navegador.</p>
+            <button class="btn-verde btn-largo" id="btn-comecar">Começar partida</button>
+            <p class="dica">Partidas contra o bot não valem rating: são para treinar. O motor roda no seu aparelho.</p>
           </div>
 
           <!-- jogo em andamento -->
           <div id="jogo-ativo" hidden>
-            <div class="cabecalho-jogo">
-              <h2 id="titulo-jogo">Partida</h2>
-              <span class="selo" id="selo-status">sua vez</span>
-            </div>
+            <div class="status-jogo" id="status-jogo">sua vez de jogar</div>
             <ul class="lista-lances" id="lances-jogar"></ul>
-            <div class="acoes-jogo">
-              <button id="btn-dica">💡 Dica</button>
-              <button id="btn-desfazer">↩ Desfazer</button>
-              <button id="btn-desistir">🏳 Desistir</button>
-              <button class="principal" id="btn-analisar-partida" disabled>Analisar esta partida</button>
-            </div>
             <div class="feedback" id="feedback-jogar" hidden></div>
+            <button class="btn-verde btn-largo" id="btn-analisar-partida" disabled>Analisar esta partida</button>
+            <button class="btn-cinza btn-largo" id="btn-abandonar">Encerrar e voltar</button>
             <details class="detalhes">
               <summary>Como o nível é aplicado</summary>
               <p class="dica">O Stockfish roda com força limitada: até ~1320 usa profundidade baixa e erros
               induzidos; acima disso usa o limite de Elo do próprio motor (1320–3190).</p>
             </details>
-            <button class="secundario" id="btn-abandonar">Encerrar e voltar</button>
+          </div>
+
+          <div class="rodape-painel">
+            <span>v1.1</span>
+            <span>Stockfish 19 · GPL-3.0</span>
           </div>
         </aside>
       </div>
@@ -125,31 +159,50 @@
     <!-- ========================================================= ANALISAR -->
     <section class="view" id="view-analisar" hidden>
       <div class="palco">
-        <div class="area-tabuleiro">
-          <div class="barra-aval" id="aval-analise" aria-hidden="true">
-            <div class="preenchimento" style="height:50%"></div>
+
+        <div class="coluna-tabuleiro">
+          <div class="tabuleiro-area">
+            <div class="barra-aval" id="aval-analise" aria-hidden="true">
+              <div class="preenchimento" style="height:50%"></div>
+            </div>
+
+            <div class="jogador-linha" id="jogador-topo-analise" data-lado="b">
+              <span class="avatar"><img src="pecas/bk.svg" alt=""></span>
+              <span class="dados"><b id="nome-pretas">Pretas</b><span class="rating" id="precisao-pretas"></span></span>
+            </div>
+
+            <div class="tabuleiro-wrap">
+              <div class="tabuleiro" id="tab-analise" role="grid" aria-label="Tabuleiro de análise"></div>
+              <svg class="setas" id="setas-analise" viewBox="0 0 8 8" preserveAspectRatio="none" aria-hidden="true"></svg>
+            </div>
+
+            <div class="jogador-linha" id="jogador-base-analise" data-lado="w">
+              <span class="avatar"><img src="pecas/wk.svg" alt=""></span>
+              <span class="dados"><b id="nome-brancas">Brancas</b><span class="rating" id="precisao-brancas"></span></span>
+            </div>
+
+            <div class="navegacao">
+              <button class="btn-icone" id="nav-inicio" title="Início">⏮</button>
+              <button class="btn-icone" id="nav-voltar" title="Lance anterior">◀</button>
+              <span class="lance-atual" id="lance-atual">posição inicial</span>
+              <button class="btn-icone" id="nav-avancar" title="Próximo lance">▶</button>
+              <button class="btn-icone" id="nav-fim" title="Fim">⏭</button>
+              <button class="btn-icone" id="nav-girar" title="Girar tabuleiro">⇅</button>
+            </div>
+
+            <svg class="grafico" id="grafico-analise" viewBox="0 0 100 40" preserveAspectRatio="none" aria-label="Gráfico de avaliação"></svg>
           </div>
-          <div class="tabuleiro-wrap">
-            <div class="tabuleiro" id="tab-analise" role="grid" aria-label="Tabuleiro de análise"></div>
-            <svg class="setas" id="setas-analise" viewBox="0 0 8 8" preserveAspectRatio="none"></svg>
-          </div>
-          <div class="navegacao">
-            <button id="nav-inicio" title="Início">⏮</button>
-            <button id="nav-voltar" title="Lance anterior">◀</button>
-            <span class="lance-atual" id="lance-atual">posição inicial</span>
-            <button id="nav-avancar" title="Próximo lance">▶</button>
-            <button id="nav-fim" title="Fim">⏭</button>
-            <button id="nav-girar" title="Girar tabuleiro">⟲</button>
-          </div>
-          <svg class="grafico" id="grafico-analise" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
         </div>
 
-        <aside class="painel painel-largo">
+        <aside class="painel">
+          <div class="painel-topo">
+            <span class="painel-titulo">Análise</span>
+          </div>
+
           <div class="importar">
-            <h2>Analisar uma partida</h2>
             <div class="linha">
-              <input type="text" id="user-chesscom" placeholder="usuário do chess.com">
-              <button id="btn-importar">Importar</button>
+              <input type="text" id="user-chesscom" placeholder="usuário do chess.com" inputmode="text">
+              <button class="btn-cinza" id="btn-importar">Importar</button>
             </div>
             <div class="linha">
               <select id="profundidade">
@@ -161,10 +214,10 @@
                 <input type="checkbox" id="modo-leve"><span>comentários curtos</span>
               </label>
             </div>
-            <textarea id="pgn" rows="4" placeholder="Cole o PGN aqui (ou arraste um arquivo .pgn)"></textarea>
+            <textarea id="pgn" rows="4" placeholder="Cole o PGN aqui"></textarea>
             <div class="linha">
-              <button class="principal" id="btn-revisar">Revisar partida</button>
-              <button id="btn-exemplo">Carregar exemplo</button>
+              <button class="btn-verde" id="btn-revisar">Revisar partida</button>
+              <button class="btn-cinza" id="btn-exemplo">Exemplo</button>
             </div>
             <div class="progresso" id="progresso" hidden>
               <div class="barra"><div class="preenchimento" id="progresso-barra"></div></div>
@@ -196,18 +249,21 @@
         <div class="barra-biblioteca">
           <h2>Minhas partidas</h2>
           <div class="linha">
-            <button id="btn-recarregar">Recarregar</button>
+            <button class="btn-cinza" id="btn-recarregar">Recarregar</button>
             <label class="botao-arquivo">Importar PGN<input type="file" id="arquivo-pgn" accept=".pgn,text/plain" hidden></label>
           </div>
         </div>
         <p class="dica" id="aviso-armazenamento"></p>
         <div id="lista-biblioteca" class="grade-jogos"></div>
-        <p class="dica">As partidas ficam em <code>dados/jogos.json</code>, no seu computador. Nada é enviado para fora.</p>
+        <details class="detalhes">
+          <summary>Sobre / diagnóstico</summary>
+          <p class="dica" id="diagnostico"></p>
+        </details>
       </div>
     </section>
   </main>
 
   <div class="toasts" id="toasts"></div>
-  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>

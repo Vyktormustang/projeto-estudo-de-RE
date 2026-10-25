@@ -175,6 +175,17 @@ export class ModoAnalise {
     document.getElementById('acc-brancas').textContent = r.accuracy.white != null ? `${r.accuracy.white}%` : '—';
     document.getElementById('acc-pretas').textContent = r.accuracy.black != null ? `${r.accuracy.black}%` : '—';
 
+    // nomes/precisão nas linhas de jogador em volta do tabuleiro
+    const nome = (chave, padrao) => (r.headers?.[chave] || padrao || '').trim();
+    const escrever = (id, texto) => {
+      const node = document.getElementById(id);
+      if (node) node.textContent = texto;
+    };
+    escrever('nome-brancas', nome('White', 'Brancas'));
+    escrever('nome-pretas', nome('Black', 'Pretas'));
+    escrever('precisao-brancas', r.accuracy.white != null ? `${r.accuracy.white}% de precisão` : '');
+    escrever('precisao-pretas', r.accuracy.black != null ? `${r.accuracy.black}% de precisão` : '');
+
     const classes = document.getElementById('contagem-classes');
     classes.innerHTML = '';
     for (const chave of ORDEM_CLASSES) {

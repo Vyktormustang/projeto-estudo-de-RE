@@ -47,6 +47,14 @@ export class Motor {
 
   async iniciar(timeoutMs = 25000) {
     if (this.pronto) return true;
+    // uma única subida por vez: interface e assistências pedem o motor juntas
+    if (!this._subindo) {
+      this._subindo = this._subirTudo(timeoutMs).finally(() => { this._subindo = null; });
+    }
+    return this._subindo;
+  }
+
+  async _subirTudo(timeoutMs) {
     const ok = await this._subir(this.url, timeoutMs);
     if (!ok && this.url !== this.urlReserva) {
       // segunda tentativa com o build completo antes de desistir

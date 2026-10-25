@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
         cfg.setBuiltInZoomControls(false);
         cfg.setDisplayZoomControls(false);
         web.setWebViewClient(new WebViewClient());
-        web.setBackgroundColor(0xFF14161A);
+        web.setBackgroundColor(0xFF312E2B);
 
         setContentView(web, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

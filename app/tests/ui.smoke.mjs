@@ -149,6 +149,25 @@ await teste('o tabuleiro desenha 64 casas', async () => {
   assert.equal($$('#tab-analise .casa').length, 64);
 });
 
+await teste('a partida começa sozinha e o tabuleiro já está interativo', async () => {
+  assert.equal(window.xadrez.jogo.emAndamento, true, 'partida em andamento ao abrir');
+  assert.equal(window.xadrez.jogo.tabuleiro.interativo, true, 'tabuleiro aceitando toque');
+  assert.equal($('#config-jogo').hidden, true, 'configuração recolhida');
+  assert.equal($('#acoes-tabuleiro').hidden, false, 'barra de ações visível');
+});
+
+await teste('as peças são imagens SVG, uma por casa ocupada', async () => {
+  const pecas = $$('#tab-jogar .peca');
+  assert.equal(pecas.length, 32);
+  assert.ok(pecas.every((p) => p.tagName === 'IMG'), 'todas são <img>');
+  assert.ok(pecas.every((p) => /^pecas\/[wb][kqrbnp]\.svg$/.test(p.getAttribute('src'))), 'src de peça válido');
+  for (const cor of ['w', 'b']) {
+    for (const tipo of ['k', 'q', 'r', 'b', 'n', 'p']) {
+      assert.ok(fs.existsSync(new URL(`../public/pecas/${cor}${tipo}.svg`, import.meta.url)), `pecas/${cor}${tipo}.svg existe`);
+    }
+  }
+});
+
 console.log('\n▶ Revisão de partida');
 
 const PGN = `[Event "Teste de interface"]
@@ -217,6 +236,63 @@ await teste('dica desenha seta', async () => {
   if (!window.xadrez.jogo.emAndamento) return; // partida pode ter acabado
   clicar('#btn-dica');
   await esperar(() => $$('#setas-jogar line').length >= 1, { descricao: 'seta da dica' });
+});
+
+console.log('\n▶ Regressões da v1.1 (tabuleiro tocável)');
+
+await teste('lance resolvido pela geometria, não pelo elemento tocado', async () => {
+  clicar('.aba[data-aba="jogar"]');
+  $('#nivel').value = '800';
+  clicar('#btn-comecar');
+  const raiz = $('#tab-jogar');
+  // jsdom não calcula layout: damos um retângulo de 800×800 para a conta 8×8
+  raiz.getBoundingClientRect = () => ({ left: 0, top: 0, width: 800, height: 800, right: 800, bottom: 800 });
+  const tab = window.xadrez.jogo.tabuleiro;
+
+  assert.equal(tab._casaDoPonto(450, 650), 'e2', 'centro de e2');
+  assert.equal(tab._casaDoPonto(450, 450), 'e4', 'centro de e4');
+  assert.equal(tab._casaDoPonto(-5, 10), null, 'fora do tabuleiro');
+  assert.equal(tab._casaDoPonto(10, 10), 'a8', 'canto superior esquerdo');
+
+  const tocar = (x, y) => raiz.dispatchEvent(new window.MouseEvent('click', {
+    clientX: x, clientY: y, bubbles: true, cancelable: true,
+  }));
+  tocar(450, 650); // peça de e2
+  assert.ok($('#tab-jogar .casa[data-sq="e2"]').classList.contains('selecionada'), 'e2 selecionada');
+  assert.ok($$('#tab-jogar .casa.destino').length > 0, 'destinos marcados');
+  tocar(450, 450); // solta/lance em e4
+  await esperar(() => window.xadrez.jogo.chess.history().includes('e4'), { descricao: 'lance e4' });
+  assert.equal(window.xadrez.jogo.chess.history()[0], 'e4');
+});
+
+await teste('lance com tabuleiro girado continua na casa certa', async () => {
+  const tab = window.xadrez.jogo.tabuleiro;
+  tab.setOrientacao('b');
+  assert.equal(tab._casaDoPonto(450, 650), 'd7', 'com pretas embaixo, y alto é a 7ª fileira');
+  assert.equal(tab._casaDoPonto(50, 50), 'h1', 'canto superior esquerdo passa a ser h1');
+  tab.setOrientacao('w');
+});
+
+await teste('overlay de promoção escondido não cobre o tabuleiro', async () => {
+  const promo = $('#promo-jogar');
+  assert.ok(promo.hasAttribute('hidden'), 'promoção começa oculta');
+  const css = fs.readFileSync(new URL('../public/styles.css', import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '');   // sem comentários: eles citam seletores
+  assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important/, 'regra global [hidden] presente');
+  assert.ok(!/\.promocao\s*\{[^}]*display:\s*flex/.test(css), 'display do overlay é guardado por :not([hidden])');
+  assert.ok(/\.promocao:not\(\[hidden\]\)/.test(css), 'overlay só aparece quando visível');
+});
+
+await teste('todo id usado pelo JS existe no HTML', async () => {
+  const arquivos = ['main.js', 'jogo.js', 'analise.js', 'biblioteca.js', 'board.js', 'util.js'];
+  const faltando = [];
+  for (const arquivo of arquivos) {
+    const fonte = fs.readFileSync(new URL(`../public/js/${arquivo}`, import.meta.url), 'utf8');
+    for (const m of fonte.matchAll(/getElementById\('([^']+)'\)/g)) {
+      if (!window.document.getElementById(m[1])) faltando.push(`${arquivo}: #${m[1]}`);
+    }
+  }
+  assert.deepEqual(faltando, []);
 });
 
 console.log('\n▶ Biblioteca');

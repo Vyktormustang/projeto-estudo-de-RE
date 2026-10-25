@@ -5,7 +5,9 @@ import { ModoJogo } from './jogo.js';
 import { ModoAnalise } from './analise.js';
 import { Biblioteca } from './biblioteca.js';
 import { toast } from './util.js';
-import { salvarJogo } from './armazenamento.js';
+import { salvarJogo, modoArmazenamento } from './armazenamento.js';
+
+export const VERSAO = '1.1';
 
 const abas = document.querySelectorAll('.aba');
 const views = {
@@ -53,10 +55,18 @@ motor.iniciar().then((ok) => {
     definirStatusMotor('Stockfish pronto', 'ok');
   } else {
     definirStatusMotor('indisponível', 'erro');
-    toast(`O motor não subiu: ${motor.erro || 'erro desconhecido'}. `
-      + 'Rodou "npm install"? A análise fica desativada sem ele.', 'erro', 9000);
+    toast('O motor não subiu neste aparelho: dá para mover as peças, mas o bot e a análise ficam parados. '
+      + `Detalhe: ${motor.erro || 'erro desconhecido'}.`, 'erro', 9000);
   }
 });
+
+// Partida pronta ao abrir: o tabuleiro já responde ao toque, sem precisar
+// achar o botão "começar" (foi a maior queixa da primeira versão).
+try {
+  jogo.iniciarPadrao();
+} catch (err) {
+  toast(`Não consegui começar a partida: ${err.message}`, 'erro', 9000);
+}
 
 // deixa a revisão salvar na biblioteca automaticamente quando terminar
 const revisarOriginal = analise.revisar.bind(analise);
@@ -97,4 +107,18 @@ document.addEventListener('keydown', (ev) => {
   }
 });
 
-window.xadrez = { jogo, analise, biblioteca, motor };
+// diagnóstico (aba Biblioteca): usado para saber o que roda no aparelho
+const diagnostico = document.getElementById('diagnostico');
+if (diagnostico) {
+  const ua = navigator.userAgent || '';
+  const chrome = /Chrome\/(\d+)/.exec(ua)?.[1];
+  diagnostico.textContent = [
+    `Xadrez Studio v${VERSAO}`,
+    `armazenamento: ${modoArmazenamento() === 'local' ? 'aparelho (localStorage)' : 'servidor local'}`,
+    chrome ? `WebView/Chrome ${chrome}` : 'navegador não identificado',
+    `wasm: ${typeof WebAssembly === 'object' ? 'sim' : 'não'}`,
+    `tela: ${window.innerWidth}×${window.innerHeight}`,
+  ].join(' · ');
+}
+
+window.xadrez = { jogo, analise, biblioteca, motor, versao: VERSAO };

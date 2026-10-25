@@ -18,7 +18,8 @@ RAIZ="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ANDROID="$RAIZ/android"
 CONSTRUCAO="$RAIZ/build/apk"
 DIST="$RAIZ/dist"
-VERSAO="1.0"
+VERSAO="1.1"
+CODIGO_VERSAO=2
 NOME="xadrez-studio-${VERSAO}"
 MIN_SDK=26
 ALVO_SDK=34
@@ -82,7 +83,7 @@ log "compilando recursos (aapt2)"
   --java "$CONSTRUCAO/gen" \
   --min-sdk-version "$MIN_SDK" \
   --target-sdk-version "$ALVO_SDK" \
-  --version-code 1 --version-name "$VERSAO" \
+  --version-code "$CODIGO_VERSAO" --version-name "$VERSAO" \
   -A "$CONSTRUCAO/assets" \
   "$CONSTRUCAO/res/recursos.zip"
 

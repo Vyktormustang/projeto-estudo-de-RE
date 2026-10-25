@@ -10,7 +10,7 @@ import {
 } from './review.js';
 
 const PECAS_PROMOCAO = [
-  ['q', '♛', 'Dama'], ['r', '♜', 'Torre'], ['b', '♝', 'Bispo'], ['n', '♞', 'Cavalo'],
+  ['q', 'Dama'], ['r', 'Torre'], ['b', 'Bispo'], ['n', 'Cavalo'],
 ];
 
 export class ModoJogo {
@@ -38,6 +38,11 @@ export class ModoJogo {
       this.iniciar(this._lerConfig());
     });
     document.getElementById('btn-abandonar').addEventListener('click', () => this._encerrarVisual());
+    document.getElementById('btn-novo-jogo')?.addEventListener('click', () => this._encerrarVisual());
+    document.getElementById('btn-girar')?.addEventListener('click', () => {
+      this.tabuleiro.setOrientacao(this.tabuleiro.orientacao === 'w' ? 'b' : 'w');
+      this._pintarJogadores();
+    });
     document.getElementById('btn-dica').addEventListener('click', () => this.pedirDica());
     document.getElementById('btn-desfazer').addEventListener('click', () => this.desfazer());
     document.getElementById('btn-desistir').addEventListener('click', () => this.desistir());
@@ -118,9 +123,10 @@ export class ModoJogo {
     this.tabuleiro.marcarUltimo(null, null);
     document.getElementById('config-jogo').hidden = true;
     document.getElementById('jogo-ativo').hidden = false;
+    document.getElementById('acoes-tabuleiro').hidden = false;
     document.getElementById('feedback-jogar').hidden = true;
-    document.getElementById('titulo-jogo').textContent =
-      `Você (${this.humano === 'w' ? 'brancas' : 'pretas'}) × ${nomeNivel(config.nivel)}`;
+    document.getElementById('titulo-jogo').textContent = `vs ${nomeNivel(config.nivel)}`;
+    this._pintarJogadores();
     document.getElementById('btn-dica').disabled = !config.assist.dica;
     document.getElementById('btn-desfazer').disabled = !config.assist.desfazer;
     this._renderizarTudo();
@@ -164,12 +170,33 @@ export class ModoJogo {
   }
 
   _pintarRelogios() {
-    if (!this.base) return;
-    document.getElementById('relogio-w').textContent = fmtTempo(this.relogios.w);
-    document.getElementById('relogio-b').textContent = fmtTempo(this.relogios.b);
     const vez = this.chess.turn();
-    document.querySelector('#placar-jogar .jogador[data-lado="w"]').classList.toggle('ativo', vez === 'w' && this.emAndamento);
-    document.querySelector('#placar-jogar .jogador[data-lado="b"]').classList.toggle('ativo', vez === 'b' && this.emAndamento);
+    const brancas = document.getElementById('relogio-w');
+    const pretas = document.getElementById('relogio-b');
+    if (!this.base) {
+      brancas.textContent = '—';
+      pretas.textContent = '—';
+    } else {
+      brancas.textContent = fmtTempo(this.relogios.w);
+      pretas.textContent = fmtTempo(this.relogios.b);
+    }
+    document.getElementById('jogador-topo')?.classList.toggle('ativo', this.emAndamento && this.base > 0 && vez !== this.humano);
+    document.getElementById('jogador-base')?.classList.toggle('ativo', this.emAndamento && this.base > 0 && vez === this.humano);
+  }
+
+  /** Quem está em cima/embaixo do tabuleiro e com que nome. */
+  _pintarJogadores() {
+    const humanoBrancas = this.humano === 'w';
+    document.getElementById('nome-b').textContent = 'Stockfish';
+    document.getElementById('rating-b').textContent = String(this.config.nivel);
+    document.getElementById('nome-w').textContent = 'Você';
+    const avatar = (id, cor) => {
+      const caixa = document.getElementById(id);
+      if (caixa) caixa.innerHTML = `<img src="pecas/${cor}k.svg" alt="">`;
+    };
+    avatar('avatar-topo', humanoBrancas ? 'b' : 'w');
+    avatar('avatar-base', this.humano);
+    this._pintarRelogios();
   }
 
   _finalizarPorTempo(quemEstourou) {
@@ -233,15 +260,18 @@ export class ModoJogo {
     const caixa = document.getElementById('promo-jogar');
     caixa.innerHTML = '';
     caixa.hidden = false;
-    for (const [tipo, glifo, nome] of PECAS_PROMOCAO) {
-      const b = el('button', { title: `promover a ${nome}` }, glifo);
+    for (const [tipo, nome] of PECAS_PROMOCAO) {
+      const b = el('button', { title: `promover a ${nome}` });
+      b.appendChild(el('img', {
+        src: `pecas/${this.humano}${tipo}.svg`, alt: nome, draggable: 'false',
+      }));
       b.addEventListener('click', () => {
         caixa.hidden = true;
         this._executarLance(de, para, tipo);
       });
       caixa.appendChild(b);
     }
-    const cancelar = el('button', { title: 'cancelar', style: 'font-size:1rem' }, '✕');
+    const cancelar = el('button', { class: 'cancelar', title: 'cancelar' }, '✕');
     cancelar.addEventListener('click', () => { caixa.hidden = true; });
     caixa.appendChild(cancelar);
   }
@@ -542,18 +572,40 @@ export class ModoJogo {
     }
   }
 
+  /** Abre a configuração de novo jogo (encerra a partida em andamento). */
   _encerrarVisual() {
     this.emAndamento = false;
+    this.botPensando = false;
     clearInterval(this._timer);
     document.getElementById('config-jogo').hidden = false;
     document.getElementById('jogo-ativo').hidden = true;
+    document.getElementById('acoes-tabuleiro').hidden = true;
+    document.getElementById('feedback-jogar').hidden = true;
+    document.getElementById('titulo-jogo').textContent = 'Nova partida';
     this.tabuleiro.setInterativo(false);
+    this.tabuleiro.setas([]);
+  }
+
+  /**
+   * Partida pronta para jogar logo que o app abre (é o que o usuário espera:
+   * tabuleiro vivo, sem precisar procurar o botão "começar").
+   */
+  iniciarPadrao() {
+    if (this.emAndamento) return;
+    this.iniciar(this._lerConfig());
   }
 
   _definirStatus(texto, tipo) {
     const selo = document.getElementById('selo-status');
-    selo.textContent = texto;
-    selo.className = `selo ${tipo || ''}`;
+    if (selo) {
+      selo.textContent = texto;
+      selo.className = `selo ${tipo || ''}`;
+    }
+    const linha = document.getElementById('status-jogo');
+    if (linha) {
+      linha.textContent = texto;
+      linha.className = `status-jogo ${tipo || ''}`;
+    }
   }
 
   _renderizarLances() {
