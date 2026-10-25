@@ -28,8 +28,9 @@ erro() { printf '\n\033[1;31mERRO:\033[0m %s\n' "$*" >&2; exit 1; }
 
 # ---------------------------------------------------------------- ferramentas
 achar_sdk() {
-  for candidato in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" "$HOME/Android/Sdk" \
-                   "$HOME/Library/Android/sdk" /usr/lib/android-sdk /opt/android-sdk; do
+  for candidato in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" \
+                   /usr/local/lib/android/sdk "$HOME/Android/Sdk" \
+                   "$HOME/Library/Android/sdk" /usr/lib/android-sdk /opt/android-sdk /opt/android; do
     if [ -n "$candidato" ] && [ -d "$candidato/build-tools" ]; then
       echo "$candidato"; return 0
     fi
@@ -50,6 +51,9 @@ done
 command -v javac >/dev/null || erro "javac não encontrado (instale JDK 17+)."
 
 log "SDK: $SDK · build-tools $BUILD_TOOLS · $PLATAFORMA"
+echo "java: $(java -version 2>&1 | head -1)"
+echo "javac: $(javac -version 2>&1)"
+echo "platforms: $(ls -1 "$SDK/platforms" 2>/dev/null | tr '\n' ' ')"
 
 # ------------------------------------------------------------------- limpeza
 rm -rf "$CONSTRUCAO"

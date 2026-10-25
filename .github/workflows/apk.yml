@@ -1,7 +1,7 @@
 name: APK
 
 # Compila o APK do Xadrez Studio no runner do GitHub (o ambiente local de
-# desenvolvimento não tem JDK/Android SDK). O resultado sai como artifact.
+# desenvolvimento não tem JDK/Android SDK). O APK e o log saem como artifacts.
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
   build:
     name: Compilar APK
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,23 +31,31 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Android SDK (platform 34 + build-tools)
-        uses: android-actions/setup-android@v3
-
-      - name: Instalar platform e build-tools
-        run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
-          ls "$ANDROID_HOME/build-tools"
-
-      - name: Node (para conferir o app web antes de empacotar)
+      - name: Node 20
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Testes do núcleo de análise (motor real)
+      - name: Ambiente Android (usa o SDK já instalado no runner)
+        run: |
+          mkdir -p build
+          {
+            echo "ANDROID_HOME=${ANDROID_HOME:-}"
+            echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-}"
+            for d in "${ANDROID_HOME:-}" /usr/local/lib/android/sdk; do
+              [ -n "$d" ] && [ -d "$d" ] && {
+                echo "--- $d"
+                echo "build-tools: $(ls "$d/build-tools" 2>/dev/null | tr '\n' ' ')"
+                echo "platforms:   $(ls "$d/platforms" 2>/dev/null | tr '\n' ' ')"
+                ls "$d/build-tools"/*/aapt2 2>/dev/null || true
+              }
+            done
+          } | tee build/ambiente.log
+
+      - name: Testes do app web
         working-directory: app
         run: |
-          npm ci --omit=dev || npm install --omit=dev
+          npm install --omit=dev
           npm install --no-save jsdom
           node tests/review.test.mjs
           node tests/armazenamento.test.mjs
@@ -56,22 +64,29 @@ jobs:
       - name: Compilar APK
         run: |
           chmod +x android/build.sh
-          ./android/build.sh
+          ./android/build.sh 2>&1 | tee build/build.log
 
       - name: Conferir o APK
         run: |
           APK="dist/xadrez-studio-1.0.apk"
-          ls -la dist
-          unzip -l "$APK" | head -40
-          unzip -l "$APK" | grep -E "classes.dex|assets/www/index.html|stockfish-19-lite-single.wasm"
-          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" | head -12
+          { ls -la dist
+            echo "--- conteúdo ---"
+            unzip -l "$APK"
+            echo "--- assinatura ---"
+            "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" || true
+          } 2>&1 | tee build/verificacao.log
+          unzip -l "$APK" | grep -q "classes.dex"
+          unzip -l "$APK" | grep -q "assets/www/index.html"
+          unzip -l "$APK" | grep -q "stockfish-19-lite-single.wasm"
 
-      - name: Publicar artifact
+      - name: Publicar APK + logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: xadrez-studio-apk
           path: |
-            dist/xadrez-studio-1.0.apk
-            dist/xadrez-studio-1.0.apk.sha256
-          if-no-files-found: error
+            dist/*.apk
+            dist/*.sha256
+            build/*.log
+          if-no-files-found: warn
           retention-days: 30

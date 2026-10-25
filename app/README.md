@@ -9,6 +9,9 @@ npm install
 npm start          # http://localhost:3000
 ```
 
+Também existe como **APK** para Android (mesma interface, motor e biblioteca dentro do
+aparelho): veja [android/README.md](../android/README.md).
+
 Não precisa de conta, não envia nada para servidor nenhum: o motor (Stockfish compilado para
 WebAssembly) roda no seu navegador e as partidas ficam em `dados/jogos.json`.
 
@@ -100,22 +103,26 @@ app/
 │       ├── board.js        tabuleiro (DOM + setas SVG)
 │       ├── engine.js       wrapper do Stockfish em Web Worker
 │       ├── uci.js          parser de UCI (compartilhado com os testes)
-│       └── review.js       núcleo puro: expected points, classes, explicações
+│       ├── armazenamento.js  partidas: JSON no servidor ou localStorage no APK
+│       ├── review.js       núcleo puro: expected points, classes, explicações
+│       └── ../vendor/chess.js   regras (vendored, também usado pelo APK)
 ├── tests/
 │   ├── review.test.mjs     análise real com Stockfish (3 partidas + unitários)
 │   └── ui.smoke.mjs        interface em jsdom com motor falso
 └── dados/jogos.json        sua biblioteca (não versionada)
 ```
 
-Os builds usados são servidos direto de `node_modules` em `/vendor` — não há cópia de binário
-no repositório: `npm install` traz `chess.js` (regras) e `stockfish` (motor).
+O servidor serve o Stockfish direto de `node_modules` em `/vendor`. O **chess.js** é vendorizado
+em `public/vendor/chess.js` porque o APK não tem `npm` — é o único arquivo de biblioteca no repo.
+No APK, o Stockfish (lite single-thread) vem de `android/servidor/`.
 
 ## Testes
 
 ```
 cd app
-npm test                     # análise com o motor real (~4 s)
-node tests/ui.smoke.mjs      # interface sem navegador
+npm test                         # análise com o motor real (~4 s)
+node tests/ui.smoke.mjs          # interface sem navegador (jsdom + motor falso)
+node tests/armazenamento.test.mjs # biblioteca offline (modo do APK)
 ```
 
 `review.test.mjs` roda três partidas (mate do pastor, miniatura de Lazard, e uma posição com
