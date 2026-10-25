@@ -36,20 +36,22 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 Para conferir no aparelho (ou no PC, com `apksigner`):
 `apksigner verify --print-certs xadrez-studio-1.7.apk`.
 
-## O que mudou na 1.7 (peças desenhadas aqui)
+## O que mudou na 1.8 (tabuleiro em tela cheia, traço original)
 
-* **Conjunto de peças próprio**, no espírito do *Neo* do chess.com: silhueta cheia com contorno
-  grosso, sem gradiente, peças claras brancas com linha escura e escuras com linha mais escura.
-  Antes era o conjunto *cburnett* (CC BY-SA 3.0, de terceiros); agora **nenhum arquivo de terceiros**
-  entra no app, e some a obrigação de atribuição/licença compartilhada nas peças.
-* Tudo é gerado por `tools/gerar-pecas.mjs`, versionado: cada peça é montada com formas simples
-  (círculo, elipse, retângulo, path) desenhadas duas vezes — passe de contorno grosso e passe de
-  preenchimento em ordem inversa — para a silhueta sair inteira, sem costura entre as partes.
-  `node tools/gerar-pecas.mjs --previa` gera uma folha de contato para conferir o desenho.
-* Legibilidade conferida em 42 px de casa (celular pequeno): peão, torre, bispo, cavalo, dama e rei
-  se distinguem por silhueta, não por detalhe fino.
-* `ui.smoke.mjs` agora com **34 verificações**, incluindo uma que valida os 12 SVGs (viewBox 45×45,
-  XML bem formado, sem crédito de terceiros).
+* **Peças de volta ao conjunto cburnett** (`standard`, Wikimedia, CC BY-SA 3.0): traço fino e
+  detalhado, o desenho que o app usava até a 1.6. O conjunto próprio da 1.7 (silhueta cheia) saiu,
+  junto com o gerador `tools/gerar-pecas.mjs` — o crédito e a licença voltam a valer e estão em
+  `app/public/pecas/LEIA-ME.txt`.
+* **Tabuleiro ocupando a tela de verdade**: caiu o teto de 980 px (que segurava o tabuleiro em
+  monitores altos) e o *cromo* encolheu — avatar 30 px, botões da barra de ações 34 px, folgas de
+  4 px e `main` com 8 px de respiro. O lado do tabuleiro passa a ser a **altura toda da janela menos
+  o cromo**, e só é limitado pela largura que sobra ao lado do painel.
+* No celular continua de ponta a ponta (100vw), e em tela deitada o cromo é 108/146 px.
+
+## O que mudou na 1.7 (peças desenhadas aqui) — revertido na 1.8
+
+* Conjunto de peças próprio, no espírito do *Neo*: silhueta cheia com contorno grosso. Funcionava,
+  mas o traço do cburnett agradou mais — o desenho próprio saiu na 1.8 e o gerador foi removido.
 
 ## O que mudou na 1.6 (arrastar a peça com o dedo, de verdade)
 
@@ -141,7 +143,7 @@ Além da correção:
 * interface refeita com referência no chess.com: topo escuro, abas, barra de avaliação
   ao lado do tabuleiro, linhas de jogador com avatar e relógio, barra de ações
   (girar/desfazer/dica/desistir) e navegação inferior no celular;
-* peças em **SVG** (desenho próprio, gerado por `tools/gerar-pecas.mjs` — ver `app/public/pecas/LEIA-ME.txt`)
+* peças em **SVG** (conjunto cburnett, CC BY-SA 3.0 — ver `app/public/pecas/LEIA-ME.txt`)
   no lugar dos glifos Unicode;
 * caminhos relativos (`styles.css`, `js/main.js`, `pecas/`), então o app abre mesmo se o
   servidor local cair para `file://`;

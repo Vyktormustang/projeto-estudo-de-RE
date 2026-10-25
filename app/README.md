@@ -19,13 +19,14 @@ A interface segue o **layout do chess.com** como referência visual (topo escuro
 de avaliação ao lado do tabuleiro, linhas de jogador com avatar e relógio, navegação inferior no
 celular) — desenho e código próprios, sem copiar assets de lá.
 
-**O tabuleiro ocupa a tela**: o lado dele não é fixo, sai da altura da janela
-(`--cromo-jogar`/`--cromo-analisar` descontam topo, linhas de jogador e barra de ações), então em
-monitor grande ele cresce até 980 px, em notebook baixo ele encolhe para caber sem rolagem, e no
-celular vai de ponta a ponta (a barra de avaliação vira uma faixa de 5 px sobre a borda esquerda).
+**O tabuleiro preenche a tela**: o lado dele é exatamente a altura da janela menos o *cromo*
+(`--cromo-jogar` 180 px / `--cromo-analisar` 276 px — topo, duas linhas de jogador, barra de ações
+e, no Analisar, navegação + gráfico). Não há teto: em 1920×1080 dá 900 px, em 2560×1440 dá 1260 px.
+Só é limitado pela largura que sobra ao lado do painel, e no celular vai de ponta a ponta (a barra
+de avaliação vira uma faixa de 5 px sobre a borda esquerda).
 O painel lateral tem altura da janela e rola por dentro; `100dvh` é usado onde existe para a barra
-de endereço do celular não cortar o tabuleiro. As **peças são desenho próprio** — silhueta cheia
-com contorno grosso, geradas por `tools/gerar-pecas.mjs` (nota em `public/pecas/LEIA-ME.txt`).
+de endereço do celular não cortar o tabuleiro. As peças são o conjunto *standard*/cburnett do Wikimedia Commons (CC BY-SA 3.0, crédito em
+`public/pecas/LEIA-ME.txt`) — traço fino e detalhado, o mesmo desde a primeira versão.
 
 ---
 
@@ -118,7 +119,7 @@ app/
 ├── public/
 │   ├── index.html          as três telas
 │   ├── styles.css          tema escuro estilo chess.com, responsivo
-│   ├── pecas/              12 peças SVG (desenho próprio) + LEIA-ME
+│   ├── pecas/              12 peças SVG (cburnett, CC BY-SA 3.0) + licença
 │   └── js/
 │       ├── main.js         abas, estado do motor, ponte entre modos
 │       ├── jogo.js         partida contra o bot (relógio, dicas, undo, feedback)
@@ -170,5 +171,5 @@ contra o HTML.
 ## Licença
 
 Código próprio: MIT. Dependências mantêm suas licenças — Stockfish é **GPL-3.0** (usado como
-programa separado, via Web Worker), chess.js é BSD-2-Clause e as peças são **desenho próprio**
-(sem licença de terceiros), com a nota em `public/pecas/LEIA-ME.txt`.
+programa separado, via Web Worker), chess.js é BSD-2-Clause e as peças (cburnett/Wikimedia) são
+**CC BY-SA 3.0**, com crédito em `public/pecas/LEIA-ME.txt`.

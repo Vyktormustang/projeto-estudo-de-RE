@@ -185,21 +185,22 @@ const PGN = `[Event "Teste de interface"]
 
 1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0`;
 
-await teste('as 12 peças são SVG próprios, válidos e sem crédito de terceiros', async () => {
+await teste('as 12 peças são SVG válidos com o crédito do conjunto', async () => {
   const dir = new URL('../public/pecas/', import.meta.url);
   const tipos = ['k', 'q', 'r', 'b', 'n', 'p'];
   for (const cor of ['w', 'b']) {
     for (const tipo of tipos) {
-      const arquivo = new URL(`${cor}${tipo}.svg`, dir);
-      const texto = fs.readFileSync(arquivo, 'utf8');
-      assert.match(texto, /<svg[^>]+viewBox="0 0 45 45"/, `${cor}${tipo}: viewBox 45x45`);
-      assert.match(texto, /<path|<circle|<ellipse|<rect/, `${cor}${tipo}: tem formas`);
-      assert.ok(!/cburnett|wikimedia|creativecommons/i.test(texto), `${cor}${tipo}: sem crédito de terceiros`);
+      const texto = fs.readFileSync(new URL(`${cor}${tipo}.svg`, dir), 'utf8');
+      assert.match(texto, /<svg[^>]+viewBox="[^"]+"/, `${cor}${tipo}: tem viewBox`);
+      assert.match(texto, /<path|<circle|<ellipse|<rect|<g/, `${cor}${tipo}: tem formas`);
       // o navegador desenha o arquivo inteiro: precisa ser XML bem formado
       const doc = new JSDOM(texto, { contentType: 'image/svg+xml' }).window.document;
       assert.ok(doc.querySelector('svg'), `${cor}${tipo}: XML válido`);
+      assert.match(texto, /cburnett/i, `${cor}${tipo}: mantém o crédito do conjunto`);
     }
   }
+  const leia = fs.readFileSync(new URL('LEIA-ME.txt', dir), 'utf8');
+  assert.match(leia, /CC BY-SA 3\.0/, 'LEIA-ME com a licença');
 });
 
 await teste('o tabuleiro é dimensionado pela janela (layout chess.com)', async () => {
@@ -211,6 +212,9 @@ await teste('o tabuleiro é dimensionado pela janela (layout chess.com)', async 
     'a área do tabuleiro usa o lado calculado pela janela');
   assert.match(css, /@supports \(height: 100dvh\)/, 'usa dvh quando o navegador suporta');
   assert.ok(!/\.palco\s*\{[^}]*max-width:\s*1060px/s.test(css), 'sem o teto antigo de 1060px');
+  assert.ok(!/--lado-tabuleiro:[^;]*980px/.test(css), 'sem teto de 980px: o tabuleiro vai até o fim da janela');
+  assert.match(css, /--lado-tabuleiro:\s*calc\(100d?vh - var\(--cromo-tabuleiro/,
+    'o lado é a altura da janela menos o cromo');
 });
 
 await teste('revisar um PGN gera relatório', async () => {
