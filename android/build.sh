@@ -89,9 +89,13 @@ log "compilando recursos (aapt2)"
 # ------------------------------------------------------------------ 3) javac
 log "compilando java"
 mapfile -t FONTES < <(find "$ANDROID/java" "$CONSTRUCAO/gen" -name '*.java')
-javac -source 17 -target 17 -encoding UTF-8 -Xlint:-options \
-  -bootclasspath "$JAR_ANDROID" -classpath "$JAR_ANDROID" \
-  -d "$CONSTRUCAO/classes" "${FONTES[@]}" 2>&1 | grep -v "bootstrap class path" || true
+echo "arquivos java: ${#FONTES[@]}"
+# sem -bootclasspath (proibido com -target >= 9); android.jar entra no classpath
+if ! javac -encoding UTF-8 -source 11 -target 11 -Xlint:-options \
+      -classpath "$JAR_ANDROID" \
+      -d "$CONSTRUCAO/classes" "${FONTES[@]}"; then
+  erro "javac falhou"
+fi
 test -f "$CONSTRUCAO/classes/br/com/xadrezstudio/MainActivity.class" \
   || erro "compilação Java não produziu MainActivity.class"
 

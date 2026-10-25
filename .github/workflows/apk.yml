@@ -21,6 +21,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   build:
@@ -144,4 +145,8 @@ jobs:
               echo "</details>"
             fi
           } > build/comentario.md
-          gh pr comment 5 --repo "${{ github.repository }}" --body-file build/comentario.md || true
+          gh pr comment 5 --repo "${{ github.repository }}" --body-file build/comentario.md \
+            || gh issue create --repo "${{ github.repository }}" \
+                 --title "Log do build do APK ($(date +%Y-%m-%dT%H:%M))" \
+                 --body-file build/comentario.md \
+            || true
