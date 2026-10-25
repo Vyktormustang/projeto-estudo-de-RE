@@ -160,7 +160,7 @@
           </div>
 
           <div class="rodape-painel">
-            <span>v1.2</span>
+            <span>v1.3</span>
             <span>Stockfish 19 · GPL-3.0</span>
           </div>
         </aside>
@@ -217,9 +217,10 @@
             </div>
             <div class="linha">
               <select id="profundidade">
-                <option value="12">Rápida (depth 12)</option>
-                <option value="14" selected>Padrão (depth 14)</option>
-                <option value="17">Profunda (depth 17)</option>
+                <option value="auto" selected>Automática · depth 14 (recomendada)</option>
+                <option value="12">Rápida · depth 12</option>
+                <option value="16">Profunda · depth 16</option>
+                <option value="18">Máxima · depth 18</option>
               </select>
               <label class="toggle pequeno">
                 <input type="checkbox" id="modo-leve"><span>comentários curtos</span>
@@ -230,6 +231,7 @@
               <button class="btn-verde" id="btn-revisar">Revisar partida</button>
               <button class="btn-cinza" id="btn-exemplo">Exemplo</button>
             </div>
+            <p class="dica" id="dica-analise"></p>
             <div class="progresso" id="progresso" hidden>
               <div class="barra"><div class="preenchimento" id="progresso-barra"></div></div>
               <span id="progresso-texto">analisando…</span>
@@ -244,6 +246,7 @@
             </div>
             <div class="classes" id="contagem-classes"></div>
             <p class="resumo" id="resumo-partida"></p>
+            <p class="dica" id="info-revisao"></p>
             <h3>Lances <span class="dica-inline">clique para ver a explicação</span></h3>
             <ul class="lista-lances com-classes" id="lances-analise"></ul>
             <div class="explicacao" id="explicacao">

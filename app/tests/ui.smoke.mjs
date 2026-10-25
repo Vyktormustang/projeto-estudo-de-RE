@@ -55,6 +55,7 @@ class MotorFalso {
       return;
     }
     if (cmd.startsWith('go')) {
+      globalThis.__buscas = (globalThis.__buscas || 0) + 1;
       const jogo = new Chess(this.fen);
       const lances = jogo.moves({ verbose: true });
       if (!lances.length) return this._emitir('bestmove (none)');
@@ -132,6 +133,13 @@ const teste = async (nome, fn) => {
 // ------------------------------------------------------------------ testes
 
 console.log('\n▶ Carregamento do app');
+// finge um celular de 8 núcleos: é o que o app vê em hardware real e o que
+// habilita o pool de análise em paralelo
+Object.defineProperty(window.navigator, 'hardwareConcurrency', { value: 8, configurable: true });
+Object.defineProperty(window.navigator, 'deviceMemory', { value: 8, configurable: true });
+// no Node 22 existe um `navigator` global (2 núcleos aqui): o app tem que enxergar
+// o navegador, então trocamos o global pelo do jsdom
+Object.defineProperty(globalThis, 'navigator', { value: window.navigator, configurable: true });
 await import('../public/js/main.js');
 
 await teste('módulos montam e expõem window.xadrez', async () => {
@@ -188,6 +196,52 @@ await teste('revisar um PGN gera relatório', async () => {
   assert.ok($('#resumo-partida').textContent.length > 30, 'resumo tem texto');
   assert.ok($$('#lances-analise .lance').length >= 7, 'lista de lances preenchida');
   assert.ok($$('#contagem-classes .chip-classe').length > 0, 'contagem de classes');
+});
+
+await teste('a revisão roda em paralelo com orçamento de tempo', async () => {
+  const revisao = window.xadrez.analise;
+  assert.ok(revisao.pool, 'pool de motores criado');
+  assert.equal(revisao.pool.tamanho, 3, 'até 3 motores em paralelo');
+  assert.ok(revisao.pool.motores.length >= 2, `pool com ${revisao.pool.motores.length} motores`);
+  assert.equal(revisao.perfil.depth, 14, 'Automática usa depth 14');
+  assert.ok(revisao.perfil.movetime >= 120 && revisao.perfil.movetime <= 1300, 'teto de tempo por posição');
+  assert.match($('#info-revisao').textContent, /depth 14/);
+  assert.match($('#info-revisao').textContent, /2 linhas por posição/);
+  assert.match($('#dica-analise').textContent, /núcleo/i);
+});
+
+await teste('perfis de análise respeitam piso, teto e tamanho da partida', async () => {
+  const { perfilDeAnalise, estimarSegundos, PERFIS_ANALISE } = await import('../public/js/engine.js');
+  const auto = perfilDeAnalise('auto', 80, 3);
+  assert.equal(auto.depth, 14, 'partida curta: depth 14');
+  assert.ok(auto.movetime >= 120 && auto.movetime <= 1200);
+  const autolonga = perfilDeAnalise('auto', 300, 3);
+  assert.equal(autolonga.depth, 12, 'partida longa desce para depth 12');
+  assert.ok(autolonga.movetime < auto.movetime, 'mais posições = menos tempo por posição');
+  assert.ok(autolonga.movetime >= 120, 'respeita o piso mínimo');
+  const rapida = perfilDeAnalise('12', 80, 3);
+  assert.equal(rapida.depth, 12);
+  assert.ok(rapida.movetime <= auto.movetime, 'rápida não passa da automática');
+  assert.equal(perfilDeAnalise('18', 10, 1).depth, 18);
+  assert.equal(perfilDeAnalise('desconhecido', 10, 1).escolha, 'auto');
+  assert.ok(PERFIS_ANALISE.auto.profundidades.length === 2);
+  assert.ok(estimarSegundos(80, auto) > 0);
+});
+
+await teste('revisar de novo o mesmo PGN não repete buscas (cache)', async () => {
+  const revisao = window.xadrez.analise;
+  const cacheAntes = revisao.pool.acertosCache;
+  const buscasAntes = globalThis.__buscas || 0;
+  clicar('#btn-revisar');
+  await esperar(() => revisao.pool.acertosCache > cacheAntes, { descricao: 'acertos de cache' });
+  await esperar(() => revisao.revisando === false, { descricao: 'fim da revisão' });
+  assert.equal(globalThis.__buscas || 0, buscasAntes, 'nenhuma busca nova no motor');
+});
+
+await teste('a assistência do modo Jogar usa um motor separado do bot', async () => {
+  const { motor, motorAjuda } = await import('../public/js/engine.js');
+  assert.notEqual(motor, motorAjuda, 'instâncias diferentes');
+  assert.equal(window.xadrez.motor, motor, 'o bot continua no motor principal');
 });
 
 await teste('clicar num lance mostra explicação e setas', async () => {

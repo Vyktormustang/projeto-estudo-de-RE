@@ -1,7 +1,7 @@
 /** Modo "Jogar": partida contra o Stockfish com assistências opcionais. */
 
 import { Chess } from '../vendor/chess.js';
-import { motor } from './engine.js';
+import { motor, motorAjuda } from './engine.js';
 import { Tabuleiro } from './board.js';
 import { toast, el, fmtTempo, nomeNivel } from './util.js';
 import { salvarJogo } from './armazenamento.js';
@@ -450,9 +450,12 @@ export class ModoJogo {
   }
 
   async _analisarParaAjuda() {
+    // sem barra de avaliação e sem feedback não há para que analisar
+    if (!this.config.assist.avaliacao && !this.config.assist.feedback) return;
     const fen = this.chess.fen();
     try {
-      const resposta = await motor.analisar({ fen, depth: 11, multipv: 2 });
+      // motor separado do bot: a análise da minha vez não atrasa mais o lance dele
+      const resposta = await motorAjuda.analisar({ fen, depth: 10, multipv: 2 });
       if (this.chess.fen() === fen) {
         this.analiseAntes = resposta;
         if (this.config.assist.avaliacao) {
@@ -471,7 +474,7 @@ export class ModoJogo {
     caixa.className = 'feedback';
     caixa.textContent = 'analisando a melhor continuação…';
     try {
-      const { lines } = await motor.analisar({ fen, depth: 15, multipv: 2 });
+      const { lines } = await motorAjuda.analisar({ fen, depth: 13, movetime: 1500, multipv: 2 });
       if (this.chess.fen() !== fen) return;
       const melhor = lines[0];
       if (!melhor?.pv?.length) return;

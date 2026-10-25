@@ -107,7 +107,7 @@ app/
 │       ├── analise.js      revisão, gráfico, navegação, explicações
 │       ├── biblioteca.js   partidas salvas
 │       ├── board.js        tabuleiro (DOM + peças SVG + setas; toque e arraste)
-│       ├── engine.js       wrapper do Stockfish em Web Worker
+│       ├── engine.js       Stockfish em Web Worker: bot, assistência e pool paralelo
 │       ├── uci.js          parser de UCI (compartilhado com os testes)
 │       ├── armazenamento.js  partidas: JSON no servidor ou localStorage no APK
 │       ├── review.js       núcleo puro: expected points, classes, explicações
@@ -134,7 +134,8 @@ node tests/armazenamento.test.mjs # biblioteca offline (modo do APK)
 `review.test.mjs` roda três partidas (mate do pastor, miniatura de Lazard, e uma posição com
 mate em 1 ignorado) e verifica classes, precisão, explicações e o resgate de PGN com `FEN`.
 `ui.smoke.mjs` sobe a página em jsdom com um motor falso que responde UCI, joga `e4`, revisa um
-PGN, navega com o teclado e confere a biblioteca. Ele também guarda as regressões da 1.1: partida
+PGN, navega com o teclado e confere a biblioteca — e cobre o pool paralelo, os perfis de análise
+(profundidade/teto de tempo), o cache de posições e o motor separado da assistência. Ele também guarda as regressões da 1.1: partida
 que já começa sozinha, peças como `<img>` SVG, lance resolvido **por coordenada** (inclusive com o
 tabuleiro girado), overlay de promoção escondido e conferência de todo `getElementById` do JS
 contra o HTML.

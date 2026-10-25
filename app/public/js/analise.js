@@ -1,7 +1,7 @@
 /** Modo "Analisar": revisão completa com classificação e explicação de cada lance. */
 
 import { Chess } from '../vendor/chess.js';
-import { motor } from './engine.js';
+import { PoolAnalise, tamanhoDoPool, perfilDeAnalise, estimarSegundos } from './engine.js';
 import { Tabuleiro } from './board.js';
 import { toast, el } from './util.js';
 import { importarChessCom } from './armazenamento.js';
@@ -25,6 +25,7 @@ export class ModoAnalise {
     this.revisando = false;
     this._ligar();
     this.tabuleiro.render('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+    this._explicarModoAnalise();
   }
 
   _ligar() {
@@ -105,6 +106,16 @@ export class ModoAnalise {
     }
   }
 
+  _explicarModoAnalise() {
+    const dica = document.getElementById('dica-analise');
+    if (!dica) return;
+    const nucleos = tamanhoDoPool();
+    dica.textContent = nucleos > 1
+      ? `Analisa ${nucleos} posições ao mesmo tempo (${nucleos} núcleos) e 2 linhas por posição — `
+        + 'é o que deixa a revisão várias vezes mais rápida.'
+      : 'Analisa uma posição por vez (o aparelho informou 1 núcleo livre). 2 linhas por posição.';
+  }
+
   async revisar() {
     if (this.revisando) {
       this.cancelar = true;
@@ -129,28 +140,50 @@ export class ModoAnalise {
     botao.textContent = 'Cancelar';
     botao.classList.add('secundario');
 
-    const profundidade = Number(document.getElementById('profundidade').value);
+    const escolha = document.getElementById('profundidade').value;
     const historico = chess.history({ verbose: true });
     const inicio = chess.getHeaders().FEN || historico[0].before;
     const fens = [inicio, ...historico.map((m) => m.after)];
-    const posicoes = [];
-    this._progresso(0, fens.length, 'analisando…');
+
+    // análise em paralelo: um Stockfish por núcleo livre, orçamento de tempo
+    // por posição (o MultiPV 3 custava ~5x mais que 2 na mesma profundidade)
+    const workers = tamanhoDoPool();
+    const perfil = perfilDeAnalise(escolha, fens.length, workers);
+    this.perfil = perfil;
+    this.pool ??= new PoolAnalise({ tamanho: workers });
+    const inicioMs = Date.now();
+    this._progresso(0, fens.length,
+      `preparando ${perfil.workers} motor(es) · ~${estimarSegundos(fens.length, perfil)} s`);
 
     try {
-      for (let i = 0; i < fens.length; i++) {
-        if (this.cancelar) throw new Error('cancelado');
-        const turn = fens[i].split(' ')[1];
-        const resposta = await motor.analisar({ fen: fens[i], depth: profundidade, multipv: 3 });
-        posicoes.push({ fen: fens[i], turn, lines: resposta.lines });
-        this._progresso(i + 1, fens.length, `analisando posição ${i + 1} de ${fens.length}`);
-      }
+      const respostas = await this.pool.analisarTodas(
+        fens,
+        () => ({ depth: perfil.depth, movetime: perfil.movetime, multipv: 2 }),
+        {
+          cancelado: () => this.cancelar,
+          aoProgredir: (feitas, total) => {
+            const decorrido = (Date.now() - inicioMs) / 1000;
+            const resta = feitas ? Math.max(0, (decorrido / feitas) * (total - feitas)) : 0;
+            this._progresso(feitas, total,
+              `${feitas} de ${total} · ~${Math.ceil(resta)} s restantes · ${perfil.workers} núcleo(s)`);
+          },
+        },
+      );
+
+      const posicoes = respostas.map((r, i) => ({
+        fen: fens[i],
+        turn: fens[i].split(' ')[1],
+        lines: r.lines || [],
+      }));
 
       const review = buildReview({ pgn, positions: posicoes });
+      review.segundos = Math.max(1, Math.round((Date.now() - inicioMs) / 1000));
+      review.perfil = perfil;
       this.review = review;
       this._renderRelatorio();
       this.irPara(-1);
       this._mostrarGrafico();
-      toast(`Revisão pronta: ${review.moves.length} lances analisados.`);
+      toast(`Revisão pronta em ${review.segundos} s: ${review.moves.length} lances analisados.`);
     } catch (err) {
       if (err.message === 'cancelado') toast('Revisão cancelada.');
       else toast(`Falha na revisão: ${err.message}`, 'erro');
@@ -197,6 +230,14 @@ export class ModoAnalise {
     }
 
     document.getElementById('resumo-partida').textContent = r.summary.text;
+
+    const info = document.getElementById('info-revisao');
+    if (info) {
+      info.textContent = r.perfil
+        ? `${r.moves.length} lances · depth ${r.perfil.depth} · 2 linhas por posição · `
+          + `${r.perfil.workers} núcleo(s) em paralelo · ${r.segundos} s`
+        : '';
+    }
 
     const lista = document.getElementById('lances-analise');
     lista.innerHTML = '';

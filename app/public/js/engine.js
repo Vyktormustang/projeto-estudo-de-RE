@@ -34,9 +34,10 @@ export function forcaDoNivel(nivel) {
 }
 
 export class Motor {
-  constructor(url = URL_PADRAO) {
+  constructor(url = URL_PADRAO, { hash = 32, reserva = URL_RESERVA } = {}) {
     this.url = url;
-    this.urlReserva = URL_RESERVA;
+    this.urlReserva = reserva;
+    this.hash = hash;
     this.worker = null;
     this.pronto = false;
     this.erro = null;
@@ -56,7 +57,7 @@ export class Motor {
 
   async _subirTudo(timeoutMs) {
     const ok = await this._subir(this.url, timeoutMs);
-    if (!ok && this.url !== this.urlReserva) {
+    if (!ok && this.urlReserva && this.url !== this.urlReserva) {
       // segunda tentativa com o build completo antes de desistir
       this.worker?.terminate?.();
       this.erro = null;
@@ -90,7 +91,7 @@ export class Motor {
       tentar();
     });
     if (this.pronto) {
-      this.enviar('setoption name Hash value 64');
+      this.enviar(`setoption name Hash value ${this.hash}`);
       this.enviar('setoption name UCI_LimitStrength value false');
       this.enviar('setoption name Skill Level value 20');
     }
@@ -154,7 +155,9 @@ export class Motor {
         }
         this.enviar(`setoption name MultiPV value ${multipv}`);
         this.enviar(`position fen ${fen}`);
-        this.enviar(movetime ? `go movetime ${movetime}` : `go depth ${depth}`);
+        // com os dois limites o Stockfish para no primeiro que chegar: piso de
+        // qualidade (profundidade) e teto de tempo (posição patológica)
+        this.enviar(movetime ? `go depth ${depth} movetime ${movetime}` : `go depth ${depth}`);
         this.tempoLimite = setTimeout(() => {
           if (this.trabalho) {
             this.enviar('stop');
@@ -190,5 +193,172 @@ export class Motor {
   }
 }
 
-/** Instância única usada pelo app. */
-export const motor = new Motor();
+/** Instância única do bot. */
+export const motor = new Motor(URL_PADRAO, { hash: 24 });
+
+/**
+ * Motor separado para as assistências do modo Jogar (barra de avaliação, dica,
+ * feedback). Antes era o mesmo motor do bot e a análise da minha vez entrava na
+ * mesma fila do lance do bot — o bot só respondia depois dela terminar.
+ */
+export const motorAjuda = new Motor(URL_PADRAO, { hash: 12 });
+
+/**
+ * Quantos Stockfish rodar em paralelo na revisão de partida.
+ * Um worker por núcleo livre, no máximo 3 (cada um carrega o wasm e um hash).
+ */
+export function tamanhoDoPool() {
+  const nav = typeof navigator !== 'undefined' ? navigator : {};
+  const nucleos = nav.hardwareConcurrency || 4;
+  const memoria = nav.deviceMemory || 4;          // GB aproximados (Chrome/WebView)
+  const porMemoria = memoria >= 6 ? 3 : memoria >= 4 ? 2 : 1;
+  const porNucleo = nucleos >= 4 ? 3 : nucleos >= 2 ? 2 : 1;
+  return Math.max(1, Math.min(3, porMemoria, porNucleo));
+}
+
+/**
+ * Pool de motores para analisar várias posições ao mesmo tempo.
+ * Cada `Motor` tem seu próprio Worker: o ganho é praticamente linear até 3.
+ */
+export class PoolAnalise {
+  constructor({ tamanho = tamanhoDoPool(), hash = 12 } = {}) {
+    this.tamanho = Math.max(1, tamanho);
+    this.hash = hash;
+    this.motores = [];
+    this.falhas = 0;
+    this.acertosCache = 0;
+    // posições já analisadas nesta sessão: FEN + nº de linhas → { depth, lines }
+    this.cache = new Map();
+  }
+
+  /** Chave do cache: mesma posição e mesmas linhas; profundidade é comparada. */
+  static chave(fen, multipv) {
+    return `${fen}|${multipv}`;
+  }
+
+  motor(indice = 0) {
+    if (!this.motores[indice]) {
+      this.motores[indice] = new Motor(URL_PADRAO, { hash: this.hash, reserva: null });
+    }
+    return this.motores[indice];
+  }
+
+  async preparar() {
+    const lista = Array.from({ length: this.tamanho }, (_, i) => this.motor(i));
+    const oks = await Promise.all(lista.map((m) => m.iniciar().catch(() => false)));
+    const prontos = oks.filter(Boolean).length;
+    if (!prontos) throw new Error(lista[0].erro || 'motor indisponível');
+    // se algum worker não subiu, trabalha só com os que subiram
+    this.tamanho = prontos;
+    return prontos;
+  }
+
+  /**
+   * Analisa `fens` distribuindo as posições entre os workers.
+   * `opcoes(i)` devolve { depth, movetime, multipv } para a posição i;
+   * `aoProgredir(feitas, total, indice)` é chamado a cada posição concluída.
+   */
+  async analisarTodas(fens, opcoes, { aoProgredir = null, cancelado = null, usarCache = true } = {}) {
+    const prontos = await this.preparar();
+    const resultados = new Array(fens.length);
+    let proxima = 0;
+    let feitas = 0;
+
+    const trabalhar = async (indiceMotor) => {
+      const m = this.motor(indiceMotor);
+      for (;;) {
+        if (cancelado?.()) return;
+        const i = proxima++;
+        if (i >= fens.length) return;
+        const cfg = typeof opcoes === 'function' ? opcoes(i) : opcoes;
+        const multipv = cfg.multipv || 2;
+
+        // reanálise da mesma posição (outra partida com a mesma abertura, ou
+        // mudar a profundidade para baixo) não precisa do motor de novo
+        const chave = PoolAnalise.chave(fens[i], multipv);
+        const guardado = usarCache ? this.cache.get(chave) : null;
+        if (guardado && guardado.depth >= (cfg.depth || 0)) {
+          this.acertosCache++;
+          resultados[i] = { fen: fens[i], lines: guardado.lines, best: null, cache: true };
+          feitas++;
+          aoProgredir?.(feitas, fens.length, i);
+          continue;
+        }
+
+        try {
+          const resposta = await m.analisar({
+            fen: fens[i],
+            depth: cfg.depth,
+            movetime: cfg.movetime || 0,
+            multipv,
+          });
+          resultados[i] = { fen: fens[i], lines: resposta.lines, best: resposta.best };
+          if (usarCache) {
+            // guarda até resultado vazio (posição de mate): repetir não muda nada
+            if (this.cache.size > 4000) this.cache.clear();
+            this.cache.set(chave, { depth: cfg.depth, lines: resposta.lines || [] });
+          }
+        } catch (err) {
+          this.falhas++;
+          resultados[i] = { fen: fens[i], lines: [], best: null, erro: err.message };
+        }
+        feitas++;
+        aoProgredir?.(feitas, fens.length, i);
+      }
+    };
+
+    await Promise.all(Array.from({ length: prontos }, (_, i) => trabalhar(i)));
+    if (cancelado?.()) throw new Error('cancelado');
+    return resultados;
+  }
+
+  parar() {
+    for (const m of this.motores) {
+      try { m.worker?.terminate?.(); } catch { /* ok */ }
+    }
+    this.motores = [];
+  }
+}
+
+/**
+ * Orçamento de análise: profundidade desejada + teto de tempo por posição,
+ * distribuído entre os workers.
+ *
+ * O MultiPV é o maior vilão do tempo: nesta mesma máquina, depth 14 custa
+ * ~389 ms com MultiPV 3 e ~55 ms com MultiPV 2 (o Stockfish refaz a busca para
+ * cada linha). A revisão só usava a 3ª linha para exibir, então caiu para 2.
+ *
+ * `profundidades: [curta, longa]` — em partidas muito longas o modo automático
+ * desce um degrau para não passar do orçamento.
+ */
+export const PERFIS_ANALISE = {
+  auto: { rotulo: 'Automática', profundidades: [14, 12], orcamento: 60, minMs: 120, maxMs: 1200 },
+  12: { rotulo: 'Rápida', profundidades: [12], orcamento: 25, minMs: 80, maxMs: 400 },
+  16: { rotulo: 'Profunda', profundidades: [16], orcamento: 150, minMs: 250, maxMs: 2000 },
+  18: { rotulo: 'Máxima', profundidades: [18], orcamento: 300, minMs: 400, maxMs: 4000 },
+};
+
+export function perfilDeAnalise(escolha, totalPosicoes, workers = 1) {
+  const chave = PERFIS_ANALISE[escolha] ? String(escolha) : 'auto';
+  const perfil = PERFIS_ANALISE[chave];
+  const n = Math.max(1, totalPosicoes);
+  const w = Math.max(1, workers);
+  const depth = chave === 'auto'
+    ? (n <= 120 ? perfil.profundidades[0] : perfil.profundidades[1])
+    : perfil.profundidades[0];
+  const porPosicao = (perfil.orcamento * 1000 * w) / n;
+  const movetime = Math.round(Math.min(perfil.maxMs, Math.max(perfil.minMs, porPosicao)));
+  return {
+    escolha: chave,
+    depth,
+    movetime,
+    workers: w,
+    orcamento: perfil.orcamento,
+    rotulo: perfil.rotulo,
+  };
+}
+
+/** Estimativa grosseira do tempo de parede da revisão, para mostrar na tela. */
+export function estimarSegundos(totalPosicoes, perfil) {
+  return Math.round((totalPosicoes * perfil.movetime) / 1000 / Math.max(1, perfil.workers));
+}
