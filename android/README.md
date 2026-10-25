@@ -36,6 +36,22 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 Para conferir no aparelho (ou no PC, com `apksigner`):
 `apksigner verify --print-certs xadrez-studio-1.5.apk`.
 
+## O que mudou na 1.6 (arrastar a peça com o dedo, de verdade)
+
+* **Causa raiz do arraste que não funcionava no celular**: `.casa` tinha `touch-action: manipulation`.
+  Com isso o navegador tratava o movimento do dedo como rolagem e mandava `pointercancel` no meio
+  do gesto, então a peça voltava para a casa. Agora é `touch-action: none` na casa (o
+  `.tabuleiro-wrap` já tinha), e a rolagem da página continua funcionando fora do tabuleiro.
+* Arraste mais robusto: ignora um segundo dedo durante o gesto, limpa fantasma/realces em
+  `lostpointercapture` (troca de aba, tela bloqueada) e mantém a peça elevada ~28 px acima do dedo
+  para não ficar escondida por ele.
+* Toque-toque continua funcionando, e o clique sintético que vem depois do gesto é ignorado
+  (`pointerdown` já resolve seleção/lance) — sem lance duplicado.
+* Acabamento no padrão chess.com: sombra leve nas peças, aro interno no tabuleiro, zebra na lista
+  de lances e o lance atual com fundo `#4a4744`.
+* `ui.smoke.mjs` agora com **33 verificações**, incluindo três específicas de arraste no dedo
+  (touch-action correto, segundo dedo ignorado, perda de captura limpa o gesto).
+
 ## O que mudou na 1.5 (tabuleiro ocupando a tela)
 
 * **Layout dirigido pela altura da janela**, como no chess.com: o lado do tabuleiro é

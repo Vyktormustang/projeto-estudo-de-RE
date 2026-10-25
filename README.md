@@ -6,7 +6,7 @@
 > * [`android/`](android/) — o **APK** do mesmo app para Android (offline, sem Play Store):
 >   build sem Gradle em [`android/build.sh`](android/build.sh). O arquivo fica no **Google Drive**
 >   (não no GitHub): <https://drive.google.com/file/d/1XxJGFOUTAZRKEsL3cVcCXLi6GtFCRqFU/view>
->   — versão **1.5**, com interface no padrão chess.com, arrastar peças no dedo/mouse,
+>   — versão **1.6**, com interface no padrão chess.com, arrastar peças no dedo/mouse,
 >   cartão de fim de jogo, análise em paralelo (bem mais rápida) e tabuleiro ocupando a tela
 >   (classificação do lance sobre a peça); instala por cima das anteriores.
 > * [`pesquisa/chesscom/`](pesquisa/chesscom/) — pesquisa de jogabilidade do chess.com

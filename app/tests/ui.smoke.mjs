@@ -441,6 +441,40 @@ await teste('arrastar com o dedo e soltar na casa legal faz o lance', async () =
   assert.ok(!casa('d2').classList.contains('arrastando-origem'), 'realce do arraste limpo');
 });
 
+await teste('arrastar funciona no dedo: touch-action não entrega o gesto ao navegador', async () => {
+  const css = fs.readFileSync(new URL('../public/styles.css', import.meta.url), 'utf8');
+  const casaCss = /\.casa\s*\{([^}]*)\}/s.exec(css)?.[1] || '';
+  assert.match(casaCss, /touch-action:\s*none/, '.casa precisa de touch-action: none');
+  assert.ok(!/touch-action:\s*manipulation/.test(casaCss), 'manipulation deixava o navegador cancelar o arraste');
+});
+
+await teste('segundo dedo durante o arraste é ignorado', async () => {
+  const raiz = tabuleiroDeTeste();
+  casa('e2').dispatchEvent(ponteiro('pointerdown', 450, 650));
+  casa('e2').dispatchEvent(ponteiro('pointermove', 450, 550));
+  const fantasma = $('.peca-arrastando');
+  assert.ok(fantasma, 'arraste em andamento');
+  // outro dedo em outra casa não pode começar um segundo arraste
+  const outro = new window.MouseEvent('pointerdown', { clientX: 50, clientY: 50, bubbles: true, cancelable: true });
+  Object.defineProperty(outro, 'pointerId', { value: 9 });
+  Object.defineProperty(outro, 'pointerType', { value: 'touch' });
+  casa('a8').dispatchEvent(outro);
+  assert.equal($$('.peca-arrastando').length, 1, 'um fantasma só');
+  raiz.dispatchEvent(ponteiro('pointerup', 450, 450));
+  await esperar(() => window.xadrez.jogo.chess.history().includes('e4'), { descricao: 'lance e4' });
+  assert.equal(window.xadrez.jogo.chess.history()[0], 'e4');
+});
+
+await teste('perder a captura do ponteiro limpa o arraste', async () => {
+  const raiz = tabuleiroDeTeste();
+  casa('g1').dispatchEvent(ponteiro('pointerdown', 550, 750));
+  casa('g1').dispatchEvent(ponteiro('pointermove', 550, 650));
+  assert.ok($('.peca-arrastando'), 'fantasma criado');
+  raiz.dispatchEvent(ponteiro('lostpointercapture', 550, 650));
+  assert.equal($('.peca-arrastando'), null, 'fantasma removido');
+  assert.ok(!casa('g1').classList.contains('arrastando-origem'), 'origem sem realce');
+});
+
 await teste('arrastar e soltar fora de destino legal desmarca a peça', async () => {
   const raiz = tabuleiroDeTeste();
   casa('c2').dispatchEvent(ponteiro('pointerdown', 250, 650));

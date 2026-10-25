@@ -33,6 +33,13 @@ de endereço do celular não cortar o tabuleiro. As peças são o conjunto
 
 ### Jogar (`Jogar`)
 
+- **Arrastar a peça com o dedo** (e com o mouse) ou toque-toque. O tabuleiro usa
+  `touch-action: none` justamente para o navegador não interpretar o arraste como rolagem e
+  cancelar o gesto no meio; a peça sai da casa de origem, é levantada acima do dedo e as casas
+  legais ficam marcadas. Soltar fora de um destino legal desmarca.
+- Um segundo dedo durante o arraste é ignorado, e perder a captura do ponteiro (trocar de aba,
+  bloquear a tela) limpa o gesto.
+
 - **Bots de 250 a 3200**, ajustáveis no slider ou por atalhos (Iniciante 400 … Motor 3000).
   Até 1320 a fraqueza vem de `Skill Level` baixo + profundidade curta; acima disso o próprio
   Stockfish limita por `UCI_Elo` (1320–3190).

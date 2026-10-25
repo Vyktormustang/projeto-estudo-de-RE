@@ -220,7 +220,7 @@ main { padding: 12px 16px; }
   aspect-ratio: 1 / 1;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, .35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(0, 0, 0, .28);
   touch-action: none;          /* arrastar peça não deve rolar a página */
   user-select: none;
   -webkit-user-select: none;
@@ -240,7 +240,11 @@ main { padding: 12px 16px; }
   align-items: center;
   justify-content: center;
   background-color: var(--claro);
-  touch-action: manipulation;
+  /* `none`, não `manipulation`: com manipulation o navegador assume o arraste
+     como rolagem e manda pointercancel no meio do gesto — era o que impedia
+     arrastar a peça com o dedo no celular. A rolagem da página continua
+     funcionando fora do tabuleiro. */
+  touch-action: none;
 }
 .casa.escura { background-color: var(--escuro); }
 
@@ -276,6 +280,7 @@ main { padding: 12px 16px; }
   width: 96%;
   height: 96%;
   object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .22));   /* como o relevo das peças do chess.com */
   pointer-events: none;   /* o clique é resolvido na casa */
   -webkit-user-drag: none;
   user-select: none;
@@ -333,10 +338,11 @@ main { padding: 12px 16px; }
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45));
 }
-.peca-arrastando.toque { transform: translate(-50%, calc(-50% - 26px)); }
+.peca-arrastando.toque { transform: translate(-50%, calc(-50% - 28px)); }
+.peca-arrastando { transition: none; }
 
 /* durante o arraste: origem esvaziada e casa sob o dedo realçada */
-.casa.arrastando-origem .peca { opacity: .18; }
+.casa.arrastando-origem .peca { opacity: .12; }
 .casa.sobre { box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .55); }
 .peca { cursor: grab; }
 .arrastando .peca { cursor: grabbing; }
@@ -549,8 +555,9 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--verde); out
   display: flex; align-items: center; gap: 5px; width: 100%;
   cursor: pointer;
 }
-.lista-lances .lance:hover { background: rgba(255, 255, 255, .06); }
-.lista-lances .lance.atual { background: rgba(129, 182, 76, .22); }
+.lista-lances li:nth-child(even) .lance { background: rgba(255, 255, 255, .035); }
+.lista-lances .lance:hover { background: rgba(255, 255, 255, .09); }
+.lista-lances .lance.atual { background: #4a4744; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
 .lista-lances .lance .classe {
   font-size: .6rem; font-weight: 800; padding: 0 4px; border-radius: 3px;
   color: #1b1b1b; line-height: 1.6;

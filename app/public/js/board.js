@@ -99,6 +99,7 @@ export class Tabuleiro {
     //    O clique sintético que vem depois é ignorado — o gesto já foi tratado.
     this.raiz.addEventListener('pointerdown', (ev) => {
       if (!this.interativo) return;
+      if (this._gesto) return;                       // segundo dedo: ignora
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
       const sq = this._casaDoEvento(ev);
       if (!sq) return;
@@ -167,6 +168,11 @@ export class Tabuleiro {
     };
     this.raiz.addEventListener('pointerup', (ev) => encerrar(ev, false));
     this.raiz.addEventListener('pointercancel', (ev) => encerrar(ev, true));
+    // WebView que perde a captura (troca de aba, tela bloqueada) não pode
+    // deixar fantasma na tela nem a casa marcada
+    this.raiz.addEventListener('lostpointercapture', (ev) => {
+      if (this._gesto && ev.pointerId === this._gesto.pointerId) encerrar(ev, true);
+    });
   }
 
   /** Cópia flutuante da peça que segue o dedo/cursor. */
