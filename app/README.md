@@ -38,14 +38,18 @@ celular) — desenho e código próprios, sem copiar assets de lá. As peças s�
 
 - Cole um **PGN**, arraste um arquivo `.pgn`, ou **importe do chess.com** pelo usuário
   (`/api/chesscom` — precisa de internet no servidor; se falhar, cole o PGN).
-- A revisão analisa **todas as posições** com multipv 3 e devolve:
+- A revisão analisa **todas as posições** (2 linhas por posição, em até 3 motores em paralelo) e
+  devolve:
+  - **selo de classificação sobre a peça** que se moveu — o `??`, o `!`, o `★` do game review,
+    na cor da classe, escalando junto com a casa (SVG); no modo Jogar o mesmo selo marca o seu
+    último lance quando o feedback está ligado,
   - **precisão** por lado (0–100%),
   - **classificação de cada lance**: Brilhante, Ótimo, Melhor, Excelente, Bom, Livro,
     Imprecisão, Erro, Oportunidade perdida, Erro grave,
   - **gráfico de avaliação** clicável,
   - **explicação em português** do lance selecionado, com o que ele faz, qual era o melhor,
     o que o adversário ganha e uma dica acionável,
-  - até **3 linhas do motor** (avaliação + continuação) para conferir.
+  - até **3 linhas do motor** no painel (avaliação + continuação) para conferir.
 
 Navegação: ← → no teclado, botões ⏮ ◀ ▶ ⏭, e clique direto na lista de lances ou no gráfico.
 

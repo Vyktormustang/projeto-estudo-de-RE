@@ -269,6 +269,7 @@ export class ModoAnalise {
     this.tabuleiro.render(fen);
     const lance = alvo >= 0 ? this.review.moves[alvo] : null;
     this.tabuleiro.marcarUltimo(lance?.from, lance?.to);
+    this._marcarClasseDoLance(lance);
     this.tabuleiro.marcarXeque(new Chess(fen).inCheck() ? this._casaDoRei(fen) : null);
     this.tabuleiro.setas(this._setasDoLance(alvo));
     document.getElementById('lance-atual').textContent = lance
@@ -284,6 +285,18 @@ export class ModoAnalise {
     this._barra(brancas);
     this._marcarGrafico(alvo);
     this._explicar(alvo);
+  }
+
+  /** Selo da classificação em cima da peça que se moveu (na posição inicial, nenhum). */
+  _marcarClasseDoLance(lance) {
+    if (!lance) { this.tabuleiro.marcarClasse(null); return; }
+    const info = CLASS_INFO[lance.class] || CLASS_INFO.good;
+    this.tabuleiro.marcarClasse({
+      casa: lance.to,
+      simbolo: info.short,
+      cor: info.color,
+      rotulo: `${info.label} — ${lance.san}`,
+    });
   }
 
   _casaDoRei(fen) {

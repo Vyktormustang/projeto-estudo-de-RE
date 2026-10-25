@@ -1,5 +1,6 @@
 /**
- * Componente de tabuleiro: 64 casas em DOM, peças em SVG e setas de dica.
+ * Componente de tabuleiro: 64 casas em DOM, peças em SVG, setas de dica e o
+ * selo de classificação do lance (o "??" do game review) sobre a peça.
  *
  * Entrada do usuário (o que importa para o app funcionar no celular):
  *  - toque  → seleciona a peça; toque no destino → lance (clique/clique);
@@ -30,6 +31,7 @@ export class Tabuleiro {
     this.ultimo = null;
     this.emXeque = null;
     this.dicaOrigem = null;
+    this.classe = null;      // selo de classificação sobre a peça
     this._arraste = null;
     this._suprimirClique = false;
     this._montar();
@@ -243,6 +245,7 @@ export class Tabuleiro {
         img.setAttribute('aria-hidden', 'true');
         casa.appendChild(img);
       }
+      if (this.classe && sq === this.classe.casa) casa.appendChild(seloDeClasse(this.classe));
       const destino = this.destinos?.[sq];
       if (destino) {
         const marca = document.createElement('i');
@@ -290,6 +293,16 @@ export class Tabuleiro {
     this.render(this.fen);
   }
 
+  /**
+   * Selo de classificação em cima da peça que acabou de se mover (como no game
+   * review do chess.com): `{ casa, simbolo, cor, rotulo }`, ou `null` para apagar.
+   * O desenho é um SVG com viewBox, então o símbolo acompanha o tamanho da casa.
+   */
+  marcarClasse(marca) {
+    this.classe = marca?.casa ? marca : null;
+    this.render(this.fen);
+  }
+
   /** setas: [{ de, para, cor }] em casas ('e2'), cor = 'verde' | 'vermelha' | 'azul' */
   setas(lista = []) {
     this.svg.innerHTML = '';
@@ -334,6 +347,57 @@ export class Tabuleiro {
     const y = this.orientacao === 'w' ? 8 - linha + 0.5 : linha - 0.5;
     return [x, y];
   }
+}
+
+const NS = 'http://www.w3.org/2000/svg';
+
+/**
+ * Selo redondo com o símbolo da classificação ('??', '★', '📖'…).
+ * Usa `viewBox` para que o glifo escale junto com a casa em qualquer tela.
+ */
+/** Cor legível sobre o selo: escuro nos selos claros (amarelo/laranja), branco nos demais. */
+function corDoTexto(_simbolo, cor) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(cor || ''));
+  if (!m) return '#fff';
+  const n = parseInt(m[1], 16);
+  const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.62 ? '#262421' : '#fff';
+}
+
+export function seloDeClasse({ simbolo = '?', cor = '#81b64c', rotulo = '' }) {
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'marca-classe');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('role', 'img');
+  if (rotulo) {
+    svg.setAttribute('aria-label', rotulo);
+    const titulo = document.createElementNS(NS, 'title');
+    titulo.textContent = rotulo;
+    svg.appendChild(titulo);
+  } else {
+    svg.setAttribute('aria-hidden', 'true');
+  }
+
+  const circulo = document.createElementNS(NS, 'circle');
+  circulo.setAttribute('cx', '12');
+  circulo.setAttribute('cy', '12');
+  circulo.setAttribute('r', '11');
+  circulo.setAttribute('fill', cor);
+  circulo.setAttribute('stroke', 'rgba(0,0,0,.35)');
+  circulo.setAttribute('stroke-width', '1.2');
+  svg.appendChild(circulo);
+
+  const texto = document.createElementNS(NS, 'text');
+  texto.setAttribute('x', '12');
+  texto.setAttribute('y', '12.6');
+  texto.setAttribute('text-anchor', 'middle');
+  texto.setAttribute('dominant-baseline', 'middle');
+  texto.setAttribute('font-size', String([...simbolo].length > 1 ? '12' : '14'));
+  texto.setAttribute('font-weight', '700');
+  texto.setAttribute('fill', corDoTexto(simbolo, cor));
+  texto.textContent = simbolo;
+  svg.appendChild(texto);
+  return svg;
 }
 
 /** FEN -> { e4: {type:'p', color:'w'}, ... } */

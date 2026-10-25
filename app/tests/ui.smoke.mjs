@@ -254,6 +254,38 @@ await teste('clicar num lance mostra explicação e setas', async () => {
   assert.match($('#lance-atual').textContent, /Qxf7#/);
 });
 
+await teste('a classificação do lance aparece em cima da peça', async () => {
+  const { CLASS_INFO } = await import('../public/js/review.js');
+  const revisao = window.xadrez.analise;
+  const botoes = $$('#lances-analise .lance');
+  clicar(botoes[botoes.length - 1]);
+
+  const lance = revisao.review.moves.at(-1);
+  const selos = $$('#tab-analise .marca-classe');
+  assert.equal(selos.length, 1, 'um selo por vez, no último lance');
+  const selo = selos[0];
+  assert.ok(selo.closest('.casa')?.dataset.sq === lance.to,
+    `selo na casa de destino (${lance.to})`);
+  assert.equal(selo.tagName.toLowerCase(), 'svg', 'selo é SVG: escala com a casa');
+  assert.match(selo.getAttribute('aria-label'), new RegExp(CLASS_INFO[lance.class].label),
+    'rótulo acessível com a classe');
+
+  const info = CLASS_INFO[lance.class];
+  assert.equal(selo.querySelector('circle').getAttribute('fill'), info.color, 'cor da classe');
+  assert.equal(selo.querySelector('text').textContent, info.short, 'símbolo da classe');
+  assert.equal(selo.parentElement.lastElementChild, selo, 'desenhado por cima da peça');
+
+  clicar('#nav-inicio');
+  assert.equal($$('#tab-analise .marca-classe').length, 0, 'posição inicial não tem selo');
+
+  clicar('#nav-avancar');
+  const primeiro = revisao.review.moves[0];
+  const seloPrimeiro = $('#tab-analise .marca-classe');
+  assert.ok(seloPrimeiro, 'volta a mostrar o selo ao navegar');
+  assert.equal(seloPrimeiro.closest('.casa').dataset.sq, primeiro.to, 'segue o lance ' + primeiro.san);
+  assert.equal(seloPrimeiro.querySelector('text').textContent, CLASS_INFO[primeiro.class].short);
+});
+
 await teste('navegação por teclado e gráfico', async () => {
   const antes = $('#lance-atual').textContent;
   window.document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'ArrowLeft' }));
@@ -276,10 +308,21 @@ await teste('começar partida e jogar e4', async () => {
   assert.equal($('#jogo-ativo').hidden, false);
   assert.equal($$('#tab-jogar .peca').length, 32, '32 peças no tabuleiro');
 
+  // o feedback depende da análise da posição antes do lance: espera ela existir
+  await esperar(() => window.xadrez.jogo.analiseAntes, { descricao: 'análise inicial do modo Jogar' });
   clicar('#tab-jogar .casa[data-sq="e2"]');
   clicar('#tab-jogar .casa[data-sq="e4"]');
   await esperar(() => window.xadrez.jogo.chess.history().length >= 2, { descricao: 'bot responder' });
   assert.equal(window.xadrez.jogo.chess.history()[0], 'e4');
+});
+
+await teste('no modo Jogar o selo marca o seu lance', async () => {
+  const jogo = window.xadrez.jogo;
+  await esperar(() => $$('#tab-jogar .marca-classe').length === 1, { descricao: 'selo no lance' });
+  const selo = $('#tab-jogar .marca-classe');
+  const historico = jogo.chess.history({ verbose: true });
+  assert.equal(selo.closest('.casa').dataset.sq, historico[0].to, 'selo no lance jogado (e4)');
+  assert.ok(selo.querySelector('text').textContent.length >= 1, 'símbolo visível');
 });
 
 await teste('lista de lances do jogo é atualizada', async () => {

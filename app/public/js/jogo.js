@@ -130,6 +130,7 @@ export class ModoJogo {
     this.tabuleiro.limparSelecao();
     this.tabuleiro.setas([]);
     this.tabuleiro.marcarUltimo(null, null);
+    this.tabuleiro.marcarClasse(null);
     this._esconderResultado();
     document.getElementById('config-jogo').hidden = true;
     document.getElementById('jogo-ativo').hidden = false;
@@ -435,6 +436,9 @@ export class ModoJogo {
       { linesBefore: antes.lines, linesAfter: resposta.lines },
     );
     const info = CLASS_INFO[classe];
+    this.tabuleiro.marcarClasse({
+      casa: meu.to, simbolo: info.short, cor: info.color, rotulo: `${info.label} — ${meu.san}`,
+    });
     const caixa = document.getElementById('feedback-jogar');
     caixa.hidden = false;
     caixa.className = `feedback ${['inaccuracy', 'mistake', 'blunder', 'miss'].includes(classe) ? 'ruim' : ''}`;
@@ -507,6 +511,7 @@ export class ModoJogo {
     this.tabuleiro.marcarDica(null);
     const ultimo = this.chess.history({ verbose: true }).at(-1);
     this.tabuleiro.marcarUltimo(ultimo?.from, ultimo?.to);
+    this.tabuleiro.marcarClasse(null);
     this.tabuleiro.render(this.chess.fen());
     this.tabuleiro.limparSelecao();
     document.getElementById('feedback-jogar').hidden = true;
