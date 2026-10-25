@@ -1,10 +1,11 @@
 // FICHA DE PERSONAGEM — tela extra no menu START (projeto de tradução PT-BR).
-// Adaptação da ficha de RPG (estilo MHA/BNHA) ao design do FireRed:
-//  - janela branca com texto nas cores padrão do jogo (cinza escuro / vermelho);
-//  - barra de título escura com texto branco (eco das barras pretas da ficha);
-//  - gráfico hexagonal (radar) desenhado pixel a pixel com os 6 atributos do
-//    primeiro POKéMON da equipe, escalados pelo maior atributo;
-//  - campos preenchidos automaticamente a partir do save.
+// Adaptação da ficha de RPG (estilo MHA/BNHA) ao design do FireRed, uma ficha
+// POR POKéMON da equipe (pedido do usuário: "era pra ser para os pokemons"):
+//  - NOME = espécie · CODINOME = apelido · TIPO = tipos do POKéMON
+//  - ALTURA = altura da espécie (Pokédex) · AFILIAÇÃO = treinador original
+//  - INDIVIDUALIDADE = habilidade · HABILIDADES = os 4 golpes
+//  - EQUIPAMENTO = item segurado · radar hexagonal = os 6 atributos
+//  - retrato = ícone animado do POKéMON · ←/→ folheia a equipe
 // Estrutura baseada em src/diploma.c (tela cheia simples com janelas de texto).
 
 #include "global.h"
@@ -18,15 +19,21 @@
 #include "item.h"
 #include "event_data.h"
 #include "string_util.h"
+#include "party_menu.h"
+#include "pokedex.h"
+#include "pokedex_screen.h"
+#include "pokemon_icon.h"
+#include "battle_main.h"
+#include "data.h"
 #include "ficha_personagem.h"
 #include "constants/songs.h"
-#include "constants/flags.h"
 #include "constants/items.h"
+#include "constants/moves.h"
 
 enum
 {
     WIN_ESQ,   // coluna esquerda (18 tiles): título + campos
-    WIN_DIR,   // coluna direita (12 tiles): radar + legenda
+    WIN_DIR,   // coluna direita (12 tiles): ícone, radar e legenda
     WIN_FICHA_COUNT
 };
 
@@ -39,6 +46,8 @@ enum
 struct FichaScreen
 {
     u8 initState;
+    u8 slot;
+    u8 iconSpriteId;
     void (*savedCallback)(void);
     u16 bgBufEsq[0x400];
     u16 bgBufDir[0x400];
@@ -51,6 +60,7 @@ static void Task_FichaInit(u8 taskId);
 static void Task_FichaInput(u8 taskId);
 static void FichaInitScreen(void);
 static void FichaDesenharTudo(void);
+static void FichaCriarIcone(void);
 
 static const struct BgTemplate sFichaBgTemplates[] = {
     {
@@ -99,33 +109,21 @@ static const ALIGNED(4) u8 sCores_Valor[3]  = { TEXT_COLOR_WHITE, TEXT_COLOR_RED
 static const ALIGNED(4) u8 sCores_Titulo[3] = { TEXT_COLOR_DARK_GRAY, TEXT_COLOR_WHITE, TEXT_COLOR_LIGHT_GRAY };
 
 // Textos (PT-BR)
-static const u8 sTexto_Titulo[]       = _("FICHA DE PERSONAGEM");
-static const u8 sTexto_Insignias[]    = _("INSÍGNIAS: ");
-static const u8 sTexto_Nome[]         = _("NOME:");
-static const u8 sTexto_Idade[]        = _("IDADE:");
-static const u8 sTexto_IdadeVal[]     = _("11 ANOS");
-static const u8 sTexto_Sangue[]       = _("SANGUE:");
-static const u8 sTexto_Tipo[]         = _("TIPO ");
-static const u8 sTexto_Altura[]       = _("ALTURA:");
-static const u8 sTexto_AlturaM[]      = _("1,40 m");
-static const u8 sTexto_AlturaF[]      = _("1,38 m");
-static const u8 sTexto_Afiliacao[]    = _("AFILIAÇÃO:");
-static const u8 sTexto_Afil0[]        = _("NOVATO DE PALLET");
-static const u8 sTexto_Afil1[]        = _("TREINADOR POKéMON");
-static const u8 sTexto_Afil2[]        = _("DESAFIANTE DA LIGA");
-static const u8 sTexto_Afil3[]        = _("ELITE DE KANTO");
-static const u8 sTexto_Individ[]      = _("INDIVIDUALIDADE:");
-static const u8 sTexto_Nenhuma[]      = _("NENHUMA");
-static const u8 sTexto_Ovo[]          = _("OVO POKéMON");
-static const u8 sTexto_Nv[]           = _(" Nv.");
-static const u8 sTexto_Equip[]        = _("EQUIPAMENTO:");
-static const u8 sTexto_Nenhum[]       = _("NENHUM");
-
-static const u8 sTexto_SangueA[]  = _("A");
-static const u8 sTexto_SangueB[]  = _("B");
-static const u8 sTexto_SangueAB[] = _("AB");
-static const u8 sTexto_SangueO[]  = _("O");
-static const u8 *const sTiposSanguineos[4] = { sTexto_SangueA, sTexto_SangueB, sTexto_SangueAB, sTexto_SangueO };
+static const u8 sTexto_Titulo[]    = _("FICHA DE PERSONAGEM");
+static const u8 sTexto_Nome[]      = _("NOME:");
+static const u8 sTexto_Codinome[]  = _("CODINOME:");
+static const u8 sTexto_TipoRot[]   = _("TIPO:");
+static const u8 sTexto_Afiliacao[] = _("AFILIAÇÃO:");
+static const u8 sTexto_Individ[]   = _("INDIVIDUALIDADE:");
+static const u8 sTexto_Equip[]     = _("EQUIPAMENTO:");
+static const u8 sTexto_Habilid[]   = _("HABILIDADES:");
+static const u8 sTexto_Altura[]    = _("ALTURA: ");
+static const u8 sTexto_Metro[]     = _(" m");
+static const u8 sTexto_Nenhum[]    = _("NENHUM");
+static const u8 sTexto_Traco[]     = _("---");
+static const u8 sTexto_Ovo[]       = _("OVO POKéMON");
+static const u8 sTexto_SemMon[]    = _("NENHUM POKéMON NA EQUIPE.");
+static const u8 sTexto_Barra[]     = _("/");
 
 // Legenda do radar (ordem horária a partir do topo)
 static const u8 sTexto_Poder[]    = _("PODER");
@@ -147,17 +145,19 @@ static const s16 sHexDir[6][2] = {
 
 // Cor (índice da paleta de texto) de cada vértice/atributo
 static const u8 sCorAtributo[6] = {
-    TEXT_COLOR_RED,         // PODER
-    TEXT_COLOR_GREEN,       // TÉCNICA
-    TEXT_COLOR_LIGHT_BLUE,  // VELOCIDADE
-    TEXT_COLOR_DARK_GRAY,   // CONTROLE
-    TEXT_COLOR_LIGHT_RED,   // COOPERAÇÃO
-    TEXT_COLOR_BLUE,        // INTELIGÊNCIA
+    TEXT_COLOR_RED,         // PODER        = Ataque
+    TEXT_COLOR_GREEN,       // TÉCNICA      = Ataque Esp.
+    TEXT_COLOR_LIGHT_BLUE,  // VELOCIDADE   = Velocidade
+    TEXT_COLOR_DARK_GRAY,   // CONTROLE     = Defesa
+    TEXT_COLOR_LIGHT_RED,   // COOPERAÇÃO   = PS
+    TEXT_COLOR_BLUE,        // INTELIGÊNCIA = Defesa Esp.
 };
 
-#define RADAR_CX 48   // relativo à janela direita (px 144 da tela)
-#define RADAR_CY 62
-#define RADAR_R  38
+#define RADAR_CX   48   // relativo à janela direita (px 144 da tela)
+#define RADAR_CY   94
+#define RADAR_R    30
+#define ICONE_X    192  // coordenadas de tela do centro do ícone
+#define ICONE_Y    34
 
 static void VBlankCB_Ficha(void)
 {
@@ -170,6 +170,8 @@ void ShowFichaPersonagem(void (*callback)(void))
 {
     sFicha = AllocZeroed(sizeof(*sFicha));
     sFicha->initState = 0;
+    sFicha->slot = 0;
+    sFicha->iconSpriteId = SPRITE_NONE;
     sFicha->savedCallback = callback;
     ResetSpriteData();
     ResetPaletteFade();
@@ -200,9 +202,11 @@ static void Task_FichaInit(u8 taskId)
         break;
     case 2:
         LoadPalette(GetTextWindowPalette(2), BG_PLTT_ID(15), PLTT_SIZE_4BPP);
+        LoadMonIconPalettes();
         break;
     case 3:
         FichaDesenharTudo();
+        FichaCriarIcone();
         break;
     case 4:
         PutWindowTilemap(WIN_ESQ);
@@ -226,20 +230,42 @@ static void Task_FichaInit(u8 taskId)
     sFicha->initState++;
 }
 
+static void FichaTrocarSlot(s8 delta)
+{
+    u8 n = CalculatePlayerPartyCount();
+
+    if (n < 2)
+        return;
+    sFicha->slot = (sFicha->slot + n + delta) % n;
+    PlaySE(SE_SELECT);
+    FichaDesenharTudo();
+    FichaCriarIcone();
+    CopyWindowToVram(WIN_ESQ, COPYWIN_FULL);
+    CopyWindowToVram(WIN_DIR, COPYWIN_FULL);
+}
+
 static void Task_FichaInput(u8 taskId)
 {
     void (*callback)(void);
 
-    if (gTasks[taskId].data[0] == 0 && JOY_NEW(A_BUTTON | B_BUTTON))
+    if (gTasks[taskId].data[0] == 0)
     {
-        PlaySE(SE_SELECT);
-        BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
-        gTasks[taskId].data[0] = 1;
+        if (JOY_NEW(DPAD_LEFT))
+            FichaTrocarSlot(-1);
+        else if (JOY_NEW(DPAD_RIGHT))
+            FichaTrocarSlot(+1);
+        else if (JOY_NEW(A_BUTTON | B_BUTTON))
+        {
+            PlaySE(SE_SELECT);
+            BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
+            gTasks[taskId].data[0] = 1;
+        }
     }
     if (gTasks[taskId].data[0] == 1 && !gPaletteFade.active)
     {
         callback = sFicha->savedCallback;
         DestroyTask(taskId);
+        FreeMonIconPalettes();
         FreeAllWindowBuffers();
         FREE_AND_SET_NULL(sFicha);
         SetMainCallback2(callback);
@@ -273,6 +299,27 @@ static void FichaInitScreen(void)
     ShowBg(BG_FICHA_DIR);
     FillBgTilemapBufferRect_Palette0(BG_FICHA_ESQ, 0, 0, 0, 32, 32);
     FillBgTilemapBufferRect_Palette0(BG_FICHA_DIR, 0, 0, 0, 32, 32);
+}
+
+// ---------- ícone do POKéMON (retrato da ficha) ----------
+
+static void FichaCriarIcone(void)
+{
+    struct Pokemon *mon = &gPlayerParty[sFicha->slot];
+    u16 especie;
+
+    if (sFicha->iconSpriteId != SPRITE_NONE)
+    {
+        DestroyMonIcon(&gSprites[sFicha->iconSpriteId]);
+        sFicha->iconSpriteId = SPRITE_NONE;
+    }
+    if (CalculatePlayerPartyCount() == 0)
+        return;
+    especie = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
+    if (especie == SPECIES_NONE)
+        return;
+    sFicha->iconSpriteId = CreateMonIcon(especie, SpriteCB_MonIcon, ICONE_X, ICONE_Y, 0,
+                                         GetMonData(mon, MON_DATA_PERSONALITY), TRUE);
 }
 
 // ---------- primitivas de desenho (sobre o pixel buffer da janela) ----------
@@ -331,7 +378,7 @@ static void FichaDesenharAnel(u16 raio, u8 cor)
     }
 }
 
-static void FichaDesenharRadar(void)
+static void FichaDesenharRadar(struct Pokemon *mon)
 {
     u16 stats[6] = { 0, 0, 0, 0, 0, 0 };
     u16 raios[6];
@@ -341,17 +388,17 @@ static void FichaDesenharRadar(void)
     u32 k;
     bool8 temMon = FALSE;
 
-    if (CalculatePlayerPartyCount() != 0
-     && GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG) != SPECIES_EGG
-     && GetMonData(&gPlayerParty[0], MON_DATA_SPECIES) != SPECIES_NONE)
+    if (mon != NULL
+     && GetMonData(mon, MON_DATA_SPECIES_OR_EGG) != SPECIES_EGG
+     && GetMonData(mon, MON_DATA_SPECIES) != SPECIES_NONE)
     {
         temMon = TRUE;
-        stats[0] = GetMonData(&gPlayerParty[0], MON_DATA_ATK);    // PODER
-        stats[1] = GetMonData(&gPlayerParty[0], MON_DATA_SPATK);  // TÉCNICA
-        stats[2] = GetMonData(&gPlayerParty[0], MON_DATA_SPEED);  // VELOCIDADE
-        stats[3] = GetMonData(&gPlayerParty[0], MON_DATA_DEF);    // CONTROLE
-        stats[4] = GetMonData(&gPlayerParty[0], MON_DATA_MAX_HP); // COOPERAÇÃO
-        stats[5] = GetMonData(&gPlayerParty[0], MON_DATA_SPDEF);  // INTELIGÊNCIA
+        stats[0] = GetMonData(mon, MON_DATA_ATK);    // PODER
+        stats[1] = GetMonData(mon, MON_DATA_SPATK);  // TÉCNICA
+        stats[2] = GetMonData(mon, MON_DATA_SPEED);  // VELOCIDADE
+        stats[3] = GetMonData(mon, MON_DATA_DEF);    // CONTROLE
+        stats[4] = GetMonData(mon, MON_DATA_MAX_HP); // COOPERAÇÃO
+        stats[5] = GetMonData(mon, MON_DATA_SPDEF);  // INTELIGÊNCIA
     }
 
     // grade: 3 anéis concêntricos + raios, em cinza claro
@@ -405,7 +452,7 @@ static void FichaLegenda(void)
     for (k = 0; k < 6; k++)
     {
         u16 x = (k & 1) ? 50 : 4;
-        u16 y = 110 + (k / 2) * 12;
+        u16 y = 127 + (k / 2) * 11;
 
         FillWindowPixelRect(WIN_DIR, PIXEL_FILL(sCorAtributo[atrib[k]]), x, y + 3, 5, 5);
         AddTextPrinterParameterized3(WIN_DIR, FONT_SMALL, x + 8, y, sCores_Rotulo, TEXT_SKIP_DRAW, rotulos[k]);
@@ -414,37 +461,30 @@ static void FichaLegenda(void)
 
 // ---------- conteúdo ----------
 
-static u8 FichaContarInsignias(void)
-{
-    u8 n = 0;
-    u32 k;
+// Linhas da coluna esquerda: passo fixo de 11 px a partir de y=19 (13 linhas)
+#define LINHA_Y(n) (18 + (n) * 11)
 
-    for (k = 0; k < 8; k++)
-    {
-        if (FlagGet(FLAG_BADGE01_GET + k))
-            n++;
-    }
-    return n;
-}
-
-static void FichaCampo(u16 y, const u8 *rotulo, const u8 *valor)
+static void FichaCampo(u8 linha, const u8 *rotulo, const u8 *valor)
 {
-    AddTextPrinterParameterized3(WIN_ESQ, FONT_NORMAL, 6, y, sCores_Rotulo, TEXT_SKIP_DRAW, rotulo);
+    AddTextPrinterParameterized3(WIN_ESQ, FONT_SMALL, 4, LINHA_Y(linha), sCores_Rotulo, TEXT_SKIP_DRAW, rotulo);
     if (valor != NULL)
-        AddTextPrinterParameterized3(WIN_ESQ, FONT_NORMAL, 12 + GetStringWidth(FONT_NORMAL, rotulo, 0), y, sCores_Valor, TEXT_SKIP_DRAW, valor);
+        AddTextPrinterParameterized3(WIN_ESQ, FONT_SMALL, 10 + GetStringWidth(FONT_SMALL, rotulo, 0), LINHA_Y(linha), sCores_Valor, TEXT_SKIP_DRAW, valor);
 }
 
-static void FichaValorIndentado(u16 y, const u8 *valor)
+static void FichaValorIndentado(u8 linha, const u8 *valor)
 {
-    AddTextPrinterParameterized3(WIN_ESQ, FONT_NORMAL, 14, y, sCores_Valor, TEXT_SKIP_DRAW, valor);
+    AddTextPrinterParameterized3(WIN_ESQ, FONT_SMALL, 14, LINHA_Y(linha), sCores_Valor, TEXT_SKIP_DRAW, valor);
 }
 
 static void FichaDesenharTudo(void)
 {
     u8 buf[48];
-    u8 insignias = FichaContarInsignias();
-    u16 soma, especie;
+    u8 n = CalculatePlayerPartyCount();
+    struct Pokemon *mon = &gPlayerParty[sFicha->slot];
+    bool8 ehOvo = FALSE;
+    u16 especie = SPECIES_NONE;
     u32 width;
+    u32 k;
 
     FillWindowPixelBuffer(WIN_ESQ, PIXEL_FILL(TEXT_COLOR_WHITE));
     FillWindowPixelBuffer(WIN_DIR, PIXEL_FILL(TEXT_COLOR_WHITE));
@@ -454,64 +494,101 @@ static void FichaDesenharTudo(void)
     FillWindowPixelRect(WIN_DIR, PIXEL_FILL(TEXT_COLOR_DARK_GRAY), 0, 0, 96, 16);
     AddTextPrinterParameterized3(WIN_ESQ, FONT_NORMAL, 4, 1, sCores_Titulo, TEXT_SKIP_DRAW, sTexto_Titulo);
 
-    // INSÍGNIAS: n (na barra de título, à direita)
-    StringCopy(buf, sTexto_Insignias);
-    ConvertIntToDecimalStringN(buf + StringLength(buf), insignias, STR_CONV_MODE_LEFT_ALIGN, 1);
+    // indicador "slot/total" na barra de título
+    ConvertIntToDecimalStringN(buf, n == 0 ? 0 : sFicha->slot + 1, STR_CONV_MODE_LEFT_ALIGN, 1);
+    StringAppend(buf, sTexto_Barra);
+    ConvertIntToDecimalStringN(buf + StringLength(buf), n, STR_CONV_MODE_LEFT_ALIGN, 1);
     width = GetStringWidth(FONT_SMALL, buf, 0);
     AddTextPrinterParameterized3(WIN_DIR, FONT_SMALL, 92 - width, 3, sCores_Titulo, TEXT_SKIP_DRAW, buf);
 
-    // coluna esquerda
-    FichaCampo(19, sTexto_Nome, gSaveBlock2Ptr->playerName);
-    FichaCampo(33, sTexto_Idade, sTexto_IdadeVal);
-
-    soma = gSaveBlock2Ptr->playerTrainerId[0] + gSaveBlock2Ptr->playerTrainerId[1]
-         + gSaveBlock2Ptr->playerTrainerId[2] + gSaveBlock2Ptr->playerTrainerId[3];
-    StringCopy(buf, sTexto_Tipo);
-    StringAppend(buf, sTiposSanguineos[soma % 4]);
-    FichaCampo(47, sTexto_Sangue, buf);
-
-    FichaCampo(61, sTexto_Altura, gSaveBlock2Ptr->playerGender == MALE ? sTexto_AlturaM : sTexto_AlturaF);
-
-    FichaCampo(75, sTexto_Afiliacao, NULL);
-    if (insignias == 0)
-        FichaValorIndentado(89, sTexto_Afil0);
-    else if (insignias <= 3)
-        FichaValorIndentado(89, sTexto_Afil1);
-    else if (insignias <= 7)
-        FichaValorIndentado(89, sTexto_Afil2);
-    else
-        FichaValorIndentado(89, sTexto_Afil3);
-
-    FichaCampo(103, sTexto_Individ, NULL);
-    if (CalculatePlayerPartyCount() == 0)
+    if (n == 0)
     {
-        FichaValorIndentado(117, sTexto_Nenhuma);
+        AddTextPrinterParameterized3(WIN_ESQ, FONT_SMALL, 4, LINHA_Y(0), sCores_Rotulo, TEXT_SKIP_DRAW, sTexto_SemMon);
+        FichaDesenharRadar(NULL);
+        FichaLegenda();
+        return;
     }
-    else if (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES_OR_EGG) == SPECIES_EGG)
+
+    especie = GetMonData(mon, MON_DATA_SPECIES_OR_EGG);
+    ehOvo = (especie == SPECIES_EGG);
+
+    // NOME (espécie) e CODINOME (apelido)
+    if (ehOvo)
     {
-        FichaValorIndentado(117, sTexto_Ovo);
+        FichaCampo(0, sTexto_Nome, sTexto_Ovo);
+        FichaCampo(1, sTexto_Codinome, sTexto_Traco);
+        FichaCampo(2, sTexto_TipoRot, sTexto_Traco);
     }
     else
     {
-        especie = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES);
         GetSpeciesName(buf, especie);
-        StringAppend(buf, sTexto_Nv);
-        ConvertIntToDecimalStringN(buf + StringLength(buf), GetMonData(&gPlayerParty[0], MON_DATA_LEVEL), STR_CONV_MODE_LEFT_ALIGN, 3);
-        FichaValorIndentado(117, buf);
+        FichaCampo(0, sTexto_Nome, buf);
+        GetMonNickname(mon, buf);
+        FichaCampo(1, sTexto_Codinome, buf);
+        // TIPO (o "tipo sanguíneo" do POKéMON)
+        StringCopy(buf, gTypeNames[gSpeciesInfo[especie].types[0]]);
+        if (gSpeciesInfo[especie].types[1] != gSpeciesInfo[especie].types[0])
+        {
+            StringAppend(buf, sTexto_Barra);
+            StringAppend(buf, gTypeNames[gSpeciesInfo[especie].types[1]]);
+        }
+        FichaCampo(2, sTexto_TipoRot, buf);
     }
 
-    FichaCampo(131, sTexto_Equip, NULL);
-    if (gSaveBlock1Ptr->registeredItem != ITEM_NONE)
+    // AFILIAÇÃO = treinador original
+    GetMonData(mon, MON_DATA_OT_NAME, buf);
+    FichaCampo(3, sTexto_Afiliacao, buf);
+
+    // INDIVIDUALIDADE = habilidade
+    FichaCampo(4, sTexto_Individ, NULL);
+    if (ehOvo)
+        FichaValorIndentado(5, sTexto_Traco);
+    else
+        FichaValorIndentado(5, gAbilityNames[GetMonAbility(mon)]);
+
+    // EQUIPAMENTO = item segurado
+    FichaCampo(6, sTexto_Equip, NULL);
+    if (!ehOvo && GetMonData(mon, MON_DATA_HELD_ITEM) != ITEM_NONE)
     {
-        CopyItemName(gSaveBlock1Ptr->registeredItem, buf);
-        FichaValorIndentado(145, buf);
+        CopyItemName(GetMonData(mon, MON_DATA_HELD_ITEM), buf);
+        FichaValorIndentado(7, buf);
     }
     else
     {
-        FichaValorIndentado(145, sTexto_Nenhum);
+        FichaValorIndentado(7, ehOvo ? sTexto_Traco : sTexto_Nenhum);
     }
 
-    // coluna direita
-    FichaDesenharRadar();
+    // HABILIDADES = os 4 golpes
+    FichaCampo(8, sTexto_Habilid, NULL);
+    if (!ehOvo)
+    {
+        for (k = 0; k < MAX_MON_MOVES; k++)
+        {
+            u16 golpe = GetMonData(mon, MON_DATA_MOVE1 + k);
+            if (golpe != MOVE_NONE)
+                FichaValorIndentado(9 + k, gMoveNames[golpe]);
+        }
+    }
+    else
+    {
+        FichaValorIndentado(9, sTexto_Traco);
+    }
+
+    // coluna direita: ALTURA (da Pokédex) sob o ícone + radar + legenda
+    if (!ehOvo)
+    {
+        u16 alt = gPokedexEntries[SpeciesToNationalPokedexNum(especie)].height; // decímetros
+        StringCopy(buf, sTexto_Altura);
+        ConvertIntToDecimalStringN(buf + StringLength(buf), alt / 10, STR_CONV_MODE_LEFT_ALIGN, 3);
+        k = StringLength(buf);
+        buf[k] = CHAR_COMMA;
+        buf[k + 1] = EOS;
+        ConvertIntToDecimalStringN(buf + k + 1, alt % 10, STR_CONV_MODE_LEFT_ALIGN, 1);
+        StringAppend(buf, sTexto_Metro);
+        width = GetStringWidth(FONT_SMALL, buf, 0);
+        AddTextPrinterParameterized3(WIN_DIR, FONT_SMALL, (96 - width) / 2, 52, sCores_Rotulo, TEXT_SKIP_DRAW, buf);
+    }
+
+    FichaDesenharRadar(ehOvo ? NULL : mon);
     FichaLegenda();
 }

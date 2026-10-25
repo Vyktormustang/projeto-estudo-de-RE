@@ -45,8 +45,8 @@ PATCHES = [
 
 TEXTO_MENU = (
     'static const u8 sText_MenuFicha[] = _("FICHA");\n'
-    'static const u8 sStartMenuDesc_Ficha[] = _("Sua FICHA DE PERSONAGEM, no\\n"\n'
-    '                                           "estilo de uma ficha de RPG.");\n\n'
+    'static const u8 sStartMenuDesc_Ficha[] = _("A FICHA DE PERSONAGEM dos seus\\n"\n'
+    '                                           "POKéMON, como num RPG.");\n\n'
 )
 
 LINHA_TABELA = (
