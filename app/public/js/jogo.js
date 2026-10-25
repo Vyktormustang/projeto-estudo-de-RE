@@ -39,6 +39,15 @@ export class ModoJogo {
     });
     document.getElementById('btn-abandonar').addEventListener('click', () => this._encerrarVisual());
     document.getElementById('btn-novo-jogo')?.addEventListener('click', () => this._encerrarVisual());
+    document.getElementById('btn-revanche')?.addEventListener('click', () => {
+      this._esconderResultado();
+      this.iniciar(this.config);
+    });
+    document.getElementById('btn-revisar-fim')?.addEventListener('click', () => {
+      this._esconderResultado();
+      this.aoTerminar?.(this.chess.pgn());
+    });
+    document.getElementById('btn-fechar-resultado')?.addEventListener('click', () => this._esconderResultado());
     document.getElementById('btn-girar')?.addEventListener('click', () => {
       this.tabuleiro.setOrientacao(this.tabuleiro.orientacao === 'w' ? 'b' : 'w');
       this._pintarJogadores();
@@ -121,6 +130,7 @@ export class ModoJogo {
     this.tabuleiro.limparSelecao();
     this.tabuleiro.setas([]);
     this.tabuleiro.marcarUltimo(null, null);
+    this._esconderResultado();
     document.getElementById('config-jogo').hidden = true;
     document.getElementById('jogo-ativo').hidden = false;
     document.getElementById('acoes-tabuleiro').hidden = false;
@@ -211,6 +221,13 @@ export class ModoJogo {
   // -------------------------------------------------------------- lances
 
   _aoClicar(sq, tipo, origem) {
+    // arraste solto fora de um destino legal: desfaz a seleção
+    if (tipo === 'cancelar') {
+      this.selecionada = null;
+      this.destinos = {};
+      this.tabuleiro.limparSelecao();
+      return;
+    }
     if (!this.emAndamento || this.botPensando || this.chess.turn() !== this.humano) return;
     const peca = this.chess.get(sq);
     const origemEfetiva = tipo === 'solta' ? origem : null;
@@ -535,12 +552,30 @@ export class ModoJogo {
     this.tabuleiro.setInterativo(false);
     this.tabuleiro.setas([]);
     this._definirStatus(texto, 'fim');
+    this._mostrarResultado(texto, resultado);
     toast(texto);
     const btn = document.getElementById('btn-analisar-partida');
     btn.disabled = false;
     document.getElementById('btn-dica').disabled = true;
     document.getElementById('btn-desfazer').disabled = true;
     this._salvarPartida(resultado, texto);
+  }
+
+  _mostrarResultado(texto, resultado) {
+    const caixa = document.getElementById('resultado-jogo');
+    if (!caixa) return;
+    const eu = this.humano;
+    let titulo = 'Empate';
+    if (resultado === '1-0') titulo = eu === 'w' ? 'Você venceu!' : 'Você perdeu';
+    else if (resultado === '0-1') titulo = eu === 'b' ? 'Você venceu!' : 'Você perdeu';
+    document.getElementById('resultado-titulo').textContent = titulo;
+    document.getElementById('resultado-sub').textContent = `${texto} · ${resultado}`;
+    caixa.hidden = false;
+  }
+
+  _esconderResultado() {
+    const caixa = document.getElementById('resultado-jogo');
+    if (caixa) caixa.hidden = true;
   }
 
   async _salvarPartida(resultado, motivo) {
@@ -581,6 +616,7 @@ export class ModoJogo {
     document.getElementById('jogo-ativo').hidden = true;
     document.getElementById('acoes-tabuleiro').hidden = true;
     document.getElementById('feedback-jogar').hidden = true;
+    this._esconderResultado();
     document.getElementById('titulo-jogo').textContent = 'Nova partida';
     this.tabuleiro.setInterativo(false);
     this.tabuleiro.setas([]);

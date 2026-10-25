@@ -74,73 +74,126 @@ export class Tabuleiro {
   setInterativo(v) {
     this.interativo = Boolean(v);
     this.raiz.style.cursor = this.interativo ? 'pointer' : 'default';
-    if (!this.interativo) this.limparSelecao();
+    if (!this.interativo) {
+      this._gesto?.fantasma?.remove();
+      this._gesto = null;
+      this.raiz.classList.remove('arrastando');
+      this.limparSelecao();
+    }
   }
 
   // -------------------------------------------------------------- entrada
 
   _eventos() {
+    // 1) clique puro (teclado, teste automatizado e navegadores sem PointerEvent)
     this.raiz.addEventListener('click', (ev) => {
       if (!this.interativo) return;
-      if (this._suprimirClique) {         // o clique veio do fim de um arraste
-        this._suprimirClique = false;
-        return;
-      }
+      if (this._suprimirClique) { this._suprimirClique = false; return; }
       const sq = this._casaDoEvento(ev);
-      if (sq) this.onCasa?.(sq);
+      if (sq) this.onCasa?.(sq, 'clique');
     });
 
-    // arrastar com mouse (no toque, o clique/clique é mais previsível e não
-    // rouba a rolagem da página)
+    // 2) ponteiro (dedo, caneta e mouse): seleciona no toque e arrasta ao mover.
+    //    O clique sintético que vem depois é ignorado — o gesto já foi tratado.
     this.raiz.addEventListener('pointerdown', (ev) => {
-      if (!this.interativo || ev.pointerType === 'touch') return;
-      if (ev.button !== 0) return;
+      if (!this.interativo) return;
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
       const sq = this._casaDoEvento(ev);
       if (!sq) return;
-      this._arraste = { origem: sq, x: ev.clientX, y: ev.clientY, ativo: false, fantasma: null };
+
+      this._suprimirClique = true;
+      clearTimeout(this._timerClique);
+      this._timerClique = setTimeout(() => { this._suprimirClique = false; }, 700);
+
+      try { this.raiz.setPointerCapture?.(ev.pointerId); } catch { /* sem captura: segue */ }
+      if (ev.cancelable) ev.preventDefault();   // não rola a página ao arrastar peça
+
+      // deixa o jogo decidir: selecionar a peça ou concluir o lance da casa tocada
+      this.onCasa?.(sq, 'pegar');
+
+      const peca = this._pecaEm(sq);
+      const selecionou = peca && this.selecionada === sq && Object.keys(this.destinos || {}).length > 0;
+      this._gesto = {
+        origem: sq,
+        x: ev.clientX,
+        y: ev.clientY,
+        pointerId: ev.pointerId,
+        toque: ev.pointerType !== 'mouse',
+        arrastando: false,
+        podeArrastar: Boolean(selecionou),
+        fantasma: null,
+      };
     });
 
     this.raiz.addEventListener('pointermove', (ev) => {
-      const a = this._arraste;
-      if (!a) return;
-      const dist = Math.hypot(ev.clientX - a.x, ev.clientY - a.y);
-      if (!a.ativo && dist < 6) return;
-      if (!a.ativo) {
-        const peca = this._pecaEm(a.origem);
-        if (!peca) { this._arraste = null; return; }
-        a.ativo = true;
-        a.fantasma = document.createElement('img');
-        a.fantasma.className = 'peca-arrastando';
-        a.fantasma.src = peca.src;
-        a.fantasma.alt = '';
-        document.body.appendChild(a.fantasma);
-        this.raiz.style.cursor = 'grabbing';
+      const g = this._gesto;
+      if (!g || ev.pointerId !== g.pointerId) return;
+      const dist = Math.hypot(ev.clientX - g.x, ev.clientY - g.y);
+      if (!g.arrastando) {
+        if (!g.podeArrastar || dist < 6) return;
+        g.arrastando = true;
+        g.fantasma = this._criarFantasma(g.origem, g.toque);
+        this.raiz.classList.add('arrastando');
+        this._marcarCasa(g.origem, 'arrastando-origem', true);
       }
-      a.fantasma.style.left = `${ev.clientX}px`;
-      a.fantasma.style.top = `${ev.clientY}px`;
       if (ev.cancelable) ev.preventDefault();
+      this._moverFantasma(g.fantasma, ev.clientX, ev.clientY);
+      this._marcarCasa(this._sobre, 'sobre', false);
+      this._sobre = this._casaDoPonto(ev.clientX, ev.clientY);
+      if (this._sobre !== g.origem) this._marcarCasa(this._sobre, 'sobre', true);
     });
 
-    const soltar = (ev) => {
-      const a = this._arraste;
-      this._arraste = null;
-      this.raiz.style.cursor = this.interativo ? 'pointer' : 'default';
-      if (!a) return;
-      if (!a.ativo) return;                    // foi só um clique
-      a.fantasma?.remove();
-      this._suprimirClique = true;
-      setTimeout(() => { this._suprimirClique = false; }, 400);
+    const encerrar = (ev, cancelado) => {
+      const g = this._gesto;
+      if (!g || ev.pointerId !== g.pointerId) return;
+      this._gesto = null;
+      this.raiz.classList.remove('arrastando');
+      this._marcarCasa(g.origem, 'arrastando-origem', false);
+      this._marcarCasa(this._sobre, 'sobre', false);
+      this._sobre = null;
+      g.fantasma?.remove();
+      try { this.raiz.releasePointerCapture?.(ev.pointerId); } catch { /* ok */ }
+      if (!g.arrastando || cancelado) return;
+
       const destino = this._casaDoPonto(ev.clientX, ev.clientY);
-      if (destino && destino !== a.origem && this._destinoValido(destino)) {
-        this.onCasa?.(destino, 'solta', a.origem);
+      if (destino && destino !== g.origem && this._destinoValido(destino)) {
+        this.onCasa?.(destino, 'solta', g.origem);
+      } else if (destino !== g.origem) {
+        // soltou fora de um destino legal: desmarca (como no chess.com)
+        this.onCasa?.(g.origem, 'cancelar');
       }
     };
-    this.raiz.addEventListener('pointerup', soltar);
-    this.raiz.addEventListener('pointercancel', () => {
-      this._arraste?.fantasma?.remove();
-      this._arraste = null;
-      this.raiz.style.cursor = this.interativo ? 'pointer' : 'default';
-    });
+    this.raiz.addEventListener('pointerup', (ev) => encerrar(ev, false));
+    this.raiz.addEventListener('pointercancel', (ev) => encerrar(ev, true));
+  }
+
+  /** Cópia flutuante da peça que segue o dedo/cursor. */
+  _criarFantasma(sq, toque) {
+    const peca = this._pecaEm(sq);
+    if (!peca) return null;
+    const img = document.createElement('img');
+    img.className = `peca-arrastando${toque ? ' toque' : ''}`;
+    img.src = peca.getAttribute('src');
+    img.alt = '';
+    img.setAttribute('aria-hidden', 'true');
+    const r = this.raiz.getBoundingClientRect?.();
+    const lado = r && r.width ? r.width / 8 : 44;
+    img.style.width = `${lado}px`;
+    img.style.height = `${lado}px`;
+    document.body.appendChild(img);
+    return img;
+  }
+
+  _moverFantasma(img, x, y) {
+    if (!img) return;
+    img.style.left = `${x}px`;
+    img.style.top = `${y}px`;
+  }
+
+  _marcarCasa(sq, classe, ativo) {
+    if (!sq) return;
+    const casa = this.raiz.querySelector(`.casa[data-sq="${sq}"]`);
+    if (casa) casa.classList.toggle(classe, Boolean(ativo));
   }
 
   _pecaEm(sq) {

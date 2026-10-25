@@ -17,19 +17,19 @@
 
   <header class="topo">
     <div class="marca">
-      <span class="marca-icone">♞</span>
+      <span class="marca-icone" aria-hidden="true"><img src="pecas/wn.svg" alt=""></span>
       <span class="marca-nome">Xadrez Studio</span>
     </div>
 
     <nav class="abas" role="tablist" aria-label="Seções">
       <button class="aba ativa" data-aba="jogar" role="tab" aria-selected="true">
-        <span class="aba-icone">♟</span><span class="aba-texto">Jogar</span>
+        <span class="aba-icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.2a3.1 3.1 0 0 1 1.7 5.7c.9.7 1.4 1.8 1.4 2.9 0 1.1-.5 2.1-1.3 2.8l1.2 4.2H9l1.2-4.2a3.8 3.8 0 0 1-1.3-2.8c0-1.1.5-2.2 1.4-2.9A3.1 3.1 0 0 1 12 3.2Z"/><rect x="6.4" y="19" width="11.2" height="1.9" rx=".9"/></svg></span><span class="aba-texto">Jogar</span>
       </button>
       <button class="aba" data-aba="analisar" role="tab" aria-selected="false">
-        <span class="aba-icone">⌕</span><span class="aba-texto">Analisar</span>
+        <span class="aba-icone" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="12.5" width="3.4" height="7.5" rx="1"/><rect x="10.3" y="8" width="3.4" height="12" rx="1"/><rect x="16.6" y="4" width="3.4" height="16" rx="1"/></svg></span><span class="aba-texto">Analisar</span>
       </button>
       <button class="aba" data-aba="biblioteca" role="tab" aria-selected="false">
-        <span class="aba-icone">▤</span><span class="aba-texto">Biblioteca</span>
+        <span class="aba-icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4.6h9.6a2.8 2.8 0 0 1 2.8 2.8v12H7.8A2.8 2.8 0 0 1 5 16.6V4.6Z"/><path d="M17.4 7.4H19v12h-8.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span><span class="aba-texto">Biblioteca</span>
       </button>
     </nav>
 
@@ -62,6 +62,17 @@
               <div class="tabuleiro" id="tab-jogar" role="grid" aria-label="Tabuleiro"></div>
               <svg class="setas" id="setas-jogar" viewBox="0 0 8 8" preserveAspectRatio="none" aria-hidden="true"></svg>
               <div class="promocao" id="promo-jogar" hidden></div>
+              <div class="resultado" id="resultado-jogo" hidden>
+                <div class="resultado-card">
+                  <div class="resultado-titulo" id="resultado-titulo">Fim de jogo</div>
+                  <div class="resultado-sub" id="resultado-sub"></div>
+                  <div class="resultado-acoes">
+                    <button class="btn-verde" id="btn-revanche">Revanche</button>
+                    <button class="btn-cinza" id="btn-revisar-fim">Analisar</button>
+                  </div>
+                  <button class="link-fechar" id="btn-fechar-resultado">ver o tabuleiro</button>
+                </div>
+              </div>
             </div>
 
             <div class="jogador-linha" id="jogador-base" data-lado="w">
@@ -74,10 +85,10 @@
             </div>
 
             <div class="acoes-tabuleiro" id="acoes-tabuleiro" hidden>
-              <button class="btn-icone" id="btn-girar" title="Girar o tabuleiro" aria-label="Girar o tabuleiro">⇅</button>
-              <button class="btn-icone" id="btn-desfazer" title="Desfazer lance">↶</button>
-              <button class="btn-icone" id="btn-dica" title="Dica: melhor lance">💡</button>
-              <button class="btn-icone" id="btn-desistir" title="Desistir">🏳</button>
+              <button class="btn-icone" id="btn-girar" title="Girar o tabuleiro" aria-label="Girar o tabuleiro"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 9l3.2-3.2M4 9l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 15H4m16 0-3.2-3.2M20 15l-3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="btn-icone" id="btn-desfazer" title="Desfazer lance" aria-label="Desfazer lance"><svg viewBox="0 0 24 24"><path d="M9 6.5 4 11.5l5 5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 11.5h9.5a5 5 0 0 1 0 10H9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="btn-icone" id="btn-dica" title="Dica: melhor lance" aria-label="Dica"><svg viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-3.6 10.8V16h7.2v-2.2A6 6 0 0 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.6 18.4h4.8M10.6 21h2.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+              <button class="btn-icone" id="btn-desistir" title="Desistir" aria-label="Desistir"><svg viewBox="0 0 24 24"><path d="M6.5 21V3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><path d="M6.5 4.4h10.9l-2.1 3.3 2.1 3.3H6.5Z" fill="currentColor"/></svg></button>
               <span class="selo" id="selo-status">—</span>
             </div>
           </div>
@@ -149,7 +160,7 @@
           </div>
 
           <div class="rodape-painel">
-            <span>v1.1</span>
+            <span>v1.2</span>
             <span>Stockfish 19 · GPL-3.0</span>
           </div>
         </aside>
@@ -182,12 +193,12 @@
             </div>
 
             <div class="navegacao">
-              <button class="btn-icone" id="nav-inicio" title="Início">⏮</button>
-              <button class="btn-icone" id="nav-voltar" title="Lance anterior">◀</button>
+              <button class="btn-icone" id="nav-inicio" title="Início" aria-label="Início"><svg viewBox="0 0 24 24"><path d="M7 5v14M20 5.5 10 12l10 6.5V5.5Z" fill="currentColor"/></svg></button>
+              <button class="btn-icone" id="nav-voltar" title="Lance anterior" aria-label="Lance anterior"><svg viewBox="0 0 24 24"><path d="M16.5 5.5 6.5 12l10 6.5V5.5Z" fill="currentColor"/></svg></button>
               <span class="lance-atual" id="lance-atual">posição inicial</span>
-              <button class="btn-icone" id="nav-avancar" title="Próximo lance">▶</button>
-              <button class="btn-icone" id="nav-fim" title="Fim">⏭</button>
-              <button class="btn-icone" id="nav-girar" title="Girar tabuleiro">⇅</button>
+              <button class="btn-icone" id="nav-avancar" title="Próximo lance" aria-label="Próximo lance"><svg viewBox="0 0 24 24"><path d="M7.5 5.5 17.5 12l-10 6.5V5.5Z" fill="currentColor"/></svg></button>
+              <button class="btn-icone" id="nav-fim" title="Fim" aria-label="Fim"><svg viewBox="0 0 24 24"><path d="M17 5v14M4 5.5 14 12 4 18.5V5.5Z" fill="currentColor"/></svg></button>
+              <button class="btn-icone" id="nav-girar" title="Girar tabuleiro" aria-label="Girar tabuleiro"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 9l3.2-3.2M4 9l3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 15H4m16 0-3.2-3.2M20 15l-3.2 3.2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             </div>
 
             <svg class="grafico" id="grafico-analise" viewBox="0 0 100 40" preserveAspectRatio="none" aria-label="Gráfico de avaliação"></svg>

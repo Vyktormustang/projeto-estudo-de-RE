@@ -281,6 +281,8 @@ await teste('overlay de promoção escondido não cobre o tabuleiro', async () =
   assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important/, 'regra global [hidden] presente');
   assert.ok(!/\.promocao\s*\{[^}]*display:\s*flex/.test(css), 'display do overlay é guardado por :not([hidden])');
   assert.ok(/\.promocao:not\(\[hidden\]\)/.test(css), 'overlay só aparece quando visível');
+  assert.ok(/\.resultado:not\(\[hidden\]\)/.test(css), 'cartão de fim de jogo também é guardado');
+  assert.ok(!/\.resultado\s*\{[^}]*display:/.test(css), 'cartão não define display fora do :not([hidden])');
 });
 
 await teste('todo id usado pelo JS existe no HTML', async () => {
@@ -293,6 +295,88 @@ await teste('todo id usado pelo JS existe no HTML', async () => {
     }
   }
   assert.deepEqual(faltando, []);
+});
+
+console.log('\n▶ Arrastar peças (ponteiro)');
+
+// jsdom não tem PointerEvent: um MouseEvent com pointerId/pointerType resolve
+const ponteiro = (tipo, x, y, pointerType = 'touch') => {
+  const ev = new window.MouseEvent(tipo, {
+    clientX: x, clientY: y, bubbles: true, cancelable: true,
+  });
+  Object.defineProperty(ev, 'pointerId', { value: 7 });
+  Object.defineProperty(ev, 'pointerType', { value: pointerType });
+  return ev;
+};
+const tabuleiroDeTeste = () => {
+  clicar('.aba[data-aba="jogar"]');
+  clicar('#btn-comecar');
+  const raiz = $('#tab-jogar');
+  raiz.getBoundingClientRect = () => ({ left: 0, top: 0, width: 800, height: 800, right: 800, bottom: 800 });
+  return raiz;
+};
+const casa = (sq) => $(`#tab-jogar .casa[data-sq="${sq}"]`);
+
+await teste('arrastar com o dedo e soltar na casa legal faz o lance', async () => {
+  const raiz = tabuleiroDeTeste();
+  casa('d2').dispatchEvent(ponteiro('pointerdown', 350, 650));
+  assert.ok(casa('d2').classList.contains('selecionada'), 'peça selecionada no toque');
+
+  casa('d2').dispatchEvent(ponteiro('pointermove', 350, 460));
+  assert.ok($('.peca-arrastando'), 'peça flutuante acompanhando o dedo');
+  assert.ok(casa('d2').classList.contains('arrastando-origem'), 'origem esvaziada durante o arraste');
+
+  raiz.dispatchEvent(ponteiro('pointerup', 350, 450));
+  await esperar(() => window.xadrez.jogo.chess.history().includes('d4'), { descricao: 'lance d4' });
+  assert.equal(window.xadrez.jogo.chess.history()[0], 'd4');
+  assert.equal($('.peca-arrastando'), null, 'fantasma removido ao soltar');
+  assert.ok(!casa('d2').classList.contains('arrastando-origem'), 'realce do arraste limpo');
+});
+
+await teste('arrastar e soltar fora de destino legal desmarca a peça', async () => {
+  const raiz = tabuleiroDeTeste();
+  casa('c2').dispatchEvent(ponteiro('pointerdown', 250, 650));
+  casa('c2').dispatchEvent(ponteiro('pointermove', 250, 350));
+  raiz.dispatchEvent(ponteiro('pointerup', 250, 350));
+  assert.ok(!casa('c2').classList.contains('selecionada'), 'peça desmarcada');
+  assert.equal($('.peca-arrastando'), null, 'fantasma removido');
+  assert.deepEqual(window.xadrez.jogo.chess.history(), [], 'nenhum lance executado');
+});
+
+await teste('toque curto seleciona, segundo toque joga (tap-tap segue funcionando)', async () => {
+  const raiz = tabuleiroDeTeste();
+  casa('e2').dispatchEvent(ponteiro('pointerdown', 450, 650));
+  raiz.dispatchEvent(ponteiro('pointerup', 450, 650));
+  assert.ok(casa('e2').classList.contains('selecionada'), 'toque curto mantém a seleção');
+
+  casa('e4').dispatchEvent(ponteiro('pointerdown', 450, 450));
+  raiz.dispatchEvent(ponteiro('pointerup', 450, 450));
+  await esperar(() => window.xadrez.jogo.chess.history().includes('e4'), { descricao: 'lance e4 por toque' });
+  assert.equal(window.xadrez.jogo.chess.history()[0], 'e4');
+});
+
+await teste('arrastar também funciona com o mouse', async () => {
+  const raiz = tabuleiroDeTeste();
+  casa('g1').dispatchEvent(ponteiro('pointerdown', 650, 750, 'mouse'));
+  casa('g1').dispatchEvent(ponteiro('pointermove', 550, 550, 'mouse'));   // f3
+  raiz.dispatchEvent(ponteiro('pointerup', 550, 550, 'mouse'));
+  await esperar(() => window.xadrez.jogo.chess.history().includes('Nf3'), { descricao: 'lance Nf3' });
+});
+
+console.log('\n▶ Fim de jogo');
+
+await teste('desistir abre o cartão de resultado e a revanche reinicia', async () => {
+  clicar('.aba[data-aba="jogar"]');
+  clicar('#btn-comecar');
+  clicar('#btn-desistir');
+  assert.equal($('#resultado-jogo').hidden, false, 'cartão visível');
+  assert.match($('#resultado-titulo').textContent, /perdeu/i);
+  assert.equal(window.xadrez.jogo.emAndamento, false);
+
+  clicar('#btn-revanche');
+  assert.equal($('#resultado-jogo').hidden, true, 'cartão escondido na revanche');
+  assert.equal(window.xadrez.jogo.emAndamento, true, 'nova partida em andamento');
+  assert.equal($$('#tab-jogar .peca').length, 32, 'tabuleiro reiniciado');
 });
 
 console.log('\n▶ Biblioteca');
