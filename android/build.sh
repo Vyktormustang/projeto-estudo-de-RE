@@ -119,6 +119,8 @@ fi
 log "alinhando (zipalign) e assinando (apksigner)"
 "$BT/zipalign" -p -f 4 "$CONSTRUCAO/nao-alinhado.apk" "$CONSTRUCAO/alinhado.apk"
 
+# A chave de assinatura é o que garante "instalar por cima". No CI ela vive no
+# cache do Actions; aqui ela é gerada se não existir.
 KS="$ANDROID/keystore/xadrez.keystore"
 if [ ! -f "$KS" ]; then
   log "gerando keystore de assinatura (guarde este arquivo: sem ele não há atualização)"

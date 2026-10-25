@@ -73,7 +73,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: android/keystore
-          key: apk-keystore-v1
+          key: apk-keystore-v2
           # sem isso cada build geraria uma chave nova e o Android recusaria
           # instalar por cima da versão anterior
 
