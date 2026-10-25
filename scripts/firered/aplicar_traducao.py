@@ -80,6 +80,12 @@ def aplicar_mapas(clone: Path, charmap: set[str], escrever: bool) -> int:
         incs = sorted((clone / "data/maps").glob("*/text.inc")) + sorted(
             p for p in (clone / "data/text").glob("*.inc")
             if p.name not in ("new_game_intro.inc", "save.inc", "braille.inc"))
+        # Onda 7+: textos que vivem FORA de data/maps e data/text —
+        # enfermeira do Centro POKéMON (event_scripts.s), Cable Club,
+        # golpes de campo, repel. test.inc é debug e fica de fora.
+        incs += [clone / "data/event_scripts.s"] + sorted(
+            p for p in (clone / "data/scripts").glob("*.inc")
+            if p.name != "test.inc")
         for inc in incs:
             texto = inc.read_text(encoding="utf-8")
             mudou = False
