@@ -36,6 +36,21 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 Para conferir no aparelho (ou no PC, com `apksigner`):
 `apksigner verify --print-certs xadrez-studio-1.6.apk`.
 
+## O que mudou na 1.7 (peças desenhadas aqui)
+
+* **Conjunto de peças próprio**, no espírito do *Neo* do chess.com: silhueta cheia com contorno
+  grosso, sem gradiente, peças claras brancas com linha escura e escuras com linha mais escura.
+  Antes era o conjunto *cburnett* (CC BY-SA 3.0, de terceiros); agora **nenhum arquivo de terceiros**
+  entra no app, e some a obrigação de atribuição/licença compartilhada nas peças.
+* Tudo é gerado por `tools/gerar-pecas.mjs`, versionado: cada peça é montada com formas simples
+  (círculo, elipse, retângulo, path) desenhadas duas vezes — passe de contorno grosso e passe de
+  preenchimento em ordem inversa — para a silhueta sair inteira, sem costura entre as partes.
+  `node tools/gerar-pecas.mjs --previa` gera uma folha de contato para conferir o desenho.
+* Legibilidade conferida em 42 px de casa (celular pequeno): peão, torre, bispo, cavalo, dama e rei
+  se distinguem por silhueta, não por detalhe fino.
+* `ui.smoke.mjs` agora com **34 verificações**, incluindo uma que valida os 12 SVGs (viewBox 45×45,
+  XML bem formado, sem crédito de terceiros).
+
 ## O que mudou na 1.6 (arrastar a peça com o dedo, de verdade)
 
 * **Causa raiz do arraste que não funcionava no celular**: `.casa` tinha `touch-action: manipulation`.
@@ -126,7 +141,7 @@ Além da correção:
 * interface refeita com referência no chess.com: topo escuro, abas, barra de avaliação
   ao lado do tabuleiro, linhas de jogador com avatar e relógio, barra de ações
   (girar/desfazer/dica/desistir) e navegação inferior no celular;
-* peças em **SVG** (conjunto cburnett, CC BY-SA 3.0 — ver `app/public/pecas/LEIA-ME.txt`)
+* peças em **SVG** (desenho próprio, gerado por `tools/gerar-pecas.mjs` — ver `app/public/pecas/LEIA-ME.txt`)
   no lugar dos glifos Unicode;
 * caminhos relativos (`styles.css`, `js/main.js`, `pecas/`), então o app abre mesmo se o
   servidor local cair para `file://`;

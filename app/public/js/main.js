@@ -7,7 +7,7 @@ import { Biblioteca } from './biblioteca.js';
 import { toast } from './util.js';
 import { salvarJogo, modoArmazenamento } from './armazenamento.js';
 
-export const VERSAO = '1.6';
+export const VERSAO = '1.7';
 
 const abas = document.querySelectorAll('.aba');
 const views = {

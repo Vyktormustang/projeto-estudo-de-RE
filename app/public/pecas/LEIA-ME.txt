@@ -1,17 +1,24 @@
-Peças de xadrez — conjunto "cburnett" (standard)
+Peças de xadrez — conjunto próprio do Xadrez Studio
 
-Autor: Colin M.L. Burnett (usuário Cburnett, Wikimedia Commons)
-Origem: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces/Standard
-Licença: Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
-         https://creativecommons.org/licenses/by-sa/3.0/
+Autor: desenho feito para este projeto (não é cópia de conjunto de terceiros).
+Gerador: tools/gerar-pecas.mjs (na raiz do repositório).
 
-Os arquivos desta pasta foram extraídos do sprite "standard.svg" do projeto
-cm-chessboard (MIT, https://github.com/shaack/cm-chessboard) por
-tools/extrair-pecas.mjs; nenhuma alteração além de recorte (viewBox) e remoção
-de metadados do editor.
+Estilo: silhueta cheia com contorno grosso, sem gradiente — inspirado no espírito
+do conjunto "Neo" do chess.com, mas desenhado do zero: nenhum path, arquivo ou
+traço foi copiado de lá nem de qualquer outro conjunto.
 
-O código do Xadrez Studio é próprio; este conjunto de imagens mantém a licença
-acima e o crédito ao autor.
+Como são geradas: cada peça é montada com formas simples (círculo, elipse,
+retângulo, path) desenhadas duas vezes — um passe de contorno grosso e um passe
+de preenchimento em ordem inversa — para a silhueta sair inteira, sem costura
+entre as partes. Para mudar o desenho, edite o gerador e rode:
 
-Rasterização/uso comercial das imagens: respeitar a CC BY-SA 3.0 (atribuição e
-compartilhamento sob a mesma licença para as imagens derivadas).
+    node tools/gerar-pecas.mjs            # regrava os 12 SVGs
+    node tools/gerar-pecas.mjs --previa   # e mostra uma prévia em /tmp
+
+Licença: por serem desenho original deste projeto, seguem a licença do app —
+sem obrigação de atribuição a terceiros. O ícone/crédito de conjuntos antigos
+(cburnett, CC BY-SA 3.0) não se aplica mais a estes arquivos; eles foram
+substituídos.
+
+Os nomes seguem a convenção usada pelo código: w/b + k q r b n p
+(rei, dama, torre, bispo, cavalo, peão).

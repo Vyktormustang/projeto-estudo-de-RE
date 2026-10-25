@@ -24,8 +24,8 @@ celular) — desenho e código próprios, sem copiar assets de lá.
 monitor grande ele cresce até 980 px, em notebook baixo ele encolhe para caber sem rolagem, e no
 celular vai de ponta a ponta (a barra de avaliação vira uma faixa de 5 px sobre a borda esquerda).
 O painel lateral tem altura da janela e rola por dentro; `100dvh` é usado onde existe para a barra
-de endereço do celular não cortar o tabuleiro. As peças são o conjunto
-*standard*/cburnett do Wikimedia Commons (CC BY-SA 3.0, crédito em `public/pecas/LEIA-ME.txt`).
+de endereço do celular não cortar o tabuleiro. As **peças são desenho próprio** — silhueta cheia
+com contorno grosso, geradas por `tools/gerar-pecas.mjs` (nota em `public/pecas/LEIA-ME.txt`).
 
 ---
 
@@ -118,7 +118,7 @@ app/
 ├── public/
 │   ├── index.html          as três telas
 │   ├── styles.css          tema escuro estilo chess.com, responsivo
-│   ├── pecas/              12 peças SVG (cburnett, CC BY-SA 3.0) + licença
+│   ├── pecas/              12 peças SVG (desenho próprio) + LEIA-ME
 │   └── js/
 │       ├── main.js         abas, estado do motor, ponte entre modos
 │       ├── jogo.js         partida contra o bot (relógio, dicas, undo, feedback)
@@ -170,5 +170,5 @@ contra o HTML.
 ## Licença
 
 Código próprio: MIT. Dependências mantêm suas licenças — Stockfish é **GPL-3.0** (usado como
-programa separado, via Web Worker), chess.js é BSD-2-Clause e as peças (cburnett/Wikimedia) são
-**CC BY-SA 3.0**, com crédito em `public/pecas/LEIA-ME.txt`.
+programa separado, via Web Worker), chess.js é BSD-2-Clause e as peças são **desenho próprio**
+(sem licença de terceiros), com a nota em `public/pecas/LEIA-ME.txt`.

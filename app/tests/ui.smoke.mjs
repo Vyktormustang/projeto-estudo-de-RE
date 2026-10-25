@@ -185,6 +185,23 @@ const PGN = `[Event "Teste de interface"]
 
 1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0`;
 
+await teste('as 12 peças são SVG próprios, válidos e sem crédito de terceiros', async () => {
+  const dir = new URL('../public/pecas/', import.meta.url);
+  const tipos = ['k', 'q', 'r', 'b', 'n', 'p'];
+  for (const cor of ['w', 'b']) {
+    for (const tipo of tipos) {
+      const arquivo = new URL(`${cor}${tipo}.svg`, dir);
+      const texto = fs.readFileSync(arquivo, 'utf8');
+      assert.match(texto, /<svg[^>]+viewBox="0 0 45 45"/, `${cor}${tipo}: viewBox 45x45`);
+      assert.match(texto, /<path|<circle|<ellipse|<rect/, `${cor}${tipo}: tem formas`);
+      assert.ok(!/cburnett|wikimedia|creativecommons/i.test(texto), `${cor}${tipo}: sem crédito de terceiros`);
+      // o navegador desenha o arquivo inteiro: precisa ser XML bem formado
+      const doc = new JSDOM(texto, { contentType: 'image/svg+xml' }).window.document;
+      assert.ok(doc.querySelector('svg'), `${cor}${tipo}: XML válido`);
+    }
+  }
+});
+
 await teste('o tabuleiro é dimensionado pela janela (layout chess.com)', async () => {
   const css = fs.readFileSync(new URL('../public/styles.css', import.meta.url), 'utf8');
   assert.match(css, /--cromo-jogar:\s*\d+px/, 'orçamento de altura no modo Jogar');
