@@ -7,9 +7,9 @@ regras, análise e biblioteca ficam dentro do aparelho.
 
 1. Baixe `xadrez-studio-1.0.apk` na release:
    **https://github.com/Vyktormustang/projeto-estudo-de-RE/releases/tag/apk-v1.0**
-2. Confira o arquivo (opcional, mas recomendado):
-   `xadrez-studio-1.0.apk.sha256` → `7d51866a6c52a91bded5e51c8ef28c4da22ae74777b138b34ee6616474eed3f5`
-   *(muda a cada build; o hash publicado na release é a referência)*
+2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.0.apk.sha256` e compare —
+   `sha256sum xadrez-studio-1.0.apk`. O hash muda a cada build; o valor válido é sempre o
+   que está anexado na própria release (e no topo das notas dela).
 3. No aparelho, abra o arquivo baixado e permita **"instalar de fontes desconhecidas"**
    para o navegador/gerenciador de arquivos.
 4. Requisitos: **Android 8.0 (API 26)** ou superior, com **WebView atualizado**
@@ -82,13 +82,16 @@ O log de cada build fica em `build/apk-info.txt` e vai como artifact:
 
 ```
 APK: xadrez-studio-1.0.apk (1.3M, 1269 KB)
-sha256: 7d51866a...
+sha256: <hash do build>
 SDK: build-tools 37.0.0 · android-36 · minSdk 26 alvo 34
 entradas no APK: 27
 badging: package='br.com.xadrezstudio' versionName='1.0' label='Xadrez Studio'
          launchable-activity: br.com.xadrezstudio.MainActivity
-assinatura: V3.0 Signer · CN=Xadrez Studio · SHA-256 18e3d2b6...
+assinatura: V3.0 Signer · CN=Xadrez Studio · SHA-256 <certificado>
 ```
+
+O **certificado** (não o hash do APK) é o que precisa ficar estável entre builds — é ele
+que permite instalar por cima. Ele fica no cache do Actions, chave `apk-keystore-v1`.
 
 E o workflow falha o build se faltar `classes.dex`, `assets/www/index.html` ou o
 `.wasm` do Stockfish.
