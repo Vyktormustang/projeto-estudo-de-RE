@@ -15,9 +15,16 @@ regras, análise e biblioteca ficam dentro do aparelho.
 4. Requisitos: **Android 8.0 (API 26)** ou superior, com **WebView atualizado**
    (o motor é WebAssembly e os módulos são ES6).
 
-O app é assinado com chave própria (não vem da Play Store). Se você instalar uma
-versão nova por cima, o Android aceita porque a chave é a mesma; se a chave mudar,
-é preciso desinstalar antes.
+O app é assinado com chave própria (não vem da Play Store). O certificado atual —
+que é o que permite instalar uma versão nova por cima, sem desinstalar — é:
+
+```
+CN=Xadrez Studio, OU=Uso pessoal, O=Xadrez Studio, L=Belem, ST=Para, C=BR
+SHA-256: 89E0:FAD2:17BB:41C9:B730:E2C7:6668:0B66:C2CB:BD21:D3A4:5BCC:6B30:09CF:4D0F:234A
+```
+
+Para conferir no aparelho (ou no PC, com `apksigner`):
+`apksigner verify --print-certs xadrez-studio-1.0.apk`.
 
 ## O que funciona sem internet
 
