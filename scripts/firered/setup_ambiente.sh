@@ -336,6 +336,8 @@ python3 "$RAIZ/scripts/firered/apply_t8_varredura.py" --pokefirered "$PF" \
 python3 "$RAIZ/scripts/firered/aplicar_traducao.py" --pokefirered "$PF" --write \
   >/tmp/setup_trad.log 2>&1 || { tail -20 /tmp/setup_trad.log; exit 1; }
 grep -E 'ERRO' /tmp/setup_trad.log && { echo "tradução com ERROs acima"; exit 1; }
+python3 "$RAIZ/scripts/firered/aplicar_ficha.py" --pokefirered "$PF" --write \
+  >/tmp/setup_ficha.log 2>&1 || { tail -10 /tmp/setup_ficha.log; exit 1; }
 ( cd "$PF" && make -j2 MODERN=1 CC1_DAEMONS=2 >/tmp/setup_rebuild.log 2>&1 ) \
   || { tail -10 /tmp/setup_rebuild.log; exit 1; }
 ok "ROM PT-BR: $(md5sum "$PF/pokefirered_modern.gba" | cut -d' ' -f1)"

@@ -12,16 +12,16 @@ as 9 gerações (1025 espécies). Todo o resto do jogo foi preservado.
 > Fame Checker, Sistema de AJUDA e nomes de área), está em:
 >
 > - **Link público (Google Drive):**
->   <https://drive.google.com/file/d/1E9GL7EyE5Uz1KKHdS84qXuiYQwrVoAHV/view>
+>   <https://drive.google.com/file/d/1R0A1slLvh4OchEkJ7NHtbIqIrxkgeWZB/view>
 > - Download direto:
->   `https://drive.google.com/uc?id=1E9GL7EyE5Uz1KKHdS84qXuiYQwrVoAHV&export=download`
+>   `https://drive.google.com/uc?id=1R0A1slLvh4OchEkJ7NHtbIqIrxkgeWZB&export=download`
 >
 > | campo | valor |
 > |---|---|
 > | arquivo | `pokefirered_gen1-9_ptbr.gba` — 16 777 216 bytes |
-> | md5 | `d6fae99247f87570a054a0ae5ec092df` |
-> | sha256 | `e96d1a53d55e26a9e87cb2ff6bf31bd00f8c0aceb41b8e3c2a8e855c0fee1e25` |
-> | sha1 | `1647b619a2f36ce8cbef623e41d77805ed1ba951` |
+> | md5 | `6971baf2ecfd89beca050f44961addbf` |
+> | sha256 | `ae5f1dff3d6ae72354b76c39ffebdcf27b78f9f5054a6705ae77173fd48b00d9` |
+> | sha1 | `c71db48ff735af2eab73d8dd0501c69c979deefc` |
 >
 > Nomes de **espécies, golpes, itens e habilidades ficam em inglês**
 > (decisão de projeto); todo o resto é PT-BR. Detalhes e provas:
