@@ -1,0 +1,17 @@
+Peças de xadrez — conjunto "cburnett" (standard)
+
+Autor: Colin M.L. Burnett (usuário Cburnett, Wikimedia Commons)
+Origem: https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces/Standard
+Licença: Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
+         https://creativecommons.org/licenses/by-sa/3.0/
+
+Os arquivos desta pasta foram extraídos do sprite "standard.svg" do projeto
+cm-chessboard (MIT, https://github.com/shaack/cm-chessboard) por
+tools/extrair-pecas.mjs; nenhuma alteração além de recorte (viewBox) e remoção
+de metadados do editor.
+
+O código do Xadrez Studio é próprio; este conjunto de imagens mantém a licença
+acima e o crédito ao autor.
+
+Rasterização/uso comercial das imagens: respeitar a CC BY-SA 3.0 (atribuição e
+compartilhamento sob a mesma licença para as imagens derivadas).

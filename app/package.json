@@ -1,0 +1,26 @@
+{
+  "name": "xadrez-studio",
+  "version": "1.0.0",
+  "description": "App pessoal de xadrez: jogar contra bots, analisar partidas e explicar lances (offline, no navegador)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "node tests/review.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chess.js": "1.4.0",
+    "stockfish": "19.0.1"
+  },
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "jsdom": "^30.1.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

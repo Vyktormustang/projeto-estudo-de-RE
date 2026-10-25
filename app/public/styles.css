@@ -1,0 +1,787 @@
+/* Xadrez Studio — folha de estilo única.
+   Referência visual: chess.com (layout, cores e proporções). O código e os
+   desenhos são próprios, exceto as peças (cburnett, CC BY-SA 3.0).
+
+   Regra de ouro deste arquivo: qualquer regra de `display` que possa competir
+   com o atributo `hidden` precisa ser escrita como `:not([hidden])` — foi um
+   overlay de promoção invisível (mas presente) que travava os cliques no
+   tabuleiro na primeira versão. */
+
+:root {
+  --fundo: #312e2b;
+  --fundo-topo: #262421;
+  --fundo-painel: #262421;
+  --fundo-cartao: #2f2c29;
+  --fundo-controle: #3c3a37;
+  --fundo-controle-hover: #4a4844;
+  --borda: #403d39;
+  --texto: #ffffff;
+  --texto-fraco: #b3b0ac;
+  --texto-apagado: #8b8987;
+  --verde: #81b64c;
+  --verde-hover: #a3d160;
+  --verde-escuro: #5d8a34;
+  --azul: #4a90d9;
+  --vermelho: #e0403c;
+  --amarelo: #f7c631;
+  --claro: #ebecd0;
+  --escuro: #739552;
+  --raio: 8px;
+
+  /* layout: o tabuleiro manda no tamanho (como no chess.com) */
+  --altura-topo: 56px;
+  --painel-largura: 384px;
+  --vao: 16px;
+  --barra-aval: 14px;
+  --vao-barra: 8px;
+  /* quanto da altura da tela é ocupado por topo, jogadores e barra de ações,
+     por aba; o resto vira tabuleiro (ver .palco/.tabuleiro-area) */
+  --cromo-jogar: 180px;
+  --cromo-analisar: 276px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
+
+/* `hidden` sempre vence: sem isso, `.promocao { display: flex }` cobre o
+   tabuleiro inteiro mesmo com o atributo hidden. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 15px/1.45 "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3 { margin: 0 0 .5rem; line-height: 1.2; }
+h2 { font-size: 1.2rem; }
+h3 {
+  font-size: .78rem; color: var(--texto-apagado); text-transform: uppercase;
+  letter-spacing: .07em; margin: 1.1rem 0 .45rem;
+}
+code { background: var(--fundo-controle); padding: .1rem .35rem; border-radius: 4px; font-size: .85em; }
+
+.aviso-navegador {
+  padding: 1rem; background: var(--vermelho); color: #fff; font-weight: 600; text-align: center;
+}
+
+/* ------------------------------------------------------------------ topo */
+
+.topo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 56px;
+  padding: 0 16px;
+  background: var(--fundo-topo);
+  border-bottom: 1px solid #1c1b19;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.marca { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.marca-icone {
+  width: 31px; height: 31px; border-radius: 7px;
+  background: var(--verde); color: #fff;
+  display: grid; place-items: center;
+  overflow: hidden;
+}
+.marca-icone img {
+  width: 84%; height: 84%; object-fit: contain;
+  /* deixa o cavalo branco, como no logo do chess.com */
+  filter: brightness(0) invert(1);
+}
+.marca-nome { font-weight: 800; letter-spacing: .01em; font-size: 1rem; }
+
+.abas { display: flex; align-items: stretch; gap: 2px; height: 100%; margin-left: 8px; }
+.aba {
+  display: flex; align-items: center; gap: 6px;
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--texto-fraco);
+  padding: 0 14px;
+  font: inherit; font-weight: 600; font-size: .92rem;
+  border-bottom: 3px solid transparent;
+  transition: color .12s, background .12s;
+}
+.aba:hover { color: var(--texto); background: rgba(255, 255, 255, .04); }
+.aba.ativa { color: var(--texto); border-bottom-color: var(--verde); }
+.aba-icone { display: inline-flex; }
+.aba-icone svg { width: 17px; height: 17px; fill: currentColor; }
+
+.status-motor {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 7px;
+  font-size: .78rem; color: var(--texto-apagado);
+  border: 1px solid var(--borda); border-radius: 4px;
+  padding: 5px 9px; white-space: nowrap;
+}
+.ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--amarelo); flex: 0 0 auto; }
+.status-motor.ok .ponto { background: var(--verde); }
+.status-motor.erro .ponto { background: var(--vermelho); }
+
+/* ---------------------------------------------------------------- layout */
+
+main { padding: 8px 12px; }
+
+/* cada aba sabe quanto da altura não é tabuleiro */
+#view-jogar { --cromo-tabuleiro: var(--cromo-jogar); }
+#view-analisar { --cromo-tabuleiro: var(--cromo-analisar); }
+
+.palco {
+  /* o lado do tabuleiro vem da altura da janela; o grupo todo fica centralizado */
+  --lado-tabuleiro: calc(100vh - var(--cromo-tabuleiro, var(--cromo-jogar)));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--painel-largura);
+  gap: var(--vao);
+  align-items: start;
+  width: min(100%, calc(var(--lado-tabuleiro) + var(--painel-largura) + var(--vao)));
+  margin: 0 auto;
+}
+@supports (height: 100dvh) {
+  /* dvh acompanha a barra de endereço do celular sem cortar o tabuleiro */
+  .palco {
+    --lado-tabuleiro: calc(100dvh - var(--cromo-tabuleiro, var(--cromo-jogar)));
+  }
+}
+
+.coluna-tabuleiro { min-width: 0; }
+
+/* área do tabuleiro: barra de avaliação na coluna 1, linha do meio */
+.tabuleiro-area {
+  display: grid;
+  grid-template-columns: var(--barra-aval) minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto;
+  column-gap: var(--vao-barra);
+  row-gap: 4px;
+  /* o tabuleiro manda no tamanho: em telas baixas ele encolhe para caber */
+  width: min(100%, var(--lado-tabuleiro, 100%));
+  margin: 0 auto;
+}
+
+.barra-aval {
+  grid-column: 1;
+  grid-row: 2;
+  position: relative;
+  width: var(--barra-aval);
+  border-radius: 3px;
+  background: #262421;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px #1c1b19;
+}
+.barra-aval .preenchimento {
+  position: absolute; bottom: 0; left: 0; width: 100%;
+  background: #f4f4f4;
+  transition: height .3s ease;
+}
+
+.jogador-linha {
+  grid-column: 2;
+  display: flex; align-items: center; gap: 9px;
+  min-width: 0;
+}
+#jogador-topo, #jogador-topo-analise { grid-row: 1; }
+#jogador-base, #jogador-base-analise { grid-row: 3; }
+
+.avatar {
+  width: 30px; height: 30px; border-radius: 5px; flex: 0 0 auto;
+  background: var(--fundo-controle);
+  display: grid; place-items: center;
+  font-size: 19px; color: #ddd;
+  overflow: hidden;
+}
+.avatar img { width: 88%; height: 88%; object-fit: contain; }
+.dados { display: flex; align-items: baseline; gap: 7px; min-width: 0; }
+.dados b {
+  font-size: .95rem; font-weight: 700; color: var(--texto);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dados .rating { font-size: .8rem; color: var(--texto-apagado); white-space: nowrap; }
+
+.relogio {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700; font-size: 1.18rem; letter-spacing: .01em;
+  background: var(--fundo-controle); color: #d7d4d1;
+  border-radius: 4px; padding: 4px 12px; min-width: 88px; text-align: center;
+  transition: background .15s, color .15s;
+}
+.jogador-linha.ativo .relogio { background: #f4f4f4; color: #262421; }
+
+/* ------------------------------------------------------------- tabuleiro */
+
+.tabuleiro-wrap {
+  grid-column: 2;
+  grid-row: 2;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(0, 0, 0, .28);
+  touch-action: none;          /* arrastar peça não deve rolar a página */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tabuleiro {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+.casa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--claro);
+  /* `none`, não `manipulation`: com manipulation o navegador assume o arraste
+     como rolagem e manda pointercancel no meio do gesto — era o que impedia
+     arrastar a peça com o dedo no celular. A rolagem da página continua
+     funcionando fora do tabuleiro. */
+  touch-action: none;
+}
+.casa.escura { background-color: var(--escuro); }
+
+/* coordenadas: colunas no rodapé da fileira 1, linhas na lateral da coluna a */
+.casa.coord::before,
+.casa.coord-linha::after {
+  position: absolute;
+  font-size: clamp(10px, 1.5vmin, 16px); font-weight: 700;
+  line-height: 1;
+  color: var(--escuro);
+  pointer-events: none;
+  z-index: 3;
+}
+.casa.coord::before { content: attr(data-file); right: 4px; bottom: 3px; }
+.casa.coord-linha::after { content: attr(data-rank); left: 4px; top: 3px; }
+.casa.escura.coord::before,
+.casa.escura.coord-linha::after { color: var(--claro); }
+
+/* realces por cima da cor da casa (sem pseudo-elemento: sobram para a
+   coordenada e para o marcador de destino) */
+.casa.ultimo-lance {
+  background-image: linear-gradient(rgba(247, 247, 105, .45), rgba(247, 247, 105, .45));
+}
+.casa.selecionada {
+  background-image: linear-gradient(rgba(247, 247, 105, .62), rgba(247, 247, 105, .62));
+}
+.casa.em-xeque {
+  background-image: radial-gradient(circle, rgba(255, 0, 0, .75) 12%, rgba(231, 60, 60, .55) 45%, rgba(231, 60, 60, 0) 72%);
+}
+.casa.origem-dica { box-shadow: inset 0 0 0 3px rgba(129, 182, 76, .95); }
+
+.peca {
+  width: 96%;
+  height: 96%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .22));   /* como o relevo das peças do chess.com */
+  pointer-events: none;   /* o clique é resolvido na casa */
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 1;
+}
+.casa.selecionada .peca { transform: scale(1.06); }
+.casa.destino .alvo {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 30%; height: 30%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, .16);
+  pointer-events: none;
+  z-index: 2;
+}
+.casa.destino.captura .alvo {
+  width: 92%; height: 92%;
+  background: transparent;
+  border: 6px solid rgba(0, 0, 0, .16);
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+/* selo de classificação do lance, sobre a peça que se moveu (game review) */
+.casa .marca-classe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46%;
+  height: 46%;
+  min-width: 15px;
+  min-height: 15px;
+  z-index: 4;                 /* acima da peça (1) e do marcador de destino (2) */
+  pointer-events: none;       /* o toque continua sendo resolvido pela casa */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .45));
+  transform-origin: 18% 18%;
+  animation: selo-entra .16s ease-out;
+}
+@keyframes selo-entra {
+  from { transform: scale(.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .casa .marca-classe { animation: none; }
+}
+
+/* peça flutuante durante o arraste */
+.peca-arrastando {
+  position: fixed;
+  pointer-events: none;
+  z-index: 90;
+  opacity: .95;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45));
+}
+.peca-arrastando.toque { transform: translate(-50%, calc(-50% - 28px)); }
+.peca-arrastando { transition: none; }
+
+/* durante o arraste: origem esvaziada e casa sob o dedo realçada */
+.casa.arrastando-origem .peca { opacity: .12; }
+.casa.sobre { box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .55); }
+.peca { cursor: grab; }
+.arrastando .peca { cursor: grabbing; }
+
+.setas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.promocao:not([hidden]) {
+  position: absolute; inset: 0;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px;
+  padding: 6px;
+  background: rgba(38, 36, 33, .82);
+  z-index: 20;
+}
+.promocao button {
+  width: 54px; height: 54px; padding: 0;
+  background: #f4f4f4; border: 0; border-radius: 6px;
+  display: grid; place-items: center;
+  cursor: pointer;
+}
+.promocao button img { width: 84%; height: 84%; }
+.promocao button:hover { background: #fff; }
+.promocao button.cancelar { width: 44px; height: 44px; font-size: 1.2rem; color: #262421; }
+
+/* cartão de fim de jogo (como o do chess.com) */
+.resultado:not([hidden]) {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  background: rgba(24, 22, 20, .62);
+  z-index: 30;
+  padding: 12px;
+}
+.resultado-card {
+  background: var(--fundo-painel);
+  border-radius: 10px;
+  padding: 18px 18px 12px;
+  width: min(300px, 100%);
+  display: grid; gap: 10px;
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .5);
+}
+.resultado-titulo { font-size: 1.2rem; font-weight: 800; }
+.resultado-sub { font-size: .84rem; color: var(--texto-fraco); line-height: 1.4; }
+.resultado-acoes { display: grid; gap: 8px; margin-top: 2px; }
+.resultado-acoes .btn-verde, .resultado-acoes .btn-cinza { width: 100%; }
+.link-fechar {
+  background: none; border: 0; color: var(--texto-apagado);
+  font-size: .78rem; text-decoration: underline; padding: 4px;
+}
+.link-fechar:hover { color: var(--texto); }
+
+/* barra de ações embaixo do tabuleiro */
+.acoes-tabuleiro {
+  grid-column: 2;
+  grid-row: 4;
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 2px;
+}
+.acoes-tabuleiro .selo { margin-left: auto; }
+
+/* ---------------------------------------------------------------- botões */
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+
+.btn-verde, .btn-cinza, .btn-icone, .botao-arquivo, .chips button, .promocao button {
+  border: 0;
+  border-radius: 5px;
+  transition: background .12s, color .12s, transform .06s;
+}
+
+.btn-verde {
+  background: var(--verde); color: #fff; font-weight: 700;
+  padding: 11px 18px; font-size: .95rem;
+  box-shadow: 0 3px 0 var(--verde-escuro);
+}
+.btn-verde:hover:not(:disabled) { background: var(--verde-hover); }
+.btn-verde:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--verde-escuro); }
+
+.btn-cinza {
+  background: var(--fundo-controle); color: var(--texto-fraco);
+  padding: 9px 14px; font-size: .88rem; font-weight: 600;
+  box-shadow: 0 2px 0 #211f1d;
+}
+.btn-cinza:hover:not(:disabled) { background: var(--fundo-controle-hover); color: var(--texto); }
+.btn-pequeno { padding: 6px 11px; font-size: .8rem; }
+.btn-largo { width: 100%; display: block; margin-top: .6rem; }
+
+.btn-icone {
+  width: 34px; height: 34px; padding: 0;
+  display: grid; place-items: center;
+  background: var(--fundo-controle); color: var(--texto-fraco);
+  box-shadow: 0 2px 0 #211f1d;
+}
+.btn-icone svg { width: 18px; height: 18px; fill: currentColor; }
+.btn-icone:hover:not(:disabled) { background: var(--fundo-controle-hover); color: var(--texto); }
+
+.selo {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  padding: 6px 10px; border-radius: 4px;
+  background: var(--fundo-controle); color: var(--texto-fraco);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.selo.sua-vez { background: rgba(129, 182, 76, .18); color: #a8d46f; }
+.selo.pensando { background: rgba(247, 198, 49, .15); color: var(--amarelo); }
+.selo.fim { background: rgba(224, 64, 60, .18); color: #ff8b88; }
+
+/* ----------------------------------------------------------------- painel */
+
+@supports (height: 100dvh) {
+  .painel { max-height: calc(100dvh - 84px); }
+}
+
+.painel {
+  background: var(--fundo-painel);
+  border-radius: var(--raio);
+  padding: 12px 14px 10px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  max-height: calc(100vh - 84px);
+  overflow-y: auto;
+  position: sticky;
+  top: calc(var(--altura-topo) + 12px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+}
+.painel-topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--borda);
+}
+.painel-titulo {
+  font-weight: 800; font-size: 1rem;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rodape-painel {
+  display: flex; justify-content: space-between; gap: 8px;
+  border-top: 1px solid var(--borda); padding-top: 8px;
+  font-size: .72rem; color: var(--texto-apagado);
+}
+
+.campo { display: grid; gap: 6px; }
+.rotulo { font-size: .85rem; color: var(--texto-fraco); display: flex; justify-content: space-between; }
+.rotulo b { color: var(--texto); font-variant-numeric: tabular-nums; }
+
+input[type="range"] { width: 100%; accent-color: var(--verde); height: 24px; }
+input[type="text"], textarea, select {
+  width: 100%;
+  background: var(--fundo-cartao);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  border-radius: 5px;
+  padding: 10px 11px;
+  font: inherit; font-size: .88rem;
+}
+input[type="text"]::placeholder, textarea::placeholder { color: #6f6d6a; }
+textarea { resize: vertical; font-size: .82rem; line-height: 1.45; }
+select { appearance: none; -webkit-appearance: none; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--verde); outline-offset: -1px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chips button {
+  background: var(--fundo-controle); color: var(--texto-fraco);
+  padding: 8px 12px; font-size: .82rem; font-weight: 600;
+}
+.chips button:hover { background: var(--fundo-controle-hover); color: var(--texto); }
+.chips button.ativo { background: rgba(129, 182, 76, .2); color: #b6e07a; box-shadow: inset 0 0 0 1px rgba(129, 182, 76, .6); }
+
+.toggles { display: grid; gap: 8px; }
+.toggle { display: flex; align-items: center; gap: 9px; font-size: .86rem; color: var(--texto-fraco); cursor: pointer; }
+.toggle input { accent-color: var(--verde); width: 17px; height: 17px; flex: 0 0 auto; }
+.toggle.pequeno { font-size: .8rem; }
+
+.dica { font-size: .78rem; color: var(--texto-apagado); margin: .35rem 0 0; line-height: 1.4; }
+.dica-inline { font-size: .72rem; color: var(--texto-apagado); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* ------------------------------------------------------------ jogo ativo */
+
+.status-jogo {
+  font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em;
+  color: #b6e07a; background: rgba(129, 182, 76, .12);
+  border-radius: 5px; padding: 7px 10px;
+}
+
+.lista-lances {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: 2.3rem 1fr 1fr;
+  gap: 0 2px;
+  align-content: start;
+  max-height: 240px;
+  overflow-y: auto;
+  font-size: .88rem;
+  background: var(--fundo-cartao);
+  border-radius: 5px;
+  padding: 4px 6px;
+}
+.lista-lances li { display: contents; }
+.lista-lances .num {
+  color: var(--texto-apagado); font-variant-numeric: tabular-nums; font-size: .8rem;
+  padding: 4px 0;
+}
+.lista-lances .lance {
+  background: transparent; border: 0; border-radius: 4px;
+  text-align: left; padding: 4px 6px; color: var(--texto);
+  font: inherit; font-weight: 600;
+  display: flex; align-items: center; gap: 5px; width: 100%;
+  cursor: pointer;
+}
+.lista-lances li:nth-child(even) .lance { background: rgba(255, 255, 255, .035); }
+.lista-lances .lance:hover { background: rgba(255, 255, 255, .09); }
+.lista-lances .lance.atual { background: #4a4744; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); }
+.lista-lances .lance .classe {
+  font-size: .6rem; font-weight: 800; padding: 0 4px; border-radius: 3px;
+  color: #1b1b1b; line-height: 1.6;
+}
+
+.feedback {
+  border-left: 3px solid var(--verde);
+  background: var(--fundo-cartao);
+  padding: 9px 11px; border-radius: 0 5px 5px 0;
+  font-size: .85rem; display: grid; gap: 3px;
+}
+.feedback.ruim { border-left-color: var(--vermelho); }
+.feedback b { display: block; }
+
+.detalhes { border-top: 1px solid var(--borda); padding-top: 8px; }
+.detalhes summary { cursor: pointer; font-size: .8rem; color: var(--texto-apagado); }
+
+/* ------------------------------------------------------------ navegação */
+
+.navegacao {
+  grid-column: 2; grid-row: 4;
+  display: flex; align-items: center; gap: 5px;
+}
+.navegacao .lance-atual {
+  flex: 1; text-align: center; font-size: .84rem; color: var(--texto-fraco);
+  font-variant-numeric: tabular-nums;
+  background: var(--fundo-cartao); border-radius: 5px; padding: 9px 6px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.grafico {
+  grid-column: 1 / -1;
+  width: 100%; height: 84px;
+  background: var(--fundo-cartao);
+  border-radius: 5px;
+  margin-top: 4px;
+}
+
+/* -------------------------------------------------------------- análise */
+
+.importar { display: grid; gap: 8px; }
+.linha { display: flex; gap: 6px; align-items: center; }
+.linha > input, .linha > select { flex: 1; min-width: 0; }
+.linha > button { flex: 0 0 auto; }
+.linha > label { flex: 0 0 auto; }
+
+.botao-arquivo {
+  display: inline-block; text-align: center; cursor: pointer;
+  background: var(--fundo-controle); color: var(--texto-fraco);
+  padding: 9px 14px; font-size: .88rem; font-weight: 600;
+  box-shadow: 0 2px 0 #211f1d;
+}
+.botao-arquivo:hover { background: var(--fundo-controle-hover); color: var(--texto); }
+
+.progresso:not([hidden]) { display: grid; gap: 5px; }
+.barra { height: 7px; background: var(--fundo-controle); border-radius: 99px; overflow: hidden; }
+.barra .preenchimento { height: 100%; width: 0; background: var(--verde); transition: width .2s; }
+.progresso span { font-size: .78rem; color: var(--texto-apagado); }
+
+.lista-importados:not([hidden]) { display: grid; gap: 5px; max-height: 220px; overflow-y: auto; }
+.lista-importados button { text-align: left; font-size: .82rem; }
+
+.precisao { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.cartao-acc {
+  background: var(--fundo-cartao); border-radius: 6px;
+  padding: 10px 12px; display: grid; gap: 2px;
+}
+.cartao-acc .rotulo { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--texto-apagado); }
+.cartao-acc b { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+
+.classes { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.classes .chip-classe {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--fundo-cartao); border-radius: 4px;
+  padding: 4px 8px; font-size: .76rem; color: var(--texto-fraco);
+}
+.classes .chip-classe i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.classes .chip-classe b { color: var(--texto); }
+
+.resumo {
+  font-size: .86rem; color: var(--texto-fraco);
+  background: var(--fundo-cartao); border-radius: 6px; padding: 10px 12px; margin: 10px 0 0;
+}
+
+.explicacao {
+  background: var(--fundo-cartao);
+  border-radius: 6px;
+  padding: 11px 13px;
+  display: grid; gap: 7px;
+  margin-top: 10px;
+}
+.explicacao h4 { margin: 0; font-size: .95rem; display: flex; align-items: center; gap: 7px; }
+.explicacao .texto { font-size: .88rem; margin: 0; }
+.explicacao ul { margin: 0; padding-left: 18px; font-size: .82rem; color: var(--texto-fraco); }
+.explicacao .linhas-motor { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .76rem; color: var(--texto-apagado); }
+.explicacao .linhas-motor div { display: flex; gap: 7px; }
+.explicacao .linhas-motor b { color: var(--texto); min-width: 54px; }
+.badge-classe {
+  font-size: .66rem; font-weight: 800; padding: 2px 6px; border-radius: 3px;
+  color: #1b1b1b; text-transform: uppercase; letter-spacing: .04em;
+}
+
+/* ------------------------------------------------------------ biblioteca */
+
+.biblioteca { display: grid; gap: 12px; max-width: 1060px; margin: 0 auto; }
+.barra-biblioteca { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.grade-jogos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.cartao-jogo {
+  background: var(--fundo-painel); border-radius: var(--raio);
+  padding: 12px 14px; display: grid; gap: 7px;
+}
+.cartao-jogo h3 { margin: 0; text-transform: none; letter-spacing: 0; font-size: .98rem; color: var(--texto); }
+.cartao-jogo .meta { font-size: .78rem; color: var(--texto-apagado); }
+.cartao-jogo .acoes { display: flex; gap: 6px; }
+.cartao-jogo .acoes button { padding: 6px 10px; font-size: .8rem; }
+
+.vazio { color: var(--texto-apagado); font-size: .88rem; padding: 8px 0; }
+
+/* ---------------------------------------------------------------- toasts */
+
+.toasts { position: fixed; bottom: 12px; right: 12px; display: grid; gap: 8px; z-index: 100; max-width: calc(100vw - 24px); }
+.toast {
+  background: var(--fundo-controle); border-left: 3px solid var(--verde);
+  border-radius: 5px; padding: 10px 14px; font-size: .85rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
+  animation: entrar .16s ease-out;
+  max-width: 340px;
+}
+.toast.erro { border-left-color: var(--vermelho); }
+@keyframes entrar { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ============================================================== celular */
+
+@media (min-width: 901px) and (max-width: 1280px) {
+  .palco { --painel-largura: 336px; }
+}
+
+@media (max-width: 900px) {
+  .topo { height: 48px; padding: 0 12px; gap: 8px; }
+  .marca-nome { font-size: .95rem; }
+  .marca-icone { width: 26px; height: 26px; font-size: 17px; }
+  .status-motor { font-size: 0; gap: 0; padding: 6px; border-radius: 50%; }
+  .status-motor .ponto { width: 10px; height: 10px; }
+  .status-motor .texto { display: none; }
+
+  /* navegação principal vira barra inferior, como no app do chess.com */
+  .abas {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    height: 56px; margin: 0; gap: 0;
+    background: var(--fundo-topo);
+    border-top: 1px solid #1c1b19;
+    z-index: 60;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .aba {
+    flex: 1; flex-direction: column; justify-content: center; gap: 1px;
+    padding: 0; font-size: .68rem; font-weight: 600;
+    border-bottom: 0; color: var(--texto-apagado);
+  }
+  .aba.ativa { color: var(--verde); background: transparent; }
+  .aba-icone svg { width: 22px; height: 22px; }
+
+  /* tabuleiro de ponta a ponta, como no app do chess.com */
+  .palco {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    --lado-tabuleiro: min(100vw, calc(100vh - var(--cromo-tabuleiro, var(--cromo-jogar))));
+  }
+  main { padding: 0 0 calc(58px + env(safe-area-inset-bottom, 0)); }
+
+  .tabuleiro-area {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    row-gap: 4px;
+    width: min(100%, var(--lado-tabuleiro, 100%));
+    margin: 0 auto;
+  }
+  /* barra de avaliação fina por cima da borda esquerda do tabuleiro */
+  .barra-aval {
+    grid-column: 1; grid-row: 2;
+    justify-self: start;
+    width: 5px;
+    border-radius: 0 3px 3px 0;
+    box-shadow: none;
+    opacity: .95;
+    z-index: 6;
+  }
+  .jogador-linha, .acoes-tabuleiro, .navegacao { grid-column: 1; padding: 0 10px; }
+  .avatar { width: 28px; height: 28px; font-size: 16px; }
+  .dados b { font-size: .9rem; }
+  .dados .rating { font-size: .72rem; }
+  .relogio { font-size: 1rem; min-width: 72px; padding: 3px 9px; }
+  /* o tabuleiro ocupa a única coluna (sem coluna implícita para a barra) */
+  .tabuleiro-wrap {
+    grid-column: 1;
+    grid-row: 2;
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .acoes-tabuleiro .btn-icone { width: 36px; height: 36px; }
+  .selo { font-size: .64rem; padding: 5px 7px; }
+  .grafico { height: 66px; margin: 4px 10px 0; width: auto; }
+
+  .painel { max-height: none; border-radius: 6px; position: static; margin: 0 8px; }
+  .lista-lances { max-height: 200px; }
+}
+
+@media (max-width: 900px) {
+  .toasts { bottom: 68px; }
+}
+
+@supports (height: 100dvh) {
+  @media (max-width: 900px) {
+    .palco {
+      --lado-tabuleiro: min(100vw, calc(100dvh - var(--cromo-tabuleiro, var(--cromo-jogar))));
+    }
+  }
+}
+
+/* deitado sobra pouca altura: o tabuleiro é limitado pela janela e o resto rola */
+@media (max-width: 900px) and (orientation: landscape) {
+  #view-jogar { --cromo-tabuleiro: 150px; }
+  #view-analisar { --cromo-tabuleiro: 210px; }
+  .tabuleiro-area { width: min(100%, var(--lado-tabuleiro, 100%)); margin: 0 auto; }
+}

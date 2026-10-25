@@ -1,0 +1,143 @@
+name: APK
+
+# Compila o APK do Xadrez Studio no runner do GitHub (o ambiente de
+# desenvolvimento não tem JDK/Android SDK).
+#
+# Saídas:
+#   - dist/xadrez-studio-<versão>.apk + .sha256 (efêmero: o runner descarta)
+#   - artifact "log-do-build" (só logs/tabela de verificação, 7 dias)
+#   - comentário na PR #5 com o resumo do build (ou o erro, se falhar)
+#
+# O binário NÃO fica no GitHub: o arquivo final vai para o Google Drive
+# (ver android/README.md). Nada de Release nem artifact com APK.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main", "arena/**"]
+    paths:
+      - "android/**"
+      - "app/public/**"
+      - "app/package.json"
+      - ".github/workflows/apk.yml"
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  build:
+    name: Compilar APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Ambiente Android
+        run: |
+          mkdir -p build
+          {
+            echo "ANDROID_HOME=${ANDROID_HOME:-}"
+            for d in "${ANDROID_HOME:-}" /usr/local/lib/android/sdk; do
+              if [ -n "$d" ] && [ -d "$d" ]; then
+                echo "--- $d"
+                echo "build-tools: $(ls "$d/build-tools" 2>/dev/null | tr '\n' ' ')"
+                echo "platforms:   $(ls "$d/platforms" 2>/dev/null | tr '\n' ' ')"
+              fi
+            done
+          } 2>&1 | tee build/ambiente.log
+
+      - name: Testes do app web
+        working-directory: app
+        run: |
+          set -o pipefail
+          {
+            npm install --omit=dev
+            npm install --no-save jsdom
+            echo "=== review (motor real) ==="; node tests/review.test.mjs
+            echo "=== armazenamento (APK) ==="; node tests/armazenamento.test.mjs
+            echo "=== interface (jsdom) ==="; node tests/ui.smoke.mjs
+          } 2>&1 | tee ../build/testes.log
+
+      - name: Cache da chave de assinatura
+        uses: actions/cache@v4
+        with:
+          path: android/keystore
+          key: apk-keystore-v2
+          # sem isso cada build geraria uma chave nova e o Android recusaria
+          # instalar por cima da versão anterior
+
+      - name: Compilar APK
+        run: |
+          set -o pipefail
+          chmod +x android/build.sh
+          ./android/build.sh 2>&1 | tee build/build.log
+
+      - name: Conferir o APK
+        run: |
+          set -o pipefail
+          APK="$(ls dist/xadrez-studio-*.apk | head -1)"
+          echo "APK: $APK"
+          unzip -l "$APK" | grep -q "classes.dex"
+          unzip -l "$APK" | grep -q "assets/www/index.html"
+          unzip -l "$APK" | grep -q "stockfish-19-lite-single.wasm"
+          echo "conteúdo essencial presente"
+
+      # Só log: o APK não é armazenado no GitHub (o arquivo final fica no Drive).
+      - name: Publicar logs do build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-do-build
+          path: |
+            build/*.log
+            build/apk-info.txt
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Comentar na PR
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULTADO: ${{ job.status }}
+          REPO: ${{ github.repository }}
+        run: |
+          {
+            echo "### Build do APK: **${RESULTADO}**"
+            echo
+            if [ -f build/apk-info.txt ]; then
+              echo '```'
+              cat build/apk-info.txt
+              echo '```'
+            fi
+            echo
+            echo "O APK **não fica no GitHub**: o arquivo final está no Google Drive"
+            echo "(link em `android/README.md`). Este job só compila e verifica."
+            if [ "${RESULTADO}" != "success" ]; then
+              echo
+              echo "<details><summary>Últimas linhas do log</summary>"
+              echo
+              echo '```'
+              tail -60 build/build.log 2>/dev/null || tail -60 build/testes.log 2>/dev/null || echo "sem log"
+              echo '```'
+              echo "</details>"
+            fi
+          } > build/comentario.md
+          gh pr comment 5 --repo "${{ github.repository }}" --body-file build/comentario.md \
+            || gh issue create --repo "${{ github.repository }}" \
+                 --title "Log do build do APK ($(date +%Y-%m-%dT%H:%M))" \
+                 --body-file build/comentario.md \
+            || true
