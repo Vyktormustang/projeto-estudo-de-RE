@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Xadrez Studio — jogar, analisar e entender</title>
+  <meta name="description" content="App pessoal de xadrez: bots com nível ajustável, análise de partidas e explicação de cada lance em português.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="importmap">
+    { "imports": { "chess.js": "/vendor/chess.js" } }
+  </script>
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">
+      <span class="marca-icone">♞</span>
+      <span>Xadrez Studio</span>
+      <span class="sub">jogar · analisar · entender</span>
+    </div>
+    <nav class="abas" role="tablist" aria-label="Seções">
+      <button class="aba ativa" data-aba="jogar" role="tab" aria-selected="true">Jogar</button>
+      <button class="aba" data-aba="analisar" role="tab" aria-selected="false">Analisar</button>
+      <button class="aba" data-aba="biblioteca" role="tab" aria-selected="false">Biblioteca</button>
+    </nav>
+    <div class="status-motor" id="status-motor" title="Estado do Stockfish (roda no seu navegador)">
+      <span class="ponto"></span><span class="texto">motor: iniciando…</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============================================================ JOGAR -->
+    <section class="view" id="view-jogar">
+      <div class="palco">
+        <div class="area-tabuleiro">
+          <div class="barra-aval" id="aval-jogar" aria-hidden="true">
+            <div class="preenchimento" style="height:50%"></div>
+          </div>
+          <div class="tabuleiro-wrap">
+            <div class="tabuleiro" id="tab-jogar" role="grid" aria-label="Tabuleiro"></div>
+            <svg class="setas" id="setas-jogar" viewBox="0 0 8 8" preserveAspectRatio="none"></svg>
+            <div class="promocao" id="promo-jogar" hidden></div>
+          </div>
+          <div class="placar" id="placar-jogar">
+            <div class="jogador" data-lado="b">
+              <span class="nome" id="nome-b">Pretas</span>
+              <span class="relogio" id="relogio-b">—</span>
+            </div>
+            <div class="jogador" data-lado="w">
+              <span class="nome" id="nome-w">Brancas</span>
+              <span class="relogio" id="relogio-w">—</span>
+            </div>
+          </div>
+        </div>
+
+        <aside class="painel">
+          <!-- configuração -->
+          <div id="config-jogo">
+            <h2>Novo jogo</h2>
+            <label class="campo">
+              <span class="rotulo">Nível do bot <b id="nivel-texto">1 200</b></span>
+              <input type="range" id="nivel" min="250" max="3200" step="50" value="1200">
+              <span class="dica" id="nivel-desc"></span>
+            </label>
+            <div class="chips" id="presets-nivel">
+              <button data-nivel="400">Iniciante 400</button>
+              <button data-nivel="800">Casual 800</button>
+              <button data-nivel="1200" class="ativo">Intermediário 1200</button>
+              <button data-nivel="1600">Clube 1600</button>
+              <button data-nivel="2000">Avançado 2000</button>
+              <button data-nivel="2500">Mestre 2500</button>
+              <button data-nivel="3000">Motor 3000</button>
+            </div>
+
+            <h3>Cor</h3>
+            <div class="chips" id="cor-jogo">
+              <button data-cor="w" class="ativo">Brancas</button>
+              <button data-cor="b">Pretas</button>
+              <button data-cor="r">Aleatório</button>
+            </div>
+
+            <h3>Tempo</h3>
+            <div class="chips" id="tempo-jogo">
+              <button data-tempo="0" class="ativo">Sem relógio</button>
+              <button data-tempo="180+2">3+2</button>
+              <button data-tempo="300+3">5+3</button>
+              <button data-tempo="600+0">10+0</button>
+              <button data-tempo="900+10">15+10</button>
+            </div>
+
+            <h3>Assistências</h3>
+            <div class="toggles">
+              <label class="toggle"><input type="checkbox" id="ass-aval" checked><span>Barra de avaliação</span></label>
+              <label class="toggle"><input type="checkbox" id="ass-dica" checked><span>Dicas (seta do melhor lance)</span></label>
+              <label class="toggle"><input type="checkbox" id="ass-desfazer" checked><span>Desfazer lance</span></label>
+              <label class="toggle"><input type="checkbox" id="ass-feedback" checked><span>Feedback a cada lance</span></label>
+            </div>
+
+            <button class="principal" id="btn-comecar">Começar partida</button>
+            <p class="dica">Partidas contra o bot não valem rating: são para treinar. O motor roda no seu navegador.</p>
+          </div>
+
+          <!-- jogo em andamento -->
+          <div id="jogo-ativo" hidden>
+            <div class="cabecalho-jogo">
+              <h2 id="titulo-jogo">Partida</h2>
+              <span class="selo" id="selo-status">sua vez</span>
+            </div>
+            <ul class="lista-lances" id="lances-jogar"></ul>
+            <div class="acoes-jogo">
+              <button id="btn-dica">💡 Dica</button>
+              <button id="btn-desfazer">↩ Desfazer</button>
+              <button id="btn-desistir">🏳 Desistir</button>
+              <button class="principal" id="btn-analisar-partida" disabled>Analisar esta partida</button>
+            </div>
+            <div class="feedback" id="feedback-jogar" hidden></div>
+            <details class="detalhes">
+              <summary>Como o nível é aplicado</summary>
+              <p class="dica">O Stockfish roda com força limitada: até ~1320 usa profundidade baixa e erros
+              induzidos; acima disso usa o limite de Elo do próprio motor (1320–3190).</p>
+            </details>
+            <button class="secundario" id="btn-abandonar">Encerrar e voltar</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========================================================= ANALISAR -->
+    <section class="view" id="view-analisar" hidden>
+      <div class="palco">
+        <div class="area-tabuleiro">
+          <div class="barra-aval" id="aval-analise" aria-hidden="true">
+            <div class="preenchimento" style="height:50%"></div>
+          </div>
+          <div class="tabuleiro-wrap">
+            <div class="tabuleiro" id="tab-analise" role="grid" aria-label="Tabuleiro de análise"></div>
+            <svg class="setas" id="setas-analise" viewBox="0 0 8 8" preserveAspectRatio="none"></svg>
+          </div>
+          <div class="navegacao">
+            <button id="nav-inicio" title="Início">⏮</button>
+            <button id="nav-voltar" title="Lance anterior">◀</button>
+            <span class="lance-atual" id="lance-atual">posição inicial</span>
+            <button id="nav-avancar" title="Próximo lance">▶</button>
+            <button id="nav-fim" title="Fim">⏭</button>
+            <button id="nav-girar" title="Girar tabuleiro">⟲</button>
+          </div>
+          <svg class="grafico" id="grafico-analise" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+        </div>
+
+        <aside class="painel painel-largo">
+          <div class="importar">
+            <h2>Analisar uma partida</h2>
+            <div class="linha">
+              <input type="text" id="user-chesscom" placeholder="usuário do chess.com">
+              <button id="btn-importar">Importar</button>
+            </div>
+            <div class="linha">
+              <select id="profundidade">
+                <option value="12">Rápida (depth 12)</option>
+                <option value="14" selected>Padrão (depth 14)</option>
+                <option value="17">Profunda (depth 17)</option>
+              </select>
+              <label class="toggle pequeno">
+                <input type="checkbox" id="modo-leve"><span>comentários curtos</span>
+              </label>
+            </div>
+            <textarea id="pgn" rows="4" placeholder="Cole o PGN aqui (ou arraste um arquivo .pgn)"></textarea>
+            <div class="linha">
+              <button class="principal" id="btn-revisar">Revisar partida</button>
+              <button id="btn-exemplo">Carregar exemplo</button>
+            </div>
+            <div class="progresso" id="progresso" hidden>
+              <div class="barra"><div class="preenchimento" id="progresso-barra"></div></div>
+              <span id="progresso-texto">analisando…</span>
+            </div>
+            <div class="lista-importados" id="lista-chesscom" hidden></div>
+          </div>
+
+          <div id="relatorio" hidden>
+            <div class="precisao">
+              <div class="cartao-acc"><span class="rotulo">Brancas</span><b id="acc-brancas">—</b></div>
+              <div class="cartao-acc"><span class="rotulo">Pretas</span><b id="acc-pretas">—</b></div>
+            </div>
+            <div class="classes" id="contagem-classes"></div>
+            <p class="resumo" id="resumo-partida"></p>
+            <h3>Lances <span class="dica-inline">clique para ver a explicação</span></h3>
+            <ul class="lista-lances com-classes" id="lances-analise"></ul>
+            <div class="explicacao" id="explicacao">
+              <p class="dica">Selecione um lance na lista (ou navegue no tabuleiro) para ver a explicação.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ========================================================== BIBLIOTECA -->
+    <section class="view" id="view-biblioteca" hidden>
+      <div class="biblioteca">
+        <div class="barra-biblioteca">
+          <h2>Minhas partidas</h2>
+          <div class="linha">
+            <button id="btn-recarregar">Recarregar</button>
+            <label class="botao-arquivo">Importar PGN<input type="file" id="arquivo-pgn" accept=".pgn,text/plain" hidden></label>
+          </div>
+        </div>
+        <div id="lista-biblioteca" class="grade-jogos"></div>
+        <p class="dica">As partidas ficam em <code>dados/jogos.json</code>, no seu computador. Nada é enviado para fora.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="toasts" id="toasts"></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

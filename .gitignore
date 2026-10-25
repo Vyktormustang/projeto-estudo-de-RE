@@ -5,6 +5,10 @@
 rom/
 rom_mod/
 
+# ---- app: dependências e dados pessoais ----
+app/node_modules/
+app/dados/
+
 # ---- ambientes e caches ----
 .venv/
 venv/
@@ -13,3 +17,4 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.DS_Store
