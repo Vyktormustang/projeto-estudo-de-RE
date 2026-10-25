@@ -1,7 +1,12 @@
 name: APK
 
-# Compila o APK do Xadrez Studio no runner do GitHub (o ambiente local de
-# desenvolvimento não tem JDK/Android SDK). O APK e o log saem como artifacts.
+# Compila o APK do Xadrez Studio no runner do GitHub (o ambiente de
+# desenvolvimento não tem JDK/Android SDK).
+#
+# Saídas:
+#   - Release "apk-v1.0" com o .apk + .sha256 (download permanente)
+#   - artifact "xadrez-studio-apk" (30 dias)
+#   - comentário na PR #5 com o resumo do build (ou o erro, se falhar)
 
 on:
   workflow_dispatch:
@@ -14,7 +19,8 @@ on:
       - ".github/workflows/apk.yml"
 
 permissions:
-  contents: read
+  contents: write
+  issues: write
 
 jobs:
   build:
@@ -34,52 +40,50 @@ jobs:
       - name: Node 20
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
-      - name: Ambiente Android (usa o SDK já instalado no runner)
+      - name: Ambiente Android
         run: |
           mkdir -p build
           {
             echo "ANDROID_HOME=${ANDROID_HOME:-}"
-            echo "ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:-}"
             for d in "${ANDROID_HOME:-}" /usr/local/lib/android/sdk; do
-              [ -n "$d" ] && [ -d "$d" ] && {
+              if [ -n "$d" ] && [ -d "$d" ]; then
                 echo "--- $d"
                 echo "build-tools: $(ls "$d/build-tools" 2>/dev/null | tr '\n' ' ')"
                 echo "platforms:   $(ls "$d/platforms" 2>/dev/null | tr '\n' ' ')"
-                ls "$d/build-tools"/*/aapt2 2>/dev/null || true
-              }
+              fi
             done
-          } | tee build/ambiente.log
+          } 2>&1 | tee build/ambiente.log
 
       - name: Testes do app web
         working-directory: app
         run: |
-          npm install --omit=dev
-          npm install --no-save jsdom
-          node tests/review.test.mjs
-          node tests/armazenamento.test.mjs
-          node tests/ui.smoke.mjs
+          set -o pipefail
+          {
+            npm install --omit=dev
+            npm install --no-save jsdom
+            echo "=== review (motor real) ==="; node tests/review.test.mjs
+            echo "=== armazenamento (APK) ==="; node tests/armazenamento.test.mjs
+            echo "=== interface (jsdom) ==="; node tests/ui.smoke.mjs
+          } 2>&1 | tee ../build/testes.log
 
       - name: Compilar APK
         run: |
+          set -o pipefail
           chmod +x android/build.sh
           ./android/build.sh 2>&1 | tee build/build.log
 
       - name: Conferir o APK
         run: |
+          set -o pipefail
           APK="dist/xadrez-studio-1.0.apk"
-          { ls -la dist
-            echo "--- conteúdo ---"
-            unzip -l "$APK"
-            echo "--- assinatura ---"
-            "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" || true
-          } 2>&1 | tee build/verificacao.log
           unzip -l "$APK" | grep -q "classes.dex"
           unzip -l "$APK" | grep -q "assets/www/index.html"
           unzip -l "$APK" | grep -q "stockfish-19-lite-single.wasm"
+          echo "conteúdo essencial presente"
 
-      - name: Publicar APK + logs
+      - name: Publicar artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -88,5 +92,56 @@ jobs:
             dist/*.apk
             dist/*.sha256
             build/*.log
+            build/apk-info.txt
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Publicar Release
+        id: release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="apk-v1.0"
+          NOTES="$(cat build/apk-info.txt 2>/dev/null || echo 'build ok')"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/xadrez-studio-1.0.apk dist/xadrez-studio-1.0.apk.sha256 --clobber
+            gh release edit "$TAG" --notes "$NOTES"
+          else
+            gh release create "$TAG" \
+              dist/xadrez-studio-1.0.apk dist/xadrez-studio-1.0.apk.sha256 \
+              --title "Xadrez Studio 1.0 — APK" \
+              --notes "$NOTES"
+          fi
+          echo "url=$(gh release view "$TAG" --json url -q .url)" >> "$GITHUB_OUTPUT"
+
+      - name: Comentar na PR
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULTADO: ${{ job.status }}
+          URL_RELEASE: ${{ steps.release.outputs.url }}
+        run: |
+          {
+            echo "### Build do APK: **${RESULTADO}**"
+            echo
+            if [ -f build/apk-info.txt ]; then
+              echo '```'
+              cat build/apk-info.txt
+              echo '```'
+            fi
+            if [ -n "${URL_RELEASE:-}" ]; then
+              echo
+              echo "Download: ${URL_RELEASE}"
+            fi
+            if [ "${RESULTADO}" != "success" ]; then
+              echo
+              echo "<details><summary>Últimas linhas do log</summary>"
+              echo
+              echo '```'
+              tail -60 build/build.log 2>/dev/null || tail -60 build/testes.log 2>/dev/null || echo "sem log"
+              echo '```'
+              echo "</details>"
+            fi
+          } > build/comentario.md
+          gh pr comment 5 --repo "${{ github.repository }}" --body-file build/comentario.md || true

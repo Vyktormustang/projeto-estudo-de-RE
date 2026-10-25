@@ -133,4 +133,17 @@ fi
 (cd "$DIST" && sha256sum "$NOME.apk" > "$NOME.apk.sha256")
 TAMANHO="$(du -h "$DIST/$NOME.apk" | cut -f1)"
 log "APK pronto: dist/$NOME.apk ($TAMANHO)"
-cat "$DIST/$NOME.apk.sha256"
+
+INFO="$RAIZ/build/apk-info.txt"
+{
+  echo "APK: $NOME.apk ($TAMANHO, $(( $(stat -c%s "$DIST/$NOME.apk") / 1024 )) KB)"
+  echo "sha256: $(cut -d' ' -f1 "$DIST/$NOME.apk.sha256")"
+  echo "SDK: build-tools $BUILD_TOOLS · $PLATAFORMA · minSdk $MIN_SDK alvo $ALVO_SDK"
+  echo "--- conteúdo principal ---"
+  unzip -l "$DIST/$NOME.apk" | grep -E "classes.dex|index.html|styles.css|stockfish|chess.js|wallpaper|ic_launcher" | awk '{print $1, $4}'
+  echo "--- badging ---"
+  "$BT/aapt2" dump badging "$DIST/$NOME.apk" 2>/dev/null | grep -E "^package|launchable-activity|sdkVersion|targetSdkVersion|application-label:" | head -6
+  echo "--- assinatura ---"
+  "$BT/apksigner" verify --print-certs "$DIST/$NOME.apk" 2>&1 | grep -E "Signer #1 certificate (DN|SHA-256)" | head -2
+  echo "total de entradas: $(unzip -l "$DIST/$NOME.apk" | tail -1 | awk '{print $2}')"
+} | tee "$INFO"
