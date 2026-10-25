@@ -1,15 +1,77 @@
 name: APK
 
+# Compila o APK do Xadrez Studio no runner do GitHub (o ambiente local de
+# desenvolvimento não tem JDK/Android SDK). O resultado sai como artifact.
+
 on:
   workflow_dispatch:
   push:
+    branches: ["main", "arena/**"]
     paths:
-      - 'android/**'
-      - 'app/**'
-      - '.github/workflows/apk.yml'
+      - "android/**"
+      - "app/public/**"
+      - "app/package.json"
+      - ".github/workflows/apk.yml"
+
+permissions:
+  contents: read
 
 jobs:
-  sonda:
+  build:
+    name: Compilar APK
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - run: echo "workflow ok"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Android SDK (platform 34 + build-tools)
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar platform e build-tools
+        run: |
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null
+          ls "$ANDROID_HOME/build-tools"
+
+      - name: Node (para conferir o app web antes de empacotar)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Testes do núcleo de análise (motor real)
+        working-directory: app
+        run: |
+          npm ci --omit=dev || npm install --omit=dev
+          npm install --no-save jsdom
+          node tests/review.test.mjs
+          node tests/armazenamento.test.mjs
+          node tests/ui.smoke.mjs
+
+      - name: Compilar APK
+        run: |
+          chmod +x android/build.sh
+          ./android/build.sh
+
+      - name: Conferir o APK
+        run: |
+          APK="dist/xadrez-studio-1.0.apk"
+          ls -la dist
+          unzip -l "$APK" | head -40
+          unzip -l "$APK" | grep -E "classes.dex|assets/www/index.html|stockfish-19-lite-single.wasm"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt2" dump badging "$APK" | head -12
+
+      - name: Publicar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xadrez-studio-apk
+          path: |
+            dist/xadrez-studio-1.0.apk
+            dist/xadrez-studio-1.0.apk.sha256
+          if-no-files-found: error
+          retention-days: 30

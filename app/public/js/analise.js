@@ -1,9 +1,10 @@
 /** Modo "Analisar": revisão completa com classificação e explicação de cada lance. */
 
-import { Chess } from 'chess.js';
+import { Chess } from '../vendor/chess.js';
 import { motor } from './engine.js';
 import { Tabuleiro } from './board.js';
 import { toast, el } from './util.js';
+import { importarChessCom } from './armazenamento.js';
 import {
   buildReview, CLASS_INFO, expectedPointsWhite, formatEval, pvToSan, describeMove,
 } from './review.js';
@@ -81,9 +82,7 @@ export class ModoAnalise {
     caixa.hidden = false;
     caixa.innerHTML = 'buscando partidas…';
     try {
-      const resp = await fetch(`/api/chesscom?usuario=${encodeURIComponent(usuario)}&limite=15`);
-      const dados = await resp.json();
-      if (!resp.ok) throw new Error(dados.detalhe || dados.erro || 'falha na importação');
+      const dados = await importarChessCom(usuario, 15);
       if (!dados.jogos?.length) {
         caixa.innerHTML = 'Nenhuma partida encontrada.';
         return;

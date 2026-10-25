@@ -1,9 +1,10 @@
 /** Modo "Jogar": partida contra o Stockfish com assistências opcionais. */
 
-import { Chess } from 'chess.js';
+import { Chess } from '../vendor/chess.js';
 import { motor } from './engine.js';
 import { Tabuleiro } from './board.js';
 import { toast, el, fmtTempo, nomeNivel } from './util.js';
+import { salvarJogo } from './armazenamento.js';
 import {
   expectedPointsWhite, toWhiteScore, classifyMove, explainMove, formatEval, CLASS_INFO,
 } from './review.js';
@@ -526,23 +527,18 @@ export class ModoJogo {
     for (const [k, v] of Object.entries(headers)) copia.setHeader(k, v);
     const pgn = copia.pgn();
     try {
-      const resp = await fetch('/api/jogos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pgn,
-          titulo: `Você × ${nomeNivel(this.config.nivel)}`,
-          brancas: headers.White,
-          pretas: headers.Black,
-          resultado,
-          origem: 'bot',
-          observacao: motivo,
-        }),
+      await salvarJogo({
+        pgn,
+        titulo: `Você × ${nomeNivel(this.config.nivel)}`,
+        brancas: headers.White,
+        pretas: headers.Black,
+        resultado,
+        origem: 'bot',
+        observacao: motivo,
       });
-      if (!resp.ok) throw new Error('servidor recusou');
       toast('Partida salva na biblioteca.');
     } catch {
-      toast('Não consegui salvar a partida (biblioteca indisponível).', 'erro');
+      toast('Não consegui salvar a partida.', 'erro');
     }
   }
 

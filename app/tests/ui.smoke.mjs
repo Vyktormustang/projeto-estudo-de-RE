@@ -22,6 +22,8 @@ globalThis.HTMLElement = window.HTMLElement;
 globalThis.Element = window.Element;
 globalThis.Node = window.Node;
 globalThis.requestAnimationFrame = (fn) => setTimeout(() => fn(Date.now()), 16);
+globalThis.location = window.location;
+globalThis.localStorage = window.localStorage;
 window.Element.prototype.scrollIntoView = function () {};
 
 /** Worker falso: responde UCI com um lance legal do chess.js. */

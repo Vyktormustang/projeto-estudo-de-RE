@@ -5,6 +5,7 @@ import { ModoJogo } from './jogo.js';
 import { ModoAnalise } from './analise.js';
 import { Biblioteca } from './biblioteca.js';
 import { toast } from './util.js';
+import { salvarJogo } from './armazenamento.js';
 
 const abas = document.querySelectorAll('.aba');
 const views = {
@@ -63,22 +64,18 @@ analise.revisar = async (...args) => {
   await revisarOriginal(...args);
   if (analise.review) {
     try {
-      await fetch('/api/jogos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pgn: analise.pgn,
-          titulo: tituloDoPgn(analise.pgn),
-          brancas: analise.review.headers.White || '',
-          pretas: analise.review.headers.Black || '',
-          resultado: analise.review.headers.Result || '*',
-          origem: 'analise',
-          revisao: {
-            accuracy: analise.review.accuracy,
-            counts: analise.review.counts,
-            summary: analise.review.summary.text,
-          },
-        }),
+      await salvarJogo({
+        pgn: analise.pgn,
+        titulo: tituloDoPgn(analise.pgn),
+        brancas: analise.review.headers.White || '',
+        pretas: analise.review.headers.Black || '',
+        resultado: analise.review.headers.Result || '*',
+        origem: 'analise',
+        revisao: {
+          accuracy: analise.review.accuracy,
+          counts: analise.review.counts,
+          summary: analise.review.summary.text,
+        },
       });
     } catch { /* biblioteca é opcional */ }
   }

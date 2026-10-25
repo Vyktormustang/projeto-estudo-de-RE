@@ -18,3 +18,8 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .DS_Store
+
+# ---- artefatos de build do APK ----
+build/
+dist/
+android/keystore/

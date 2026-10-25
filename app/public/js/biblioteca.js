@@ -1,8 +1,9 @@
 /** Modo "Biblioteca": partidas salvas no computador. */
 
-import { Chess } from 'chess.js';
+import { Chess } from '../vendor/chess.js';
 import { toast, el, fmtData } from './util.js';
 import { CLASS_INFO } from './review.js';
+import { listarJogos, excluirJogo, modoArmazenamento } from './armazenamento.js';
 
 export class Biblioteca {
   constructor() {
@@ -13,10 +14,14 @@ export class Biblioteca {
   async carregar() {
     const grade = document.getElementById('lista-biblioteca');
     grade.innerHTML = '<p class="vazio">carregando…</p>';
+    const aviso = document.getElementById('aviso-armazenamento');
+    if (aviso) {
+      aviso.textContent = modoArmazenamento() === 'local'
+        ? 'Salvando na memória do aparelho/navegador (modo offline).'
+        : 'Salvando em dados/jogos.json, na sua máquina.';
+    }
     try {
-      const resp = await fetch('/api/jogos');
-      if (!resp.ok) throw new Error(`servidor respondeu ${resp.status}`);
-      this.jogos = await resp.json();
+      this.jogos = await listarJogos();
       this._render();
     } catch (err) {
       grade.innerHTML = '';
@@ -85,7 +90,7 @@ export class Biblioteca {
     excluir.addEventListener('click', async () => {
       if (!confirm('Excluir esta partida da biblioteca?')) return;
       try {
-        await fetch(`/api/jogos/${jogo.id}`, { method: 'DELETE' });
+        await excluirJogo(jogo.id);
         toast('Partida excluída.');
         this.carregar();
       } catch {

@@ -7,9 +7,6 @@
   <meta name="description" content="App pessoal de xadrez: bots com nível ajustável, análise de partidas e explicação de cada lance em português.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♞</text></svg>">
   <link rel="stylesheet" href="/styles.css">
-  <script type="importmap">
-    { "imports": { "chess.js": "/vendor/chess.js" } }
-  </script>
 </head>
 <body>
   <header class="topo">
@@ -203,6 +200,7 @@
             <label class="botao-arquivo">Importar PGN<input type="file" id="arquivo-pgn" accept=".pgn,text/plain" hidden></label>
           </div>
         </div>
+        <p class="dica" id="aviso-armazenamento"></p>
         <div id="lista-biblioteca" class="grade-jogos"></div>
         <p class="dica">As partidas ficam em <code>dados/jogos.json</code>, no seu computador. Nada é enviado para fora.</p>
       </div>

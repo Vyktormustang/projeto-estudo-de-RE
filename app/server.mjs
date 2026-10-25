@@ -37,7 +37,6 @@ const MIME = {
 
 /** Bibliotecas servidas a partir de node_modules (instaladas com npm install). */
 const VENDOR = {
-  '/vendor/chess.js': 'node_modules/chess.js/dist/esm/chess.js',
   '/vendor/stockfish/stockfish-19-lite-single.js': 'node_modules/stockfish/bin/stockfish-19-lite-single.js',
   '/vendor/stockfish/stockfish-19-lite-single.wasm': 'node_modules/stockfish/bin/stockfish-19-lite-single.wasm',
   '/vendor/stockfish/stockfish-19.js': 'node_modules/stockfish/bin/stockfish-19.js',

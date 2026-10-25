@@ -12,7 +12,7 @@
  * Nada aqui "chuta" texto genérico: cada frase é amarrada a um fato calculado.
  */
 
-import { Chess } from 'chess.js';
+import { Chess } from '../vendor/chess.js';
 
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 const PIECE_NAME_PT = {
