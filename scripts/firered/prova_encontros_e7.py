@@ -218,11 +218,16 @@ def capturar(pf: Path, estado: Path, outdir: Path, max_bolas: int = 1) -> dict:
     # time nunca cresce. O corte com START é o que fecha.
     for f in range(1700, 3400, 150):
         pulsos.append(f"{f}:A")
-    pulsos.append("3500:START")
-    for f in range(3650, 4700, 150):
-        pulsos.append(f"{f}:A")
+    # O frame em que o teclado abre DESLIZA (nº de balançadas da bola e das
+    # caixas de texto varia com o RNG) — um único START em 3500 já perdeu o
+    # teclado numa regressão. START repetido + A cobre a janela 3500..5900;
+    # os extras caem no overworld/menu e não mudam gPlayerPartyCount.
+    for inicio_start in (3500, 4400, 5300):
+        pulsos.append(f"{inicio_start}:START")
+        for f in range(inicio_start + 150, inicio_start + 900, 150):
+            pulsos.append(f"{f}:A")
     log = nav(rom, mapa, entrada=com_bolas, saida=outdir / "depois.bin", outdir=outdir,
-              frames=4900, pulsos=",".join(pulsos),
+              frames=6400, pulsos=",".join(pulsos),
               every=100, offsets=off)
     depois = contar_time(pf, mapa, off, outdir / "depois.bin")
     return {"antes": antes, "depois": depois,

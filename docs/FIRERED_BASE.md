@@ -12,14 +12,14 @@ as 9 gerações (1025 espécies). Todo o resto do jogo foi preservado.
 > Fame Checker, Sistema de AJUDA e nomes de área), está em:
 >
 > - **Link público (Google Drive):**
->   <https://drive.google.com/file/d/10Z6_EoI66NhhIqqCFXixseQa1AlWQMHV/view>
+>   <https://drive.google.com/file/d/1DT1q3V8c16nBbkFse4osrmpM88mqGoY1/view>
 > - Download direto:
->   `https://drive.google.com/uc?id=10Z6_EoI66NhhIqqCFXixseQa1AlWQMHV&export=download`
+>   `https://drive.google.com/uc?id=1DT1q3V8c16nBbkFse4osrmpM88mqGoY1&export=download`
 >
 > | campo | valor |
 > |---|---|
 > | arquivo | `pokefirered_gen1-9_ptbr.gba` — 16 777 216 bytes |
-> | md5 | `98efdd9bca9cb6166f4a3dc69693c48c` |
+> | md5 | `692b33ae6c4d46bd126f18b96a356d17` |
 > | sha256 | `30dc33af13ac9d6a681998ba6acc0b9013b65600b4c17a934d49d1bd9aa1f2aa` |
 > | sha1 | `ce8b8b2f7bfb1eda0d77c73291a2a3d6b54d45d2` |
 >

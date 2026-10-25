@@ -65,8 +65,8 @@ Cada etapa: muda → compila → prova em jogo (screenshot) → commit → Linea
 - **T8 — CONCLUÍDA:** varredura final (Pokédex em métrico, nomes de área ROTA n/MONTE LUA/…, sobras de UI), regressão E8 PASS e entrega — `reports/firered_t8/`.
 
 **Entrega:** ROM PT-BR no Google Drive (pública) —
-<https://drive.google.com/file/d/10Z6_EoI66NhhIqqCFXixseQa1AlWQMHV/view>,
-md5 `98efdd9bca9cb6166f4a3dc69693c48c`. Detalhes em
+<https://drive.google.com/file/d/1DT1q3V8c16nBbkFse4osrmpM88mqGoY1/view>,
+md5 `692b33ae6c4d46bd126f18b96a356d17`. Detalhes em
 [`FIRERED_BASE.md`](FIRERED_BASE.md).
 
 **Fica em inglês (deliberado):** nomes de espécies/golpes/itens/
