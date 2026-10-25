@@ -53,7 +53,23 @@ habilidade 12, item 14 caracteres. Tradução que não cabe → abreviar.
 
 Cada etapa: muda → compila → prova em jogo (screenshot) → commit → Linear.
 
-## Status
+## Status — PROJETO CONCLUÍDO (2026-10-25)
 
-- **T1 — CONCLUÍDA (2026-10-24):** fonte com ã/õ/Ã/Õ nas 4 fontes latinas, charmap, larguras, ferramentas (`aplicar_fonte_ptbr.py`, `aplicar_traducao.py`) e intro do jogo traduzida — provas em `reports/firered_t1/`.
-- **T2 — EM ANDAMENTO (onda 1 concluída: 255 strings de src/strings.c + save.inc; provas em reports/firered_t2/).**
+- **T1 — CONCLUÍDA (2026-10-24):** fonte com ã/õ/Ã/Õ nas 4 fontes latinas, charmap, larguras, ferramentas (`aplicar_fonte_ptbr.py`, `aplicar_traducao.py`) e intro traduzida — `reports/firered_t1/`.
+- **T2 — CONCLUÍDA:** interface (664 strings de `src/strings.c` ao final do T8) — `reports/firered_t2/`.
+- **T3 — CONCLUÍDA:** mensagens de batalha (`battle_message.c`) — `reports/firered_t3/`.
+- **T4 — CONCLUÍDA:** descrições dos itens (nomes em inglês) — `reports/firered_t4/`.
+- **T5 — CONCLUÍDA:** descrições de golpes e habilidades (nomes em inglês) — `reports/firered_t5/`.
+- **T6 — CONCLUÍDA:** as 1.025 descrições da Pokédex — `reports/firered_t6/`.
+- **T7 — CONCLUÍDA:** diálogos dos 430 mapas em 6 ondas (~3.300 labels nos dicts `traducao_mapas_onda1..6_ptbr.py`), incl. VS Seeker, Fame Checker e Sistema de AJUDA — `reports/firered_t7_onda*/`.
+- **T8 — CONCLUÍDA:** varredura final (Pokédex em métrico, nomes de área ROTA n/MONTE LUA/…, sobras de UI), regressão E8 PASS e entrega — `reports/firered_t8/`.
+
+**Entrega:** ROM PT-BR no Google Drive (pública) —
+<https://drive.google.com/file/d/113SPdjPf9OB1ei3CI7K2foTeO1EEqfg6/view>,
+md5 `a6dc773f5162041c04301924af8505ca`. Detalhes em
+[`FIRERED_BASE.md`](FIRERED_BASE.md).
+
+**Fica em inglês (deliberado):** nomes de espécies/golpes/itens/
+habilidades e tipos (decisão do usuário), nomes próprios de
+cidades/ilhas, créditos e telas exclusivas de wireless/link
+multiplayer (sem como provar em jogo — contrato do projeto).

@@ -4,6 +4,30 @@ Build final produzida a partir do **FireRed de verdade** (`pret/pokefirered`,
 descompilação oficial), modificando **somente o necessário** para comportar
 as 9 gerações (1025 espécies). Todo o resto do jogo foi preservado.
 
+> **🇧🇷 NOVA ENTREGA (2026-10-25): versão traduzida para PT-BR.**
+> A build abaixo nesta seção é a entrega original em inglês (E9).
+> A versão atual, com o jogo inteiro em português do Brasil (T1-T8:
+> interface, batalha, descrições de golpes/itens/habilidades, as 1.025
+> entradas da Pokédex em métrico, todos os diálogos dos 430 mapas,
+> Fame Checker, Sistema de AJUDA e nomes de área), está em:
+>
+> - **Link público (Google Drive):**
+>   <https://drive.google.com/file/d/113SPdjPf9OB1ei3CI7K2foTeO1EEqfg6/view>
+> - Download direto:
+>   `https://drive.google.com/uc?id=113SPdjPf9OB1ei3CI7K2foTeO1EEqfg6&export=download`
+>
+> | campo | valor |
+> |---|---|
+> | arquivo | `pokefirered_gen1-9_ptbr.gba` — 16 777 216 bytes |
+> | md5 | `a6dc773f5162041c04301924af8505ca` |
+> | sha256 | `0343c51f2324176dc3051d492d54b05f6faa083cd3381e4e45c7087665a19b88` |
+> | sha1 | `b20766f69a66db8e22981ed22c6df308a382d5c5` |
+>
+> Nomes de **espécies, golpes, itens e habilidades ficam em inglês**
+> (decisão de projeto); todo o resto é PT-BR. Detalhes e provas:
+> [`PLANO_TRADUCAO_PTBR.md`](PLANO_TRADUCAO_PTBR.md) e
+> `reports/firered_t2…t8/`.
+
 ## Download
 
 - **Link público (Google Drive):**
