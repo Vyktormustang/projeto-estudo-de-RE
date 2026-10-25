@@ -108,21 +108,6 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
-      # TEMPORÁRIO: publica o APK num branch descartável só para transportá-lo ao
-      # sandbox (o GitHub não entrega assets/artifacts por lá). Sai do arquivo
-      # assim que o upload ao Drive terminar.
-      - name: Transportar o APK (temporário)
-        if: success()
-        run: |
-          set -e
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan apk-transfer
-          git rm -rf --cached . > /dev/null
-          git add -f dist/*.apk dist/*.sha256 build/apk-info.txt
-          git commit -q -m "temp: apk para transportar ao Drive (branch descartavel)"
-          git push -f origin HEAD:refs/heads/apk-transfer
-
       - name: Comentar na PR
         if: always()
         env:

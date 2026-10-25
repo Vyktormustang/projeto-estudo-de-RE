@@ -15,6 +15,11 @@ aparelho): veja [android/README.md](../android/README.md).
 Não precisa de conta, não envia nada para servidor nenhum: o motor (Stockfish compilado para
 WebAssembly) roda no seu navegador e as partidas ficam em `dados/jogos.json`.
 
+A interface segue o **layout do chess.com** como referência visual (topo escuro com abas, barra
+de avaliação ao lado do tabuleiro, linhas de jogador com avatar e relógio, navegação inferior no
+celular) — desenho e código próprios, sem copiar assets de lá. As peças são o conjunto
+*standard*/cburnett do Wikimedia Commons (CC BY-SA 3.0, crédito em `public/pecas/LEIA-ME.txt`).
+
 ---
 
 ## O que dá para fazer
@@ -94,13 +99,14 @@ app/
 ├── server.mjs              servidor HTTP: estático, /vendor, /api/jogos, /api/chesscom
 ├── public/
 │   ├── index.html          as três telas
-│   ├── styles.css          tema escuro, tabuleiro responsivo
+│   ├── styles.css          tema escuro estilo chess.com, responsivo
+│   ├── pecas/              12 peças SVG (cburnett, CC BY-SA 3.0) + licença
 │   └── js/
 │       ├── main.js         abas, estado do motor, ponte entre modos
 │       ├── jogo.js         partida contra o bot (relógio, dicas, undo, feedback)
 │       ├── analise.js      revisão, gráfico, navegação, explicações
 │       ├── biblioteca.js   partidas salvas
-│       ├── board.js        tabuleiro (DOM + setas SVG)
+│       ├── board.js        tabuleiro (DOM + peças SVG + setas; toque e arraste)
 │       ├── engine.js       wrapper do Stockfish em Web Worker
 │       ├── uci.js          parser de UCI (compartilhado com os testes)
 │       ├── armazenamento.js  partidas: JSON no servidor ou localStorage no APK
@@ -128,11 +134,15 @@ node tests/armazenamento.test.mjs # biblioteca offline (modo do APK)
 `review.test.mjs` roda três partidas (mate do pastor, miniatura de Lazard, e uma posição com
 mate em 1 ignorado) e verifica classes, precisão, explicações e o resgate de PGN com `FEN`.
 `ui.smoke.mjs` sobe a página em jsdom com um motor falso que responde UCI, joga `e4`, revisa um
-PGN, navega com o teclado e confere a biblioteca.
+PGN, navega com o teclado e confere a biblioteca. Ele também guarda as regressões da 1.1: partida
+que já começa sozinha, peças como `<img>` SVG, lance resolvido **por coordenada** (inclusive com o
+tabuleiro girado), overlay de promoção escondido e conferência de todo `getElementById` do JS
+contra o HTML.
 
 ## Escopo e limites (honestos)
 
-- **Não é um clone do chess.com**: não tem contas, rating, online, torneios nem app mobile.
+- **Não é um clone do chess.com**: a semelhança é de layout; não tem contas, rating, online nem
+  torneios. O "app mobile" é o APK deste mesmo código.
 - **Precisão e classes são aproximações** das faixas públicas; o objetivo é consistência interna.
 - **"Brilhante" é heurística** (sacrifício + avaliação), não a definição exata de outra plataforma.
 - **Sem LLM**: se o motor não produz um fato, a explicação não inventa motivo.
@@ -141,4 +151,5 @@ PGN, navega com o teclado e confere a biblioteca.
 ## Licença
 
 Código próprio: MIT. Dependências mantêm suas licenças — Stockfish é **GPL-3.0** (usado como
-programa separado, via Web Worker) e chess.js é BSD-2-Clause.
+programa separado, via Web Worker), chess.js é BSD-2-Clause e as peças (cburnett/Wikimedia) são
+**CC BY-SA 3.0**, com crédito em `public/pecas/LEIA-ME.txt`.

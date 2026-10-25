@@ -7,11 +7,15 @@ regras, análise e biblioteca ficam dentro do aparelho.
 
 **O APK fica no Google Drive, não no GitHub.**
 
-- Arquivo: **<https://drive.google.com/file/d/1gpyXE7IW91YPL4FNa5YnmrA9P73T-xEK/view>**
+- Arquivo: **<https://drive.google.com/file/d/1lt3-goUhaGpYS4-CPnBY5AXwi4YYQuis/view>**
 - Pasta (APK + checksum): **<https://drive.google.com/drive/folders/1-xOz3IsCInEwniaoNbLWc9XdsYX0_Yen>**
-- `sha256`: `a2194517f6c02cf0848cdceb91059900fdf32b6f11d61eec20fd56a3427e7487`
-2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.0.apk.sha256` e compare —
-   `sha256sum xadrez-studio-1.0.apk`. O hash muda a cada build; o valor válido é sempre o
+- Versão atual: **1.1** (`versionCode 2`) — instala **por cima** da 1.0, sem desinstalar
+- `sha256`: `a30e238a678e14d94f247816af44dd2978df454a961e492b186079130b55903f`
+- Tamanho: 1.321.882 bytes · 41 entradas no APK
+
+1. Baixe `xadrez-studio-1.1.apk`.
+2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.1.apk.sha256` e compare —
+   `sha256sum xadrez-studio-1.1.apk`. O hash muda a cada build; o valor válido é sempre o
    do `.sha256` que está na mesma pasta do Drive.
 3. No aparelho, abra o arquivo baixado e permita **"instalar de fontes desconhecidas"**
    para o navegador/gerenciador de arquivos.
@@ -30,7 +34,30 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 `apk-keystore-v2`), então versões novas instalam por cima sem desinstalar.
 
 Para conferir no aparelho (ou no PC, com `apksigner`):
-`apksigner verify --print-certs xadrez-studio-1.0.apk`.
+`apksigner verify --print-certs xadrez-studio-1.1.apk`.
+
+## O que mudou na 1.1
+
+A 1.0 abria, mas **não deixava mover as peças**. Causa encontrada: o overlay de
+promoção (`#promo-jogar`) tinha `display: flex` no CSS, o que vence o atributo
+`hidden` do HTML — sobrava uma camada invisível cobrindo o tabuleiro inteiro e os
+toques nunca chegavam às casas. Os testes em jsdom não pegavam porque chamam
+`.click()` direto na casa, sem hit-testing.
+
+Além da correção:
+
+* `[hidden] { display: none !important }` no CSS (fecha essa classe de bug de vez);
+* a casa é resolvida pela **geometria** do tabuleiro (8×8), não pelo elemento sob o dedo;
+* arrastar com o mouse e tocar-para-selecionar/toque-para-mover no celular;
+* a partida **começa sozinha** ao abrir (antes era preciso achar "Começar partida");
+* interface refeita com referência no chess.com: topo escuro, abas, barra de avaliação
+  ao lado do tabuleiro, linhas de jogador com avatar e relógio, barra de ações
+  (girar/desfazer/dica/desistir) e navegação inferior no celular;
+* peças em **SVG** (conjunto cburnett, CC BY-SA 3.0 — ver `app/public/pecas/LEIA-ME.txt`)
+  no lugar dos glifos Unicode;
+* caminhos relativos (`styles.css`, `js/main.js`, `pecas/`), então o app abre mesmo se o
+  servidor local cair para `file://`;
+* "Sobre / diagnóstico" na Biblioteca mostra versão, WebView, wasm e modo de armazenamento.
 
 ## O que funciona sem internet
 
