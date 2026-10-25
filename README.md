@@ -1,3 +1,15 @@
+# Projeto — xadrez (pesquisa + app) e RE de GBA
+
+> **Mapa rápido deste repositório**
+> * [`app/`](app/) — **Xadrez Studio**: app local para jogar contra o Stockfish, analisar partidas e
+>   explicar cada lance em português. Roda com `cd app && npm install && npm start`.
+> * [`pesquisa/chesscom/`](pesquisa/chesscom/) — pesquisa de jogabilidade do chess.com
+>   ([solo e bots](pesquisa/chesscom/solo-e-bots.md) · [contra pessoas](pesquisa/chesscom/jogabilidade.md)).
+> * O texto abaixo descreve o projeto anterior de **engenharia reversa de GBA** (Pokémon FireRed),
+>   mantido como registro histórico; os scripts dele não fazem parte deste repositório.
+
+---
+
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
 ![plataforma](https://img.shields.io/badge/plataforma-Game%20Boy%20Advance-blue)
