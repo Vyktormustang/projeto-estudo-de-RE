@@ -7,15 +7,15 @@ regras, análise e biblioteca ficam dentro do aparelho.
 
 **O APK fica no Google Drive, não no GitHub.**
 
-- Arquivo: **<https://drive.google.com/file/d/1lt3-goUhaGpYS4-CPnBY5AXwi4YYQuis/view>**
+- Arquivo: **<https://drive.google.com/file/d/1oot2gyXsiMcHMAtXvy6stbcXINCW23ZV/view>**
 - Pasta (APK + checksum): **<https://drive.google.com/drive/folders/1-xOz3IsCInEwniaoNbLWc9XdsYX0_Yen>**
-- Versão atual: **1.1** (`versionCode 2`) — instala **por cima** da 1.0, sem desinstalar
-- `sha256`: `a30e238a678e14d94f247816af44dd2978df454a961e492b186079130b55903f`
+- Versão atual: **1.2** (`versionCode 3`) — instala **por cima** da 1.0/1.1, sem desinstalar
+- `sha256`: `7d0db110e266ada9ae03de511cb89488584e1d0c800c65cbf9be878e0627a355`
 - Tamanho: 1.321.882 bytes · 41 entradas no APK
 
-1. Baixe `xadrez-studio-1.1.apk`.
-2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.1.apk.sha256` e compare —
-   `sha256sum xadrez-studio-1.1.apk`. O hash muda a cada build; o valor válido é sempre o
+1. Baixe `xadrez-studio-1.2.apk`.
+2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.2.apk.sha256` e compare —
+   `sha256sum xadrez-studio-1.2.apk`. O hash muda a cada build; o valor válido é sempre o
    do `.sha256` que está na mesma pasta do Drive.
 3. No aparelho, abra o arquivo baixado e permita **"instalar de fontes desconhecidas"**
    para o navegador/gerenciador de arquivos.
@@ -34,7 +34,20 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 `apk-keystore-v2`), então versões novas instalam por cima sem desinstalar.
 
 Para conferir no aparelho (ou no PC, com `apksigner`):
-`apksigner verify --print-certs xadrez-studio-1.1.apk`.
+`apksigner verify --print-certs xadrez-studio-1.2.apk`.
+
+## O que mudou na 1.2
+
+* **Arrastar peças** com o dedo, com a caneta e com o mouse (Pointer Events): tocar seleciona,
+  mover levanta a peça, soltar na casa legal executa o lance; a peça flutuante fica acima do
+  dedo, a origem fica esvaziada e a casa sob o dedo ganha realce. Soltar fora de um destino legal
+  desmarca; o toque curto continua valendo (tap-tap).
+* `touch-action: none` no tabuleiro — arrastar peça não rola mais a página no meio do gesto.
+* Ícones das abas e da barra de ações em **SVG** (antes eram glifos Unicode), marca com o cavalo
+  branco sobre o quadrado verde e relógio no tamanho do chess.com.
+* **Cartão de fim de jogo** com *Revanche*, *Analisar* e *ver o tabuleiro*.
+* `ui.smoke.mjs` cobre arraste no dedo, arraste no mouse, soltura inválida, tap-tap e o cartão de
+  resultado — 21 verificações de interface.
 
 ## O que mudou na 1.1
 
