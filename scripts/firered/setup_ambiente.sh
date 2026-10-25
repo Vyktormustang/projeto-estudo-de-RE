@@ -331,6 +331,8 @@ ok "offsets em /tmp/pf_offsets.json"
 log "9/9 aplicando fonte PT-BR (T1) + dicionários de tradução + rebuild"
 python3 "$RAIZ/scripts/firered/aplicar_fonte_ptbr.py" --pokefirered "$PF" --write \
   >/tmp/setup_fonte.log 2>&1 || { tail -10 /tmp/setup_fonte.log; exit 1; }
+python3 "$RAIZ/scripts/firered/apply_t8_varredura.py" --pokefirered "$PF" \
+  >/tmp/setup_t8.log 2>&1 || { tail -10 /tmp/setup_t8.log; exit 1; }
 python3 "$RAIZ/scripts/firered/aplicar_traducao.py" --pokefirered "$PF" --write \
   >/tmp/setup_trad.log 2>&1 || { tail -20 /tmp/setup_trad.log; exit 1; }
 grep -E 'ERRO' /tmp/setup_trad.log && { echo "tradução com ERROs acima"; exit 1; }

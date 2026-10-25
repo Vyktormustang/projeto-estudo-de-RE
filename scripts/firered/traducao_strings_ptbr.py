@@ -678,4 +678,81 @@ TRADUCOES.update({
     "gText_Rooftop": r"TERRAÇO",
     "gText_Rooftop2": r"TERRAÇO",
     "gText_NowOn": r"Agora em:",
+
+    # ---------- T8: varredura final (sobras de baixa visibilidade) ----------
+    # Pokédex (cabeçalhos das abas)
+    "gText_Search": r"{COLOR DYNAMIC_COLOR6}{SHADOW DYNAMIC_COLOR5}BUSCA",
+    "gText_PokemonList": r"{COLOR DYNAMIC_COLOR6}{SHADOW DYNAMIC_COLOR5}LISTA POKéMON",
+    "gText_PokemonListNoColor": r"LISTA POKéMON",
+    "gText_SearchNoColor": r"BUSCA",
+    # Pokédex (rótulos de altura/peso — valores viram métrico via apply_t8)
+    "gText_HT": r"ALT.",
+    "gText_WT": r"PESO",
+    # bolsa (títulos de bolso restantes)
+    "gText_KeyItems": r"ITENS-CHAVE",
+    "gText_ItemsPocket": r"BOLSO DE ITENS",
+    "gText_KeyItemsPocket": r"BOLSO ITENS-CHAVE",
+    "gText_PokeBallsPocket": r"BOLSO POKé BALLS",
+    # menu inicial
+    "gText_MysteryGiftCantUse": r"O MYSTERY GIFT não pode ser usado\ncom o Adaptador Wireless conectado.",
+    # apagador de golpes
+    "gText_12PoofForgotMove": r"1, {PAUSE 0x0F}2, e{PAUSE 0x0F}‥ {PAUSE 0x0F}‥ {PAUSE 0x0F}‥ {PAUSE 0x0F}{PLAY_SE SE_BALL_BOUNCE_1}Puf!\p{STR_VAR_1} esqueceu como\nusar {STR_VAR_2}.\pE...{PAUSE_UNTIL_PRESS}",
+    "gText_1_2_and_Poof": r"{PAUSE 0x20}1, {PAUSE 0x0F}2, e {PAUSE 0x0F}‥ {PAUSE 0x0F}‥ {PAUSE 0x0F}‥ {PAUSE 0x0F}{PLAY_SE SE_BALL_BOUNCE_1}Puf!\p",
+    # resumo: encontro do destino (ovos)
+    "gText_PokeSum_FatefulEncounterHatched": r"Natureza {DYNAMIC 0x00}. Encontro do\ndestino (chocou: {DYNAMIC 0x02}\nno {LV_2} {DYNAMIC 0x01}).",
+    "gText_PokeSum_FatefulEncounterHatched_BoldGentleGrammar": r"Natureza {DYNAMIC 0x00}. Encontro do\ndestino (chocou: {DYNAMIC 0x02}\nno {LV_2} {DYNAMIC 0x01}).",
+    "gText_PokeSum_ApparentlyFatefulEncounterHatched": r"Natureza {DYNAMIC 0x00}. Ao que parece,\nencontro do destino (chocou:\n{DYNAMIC 0x02} no {LV_2} {DYNAMIC 0x01}).",
+    "gText_PokeSum_ApparentlyFatefulEncounterHatched_BoldGentleGrammar": r"Natureza {DYNAMIC 0x00}. Ao que parece,\nencontro do destino (chocou:\n{DYNAMIC 0x02} no {LV_2} {DYNAMIC 0x01}).",
+    # whiteout (derrota fora de batalha de treinador)
+    "gText_PlayerScurriedToCenter": r"{PLAYER} correu a um CENTRO POKéMON,\nprotegendo os POKéMON exaustos e\ndesmaiados de mais perigo‥\p",
+    "gText_PlayerScurriedBackHome": r"{PLAYER} correu de volta para casa,\nprotegendo os POKéMON exaustos e\ndesmaiados de mais perigo‥\p",
+    # diploma
+    "gText_Diploma_ThisDocument": r"Este documento é emitido em\nreconhecimento à magnífica\nconquista de completar a\nPOKéDEX {DYNAMIC 0x01}.",
+    # cassino / barras de controle
+    "gString_SlotMachineControls": r"{DPAD_LEFTRIGHT}COMBOS {DPAD_DOWN}APOSTA {A_BUTTON}PARAR {B_BUTTON}SAIR",
+    "gString_Help": r"AJUDA",
+    "gText_HelpSystemControls_AorBtoCancel": r"{A_BUTTON}{B_BUTTON}SAIR",
+    "gText_HelpSystemControls_PickOkCancel": r"{DPAD_UPDOWN}MOVER {A_BUTTON}OK {B_BUTTON}SAIR",
+    "gText_PickOKCancel": r"{DPAD_UPDOWN}MOVER {A_BUTTON}OK {B_BUTTON}SAIR",
+    # animação de uso de item (fragmentos compostos)
+    "gText_WasUsedOn": r" foi usado em\n",
+    "gText_LevelRoseTo": r" subiu para o nível\n",
+    # multichoice genérico
+    "gText_Right": r"Direita",
+    "gText_Left": r"Esquerda",
+    # cartão de treinador (link)
+    "gText_WaitingTrainerFinishReading": r"Esperando o outro TREINADOR\nterminar de ler seu CARTÃO.",
+    # easy chat (perfil, entrevista, carta)
+    "gText_CombineFourWordsOrPhrases": r"Combine quatro palavras ou frases",
+    "gText_AndMakeYourProfile": r"e monte o seu perfil.",
+    "gText_MakeMessageSixPhrases": r"Monte uma mensagem de seis frases.",
+    "gText_MaxTwoTwelveLetterPhrases": r"Máx.: 2 frases de 12 letras/linha.",
+    "gText_FindWordsThatDescribeYour": r"Ache palavras que descrevam os",
+    "gText_FeelingsRightNow": r"seus sentimentos agora.",
+    "gText_CombineNineWordsOrPhrases": r"Combine nove palavras ou frases",
+    "gText_AndMakeAMessage": r"e monte uma mensagem.",
+    "gText_ChangeJustOneWordOrPhrase": r"Troque só uma palavra ou frase",
+    "gText_AndImproveTheBardsSong": r"e melhore a canção do BARDO.",
+    "gText_AndFillOutTheQuestionnaire": r"e preencha o questionário.",
+    "gText_YourProfile": r"Seu perfil",
+    "gText_YourFeelingAtTheBattlesStart": r"Seu sentimento ao iniciar a batalha",
+    "gText_WhatYouSayIfYouWin": r"O que você diz se vencer a batalha",
+    "gText_WhatYouSayIfYouLose": r"O que você diz se perder a batalha",
+    "gText_TheAnswer": r"A resposta",
+    "gText_TheMailMessage": r"A mensagem da CARTA",
+    "gText_TheNewSong": r"A nova canção",
+    "gText_CombineTwoWordsOrPhrases": r"Combine duas palavras ou frases",
+    "gText_AndMakeATrendySaying": r"e crie um ditado da moda.",
+    "gText_TheTrendySaying": r"O ditado da moda",
+    "gText_IsAsShownOkay": r"está assim. Tudo bem?",
+    "gText_AllTextBeingEditedWill": r"Todo o texto em edição será",
+    "gText_BeDeletedThatOkay": r"apagado. Tudo bem?",
+    "gText_QuitEditing": r"Parar de editar?",
+    "gText_StopGivingPkmnMail": r"Parar de dar a CARTA ao POKéMON?",
+    "gText_AtTheBattlesStart": r"No início da batalha:",
+    "gText_UponWinningABattle": r"Ao vencer uma batalha:",
+    "gText_UponLosingABattle": r"Ao perder uma batalha:",
+    "gText_TheBardsSong": r"A Canção do BARDO",
+    "gText_WhatsHipAndHappening": r"O que está na moda?",
+    "gText_Interview": r"Entrevista",
 })
