@@ -105,31 +105,23 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Publicar Release
-        id: release
+      - name: Transferir o APK por branch descartável
         if: success()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="apk-v1.0"
-          NOTES="$(cat build/apk-info.txt 2>/dev/null || echo 'build ok')"
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" dist/xadrez-studio-1.0.apk dist/xadrez-studio-1.0.apk.sha256 --clobber
-            gh release edit "$TAG" --notes "$NOTES"
-          else
-            gh release create "$TAG" \
-              dist/xadrez-studio-1.0.apk dist/xadrez-studio-1.0.apk.sha256 \
-              --title "Xadrez Studio 1.0 — APK" \
-              --notes "$NOTES"
-          fi
-          echo "url=$(gh release view "$TAG" --json url -q .url)" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan apk-transfer
+          git rm -rf --cached . > /dev/null
+          git add -f dist/xadrez-studio-1.0.apk dist/xadrez-studio-1.0.apk.sha256 build/apk-info.txt
+          git commit -q -m "temp: apk para transferencia (branch descartavel)"
+          git push -f origin HEAD:refs/heads/apk-transfer
 
       - name: Comentar na PR
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RESULTADO: ${{ job.status }}
-          URL_RELEASE: ${{ steps.release.outputs.url }}
+          REPO: ${{ github.repository }}
         run: |
           {
             echo "### Build do APK: **${RESULTADO}**"
@@ -139,10 +131,9 @@ jobs:
               cat build/apk-info.txt
               echo '```'
             fi
-            if [ -n "${URL_RELEASE:-}" ]; then
-              echo
-              echo "Download: ${URL_RELEASE}"
-            fi
+            echo
+            echo "O APK **não fica no GitHub**: o arquivo final está no Google Drive"
+            echo "(link em `android/README.md`). Este job só compila e verifica."
             if [ "${RESULTADO}" != "success" ]; then
               echo
               echo "<details><summary>Últimas linhas do log</summary>"
