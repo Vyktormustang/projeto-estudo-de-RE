@@ -5,9 +5,10 @@
 >   explicar cada lance em português. Roda com `cd app && npm install && npm start`.
 > * [`android/`](android/) — o **APK** do mesmo app para Android (offline, sem Play Store):
 >   build sem Gradle em [`android/build.sh`](android/build.sh). O arquivo fica no **Google Drive**
->   (não no GitHub): <https://drive.google.com/file/d/1LPjmf54_xKExR_MZV39GetQrItEZcYVP/view>
->   — versão **1.3**, com interface no padrão chess.com, arrastar peças no dedo/mouse,
->   cartão de fim de jogo e análise em paralelo (bem mais rápida); instala por cima das anteriores.
+>   (não no GitHub): <https://drive.google.com/file/d/1XxJGFOUTAZRKEsL3cVcCXLi6GtFCRqFU/view>
+>   — versão **1.5**, com interface no padrão chess.com, arrastar peças no dedo/mouse,
+>   cartão de fim de jogo, análise em paralelo (bem mais rápida) e tabuleiro ocupando a tela
+>   (classificação do lance sobre a peça); instala por cima das anteriores.
 > * [`pesquisa/chesscom/`](pesquisa/chesscom/) — pesquisa de jogabilidade do chess.com
 >   ([solo e bots](pesquisa/chesscom/solo-e-bots.md) · [contra pessoas](pesquisa/chesscom/jogabilidade.md)).
 > * O texto abaixo descreve o projeto anterior de **engenharia reversa de GBA** (Pokémon FireRed),
