@@ -92,29 +92,17 @@ jobs:
           unzip -l "$APK" | grep -q "stockfish-19-lite-single.wasm"
           echo "conteúdo essencial presente"
 
-      - name: Publicar artifact
+      # Só log: o APK não é armazenado no GitHub (o arquivo final fica no Drive).
+      - name: Publicar logs do build
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: xadrez-studio-apk
+          name: log-do-build
           path: |
-            dist/*.apk
-            dist/*.sha256
             build/*.log
             build/apk-info.txt
           if-no-files-found: warn
-          retention-days: 30
-
-      - name: Transferir o APK por branch descartável
-        if: success()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan apk-transfer
-          git rm -rf --cached . > /dev/null
-          git add -f dist/xadrez-studio-1.0.apk dist/xadrez-studio-1.0.apk.sha256 build/apk-info.txt
-          git commit -q -m "temp: apk para transferencia (branch descartavel)"
-          git push -f origin HEAD:refs/heads/apk-transfer
+          retention-days: 7
 
       - name: Comentar na PR
         if: always()

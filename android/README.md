@@ -5,11 +5,14 @@ regras, análise e biblioteca ficam dentro do aparelho.
 
 ## Baixar e instalar
 
-1. Baixe `xadrez-studio-1.0.apk` na release:
-   **https://github.com/Vyktormustang/projeto-estudo-de-RE/releases/tag/apk-v1.0**
+**O APK fica no Google Drive, não no GitHub.**
+
+- Arquivo: **<https://drive.google.com/file/d/1gpyXE7IW91YPL4FNa5YnmrA9P73T-xEK/view>**
+- Pasta (APK + checksum): **<https://drive.google.com/drive/folders/1-xOz3IsCInEwniaoNbLWc9XdsYX0_Yen>**
+- `sha256`: `a2194517f6c02cf0848cdceb91059900fdf32b6f11d61eec20fd56a3427e7487`
 2. Confira o arquivo (opcional): baixe também `xadrez-studio-1.0.apk.sha256` e compare —
    `sha256sum xadrez-studio-1.0.apk`. O hash muda a cada build; o valor válido é sempre o
-   que está anexado na própria release (e no topo das notas dela).
+   do `.sha256` que está na mesma pasta do Drive.
 3. No aparelho, abra o arquivo baixado e permita **"instalar de fontes desconhecidas"**
    para o navegador/gerenciador de arquivos.
 4. Requisitos: **Android 8.0 (API 26)** ou superior, com **WebView atualizado**
@@ -22,6 +25,9 @@ que é o que permite instalar uma versão nova por cima, sem desinstalar — é:
 CN=Xadrez Studio, OU=Uso pessoal, O=Xadrez Studio, L=Belem, ST=Para, C=BR
 SHA-256: 89E0:FAD2:17BB:41C9:B730:E2C7:6668:0B66:C2CB:BD21:D3A4:5BCC:6B30:09CF:4D0F:234A
 ```
+
+Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
+`apk-keystore-v2`), então versões novas instalam por cima sem desinstalar.
 
 Para conferir no aparelho (ou no PC, com `apksigner`):
 `apksigner verify --print-certs xadrez-studio-1.0.apk`.
@@ -80,8 +86,12 @@ Com JDK 17 e Android SDK (build-tools + platform 34):
 ./android/build.sh          # gera dist/xadrez-studio-1.0.apk + .sha256 + build/apk-info.txt
 ```
 
-Ou dispare o workflow **APK** em *Actions* (execução manual disponível), que
-roda os testes do app e publica a release.
+Ou dispare o workflow **APK** em *Actions*, que roda os testes, compila e verifica.
+**O workflow não publica o arquivo** — ele só guarda os logs do build (7 dias). Isso é
+proposital: binário não fica no GitHub. Para pegar o APK de um build do CI sem ter JDK/SDK
+na máquina, o caminho usado foi um branch órfão temporário (`apk-transfer`) que é clonado
+e apagado em seguida; se precisar repetir, recrie a etapa no workflow, baixe, rode o
+upload e apague o branch de novo.
 
 ## Verificação feita no build
 

@@ -4,8 +4,8 @@
 > * [`app/`](app/) — **Xadrez Studio**: app local para jogar contra o Stockfish, analisar partidas e
 >   explicar cada lance em português. Roda com `cd app && npm install && npm start`.
 > * [`android/`](android/) — o **APK** do mesmo app para Android (offline, sem Play Store):
->   build sem Gradle em [`android/build.sh`](android/build.sh) e release em
->   [apk-v1.0](https://github.com/Vyktormustang/projeto-estudo-de-RE/releases/tag/apk-v1.0).
+>   build sem Gradle em [`android/build.sh`](android/build.sh). O arquivo fica no **Google Drive**
+>   (não no GitHub): <https://drive.google.com/file/d/1gpyXE7IW91YPL4FNa5YnmrA9P73T-xEK/view>
 > * [`pesquisa/chesscom/`](pesquisa/chesscom/) — pesquisa de jogabilidade do chess.com
 >   ([solo e bots](pesquisa/chesscom/solo-e-bots.md) · [contra pessoas](pesquisa/chesscom/jogabilidade.md)).
 > * O texto abaixo descreve o projeto anterior de **engenharia reversa de GBA** (Pokémon FireRed),
