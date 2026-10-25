@@ -17,7 +17,14 @@ WebAssembly) roda no seu navegador e as partidas ficam em `dados/jogos.json`.
 
 A interface segue o **layout do chess.com** como referência visual (topo escuro com abas, barra
 de avaliação ao lado do tabuleiro, linhas de jogador com avatar e relógio, navegação inferior no
-celular) — desenho e código próprios, sem copiar assets de lá. As peças são o conjunto
+celular) — desenho e código próprios, sem copiar assets de lá.
+
+**O tabuleiro ocupa a tela**: o lado dele não é fixo, sai da altura da janela
+(`--cromo-jogar`/`--cromo-analisar` descontam topo, linhas de jogador e barra de ações), então em
+monitor grande ele cresce até 980 px, em notebook baixo ele encolhe para caber sem rolagem, e no
+celular vai de ponta a ponta (a barra de avaliação vira uma faixa de 5 px sobre a borda esquerda).
+O painel lateral tem altura da janela e rola por dentro; `100dvh` é usado onde existe para a barra
+de endereço do celular não cortar o tabuleiro. As peças são o conjunto
 *standard*/cburnett do Wikimedia Commons (CC BY-SA 3.0, crédito em `public/pecas/LEIA-ME.txt`).
 
 ---

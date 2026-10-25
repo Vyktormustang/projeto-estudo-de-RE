@@ -36,6 +36,21 @@ Esse certificado é reaproveitado entre builds pelo cache do Actions (chave
 Para conferir no aparelho (ou no PC, com `apksigner`):
 `apksigner verify --print-certs xadrez-studio-1.4.apk`.
 
+## O que mudou na 1.5 (tabuleiro ocupando a tela)
+
+* **Layout dirigido pela altura da janela**, como no chess.com: o lado do tabuleiro é
+  `min(100dvh - cromo, 980px)`, onde o *cromo* (topo + linhas de jogador + barra de ações, e no
+  Analisar também navegação + gráfico) é descontado por aba. No desktop o conjunto tabuleiro +
+  painel fica centralizado e **cabe na tela sem rolagem**; antes havia um teto de 1060 px que
+  deixava faixas vazias nas laterais e um tabuleiro pequeno.
+* **Celular de ponta a ponta**: sem margem lateral, tabuleiro colado nas bordas (canto vivo, como
+  no app), barra de avaliação reduzida a 5 px sobre a borda esquerda do tabuleiro, linhas de
+  jogador e barra de ações com respiro de 10 px.
+* **Deitado** (pouca altura): o tabuleiro é limitado pela janela e o resto rola.
+* Painel lateral com altura da janela e rolagem interna (`position: sticky` no desktop).
+* Coordenadas do tabuleiro acompanham o tamanho (`clamp(10px, 1.5vmin, 16px)`), em vez de 11 px fixos.
+* Teste novo no `ui.smoke.mjs` (30 verificações) trava o orçamento de altura e o fim do teto antigo.
+
 ## O que mudou na 1.4 (classificação em cima da peça)
 
 * **Selo da classe do lance sobre a peça**, como no game review: círculo com o símbolo

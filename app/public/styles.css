@@ -27,6 +27,17 @@
   --claro: #ebecd0;
   --escuro: #739552;
   --raio: 8px;
+
+  /* layout: o tabuleiro manda no tamanho (como no chess.com) */
+  --altura-topo: 56px;
+  --painel-largura: 384px;
+  --vao: 16px;
+  --barra-aval: 14px;
+  --vao-barra: 8px;
+  /* quanto da altura da tela é ocupado por topo, jogadores e barra de ações,
+     por aba; o resto vira tabuleiro (ver .palco/.tabuleiro-area) */
+  --cromo-jogar: 192px;
+  --cromo-analisar: 284px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
@@ -113,15 +124,27 @@ code { background: var(--fundo-controle); padding: .1rem .35rem; border-radius: 
 
 /* ---------------------------------------------------------------- layout */
 
-main { padding: 16px; }
+main { padding: 12px 16px; }
+
+/* cada aba sabe quanto da altura não é tabuleiro */
+#view-jogar { --cromo-tabuleiro: var(--cromo-jogar); }
+#view-analisar { --cromo-tabuleiro: var(--cromo-analisar); }
 
 .palco {
+  /* o lado do tabuleiro vem da altura da janela; o grupo todo fica centralizado */
+  --lado-tabuleiro: min(calc(100vh - var(--cromo-tabuleiro, var(--cromo-jogar))), 980px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) var(--painel-largura);
+  gap: var(--vao);
   align-items: start;
-  max-width: 1060px;
+  width: min(100%, calc(var(--lado-tabuleiro) + var(--painel-largura) + var(--vao)));
   margin: 0 auto;
+}
+@supports (height: 100dvh) {
+  /* dvh acompanha a barra de endereço do celular sem cortar o tabuleiro */
+  .palco {
+    --lado-tabuleiro: min(calc(100dvh - var(--cromo-tabuleiro, var(--cromo-jogar))), 980px);
+  }
 }
 
 .coluna-tabuleiro { min-width: 0; }
@@ -129,12 +152,12 @@ main { padding: 16px; }
 /* área do tabuleiro: barra de avaliação na coluna 1, linha do meio */
 .tabuleiro-area {
   display: grid;
-  grid-template-columns: 14px minmax(0, 1fr);
+  grid-template-columns: var(--barra-aval) minmax(0, 1fr);
   grid-template-rows: auto auto auto auto;
-  column-gap: 8px;
+  column-gap: var(--vao-barra);
   row-gap: 6px;
   /* o tabuleiro manda no tamanho: em telas baixas ele encolhe para caber */
-  max-width: min(100%, calc(100vh - 190px));
+  width: min(100%, var(--lado-tabuleiro, 100%));
   margin: 0 auto;
 }
 
@@ -142,7 +165,7 @@ main { padding: 16px; }
   grid-column: 1;
   grid-row: 2;
   position: relative;
-  width: 14px;
+  width: var(--barra-aval);
   border-radius: 3px;
   background: #262421;
   overflow: hidden;
@@ -225,7 +248,7 @@ main { padding: 16px; }
 .casa.coord::before,
 .casa.coord-linha::after {
   position: absolute;
-  font-size: 11px; font-weight: 700;
+  font-size: clamp(10px, 1.5vmin, 16px); font-weight: 700;
   line-height: 1;
   color: var(--escuro);
   pointer-events: none;
@@ -427,6 +450,10 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 
 /* ----------------------------------------------------------------- painel */
 
+@supports (height: 100dvh) {
+  .painel { max-height: calc(100dvh - 84px); }
+}
+
 .painel {
   background: var(--fundo-painel);
   border-radius: var(--raio);
@@ -434,8 +461,10 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   display: grid;
   gap: 10px;
   align-content: start;
-  max-height: calc(100vh - 88px);
+  max-height: calc(100vh - 84px);
   overflow-y: auto;
+  position: sticky;
+  top: calc(var(--altura-topo) + 12px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
 }
 .painel-topo {
@@ -680,29 +709,68 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--verde); out
   .aba.ativa { color: var(--verde); background: transparent; }
   .aba-icone svg { width: 22px; height: 22px; }
 
-  .palco { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  main { padding: 8px 8px calc(66px + env(safe-area-inset-bottom, 0)); }
+  /* tabuleiro de ponta a ponta, como no app do chess.com */
+  .palco {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+    --lado-tabuleiro: min(100vw, calc(100vh - var(--cromo-tabuleiro, var(--cromo-jogar))));
+  }
+  main { padding: 0 0 calc(58px + env(safe-area-inset-bottom, 0)); }
 
-  .tabuleiro-area { grid-template-columns: 9px minmax(0, 1fr); column-gap: 5px; row-gap: 3px; }
-  .barra-aval { width: 9px; border-radius: 2px; }
+  .tabuleiro-area {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+    row-gap: 4px;
+    width: min(100%, var(--lado-tabuleiro, 100%));
+    margin: 0 auto;
+  }
+  /* barra de avaliação fina por cima da borda esquerda do tabuleiro */
+  .barra-aval {
+    grid-column: 1; grid-row: 2;
+    justify-self: start;
+    width: 5px;
+    border-radius: 0 3px 3px 0;
+    box-shadow: none;
+    opacity: .95;
+    z-index: 6;
+  }
+  .jogador-linha, .acoes-tabuleiro, .navegacao { grid-column: 1; padding: 0 10px; }
   .avatar { width: 28px; height: 28px; font-size: 16px; }
   .dados b { font-size: .9rem; }
   .dados .rating { font-size: .72rem; }
   .relogio { font-size: 1rem; min-width: 72px; padding: 3px 9px; }
-  .tabuleiro-wrap { max-width: none; border-radius: 3px; }
+  /* o tabuleiro ocupa a única coluna (sem coluna implícita para a barra) */
+  .tabuleiro-wrap {
+    grid-column: 1;
+    grid-row: 2;
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
   .acoes-tabuleiro .btn-icone { width: 36px; height: 36px; }
   .selo { font-size: .64rem; padding: 5px 7px; }
+  .grafico { height: 66px; margin: 4px 10px 0; width: auto; }
 
-  .painel { max-height: none; border-radius: 6px; }
+  .painel { max-height: none; border-radius: 6px; position: static; margin: 0 8px; }
   .lista-lances { max-height: 200px; }
-  .grafico { height: 66px; }
 }
 
 @media (max-width: 900px) {
-  .tabuleiro-area { max-width: 100%; }
   .toasts { bottom: 68px; }
 }
 
+@supports (height: 100dvh) {
+  @media (max-width: 900px) {
+    .palco {
+      --lado-tabuleiro: min(100vw, calc(100dvh - var(--cromo-tabuleiro, var(--cromo-jogar))));
+    }
+  }
+}
+
+/* deitado sobra pouca altura: o tabuleiro é limitado pela janela e o resto rola */
 @media (max-width: 900px) and (orientation: landscape) {
-  .tabuleiro-area { max-width: min(100%, 80vh); }
+  #view-jogar { --cromo-tabuleiro: 116px; }
+  #view-analisar { --cromo-tabuleiro: 152px; }
+  .tabuleiro-area { width: min(100%, var(--lado-tabuleiro, 100%)); margin: 0 auto; }
 }

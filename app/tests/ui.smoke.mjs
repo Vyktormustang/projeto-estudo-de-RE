@@ -185,6 +185,17 @@ const PGN = `[Event "Teste de interface"]
 
 1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0`;
 
+await teste('o tabuleiro é dimensionado pela janela (layout chess.com)', async () => {
+  const css = fs.readFileSync(new URL('../public/styles.css', import.meta.url), 'utf8');
+  assert.match(css, /--cromo-jogar:\s*\d+px/, 'orçamento de altura no modo Jogar');
+  assert.match(css, /--cromo-analisar:\s*\d+px/, 'orçamento de altura no Analisar');
+  assert.match(css, /#view-jogar\s*\{\s*--cromo-tabuleiro/, 'cada aba informa seu cromo');
+  assert.match(css, /\.tabuleiro-area\s*\{[^}]*width:\s*min\(100%,\s*var\(--lado-tabuleiro/s,
+    'a área do tabuleiro usa o lado calculado pela janela');
+  assert.match(css, /@supports \(height: 100dvh\)/, 'usa dvh quando o navegador suporta');
+  assert.ok(!/\.palco\s*\{[^}]*max-width:\s*1060px/s.test(css), 'sem o teto antigo de 1060px');
+});
+
 await teste('revisar um PGN gera relatório', async () => {
   clicar('.aba[data-aba="analisar"]');
   assert.equal($('#view-analisar').hidden, false, 'aba de análise visível');
