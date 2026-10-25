@@ -69,6 +69,14 @@ jobs:
             echo "=== interface (jsdom) ==="; node tests/ui.smoke.mjs
           } 2>&1 | tee ../build/testes.log
 
+      - name: Cache da chave de assinatura
+        uses: actions/cache@v4
+        with:
+          path: android/keystore
+          key: apk-keystore-v1
+          # sem isso cada build geraria uma chave nova e o Android recusaria
+          # instalar por cima da versão anterior
+
       - name: Compilar APK
         run: |
           set -o pipefail
