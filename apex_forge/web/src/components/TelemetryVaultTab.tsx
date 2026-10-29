@@ -19,6 +19,7 @@ import { StreakTracker } from './StreakTracker';
 import { WeeklyComparison } from './WeeklyComparison';
 import { MonthlyReview } from './MonthlyReview';
 import { DailyJournal } from './DailyJournal';
+import { EnergyChart } from './EnergyChart';
 import { WeeklyGoals } from './WeeklyGoals';
 import { computePolymathRadar } from '../engine/polymathRadarEngine';
 import { addDaysToBioDay, evaluateEvolutionPhase } from '../engine/stateEngine';
@@ -486,6 +487,9 @@ export const TelemetryVaultTab: React.FC<Props> = ({
 
         {/* DAILY JOURNAL */}
         <DailyJournal bioDayId={bioDayId} vault={vault} onUpdateVault={onUpdateVault} />
+
+        {/* ENERGY CHART */}
+        <EnergyChart bioDayId={bioDayId} vault={vault} />
 
         <div className="grid-2" style={{ marginBottom: 10 }}>
           <button
