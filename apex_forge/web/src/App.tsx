@@ -359,7 +359,7 @@ export const AppInner: React.FC = () => {
           <div>
             <div className="brand-title">FORJA • {vault.profile.codename}</div>
             <div className="brand-sub">
-              Treino {vault.nextQueueSlot} • {envLabel} • v37.0.0
+              Treino {vault.nextQueueSlot} • {envLabel} • v38.0.0
             </div>
           </div>
         </div>

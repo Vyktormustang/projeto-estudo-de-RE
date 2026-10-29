@@ -21,6 +21,7 @@ import { MonthlyReview } from './MonthlyReview';
 import { DailyJournal } from './DailyJournal';
 import { EnergyChart } from './EnergyChart';
 import { SleepChart } from './SleepChart';
+import { HabitTracker } from './HabitTracker';
 import { WeeklyGoals } from './WeeklyGoals';
 import { computePolymathRadar } from '../engine/polymathRadarEngine';
 import { addDaysToBioDay, evaluateEvolutionPhase } from '../engine/stateEngine';
@@ -494,6 +495,9 @@ export const TelemetryVaultTab: React.FC<Props> = ({
 
         {/* SLEEP CHART */}
         <SleepChart bioDayId={bioDayId} vault={vault} />
+
+        {/* HABIT TRACKER */}
+        <HabitTracker bioDayId={bioDayId} vault={vault} onUpdateVault={onUpdateVault} />
 
         <div className="grid-2" style={{ marginBottom: 10 }}>
           <button
