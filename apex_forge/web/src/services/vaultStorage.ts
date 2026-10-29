@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const LOCAL_STORAGE_KEY = 'forja_apice_vault_v36';
+const LOCAL_STORAGE_KEY = 'forja_apice_vault_v37';
 
 function sanitizeLoadedVault(raw: unknown): VaultState {
   const fallback = createInitialVault();

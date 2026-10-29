@@ -1,4 +1,4 @@
-export const ENGINE_VERSION = '36.0.0';
+export const ENGINE_VERSION = '37.0.0';
 
 export type BiologicalSex = 'MASCULINO' | 'FEMININO';
 export type TrainingLevel = 'INICIANTE' | 'INTERMEDIARIO' | 'AVANCADO';
