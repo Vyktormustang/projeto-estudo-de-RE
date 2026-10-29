@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Fundo Obsidiana Tatico -->
+    <path
+        android:fillColor="#080A0F"
+        android:pathData="M0,0h108v108h-108z" />
+
+    <!-- Moldura Hexagonal de Blindagem -->
+    <path
+        android:fillColor="#131926"
+        android:strokeColor="#F59E0B"
+        android:strokeWidth="2.6"
+        android:pathData="M54,12 L88,31 L88,77 L54,96 L20,77 L20,31 Z" />
+
+    <!-- Chama do Apice (Ouro Forja) -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M54,23 C63,35 71,44 71,56 C71,66 63.5,74 54,74 C44.5,74 37,66 37,56 C37,48 41.5,41 46,35 C46,42 50,45 52,45 C49,37 50,29 54,23 Z" />
+
+    <!-- Nucleo Autonomico Esmeralda (Equilibrio Biologico) -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M54,48 C58.5,53 61,57 61,61.5 C61,65.5 57.9,68.5 54,68.5 C50.1,68.5 47,65.5 47,61.5 C47,57 49.5,53 54,48 Z" />
+
+    <!-- Base da Bigorna -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M35,78 L73,78 L69,84 L39,84 Z" />
+</vector>
