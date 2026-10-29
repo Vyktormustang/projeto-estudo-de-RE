@@ -17,6 +17,7 @@ import { ExportCsvPanel } from './ExportCsvPanel';
 import { WeeklyInsights } from './WeeklyInsights';
 import { StreakTracker } from './StreakTracker';
 import { WeeklyComparison } from './WeeklyComparison';
+import { MonthlyReview } from './MonthlyReview';
 import { WeeklyGoals } from './WeeklyGoals';
 import { computePolymathRadar } from '../engine/polymathRadarEngine';
 import { addDaysToBioDay, evaluateEvolutionPhase } from '../engine/stateEngine';
@@ -478,6 +479,9 @@ export const TelemetryVaultTab: React.FC<Props> = ({
 
         {/* WEEKLY COMPARISON */}
         <WeeklyComparison bioDayId={bioDayId} vault={vault} />
+
+        {/* MONTHLY REVIEW */}
+        <MonthlyReview bioDayId={bioDayId} vault={vault} />
 
         <div className="grid-2" style={{ marginBottom: 10 }}>
           <button
