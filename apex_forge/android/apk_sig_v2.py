@@ -178,16 +178,19 @@ def _build_apk_signing_block(v2_signing_data):
       uint64: 8  -- ID size
       uint64: APK_SIG_BLOCK_ID  -- header ID
         uint64: entry_id  -- = APK_SIG_BLOCK_ID
-        uint64: entry_size  -- size of v2_signing_data
+        uint64: entry_size  -- size of (algorithm_id + v2_signing_data)
+        uint32: algorithm_id  -- = APK_SIG_BLOCK_ID
         byte[] v2_signing_data
       uint64: APK_SIG_BLOCK_ID  -- footer ID
       uint64: block_size  -- footer size copy
     """
     entry_id = APK_SIG_BLOCK_ID
-    entry_size = len(v2_signing_data)
+    # entry_size = algorithm_id (4 bytes) + v2_signing_data
+    entry_size = 4 + len(v2_signing_data)
 
-    # block_size = 8 (ID size) + 8 (ID value) + 8 (entry ID) + 8 (entry size)
-    #            + len(v2_signing_data) + 8 (footer ID) + 8 (footer size)
+    # block_size = 8 (ID size) + 8 (ID value)
+    #            + 8 (entry ID) + 8 (entry size) + entry_size
+    #            + 8 (footer ID) + 8 (footer size)
     block_size = 8 + 8 + 8 + 8 + entry_size + 8 + 8
 
     block = bytearray()
@@ -195,9 +198,10 @@ def _build_apk_signing_block(v2_signing_data):
     block += _u64le(8)  # ID size
     block += _u64le(APK_SIG_BLOCK_ID)  # header ID
 
-    # Entry inside the block
+    # Entry inside the block: entry_id + entry_size + algorithm_id + entry_data
     block += _u64le(entry_id)
     block += _u64le(entry_size)
+    block += _u32le(APK_SIG_BLOCK_ID)  # algorithm_id within the entry
     block += v2_signing_data
 
     # Footer
