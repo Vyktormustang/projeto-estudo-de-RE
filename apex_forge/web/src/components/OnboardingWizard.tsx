@@ -164,7 +164,7 @@ export const OnboardingWizard: React.FC<Props> = ({
           </div>
           <div>
             <div className="brand-title">FORJA — Sistema do Ápice</div>
-            <div className="brand-sub">Configuração Rápida v34.0.0 • Passo {step}/4</div>
+            <div className="brand-sub">Configuração Rápida v35.0.0 • Passo {step}/4</div>
           </div>
         </div>
         {onCancelEdit && (
