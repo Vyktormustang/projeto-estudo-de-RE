@@ -26,6 +26,89 @@ echo "[2/8] Compilando recursos Android via aapt2..."
 echo "[3/8] Criando APK base com AXML binário + ResTable (Python, sem android.jar)..."
 /tmp/venv/bin/python "$MAKE_APK_BASE"
 
+# Substituir AndroidManifest.xml gerado (com string pool corrompido) pelo manifest v15 valido
+# com versionCode=3800 e versionName="38.0.0"
+/tmp/venv/bin/python - << 'PY'
+import zipfile, shutil, os, struct, zlib
+
+base_apk = "/tmp/forja_apk_build/base.apk"
+manifest_v38 = "/tmp/manifest_v38.axml"
+
+# Ler o base.apk e substituir o AndroidManifest.xml
+entries = []
+with zipfile.ZipFile(base_apk, 'r') as zin:
+    for info in zin.infolist():
+        if info.filename == 'AndroidManifest.xml':
+            with open(manifest_v38, 'rb') as f:
+                data = f.read()
+            print(f"AndroidManifest.xml substituido pelo v38: {len(data)} bytes")
+        else:
+            data = zin.read(info.filename)
+        entries.append((info.filename, data, info.compress_type, info.external_attr, info.date_time))
+
+# Reescrever base.apk com alinhamento de 4 bytes
+outfile = base_apk + ".tmp"
+with open(outfile, 'wb') as f:
+    current_offset = 0
+    central_dir = []
+
+    for filename, data, compress_type, external_attr, date_time in entries:
+        padding = (4 - (current_offset % 4)) % 4
+        if padding > 0:
+            f.write(b'\x00' * padding)
+            current_offset += padding
+
+        crc = zlib.crc32(data) & 0xffffffff
+
+        if compress_type == zipfile.ZIP_STORED or filename == 'resources.arsc':
+            ct = zipfile.ZIP_STORED
+            comp_data = data
+            comp_size = len(data)
+        else:
+            ct = zipfile.ZIP_DEFLATED
+            co = zlib.compressobj(zlib.Z_DEFAULT_COMPRESSION, zlib.DEFLATED, -15)
+            comp_data = co.compress(data) + co.flush()
+            comp_size = len(comp_data)
+
+        uncomp_size = len(data)
+        filename_bytes = filename.encode('utf-8')
+        local_offset = current_offset
+
+        f.write(struct.pack('<IHHHHHIIIHH',
+            0x04034b50, 20, 0, ct, 0, 0,
+            crc, comp_size, uncomp_size,
+            len(filename_bytes), 0))
+        f.write(filename_bytes)
+        f.write(comp_data)
+
+        current_offset = f.tell()
+
+        new_info = zipfile.ZipInfo(filename, date_time=date_time)
+        new_info.external_attr = external_attr
+        new_info.compress_type = ct
+        central_dir.append((new_info, crc, comp_size, uncomp_size, len(filename_bytes), local_offset))
+
+    cd_start = f.tell()
+    for new_info, crc, comp_size, uncomp_size, name_len, local_offset in central_dir:
+        filename_bytes = new_info.filename.encode('utf-8')
+        f.write(struct.pack('<IHHHHHHIIIHHHHHII',
+            0x02014b50, 20, 20, 0, new_info.compress_type,
+            0, 0, crc, comp_size, uncomp_size,
+            name_len, 0, 0, 0, 0,
+            new_info.external_attr, local_offset & 0xffffffff))
+        f.write(filename_bytes)
+
+    cd_end = f.tell()
+
+    f.write(struct.pack('<IHHHHIIH',
+        0x06054b50, 0, 0,
+        len(central_dir), len(central_dir),
+        cd_end - cd_start, cd_start, 0))
+
+shutil.move(outfile, base_apk)
+print("base.apk atualizado com AndroidManifest.xml valido (v38)")
+PY
+
 echo "[3b/8] Substituindo resources.arsc, classes.dex e adicionando recursos do v22.0 (funciona)..."
 # O resources.arsc gerado por make_apk_base.py e minimo (264 bytes) e nao contem
 # recursos como @drawable/ic_launcher, @string/app_name, @style/AppTheme,
