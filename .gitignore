@@ -1,0 +1,15 @@
+# --- GBA RE (projeto anterior) ---
+rom/*.gba
+rom_mod/*.gba
+emu/*.bin
+deliver/
+*.pyc
+__pycache__/
+
+# --- FORJA ---
+forja/web/node_modules/
+forja/web/dist/
+forja/dist/
+forja/web/.vite/
+*.apk
+!forja/**/*.apk

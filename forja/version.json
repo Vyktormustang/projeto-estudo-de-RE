@@ -1,0 +1,8 @@
+{
+  "name": "39.0.0",
+  "code": 3900,
+  "applicationId": "br.forja.apice",
+  "minSdk": 24,
+  "targetSdk": 34,
+  "canal": "canario"
+}
