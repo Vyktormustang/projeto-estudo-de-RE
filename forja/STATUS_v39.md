@@ -12,8 +12,9 @@ assinado (v1+v2+v3), zero permissões, com Release automática. Falta apenas o
 |---|---|
 | Resultado | ✅ 22/22 passos verdes |
 | APK | `Forja_Apice_v39.0.0.apk` — 46 089 bytes |
-| SHA-256 | `1c1e3f1a37bd0d579adcc592b95bcad24d2b4541dd22220aee76346cc4ffdb84` |
-| MD5 | `db3500130c157484f0110ed2c3dd6fb5` |
+| SHA-256 | `fc040f48267c8133d8de112babcc5ae0bac34fd5ece8fc0b8606cd55b0de6cf3` |
+| MD5 | `54e6a05b843b0d7ae5059dea815224f5` |
+| Certificado (SHA-256) | `15:E9:23:0C:8A:25:99:DB:FB:A2:2B:11:A3:87:18:95:12:55:93:1F:E4:E6:29:EB:04:C8:AA:A1:D8:73:8B:7C` |
 | Assinatura | `apksigner verify` OK — v1 + v2 + v3 |
 | Alinhamento | `zipalign -c -p 4` OK |
 | Permissões | `uses-permission = 0` (offline de verdade) |
@@ -22,6 +23,11 @@ assinado (v1+v2+v3), zero permissões, com Release automática. Falta apenas o
 
 Download:
 `https://github.com/Vyktormustang/projeto-estudo-de-RE/releases/download/forja-v39.0.0-canario/Forja_Apice_v39.0.0.apk`
+
+> O SHA-256 muda a cada build com o mesmo conteúdo: o `zip` grava o horário dos
+> arquivos, então os bytes não são reprodutíveis bit a bit (o conteúdo lógico é).
+> Se precisar de reprodutibilidade bit-exata, é um ajuste pequeno no
+> `build_apk.sh` (timestamps fixos + `SOURCE_DATE_EPOCH`).
 
 > O APK é **pequeno (45 KB)** de propósito: é o build de canário — shell WebView
 > + núcleo do xadrez. O v38 tinha 536 KB porque carregava as 240 lições, o

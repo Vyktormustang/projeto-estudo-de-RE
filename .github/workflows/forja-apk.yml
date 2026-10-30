@@ -216,7 +216,7 @@ jobs:
           BT="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)"
           PERMS=$("${BT}aapt2" dump permissions "$APK" | grep -c 'uses-permission' || true)
           CERT=$("${BT}apksigner" verify --print-certs "$APK" \
-                 | grep -m1 'certificate SHA-256 digest' | awk -F': ' '{print $2}' || true)
+                 | grep -i 'sha-256 digest' | head -1 | sed 's/.*digest:[[:space:]]*//' || true)
           echo "FORJA_CERT_SHA256=${CERT}" 
           echo "::notice title=APK FORJA v${{ steps.versao.outputs.name }}::sha256=${{ steps.apk.outputs.apk_sha256 }} md5=${{ steps.apk.outputs.apk_md5 }} bytes=${{ steps.apk.outputs.apk_size }}"
           echo "::notice title=Assinatura::cert_sha256=${CERT} schemes=v1+v2+v3 zipalign=OK"
@@ -277,5 +277,5 @@ jobs:
             echo "| SHA-256 | \`${{ steps.apk.outputs.apk_sha256 }}\` |"
             echo "| MD5 | \`${{ steps.apk.outputs.apk_md5 }}\` |"
             echo "| bytes | ${{ steps.apk.outputs.apk_size }} |"
-            echo "| union | reproduzível: \`bash forja/tools/build_apk.sh\` |"
+            echo "| reproduzir | \`bash forja/tools/build_apk.sh\` (bytes podem variar por timestamp do zip) |"
           } >> "$GITHUB_STEP_SUMMARY"
