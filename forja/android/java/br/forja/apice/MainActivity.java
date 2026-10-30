@@ -5,7 +5,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -104,8 +104,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (web != null) {
-            View pai = (View) web.getParent();
-            if (pai != null) pai.removeView(web);
+            // getParent() devolve ViewParent; removeView é método de ViewGroup.
+            if (web.getParent() instanceof ViewGroup) {
+                ((ViewGroup) web.getParent()).removeView(web);
+            }
             web.destroy();
             web = null;
         }
