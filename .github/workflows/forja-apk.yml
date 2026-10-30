@@ -1,0 +1,217 @@
+name: FORJA — APK assinado
+
+# Gera o Forja_Apice_v<versão>.apk (WebView offline, sem permissões de rede)
+# a cada push que toque em forja/**, e publica como artifact + Release.
+
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+    paths:
+      - 'forja/**'
+      - '.github/workflows/forja-apk.yml'
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: 'versionName (vazio = forja/version.json)'
+        required: false
+        default: ''
+      version_code:
+        description: 'versionCode (vazio = forja/version.json)'
+        required: false
+        default: ''
+      publicar_release:
+        description: 'Criar/atualizar Release com o APK'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: forja-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: Build + assinatura + verificação
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Versão (version.json ou input)
+        id: versao
+        run: |
+          set -euo pipefail
+          NOME_IN="${{ github.event.inputs.version_name }}"
+          CODE_IN="${{ github.event.inputs.version_code }}"
+          if [ -z "$NOME_IN" ]; then
+            NOME_IN=$(python3 -c "import json;print(json.load(open('forja/version.json'))['name'])")
+          fi
+          if [ -z "$CODE_IN" ]; then
+            CODE_IN=$(python3 -c "import json;print(json.load(open('forja/version.json'))['code'])")
+          fi
+          echo "name=$NOME_IN" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE_IN" >> "$GITHUB_OUTPUT"
+          echo "tag=forja-v$NOME_IN" >> "$GITHUB_OUTPUT"
+          echo "FORJA_VERSION_NAME=$NOME_IN" >> "$GITHUB_ENV"
+          echo "Versão do build: $NOME_IN ($CODE_IN)"
+
+      - name: Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: forja/web/package-lock.json
+
+      - name: npm ci
+        working-directory: forja/web
+        run: npm ci --no-audit --no-fund
+
+      - name: TypeScript (tsc --noEmit)
+        working-directory: forja/web
+        run: npm run typecheck
+
+      - name: Testes (vitest)
+        working-directory: forja/web
+        run: npm test
+
+      - name: Build web (vite)
+        working-directory: forja/web
+        run: npm run build
+
+      - name: JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Android SDK (build-tools + platform)
+        uses: android-actions/setup-android@v3
+
+      - name: Garantir build-tools 34.0.0 e platform 34
+        run: |
+          set -euo pipefail
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" >/dev/null
+          ls "$ANDROID_HOME/build-tools"
+          ls "$ANDROID_HOME/platforms"
+
+      - name: Reconstituir keystore
+        # Preferência: segredo do repositório. Sem segredo (token sem permissão
+        # de admin), cai no keystore versionado em forja/signing/ — ver o README
+        # daquela pasta sobre a troca do certificado.
+        env:
+          KS_B64: ${{ secrets.FORJA_KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.FORJA_KS_PASS }}
+          KEY_PASS: ${{ secrets.FORJA_KEY_PASS }}
+          KS_ALIAS: ${{ secrets.FORJA_KS_ALIAS }}
+        run: |
+          set -euo pipefail
+          if [ -n "${KS_B64:-}" ]; then
+            echo "Fonte do keystore: segredo do repositório"
+            printf '%s' "$KS_B64" | base64 -d > "$RUNNER_TEMP/forja.p12"
+            SENHA="${KS_PASS:?segredo FORJA_KS_PASS ausente}"
+            SENHA_CHAVE="${KEY_PASS:-$SENHA}"
+            APELIDO="${KS_ALIAS:-forja}"
+          else
+            echo "Fonte do keystore: forja/signing/forja.p12.b64 (versionado)"
+            echo "::warning::Usando keystore versionado. Para produção, adicione os segredos FORJA_KEYSTORE_B64 / FORJA_KS_PASS / FORJA_KEY_PASS."
+            base64 -d forja/signing/forja.p12.b64 > "$RUNNER_TEMP/forja.p12"
+            SENHA="forja-ci-offline-2026"
+            SENHA_CHAVE="$SENHA"
+            APELIDO="forja"
+          fi
+          test -s "$RUNNER_TEMP/forja.p12"
+          echo "Keystore reconstituído ($(stat -c %s "$RUNNER_TEMP/forja.p12") bytes)"
+          echo "FORJA_KS_FILE=$RUNNER_TEMP/forja.p12" >> "$GITHUB_ENV"
+          echo "FORJA_KS_ALIAS=$APELIDO" >> "$GITHUB_ENV"
+          echo "FORJA_KS_PASS=$SENHA" >> "$GITHUB_ENV"
+          echo "FORJA_KEY_PASS=$SENHA_CHAVE" >> "$GITHUB_ENV"
+
+      - name: Empacotar APK (aapt2 → javac → d8 → zipalign → apksigner)
+        id: apk
+        run: |
+          set -euo pipefail
+          bash forja/tools/build_apk.sh \
+            --dist forja/web/dist \
+            --version-name "${{ steps.versao.outputs.name }}" \
+            --version-code "${{ steps.versao.outputs.code }}" \
+            --ks "$FORJA_KS_FILE" \
+            --ks-pass "$FORJA_KS_PASS" \
+            --ks-key-alias "$FORJA_KS_ALIAS" \
+            --key-pass "$FORJA_KEY_PASS" \
+            --out "forja/dist/Forja_Apice_v${{ steps.versao.outputs.name }}.apk"
+
+      - name: Fumaça pós-build (conteúdo do APK)
+        run: |
+          set -euo pipefail
+          APK="${{ steps.apk.outputs.apk_path }}"
+          echo "--- entradas obrigatórias ---"
+          for entrada in AndroidManifest.xml classes.dex resources.arsc \
+                         assets/www/index.html; do
+            unzip -l "$APK" | grep -q "$entrada" \
+              && echo "OK   $entrada" \
+              || { echo "FALTA $entrada"; exit 1; }
+          done
+          echo "--- permissões declaradas (deve ser vazio) ---"
+          AAPT2="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2"
+          "$AAPT2" dump permissions "$APK" | tee permissoes.txt
+          if grep -q 'uses-permission' permissoes.txt; then
+            echo "::warning::APK declara permissões — revise (esperado: zero)"
+          fi
+          echo "--- tamanho ---"
+          ls -lh "$APK"
+
+      - name: Publicar artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: forja-apk-${{ steps.versao.outputs.name }}
+          path: |
+            ${{ steps.apk.outputs.apk_path }}
+            permissoes.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Release (tag forja-v<versão>)
+        if: github.event_name == 'workflow_dispatch' && inputs.publicar_release != 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG="${{ steps.versao.outputs.tag }}"
+          APK="${{ steps.apk.outputs.apk_path }}"
+          NOTAS="FORJA v${{ steps.versao.outputs.name }} (build ${{ steps.versao.outputs.code }})
+          - APK WebView offline, zero permissões
+          - SHA-256: \`${{ steps.apk.outputs.apk_sha256 }}\`
+          - MD5: \`${{ steps.apk.outputs.apk_md5 }}\`
+          - Tamanho: ${{ steps.apk.outputs.apk_size }} bytes
+          - Commit: ${{ github.sha }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" --clobber
+            gh release edit "$TAG" --notes "$NOTAS"
+          else
+            gh release create "$TAG" "$APK" \
+              --title "FORJA v${{ steps.versao.outputs.name }}" \
+              --notes "$NOTAS" \
+              --target "${{ github.sha }}"
+          fi
+
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "## FORJA v${{ steps.versao.outputs.name }}"
+            echo
+            echo "| Campo | Valor |"
+            echo "|---|---|"
+            echo "| APK | \`${{ steps.apk.outputs.apk_path }}\` |"
+            echo "| SHA-256 | \`${{ steps.apk.outputs.apk_sha256 }}\` |"
+            echo "| MD5 | \`${{ steps.apk.outputs.apk_md5 }}\` |"
+            echo "| bytes | ${{ steps.apk.outputs.apk_size }} |"
+            echo "| union | reproduzível: \`bash forja/tools/build_apk.sh\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
