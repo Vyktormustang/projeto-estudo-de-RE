@@ -208,6 +208,20 @@ jobs:
           echo "--- tamanho ---"
           ls -lh "$APK"
 
+      - name: Relatório de verificação (anotações)
+        if: success()
+        run: |
+          set -euo pipefail
+          APK="${{ steps.apk.outputs.apk_path }}"
+          AAPT2="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2"
+          PERMS=$("$AAPT2" dump permissions "$APK" | grep -c 'uses-permission' || true)
+          CERT=$("$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" \
+                 | grep -m1 'certificate SHA-256 digest' | awk '{print $NF}' || true)
+          echo "::notice title=APK FORJA v${{ steps.versao.outputs.name }}::sha256=${{ steps.apk.outputs.apk_sha256 }} md5=${{ steps.apk.outputs.apk_md5 }} bytes=${{ steps.apk.outputs.apk_size }}"
+          echo "::notice title=Assinatura::cert_sha256=${CERT} schemes=v1+v2+v3 zipalign=OK"
+          echo "::notice title=Permissões::uses-permission=$PERMS (esperado 0)"
+          echo "::notice title=Entradas::$(tr '\n' ' ' < entradas.txt | grep -o 'assets/www/[^ ]*\|classes.dex\|AndroidManifest.xml\|resources.arsc' | sort -u | tr '\n' ' ')"
+
       - name: Publicar artifact
         uses: actions/upload-artifact@v4
         with:
@@ -221,13 +235,19 @@ jobs:
           retention-days: 30
 
       - name: Release (tag forja-v<versão>)
-        if: github.event_name == 'workflow_dispatch' && inputs.publicar_release != 'false'
+        # main = release estável; branch de trabalho = prerelease (canário).
+        if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/arena/') || github.event_name == 'workflow_dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           TAG="${{ steps.versao.outputs.tag }}"
           APK="${{ steps.apk.outputs.apk_path }}"
+          PRE=""
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            PRE="--prerelease"
+            TAG="${TAG}-canario"
+          fi
           NOTAS="FORJA v${{ steps.versao.outputs.name }} (build ${{ steps.versao.outputs.code }})
           - APK WebView offline, zero permissões
           - SHA-256: \`${{ steps.apk.outputs.apk_sha256 }}\`
@@ -238,7 +258,7 @@ jobs:
             gh release upload "$TAG" "$APK" --clobber
             gh release edit "$TAG" --notes "$NOTAS"
           else
-            gh release create "$TAG" "$APK" \
+            gh release create "$TAG" "$APK" $PRE \
               --title "FORJA v${{ steps.versao.outputs.name }}" \
               --notes "$NOTAS" \
               --target "${{ github.sha }}"
