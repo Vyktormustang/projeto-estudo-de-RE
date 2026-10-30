@@ -89,17 +89,43 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Android SDK (build-tools + platform)
-        uses: android-actions/setup-android@v3
+      - name: Android SDK (usa o SDK pré-instalado do runner)
+        run: |
+          set -euo pipefail
+          # O runner ubuntu-latest já traz o SDK; não dependemos de ação externa.
+          if [ -z "${ANDROID_HOME:-}" ] || [ ! -d "${ANDROID_HOME:-/nada}" ]; then
+            for cand in /usr/local/lib/android/sdk "$HOME/Android/Sdk" /opt/android-sdk; do
+              if [ -d "$cand" ]; then ANDROID_HOME="$cand"; break; fi
+            done
+          fi
+          test -n "${ANDROID_HOME:-}" || { echo "::error::SDK Android não encontrado"; exit 1; }
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          ls "$ANDROID_HOME" || true
+          echo "build-tools: $(ls "$ANDROID_HOME/build-tools" 2>/dev/null | tr '\n' ' ')"
+          echo "platforms:   $(ls "$ANDROID_HOME/platforms" 2>/dev/null | tr '\n' ' ')"
 
       - name: Garantir build-tools 34.0.0 e platform 34
         run: |
           set -euo pipefail
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" >/dev/null
-          ls "$ANDROID_HOME/build-tools"
-          ls "$ANDROID_HOME/platforms"
+          PRECISA=""
+          [ -d "$ANDROID_HOME/build-tools/34.0.0" ] || PRECISA="$PRECISA build-tools;34.0.0"
+          [ -d "$ANDROID_HOME/platforms/android-34" ] || PRECISA="$PRECISA platforms;android-34"
+          if [ -n "$PRECISA" ]; then
+            SDKM="$(ls "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager 2>/dev/null | head -1)"
+            test -n "$SDKM" || { echo "::error::sdkmanager ausente e faltam pacotes:$PRECISA"; exit 1; }
+            echo "Instalando:$PRECISA"
+            yes | "$SDKM" --licenses >/dev/null 2>&1 || true
+            # shellcheck disable=SC2086
+            "$SDKM" $PRECISA >/dev/null
+          fi
+          test -d "$ANDROID_HOME/build-tools/34.0.0"
+          test -d "$ANDROID_HOME/platforms/android-34"
+          ls "$ANDROID_HOME/build-tools/34.0.0"/aapt2 \
+             "$ANDROID_HOME/build-tools/34.0.0"/d8 \
+             "$ANDROID_HOME/build-tools/34.0.0"/zipalign \
+             "$ANDROID_HOME/build-tools/34.0.0"/apksigner
 
       - name: Reconstituir keystore
         # Preferência: segredo do repositório. Sem segredo (token sem permissão
