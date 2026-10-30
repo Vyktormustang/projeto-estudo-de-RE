@@ -3,8 +3,8 @@
   FORJA — shell Android (WebView offline).
   Sem <uses-permission>: o app não pede rede, storage nem nada. WebView lê os
   assets embarcados por file:///android_asset/www/index.html.
-  versionCode/versionName são injetados no build por aapt2 (--version-code /
-  --version-name) — o CI passa os valores reais.
+  versionCode e versionName abaixo são o padrão local; o CI injeta os valores
+  reais via aapt2 link (opções version-code e version-name).
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="br.forja.apice"
