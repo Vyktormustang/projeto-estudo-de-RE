@@ -213,10 +213,11 @@ jobs:
         run: |
           set -euo pipefail
           APK="${{ steps.apk.outputs.apk_path }}"
-          AAPT2="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)aapt2"
-          PERMS=$("$AAPT2" dump permissions "$APK" | grep -c 'uses-permission' || true)
-          CERT=$("$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" \
-                 | grep -m1 'certificate SHA-256 digest' | awk '{print $NF}' || true)
+          BT="$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)"
+          PERMS=$("${BT}aapt2" dump permissions "$APK" | grep -c 'uses-permission' || true)
+          CERT=$("${BT}apksigner" verify --print-certs "$APK" \
+                 | grep -m1 'certificate SHA-256 digest' | awk -F': ' '{print $2}' || true)
+          echo "FORJA_CERT_SHA256=${CERT}" 
           echo "::notice title=APK FORJA v${{ steps.versao.outputs.name }}::sha256=${{ steps.apk.outputs.apk_sha256 }} md5=${{ steps.apk.outputs.apk_md5 }} bytes=${{ steps.apk.outputs.apk_size }}"
           echo "::notice title=Assinatura::cert_sha256=${CERT} schemes=v1+v2+v3 zipalign=OK"
           echo "::notice title=Permissões::uses-permission=$PERMS (esperado 0)"
