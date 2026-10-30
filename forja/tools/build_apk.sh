@@ -132,10 +132,13 @@ find "$TRAB/classes" -name '*.class' > "$TRAB/classes.txt"
 "$D8" --release --min-api 24 --lib "$ANDROID_JAR" --output "$TRAB/dex" @"$TRAB/classes.txt"
 [ -f "$TRAB/dex/classes.dex" ] || falhar "d8 não gerou classes.dex"
 
-passo "4/6 inserindo classes.dex no APK"
-cp "$TRAB/base.apk" "$TRAB/nao_assinado.apk"
-( cd "$TRAB/dex" && zip -q -X "$TRAB/nao_assinado.apk" classes.dex )
-unzip -l "$TRAB/nao_assinado.apk" | grep -q 'classes.dex' || falhar "classes.dex fora do APK"
+passo "4/6 empacotando determinístico (reprozip) com classes.dex"
+# zip/aapt2 gravam o horário corrente; o reprozip fixa timestamp para que o
+# mesmo commit gere exatamente o mesmo SHA-256.
+python3 "$AQUI/reprozip.py" --base "$TRAB/base.apk" \
+  --out "$TRAB/nao_assinado.apk" --extra "$TRAB/dex/classes.dex"
+unzip -l "$TRAB/nao_assinado.apk" > "$TRAB/entradas.txt"
+grep -q 'classes.dex' "$TRAB/entradas.txt" || falhar "classes.dex fora do APK"
 
 # ----------------------------------------------------------- 5) zipalign
 passo "5/6 zipalign -p 4"

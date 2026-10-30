@@ -208,6 +208,32 @@ jobs:
           echo "--- tamanho ---"
           ls -lh "$APK"
 
+      - name: Prova de reprodutibilidade (build duplo)
+        run: |
+          set -euo pipefail
+          APK="${{ steps.apk.outputs.apk_path }}"
+          # GITHUB_OUTPUT vazio de propósito: o 2º build não deve sobrescrever
+          # as saídas do 1º (usadas pelo artifact e pela Release).
+          GITHUB_OUTPUT= bash forja/tools/build_apk.sh \
+            --dist forja/web/dist \
+            --version-name "${{ steps.versao.outputs.name }}" \
+            --version-code "${{ steps.versao.outputs.code }}" \
+            --ks "$FORJA_KS_FILE" \
+            --ks-pass "$FORJA_KS_PASS" \
+            --ks-key-alias "$FORJA_KS_ALIAS" \
+            --key-pass "$FORJA_KEY_PASS" \
+            --out "$RUNNER_TEMP/repro.apk" | tail -6
+          A=$(sha256sum "$APK" | cut -d' ' -f1)
+          B=$(sha256sum "$RUNNER_TEMP/repro.apk" | cut -d' ' -f1)
+          echo "build1=$A"
+          echo "build2=$B"
+          if [ "$A" = "$B" ]; then
+            echo "::notice title=Reprodutibilidade::OK — dois builds do mesmo commit geram o mesmo SHA-256 ($A)"
+          else
+            echo "::error title=Reprodutibilidade::DIVERGE — $A != $B"
+            exit 1
+          fi
+
       - name: Relatório de verificação (anotações)
         if: success()
         run: |
