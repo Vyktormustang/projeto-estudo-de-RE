@@ -123,9 +123,8 @@ passo "3/6 javac do shell WebView"
 find "$FORJA/android/java" -name '*.java' > "$TRAB/fontes.txt"
 find "$TRAB/gen" -name '*.java' >> "$TRAB/fontes.txt"
 [ -s "$TRAB/fontes.txt" ] || falhar "nenhum .java encontrado"
-javac -source 8 -target 8 -encoding UTF-8 -Xlint:-options \
-  -bootclasspath "$ANDROID_JAR" -classpath "$ANDROID_JAR" \
-  -d "$TRAB/classes" @"$TRAB/fontes.txt"
+javac -encoding UTF-8 -source 8 -target 8 -nowarn -Xlint:-options \
+  -classpath "$ANDROID_JAR" -d "$TRAB/classes" @"$TRAB/fontes.txt"
 
 # ------------------------------------------------------------- 4) d8 -> dex
 passo "4/6 d8 -> classes.dex"
