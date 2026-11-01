@@ -1,0 +1,49 @@
+.syntax unified
+.cpu arm7tdmi
+.thumb
+.section .entry,"ax",%progbits
+.align 2
+.global entry_battle_init_v7,entry_turn_start_v7
+.global entry_attackcanceler_v7,entry_critcalc_v7,entry_damage_v7
+.global entry_healthbar_v7,entry_datahp_v7
+.global entry_seteffect_chance_v7,entry_seteffect_primary_v7,entry_seteffect_secondary_v7
+.global entry_moveend_v7,entry_statbuffchange_v7
+.global entry_pivot_check,entry_parting_init,entry_parting_check
+.global entry_coaching_check,entry_dragon_cheer_apply,entry_restore_attacker
+.global entry_upper_hand_check,entry_burning_jealousy_sec,entry_alluring_voice_sec
+.global entry_psychic_noise_apply,entry_target_heal_prep
+.global entry_life_dew_check,entry_life_dew_self,entry_life_dew_ally
+.macro VECTOR name,dest
+.thumb_func
+\name:
+ ldr r3,1f
+ bx r3
+ .align 2
+1: .word \dest
+.endm
+VECTOR entry_battle_init_v7,hook_battle_init_v7
+VECTOR entry_turn_start_v7,hook_turn_start_v7
+VECTOR entry_attackcanceler_v7,hook_attackcanceler_v7
+VECTOR entry_critcalc_v7,hook_critcalc_v7
+VECTOR entry_damage_v7,hook_damage_v7
+VECTOR entry_healthbar_v7,hook_healthbar_v7
+VECTOR entry_datahp_v7,hook_datahp_v7
+VECTOR entry_seteffect_chance_v7,hook_seteffect_chance_v7
+VECTOR entry_seteffect_primary_v7,hook_seteffect_primary_v7
+VECTOR entry_seteffect_secondary_v7,hook_seteffect_secondary_v7
+VECTOR entry_moveend_v7,hook_moveend_v7
+VECTOR entry_statbuffchange_v7,hook_statbuffchange_v7
+VECTOR entry_pivot_check,hook_pivot_check
+VECTOR entry_parting_init,hook_parting_init
+VECTOR entry_parting_check,hook_parting_check
+VECTOR entry_coaching_check,hook_coaching_check
+VECTOR entry_dragon_cheer_apply,hook_dragon_cheer_apply
+VECTOR entry_restore_attacker,hook_restore_attacker
+VECTOR entry_upper_hand_check,hook_upper_hand_check
+VECTOR entry_burning_jealousy_sec,hook_burning_jealousy_sec
+VECTOR entry_alluring_voice_sec,hook_alluring_voice_sec
+VECTOR entry_psychic_noise_apply,hook_psychic_noise_apply
+VECTOR entry_target_heal_prep,hook_target_heal_prep
+VECTOR entry_life_dew_check,hook_life_dew_check
+VECTOR entry_life_dew_self,hook_life_dew_self
+VECTOR entry_life_dew_ally,hook_life_dew_ally

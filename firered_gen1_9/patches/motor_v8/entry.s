@@ -1,0 +1,55 @@
+.syntax unified
+.cpu arm7tdmi
+.thumb
+.section .entry,"ax",%progbits
+.align 2
+.global entry_battle_init_v8,entry_turn_start_v8
+.global entry_set_turn_order_v8,entry_endturn_v8
+.global entry_attackcanceler_v8,entry_accuracycheck_v8
+.global entry_damage_v8,entry_typecalc_v8
+.global entry_seteffect_chance_v8,entry_seteffect_primary_v8,entry_seteffect_secondary_v8
+.global entry_switchineffects_v8,entry_jumpifcantmakeasleep_v8
+.global entry_rapidspinfree_v8,entry_weatherball_v8,entry_brickbreak_v8
+.global entry_target_heal_prep_v8
+.global entry_field_status_prep_v8,entry_field_status_apply_v8
+.global entry_defog_evasion_check_v8,entry_defog_clear_v8
+.global entry_shore_up_prep_v8
+.global entry_tidy_up_check_v8,entry_tidy_up_clear_v8
+.global entry_chilly_reception_snow_v8,entry_hazard_hit_apply_v8
+.global entry_sticky_web_restore_v8,entry_mortal_spin_check_v8
+.macro VECTOR name,dest
+.thumb_func
+\name:
+ ldr r3,1f
+ bx r3
+ .align 2
+1: .word \dest
+.endm
+VECTOR entry_battle_init_v8,hook_battle_init_v8
+VECTOR entry_turn_start_v8,hook_turn_start_v8
+VECTOR entry_set_turn_order_v8,hook_set_turn_order_v8
+VECTOR entry_endturn_v8,hook_endturn_v8
+VECTOR entry_attackcanceler_v8,hook_attackcanceler_v8
+VECTOR entry_accuracycheck_v8,hook_accuracycheck_v8
+VECTOR entry_damage_v8,hook_damage_v8
+VECTOR entry_typecalc_v8,hook_typecalc_v8
+VECTOR entry_seteffect_chance_v8,hook_seteffect_chance_v8
+VECTOR entry_seteffect_primary_v8,hook_seteffect_primary_v8
+VECTOR entry_seteffect_secondary_v8,hook_seteffect_secondary_v8
+VECTOR entry_switchineffects_v8,hook_switchineffects_v8
+VECTOR entry_jumpifcantmakeasleep_v8,hook_jumpifcantmakeasleep_v8
+VECTOR entry_rapidspinfree_v8,hook_rapidspinfree_v8
+VECTOR entry_weatherball_v8,hook_weatherball_v8
+VECTOR entry_brickbreak_v8,hook_brickbreak_v8
+VECTOR entry_target_heal_prep_v8,hook_target_heal_prep_v8
+VECTOR entry_field_status_prep_v8,hook_field_status_prep_v8
+VECTOR entry_field_status_apply_v8,hook_field_status_apply_v8
+VECTOR entry_defog_evasion_check_v8,hook_defog_evasion_check_v8
+VECTOR entry_defog_clear_v8,hook_defog_clear_v8
+VECTOR entry_shore_up_prep_v8,hook_shore_up_prep_v8
+VECTOR entry_tidy_up_check_v8,hook_tidy_up_check_v8
+VECTOR entry_tidy_up_clear_v8,hook_tidy_up_clear_v8
+VECTOR entry_chilly_reception_snow_v8,hook_chilly_reception_snow_v8
+VECTOR entry_hazard_hit_apply_v8,hook_hazard_hit_apply_v8
+VECTOR entry_sticky_web_restore_v8,hook_sticky_web_restore_v8
+VECTOR entry_mortal_spin_check_v8,hook_mortal_spin_check_v8
