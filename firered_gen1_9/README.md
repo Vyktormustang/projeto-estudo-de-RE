@@ -4,7 +4,9 @@
 
 Corrige os dois desvios confirmados no v12: **Eerie Spell atinge o alvo através de Substitute sem consumir o boneco**, e **Shield Dust bloqueia somente o dreno de PP**. Preserva Soundproof, Endure, proteção dos PPs de Transform/Mimic e comportamento dos outros golpes. Testes dedicados incluem Substitute criado durante o turno e seleção de alvos em duplas. Payload de 454 bytes, sem RAM nova ou mudanças no catálogo.
 
-**42 verificações aprovadas, nenhuma pulada**, incluindo **uma observação intermediária de KO/EXP, não validação de vitória**: a fixture permanece na experiência tanto no controle v12 quanto no v13; a causa ainda precisa ser investigada. Saída SHA-256 `71756c820ebb71c0c64735b0e8f36cf420da29ac419f8ee09a39109d9cb4951c`, gerada em arquivo novo por `scripts/motor_v13.py`. Veja [MOTOR_V13.md — correções, testes, hashes e ressalva KO/EXP](docs/MOTOR_V13.md). A engine continua parcial; 15.008 aprendizados e 708/729 omissões restauradas, sem novas inclusões nesta etapa.
+**Auditoria KO/EXP concluída, sem nova ROM:** o teste criava um Pokémon nível 10 com apenas 1 EXP total. Corrigindo as fábricas para EXP 560, o ganho de experiência, a subida de nível e o retorno ao mapa passam em v12/v13. **54/54 verificações**, incluindo regressões v13 e EV/IV; reproduções negativas de EXP inválida ficam separadas. Veja [AUDITORIA_EXP_FIXTURES.md — causa, controles e reprodução](docs/AUDITORIA_EXP_FIXTURES.md).
+
+SHA-256 v13 permanece `71756c820ebb71c0c64735b0e8f36cf420da29ac419f8ee09a39109d9cb4951c`, gerado em arquivo novo por `scripts/motor_v13.py`; **não há v14** nesta auditoria. Veja também [MOTOR_V13.md — correções, hashes e registro histórico](docs/MOTOR_V13.md). A engine continua parcial; 15.008 aprendizados e 708/729 omissões restauradas, sem novas inclusões.
 
 ## Motor parcial `v12` — Eerie Spell e Soundproof
 

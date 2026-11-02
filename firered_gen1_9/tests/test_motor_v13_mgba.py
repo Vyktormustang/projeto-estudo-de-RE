@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 import test_motor_v12_mgba as v12
 from scripts import motor_v13 as patch
+from battle_fixture_helpers import finish_victory, main_callback2, party_experience
 
 old = v12.old
 v11 = v12.v11
@@ -45,18 +46,6 @@ class MotorV13MGBATests(unittest.TestCase):
             for sub,ability in ((1,4),(200,4),(0,19)):
                 out,_ = test._run_turn(test.interaction_state(sub=sub,ability=ability))
                 cls.baseline[sub,ability] = snapshot(out)
-            # KO de controle SEM Substitute na base: esta fixture fica no
-            # controller de EXP. Registrar antes de atribuir isso ao v13.
-            st = bytearray(test.eerie_state())
-            old.put16(st,old.FOE_BATTLE+0x2A,1)
-            old.put16(st,old.offset(old.ENEMY_PARTY_ADDR)+86,1)
-            old.MotorV10MGBATests._run_turn(test,bytes(st))
-            for _ in range(12):
-                cls.f.pulse('B',90)
-            out = cls.f.state()
-            cls.baseline_ko_phase = (out[old.offset(0x020216C8)],
-                old.u32(out,old.offset(0x020215B0)),v12.text(out))
-            cls.baseline_ko_pp = v12.pp(out)
         finally:
             cls.f.close()
         cls.f = old.Emulator(rom,Path(CORE),Path(cls.temp.name)/'v13')
@@ -152,24 +141,19 @@ class MotorV13MGBATests(unittest.TestCase):
         self.assertEqual(old.u16(out,old.offset(v11.LAST_MOVES)+2),164)
         self.assertEqual(sum(v12.pp(out)),156)
 
-    def test_observacao_ko_sem_dreno_e_limite_de_experiencia_da_fixture(self):
+    def test_ko_atras_de_substitute_sem_dreno_com_exp_e_retorno_ao_mapa(self):
         st = bytearray(self.interaction_state(sub=200))
         old.put16(st,old.FOE_BATTLE+0x2A,1)
         old.put16(st,old.offset(old.ENEMY_PARTY_ADDR)+86,1)
         before_pp = [v11.party_pp(st,s) for s in range(4)]
-        # Observação intermediária, NÃO validação do encerramento da batalha.
-        # A fixture de controle v12 também fica no controller de EXP após KO.
-        _,seen = old.MotorV10MGBATests._run_turn(self,bytes(st))
-        for _ in range(12):
-            self.f.pulse('B',90)
-        out = self.f.state()
-        self.assertEqual(old.u16(out,old.offset(old.ENEMY_PARTY_ADDR)+86),0,seen)
+        before_exp = party_experience(st)
+        # EXP da fixture agora é coerente com nível 10 (560, não 1).
+        self.assertEqual(before_exp,560)
+        old.MotorV10MGBATests._run_turn(self,bytes(st))
+        out = finish_victory(self.f,main_callback2(self.fixture))
+        self.assertEqual(old.u16(out,old.offset(old.ENEMY_PARTY_ADDR)+86),0)
         self.assertEqual([v11.party_pp(out,s) for s in range(4)],before_pp)
-        self.assertEqual(self.baseline_ko_pp,[10]*4)
-        self.assertEqual(self.baseline_ko_phase[:2],(0,0x08187142))
-        self.assertIn('EXP.',self.baseline_ko_phase[2])
-        self.assertEqual((out[old.offset(0x020216C8)],
-            old.u32(out,old.offset(0x020215B0)),v12.text(out)),self.baseline_ko_phase)
+        self.assertEqual(party_experience(out),before_exp+21)
         self.assertEqual(old.u32(out,MARKER)&0x100,0)
 
     def test_endure_preserva_alvo_a_1hp_mesmo_com_substitute(self):

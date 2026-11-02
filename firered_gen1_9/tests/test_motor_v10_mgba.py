@@ -30,6 +30,7 @@ from test_golpes_gen9_mgba import invoke, moves as get_moves, seed_mon
 from test_motor_ampliado_mgba import stored_quantity
 from test_motor_v7_mgba import bank_off, decode_gba_str
 from scripts import motor_v10 as patch
+from battle_fixture_helpers import set_level10_starter_test_stats
 
 ROM_ENV = os.environ.get("MOTOR_V10_ROM")
 BASE_ENV = os.environ.get("MOTOR_V10_BASE")
@@ -125,7 +126,7 @@ class MotorV10MGBATests(unittest.TestCase):
                 bt = u32(st, offset(0x02020374))
                 if bt == 0x04:
                     e1 = bytearray(seed_mon(bytes(st), 6, 10, (150, 150, 150, 150)))
-                    set_exp_and_test_stats(e1, 6, 10)
+                    set_level10_starter_test_stats(e1,stat=10)
                     put16(e1, offset(PARTY) + 86, 220)
                     put16(e1, offset(PARTY) + 88, 220)
                     st[offset(ENEMY_PARTY_ADDR + 100) : offset(ENEMY_PARTY_ADDR + 200)] = (
@@ -148,17 +149,17 @@ class MotorV10MGBATests(unittest.TestCase):
     @classmethod
     def _make_singles_fixture(cls) -> bytes:
         state = bytearray(seed_mon(cls.fixture, 1, 10, (672, 558, 33, 150)))
-        set_exp_and_test_stats(state, 1, 10)
+        set_level10_starter_test_stats(state,stat=10)
         return cls._enter_wild_encounter(state)
 
     @classmethod
     def _make_two_party_singles_fixture(cls) -> bytes:
         s1 = bytearray(seed_mon(cls.fixture, 1, 10, (746, 150, 150, 150)))
-        set_exp_and_test_stats(s1, 1, 10)
+        set_level10_starter_test_stats(s1,stat=10)
         put16(s1, offset(PARTY) + 86, 160)
         put16(s1, offset(PARTY) + 88, 160)
         s2 = bytearray(seed_mon(cls.fixture, 6, 10, (150, 150, 150, 150)))
-        set_exp_and_test_stats(s2, 6, 10)
+        set_level10_starter_test_stats(s2,stat=10)
         put16(s2, offset(PARTY) + 86, 0)  # aliado desmaiado no slot 1 da equipe
         put16(s2, offset(PARTY) + 88, 160)
         s1[offset(PARTY + 100) : offset(PARTY + 200)] = s2[offset(PARTY) : offset(PARTY) + 100]
@@ -168,15 +169,15 @@ class MotorV10MGBATests(unittest.TestCase):
     @classmethod
     def _make_two_enemy_trainer_like_fixture(cls) -> bytes:
         state = bytearray(seed_mon(cls.fixture, 1, 10, (521, 150, 150, 150)))
-        set_exp_and_test_stats(state, 1, 10)
+        set_level10_starter_test_stats(state,stat=10)
         return cls._enter_wild_encounter(state, two_foes=True)
 
     @classmethod
     def _make_doubles_fixture(cls) -> bytes:
         s1 = bytearray(seed_mon(cls.fixture, 1, 10, (677, 631, 150, 150)))
-        set_exp_and_test_stats(s1, 1, 10)
+        set_level10_starter_test_stats(s1,stat=10)
         s2 = bytearray(seed_mon(cls.fixture, 4, 10, (150, 150, 150, 150)))
-        set_exp_and_test_stats(s2, 4, 10)
+        set_level10_starter_test_stats(s2,stat=10)
         s1[offset(PARTY + 100) : offset(PARTY + 200)] = s2[offset(PARTY) : offset(PARTY) + 100]
         s1[offset(PLAYER_PARTY_COUNT)] = 2
         return cls._enter_wild_encounter(s1, doubles=True)

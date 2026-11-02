@@ -2,6 +2,8 @@
 
 **02/11/2026 — duas correções concluídas; projeto ainda parcial.** Esta etapa parte do v12 exato e grava um novo arquivo. Foram usados apenas estados/saves sintéticos em mGBA 0.10.5. ROMs e saves continuam fora do Git.
 
+> **Adendo da auditoria KO/EXP (02/11/2026):** a espera descrita neste relatório foi atribuída ao cenário sintético: Pokémon nível 10 com EXP total 1. Corrigindo somente EXP/checksum para 560, v12 e v13 encerram a batalha. As fábricas foram corrigidas; o teste KO agora verifica EXP, vitória e retorno ao mapa. **ROM v13 inalterada**, 54 verificações passaram na nova etapa. Veja [AUDITORIA_EXP_FIXTURES.md](AUDITORIA_EXP_FIXTURES.md). A seção KO/EXP abaixo conserva o registro histórico anterior à identificação da causa.
+
 ## Correções confirmadas
 
 1. **Eerie Spell (720) atravessa Substitute:** o alvo recebe dano e perde até três PPs do último golpe usado; o boneco mantém seu HP e seu bit de status.
