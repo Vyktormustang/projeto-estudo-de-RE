@@ -1,5 +1,9 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria de histórico e PP — v13 mantido
+
+**Trocas manuais, cancelamento e retorno** preservam os PPs corretamente e limpam o histórico apenas quando há troca. **Thrash, Rollout e SolarBeam continuam suas sequências já iniciadas após Eerie Spell zerar os PPs**, compatível com a referência moderna consultada; não foi adicionado o cancelamento legado de Spite. Oito testes novos e regressões reexecutadas: **50/50 nesta etapa, nenhum pulado**. Não há mudança na ROM nem motor v14. Veja [AUDITORIA_EERIE_HISTORICO_PP.md — evidências, reprodução e limites](docs/AUDITORIA_EERIE_HISTORICO_PP.md). Isso não valida toda a potência de Rollout, todas as travas ou todos os tipos de troca.
+
 ## Motor parcial `v13` — Eerie Spell atravessa Substitute e respeita Shield Dust
 
 Corrige os dois desvios confirmados no v12: **Eerie Spell atinge o alvo através de Substitute sem consumir o boneco**, e **Shield Dust bloqueia somente o dreno de PP**. Preserva Soundproof, Endure, proteção dos PPs de Transform/Mimic e comportamento dos outros golpes. Testes dedicados incluem Substitute criado durante o turno e seleção de alvos em duplas. Payload de 454 bytes, sem RAM nova ou mudanças no catálogo.

@@ -4,6 +4,8 @@
 
 > **Adendo da auditoria KO/EXP (02/11/2026):** a espera descrita neste relatório foi atribuída ao cenário sintético: Pokémon nível 10 com EXP total 1. Corrigindo somente EXP/checksum para 560, v12 e v13 encerram a batalha. As fábricas foram corrigidas; o teste KO agora verifica EXP, vitória e retorno ao mapa. **ROM v13 inalterada**, 54 verificações passaram na nova etapa. Veja [AUDITORIA_EXP_FIXTURES.md](AUDITORIA_EXP_FIXTURES.md). A seção KO/EXP abaixo conserva o registro histórico anterior à identificação da causa.
 
+> **Adendo de histórico/PP (02/11/2026):** trocas manuais, cancelamento e retorno, além das sequências Thrash/Rollout/SolarBeam esgotadas por Eerie Spell, agora têm testes dedicados. Os resultados não exigiram patch; o cancelamento legado de Spite não foi copiado. Veja [AUDITORIA_EERIE_HISTORICO_PP.md](AUDITORIA_EERIE_HISTORICO_PP.md) para o escopo restrito e as limitações restantes.
+
 ## Correções confirmadas
 
 1. **Eerie Spell (720) atravessa Substitute:** o alvo recebe dano e perde até três PPs do último golpe usado; o boneco mantém seu HP e seu bit de status.
