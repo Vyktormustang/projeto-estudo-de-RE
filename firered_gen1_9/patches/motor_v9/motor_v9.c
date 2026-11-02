@@ -1,34 +1,36 @@
-/*
- * Payload nativo Thumb (ARM7TDMI) do motor_v9 — FireRed Gen 1-9 (PT-BR).
+/* Rotinas auxiliares de batalha do motor_v9 (ARM7TDMI / Thumb).
  *
- * Implementa as familias finais de golpes de subida de nivel antes omitidos
- * (49 golpes / +368 entradas em learnsets_motor_v9.csv), encadeado de forma
- * limpa sobre o motor_v8 sem tocar saves pessoais nem estruturas persistentes:
+ * Encadeia sobre o motor_v8 sem tocar saves ou estruturas persistentes,
+ * restaurando +378 entradas de subida de nivel em 51 golpes nao-TM divididos
+ * em seis familias mecanicas compartilhadas:
  *
- *  - Familia 1 (Tipos e vulnerabilidade elemental): Soak (486), Magic Powder
- *    (675), Reflect Type (512), Trick-or-Treat (563), Forest's Curse (567) e
- *    Tar Shot (674), com suporte a 3o tipo efemero (STAB + efetividade) e 2x
- *    de Fogo em alvos cobertos por Tar Shot.
- *  - Familia 2 (Habilidades nativas Gen 3 e eletrificacao): Gastro Acid (380),
- *    Worry Seed (388, acordando alvos adormecidos), Entrainment (493), Doodle
- *    (759) e Electrify (578).
- *  - Familia 3 (Trocas, divisoes, inversao e sinergias de atributos): Power
- *    Trick (379), Speed Swap (638), Power Split (470), Guard Split (469),
- *    Power Swap (384), Guard Swap (385), Heart Swap (391), Topsy-Turvy (572),
- *    Acupressure (367), Decorate (684), Spicy Extract (750), Venom Drench
- *    (595), Toxic Thread (627), Rototiller (559), Flower Shield (575),
- *    Magnetic Flux (598), Gear Up (629) e Strength Sap (623, com Liquid Ooze
- *    e bloqueio por Psychic Noise / Clear Body / Hyper Cutter).
- *  - Familia 4 (Sacrificio de HP, clerigo, cura continua, critico e pivot):
- *    Final Gambit (514), Fillet Away (760), Clangorous Soul (682), No Retreat
- *    (673), Shed Tail (770), Aqua Ring (392), Laser Focus (628), Psycho Shift
- *    (375), Purify (640), Take Heart (743), Jungle Healing (710), Lunar
- *    Blessing (742), Healing Wish (361), Lunar Dance (460) e Dark Void (463,
- *    restrito a Darkrai #491).
- *  - Familia 5 (Copia, controle de ordem de acao e prisao): Copycat (383),
- *    After You (494), Quash (510), Octolock (678) e Fairy Lock (583).
+ *  1. Modificacao de tipo, terceiro tipo e eletrificacao:
+ *     Soak (486), Magic Powder (675), Reflect Type (512), Trick-or-Treat
+ *     (563), Forest's Curse (567) e Electrify (578).
+ *  2. Trocas, divisoes, inversoes e impulsos compostos de atributos:
+ *     Power Trick (379), Power Swap (384), Guard Swap (385), Heart Swap (391),
+ *     Speed Swap (638), Guard Split (469), Power Split (470), Topsy-Turvy
+ *     (572), Acupressure (367), Venom Drench (595), Toxic Thread (627),
+ *     Tar Shot (674), Decorate (684), Spicy Extract (750), No Retreat (673),
+ *     Clangorous Soul (682), Fillet Away (760), Magnetic Flux (598), Gear Up
+ *     (629), Flower Shield (575) e Rototiller (559).
+ *  3. Regeneracao, drenagem por Atk, sacrificio/substituto e purificacao:
+ *     Aqua Ring (392), Strength Sap (623), Healing Wish (361), Lunar Dance
+ *     (460), Shed Tail (770), Psycho Shift (375), Purify (640), Take Heart
+ *     (743), Jungle Healing (710), Lunar Blessing (742) e Dark Void (463).
+ *  4. Manipulacao de habilidade em batalha:
+ *     Gastro Acid (380), Worry Seed (388), Entrainment (493) e Doodle (759).
+ *  5. Controle de ordem/copia, foco critico, dano fixo por HP e Natural Gift:
+ *     Copycat (383), After You (494), Quash (510), Final Gambit (514),
+ *     Laser Focus (628) e Natural Gift (363).
+ *  6. Salas de itens e travas de troca:
+ *     Magic Room (477), Octolock (678) e Fairy Lock (583).
+ *
+ * Seis golpes de subida de nivel (24 linhas) permanecem documentadamente fora
+ * de escopo por dependerem de habilidades ou UI ausentes na base Gen 3:
+ * Simple Beam (492), Ally Switch (501), Instruct (644), Stuff Cheeks (672),
+ * Teatime (677) e Revival Blessing (755).
  */
-
 typedef unsigned char u8;
 typedef signed char s8;
 typedef unsigned short u16;
@@ -43,76 +45,88 @@ typedef int s32;
 
 #define WEATHER_SNOW_BIT  0x0100u
 
-/* Estado efemero do motor_v7 em 0x0203FC00..0x0203FC5F (somente leitura). */
+#define STATUS2_SUBSTITUTE        0x01000000u
+#define STATUS2_ESCAPE_PREVENTION 0x04000000u
+#define STATUS2_FORESIGHT         0x20000000u
+
 struct V7BattleState {
     u8 stat_rose_mask;
+    u8 stat_fell_mask;
+    u8 move_started_mask;
     u8 passed_canceler_mask;
+    u8 prev_failed_mask;
+    u8 last_failed_mask;
     u8 parting_dropped;
+    u8 saved_attacker;
     u8 heal_block_turns[4];
-    u8 pad0;
+    u32 rose_pid[4];
+    u32 fell_pid[4];
+    u32 failed_pid[4];
     u32 heal_block_pid[4];
     u32 cheer_minus1_pid[4];
 };
 
-/* Estado efemero do motor_v8 em 0x0203FC60..0x0203FC9F (somente leitura). */
 struct V8BattleState {
     u8 terrain_type;
     u8 terrain_turns;
     u8 trick_room_turns;
     u8 wonder_room_turns;
     u8 gravity_turns;
+    u8 endturn_step;
+    u8 switchin_hazard_step;
+    u8 switchin_bank;
     u8 tailwind_turns[2];
     u8 aurora_veil_turns[2];
     u8 stealth_rock[2];
     u8 toxic_spikes[2];
     u8 sticky_web[2];
     u8 magnet_rise_turns[4];
-    u8 endturn_step;
-    u8 switchin_hazard_step;
-    u8 switchin_bank;
     u8 saved_target;
-    u32 magnet_rise_pid[4];
+    u8 pending_tail_idx;
     u32 switchin_tag;
+    u32 magnet_rise_pid[4];
 };
 
-/* Estado efemero do motor_v9 em 0x0203FCA0..0x0203FD1F (128 B, fora de saves). */
 struct V9BattleState {
-    u32 active_tag[4];          /* 0x00..0x0F: tag de identidade por battler */
-    u32 octolock_src_tag[4];    /* 0x10..0x1F: tag de quem aplicou Octolock */
-    u16 last_used_move;         /* 0x20..0x21: ultimo golpe executado (Copycat) */
-    u16 work_u16;               /* 0x22..0x23: valor temporario (Final Gambit / Sap) */
-    u8 aqua_ring_mask;          /* 0x24: bitmask de Aqua Ring ativo */
-    u8 tar_shot_mask;           /* 0x25: bitmask de Tar Shot ativo */
-    u8 no_retreat_mask;         /* 0x26: bitmask de No Retreat ja usado */
-    u8 gastro_acid_mask;        /* 0x27: bitmask de Gastro Acid ativo */
-    u8 electrified_mask;        /* 0x28: bitmask de Electrify neste turno */
-    u8 extra_type[4];           /* 0x29..0x2C: 3o tipo (0=nenhum, 7=Ghost, 12=Grass) */
-    u8 laser_focus_turns[4];    /* 0x2D..0x30: contador de Laser Focus (2 -> 1 -> 0) */
-    u8 octolock_active[4];      /* 0x31..0x34: 1 se preso por Octolock */
-    u8 octolock_trapper[4];     /* 0x35..0x38: banco que aplicou Octolock */
-    u8 fairy_lock_turns;        /* 0x39: contador de Fairy Lock (2 -> 1 -> 0) */
-    u8 fairy_lock_mask;         /* 0x3A: bancos marcados por Fairy Lock */
-    u8 healing_wish_pending[2]; /* 0x3B..0x3C: por lado (0=nao, 1=HWish, 2=LunarDance) */
-    u8 shed_tail_sub_hp[4];     /* 0x3D..0x40: HP do Substitute a transferir */
-    u8 endturn_step;            /* 0x41: cursor de fim de turno do motor_v9 */
-    u8 saved_target;            /* 0x42: backup de TARGET em filas/loops */
-    u8 saved_attacker;          /* 0x43: backup de ATTACKER em Octolock */
-    u8 q_len;                   /* 0x44: tamanho da fila de mudancas de atributo */
-    u8 q_pos;                   /* 0x45: cursor da fila de mudancas de atributo */
-    u8 q_after_mode;            /* 0x46: acao pos-fila (0=end, 1=no_retreat, 2=tar_shot, 3=toxic_thread) */
-    u8 work_idx;                /* 0x47: cursor auxiliar (Cleric / Dark Void / PP) */
-    u8 work_bank;               /* 0x48: banco auxiliar */
-    u8 work_mode;               /* 0x49: modo auxiliar */
-    u8 q_bank[12];              /* 0x4A..0x55: bancos da fila de atributos */
-    u8 q_stat[12];              /* 0x56..0x61: bytes statChanger da fila */
-    u8 pad[2];                  /* 0x62..0x63: alinhamento a 4 bytes (100 B total) */
+    u16 last_used_move;
+    u16 saved_dmg;
+    u32 saved_status;
+    u8 magic_room_turns;
+    u8 fairy_lock_turns;
+    u8 electrified_mask;
+    u8 fairy_lock_mask;
+    u8 wish_pending[2];
+    u8 laser_focus_turns[4];
+    u8 extra_type[4];
+    u8 octolock_src[4];
+    u8 shed_tail_sub_hp;
+    u8 endturn_step_v9;
+    u8 multi_step;
+    u8 multi_aux;
+    u8 saved_atk;
+    u8 saved_tgt;
+    u8 op_count;
+    u8 op_idx;
+    u8 op_bank[12];
+    u8 op_changer[12];
+    u32 extra_type_tag[4];
+    u32 aqua_ring_tag[4];
+    u32 tar_shot_tag[4];
+    u32 no_retreat_tag[4];
+    u32 laser_focus_tag[4];
+    u32 octolock_src_tag[4];
+    u32 octolock_tgt_tag[4];
 };
 
 #define V7_STATE                ((volatile struct V7BattleState *)0x0203FC00u)
 #define V8_STATE                ((volatile struct V8BattleState *)0x0203FC60u)
-#define V9_STATE                ((volatile struct V9BattleState *)0x0203FCA0u)
+#define V9_STATE ((volatile struct V9BattleState *)0x0203FCA0u)
+_Static_assert(__builtin_offsetof(struct V9BattleState, multi_step) == 0x1Cu, "multi_step offset mismatch");
+_Static_assert(sizeof(struct V9BattleState) <= 0xC0u, "V9BattleState exceeds 0x0203FCA0..0x0203FD5F");
 
-/* Simbolos verificados de RAM da engine FireRed Gen 1-9 */
+#define MAIN_IN_BATTLE_BYTE     (*(volatile u8 *)0x03004A45u)
+#define BATTLE_MAIN_FUNC        (*(volatile u32 *)0x03005318u)
+
 #define BATTLE_TYPE_FLAGS       (*(volatile u32 *)0x02020374u)
 #define ACTIVE_BATTLER          (*(volatile u8 *)0x020213ECu)
 #define CONTROLLER_EXEC_FLAGS   (*(volatile u32 *)0x020213F0u)
@@ -137,113 +151,90 @@ struct V9BattleState {
 #define SIDE_STATUSES           ((volatile u16 *)0x0202161Cu)
 #define STATUSES3               ((volatile u32 *)0x02021638u)
 #define DISABLE_STRUCTS_REAL    ((volatile u8 *)0x02021648u)
-#define PROTECT_STRUCTS         ((volatile u8 *)0x020216CCu)
 #define MOVE_EFFECT_BYTE        (*(volatile u8 *)0x020216C3u)
 #define MULTISTRING_CHOOSER     (*(volatile u8 *)0x020216C5u)
 #define BATTLE_OUTCOME          (*(volatile u8 *)0x020216C8u)
+#define PROTECT_STRUCTS         ((volatile u8 *)0x020216CCu)
 #define BATTLE_WEATHER          (*(volatile u16 *)0x0202175Cu)
+#define WEATHER_DURATION        (*(volatile u8 *)0x02021788u)
+#define DYNAMIC_POWER           (*(volatile u16 *)0x02021792u)
 #define SCRIPTING_BATTLER       (*(volatile u8 *)0x0202181Fu)
-#define STAT_CHANGER_BYTE       (*(volatile u8 *)0x02021822u)
-#define STAT_ANIM_PLAYED        (*(volatile u8 *)0x02021823u)
+#define STAT_BUFF_ADDR          (*(volatile u8 *)0x02021822u)
+#define ANIM_ARG1_BYTE          (*(volatile u8 *)0x02021823u)
 #define BATTLE_STRUCT_PTR       (*(volatile u8 *volatile *)0x0202182Cu)
 #define BATTLE_RESOURCES_PTR    (*(volatile u8 *volatile *)0x02021838u)
-#define ENEMY_PARTY             ((const u8 *)0x0203A734u)
-#define PLAYER_PARTY            ((const u8 *)0x0203A98Cu)
-#define BATTLE_MAIN_FUNC        (*(volatile u32 *)0x03005318u)
 
-/* Tabelas ROM */
+#define ENEMY_PARTY_BASE        ((u8 *)0x0203A734u)
+#define PLAYER_PARTY_BASE       ((u8 *)0x0203A98Cu)
+
 #define MOVE_TABLE              ((const u8 *)0x09000000u)
-#define SCRIPT_TABLE_ROM        ((const u8 *const *)0x0900A000u)
+#define SCRIPT_TABLE            ((const u8 *const *)0x0900A000u)
+#define NEW_ITEMS_TABLE         ((const u8 *)0x08E11000u)
 #define TYPE_EFFECT_TABLE       ((const u8 *)0x08200C18u)
 #define STAT_STAGE_RATIOS       ((const u8 *)0x086BC7BCu)
 
-/* Enderecos fixos de BattleScripts em SCRIPTS_V9 (0x090C6000) e nativos */
+/* Sub-scripts do motor_v7 / motor_v8 reutilizados */
+#define BS_HEAL_BLOCK_CANCEL    ((const u8 *)0x090BF000u)
+#define BS_V8_ENDTURN_MSGS      ((const u8 *)0x090C1030u)
+#define BS_V8_ENDTURN_GRASSY    ((const u8 *)0x090C1070u)
+
+/* Sub-scripts fixos gravados em 0x090C6000..0x090C633F por motor_v9.py */
 #define BS_V9_ENDTURN_AQUA_RING ((const u8 *)0x090C6000u)
 #define BS_V9_ENDTURN_OCTOLOCK  ((const u8 *)0x090C6020u)
-#define BS_V9_STAT_QUEUE        ((const u8 *)0x090C6080u)
-#define BS_V9_HEALING_WISH_IN   ((const u8 *)0x090C6100u)
-#define BS_V9_LUNAR_DANCE_IN    ((const u8 *)0x090C6140u)
-#define BS_V9_WORRY_SEED_WOKE   ((const u8 *)0x090C6180u)
-#define BS_V9_CANT_ESCAPE_END   ((const u8 *)0x090C61A0u)
-#define BS_V9_LIQUID_OOZE_TAIL  ((const u8 *)0x090C61C0u)
-#define BS_V9_SLEEP_EFF         ((const u8 *)0x090C61E0u)
-#define BS_V9_STR_TAILS         ((const u8 *)0x090C6200u)
+#define BS_V9_ENDTURN_MROOM     ((const u8 *)0x090C60A0u)
+#define BS_V9_SWITCHIN_HWISH    ((const u8 *)0x090C60B0u)
+#define BS_V9_SWITCHIN_LDANCE   ((const u8 *)0x090C60D0u)
+#define BS_V9_WORRY_SEED_WAKE   ((const u8 *)0x090C60F0u)
+#define BS_V9_OCTOLOCK_SET      ((const u8 *)0x090C6110u)
+#define BS_V9_TOXIC_THREAD_PSN  ((const u8 *)0x090C6130u)
+#define BS_V9_CLEANSE_CURE_STEP ((const u8 *)0x090C6150u)
+#define BS_V9_CLEANSE_HEAL_STEP ((const u8 *)0x090C6170u)
+#define BS_V9_PSHIFT_INFLICT    ((const u8 *)0x090C6190u)
+#define BS_V9_PSHIFT_SELF_CURE  ((const u8 *)0x090C61B0u)
+#define BS_V9_MSG_TAILS         ((const u8 *)0x090C61D0u)
 
-#define BS_HEAL_BLOCK_CANCEL    ((const u8 *)0x090BF000u)
-#define BS_DOESNT_AFFECT        ((const u8 *)0x081853DCu)
+#define BS_HIT_CALC_START       ((const u8 *)0x081853D8u)
 #define BS_MOVE_END             ((const u8 *)0x081853F6u)
+#define BS_MISS_AFTER_PP        ((const u8 *)0x08185408u)
 #define BS_BUT_IT_FAILED        ((const u8 *)0x0818689Au)
-#define BS_POISON_EFF           ((const u8 *)0x08187C7Du)
-#define BS_BURN_EFF             ((const u8 *)0x08187C8Bu)
-#define BS_PARALYSIS_EFF        ((const u8 *)0x08187CA7u)
-#define BS_TOXIC_EFF            ((const u8 *)0x08187CC0u)
 
-#define ENTRY_ENDTURN_V8_ADDR   0x090C3019u
-#define ENTRY_ENDTURN_V9_ADDR   0x090C9011u
-
-/* Encadeamento com motor_v8 / motor_v7 / funcoes nativas */
+/* Encadeamento sobre motor_v8 / motor_v7 / funcoes nativas */
 #define PREV_BATTLE_INIT_V8     ((void (*)(void))0x090C3001u)
 #define PREV_TURN_START_V8      ((void (*)(void))0x090C3009u)
-#define PREV_ENDTURN_V8         ((void (*)(void))0x090C3019u)
 #define PREV_ATTACKCANCELER_V8  ((void (*)(void))0x090C3021u)
 #define PREV_CRITCALC_V7        ((void (*)(void))0x090C0019u)
+#define PREV_DAMAGE_V8          ((void (*)(void))0x090C3031u)
 #define PREV_TYPECALC_V8        ((void (*)(void))0x090C3039u)
 #define PREV_SWITCHINEFFECTS_V8 ((void (*)(void))0x090C3059u)
 
-#define ORIG_ACCURACYCHECK      ((void (*)(void))0x08057F2Du)
+#define ENTRY_ENDTURN_V9_THUMB  0x090C9011u
 #define ORIG_BATTLE_TURN_PASSED ((void (*)(void))0x08053221u)
 #define FN_TURN_VALUES_CLEANUP  ((void (*)(u8))0x080543A5u)
-#define FN_MODULATE_TYPE_EFF    ((void (*)(u8))0x080587C1u)
 #define FN_DO_FIELD_ENDTURN     ((u8 (*)(void))0x0806D069u)
+
 #define FN_GET_SIDE             ((u8 (*)(u8))0x08024685u)
-#define FN_OAK_TUTORIAL         ((u8 (*)(void))0x0803B575u)
 #define FN_EMIT_SET_MON_DATA    ((void (*)(u8, u8, u8, u8, const void *))0x08049DF5u)
 #define FN_GET_SCRIPT_BANK      ((u8 (*)(u8))0x0806C535u)
 #define FN_MARK_BUFFER_EXEC     ((void (*)(u8))0x0806C8BDu)
 #define FN_BS_PUSH              ((void (*)(const u8 *))0x0806CB2Du)
 #define FN_ABILITY_EFFECTS      ((u8 (*)(u8, u8, u8, u8, u16))0x0806F4DDu)
 #define FN_GET_MOVE_TARGET      ((u8 (*)(u16, u8))0x08071DE1u)
-#define FN_GET_MON_DATA         ((u32 (*)(const void *, u32, const void *))0x0810A96Du)
+#define FN_SET_MON_DATA         ((void (*)(void *, u32, const void *))0x0810AF79u)
 #define FN_RANDOM               ((u16 (*)(void))0x0812E9C5u)
 #define FN_UDIV32               ((u32 (*)(u32, u32))0x08172B3Du)
 #define FN_UMOD32               ((u32 (*)(u32, u32))0x08172B4Du)
 
-/* Indices de strings em BS_V9_STR_TAILS (0x01A4 + idx) */
-enum {
-    TAIL_SOAK = 0,
-    TAIL_MAGIC_POWDER = 1,
-    TAIL_REFLECT_TYPE = 2,
-    TAIL_TRICK_OR_TREAT = 3,
-    TAIL_FORESTS_CURSE = 4,
-    TAIL_GASTRO_ACID = 5,
-    TAIL_WORRY_SEED = 6,
-    TAIL_ENTRAINMENT = 7,
-    TAIL_DOODLE = 8,
-    TAIL_ELECTRIFY = 9,
-    TAIL_POWER_TRICK = 10,
-    TAIL_SPEED_SWAP = 11,
-    TAIL_POWER_SPLIT = 12,
-    TAIL_GUARD_SPLIT = 13,
-    TAIL_POWER_SWAP = 14,
-    TAIL_GUARD_SWAP = 15,
-    TAIL_HEART_SWAP = 16,
-    TAIL_TOPSY_TURVY = 17,
-    TAIL_TAR_SHOT = 18,
-    TAIL_FAIRY_LOCK = 19,
-    TAIL_AQUA_RING_SET = 20,
-    TAIL_AQUA_RING_HEAL = 21,
-    TAIL_LASER_FOCUS = 22,
-    TAIL_ATK_HEALED = 23,
-    TAIL_SCR_HEALED = 24,
-    TAIL_SCR_CURED = 25,
-    TAIL_DARK_VOID_BLOCK = 26,
-    TAIL_HEALING_WISH_CAME = 27,
-    TAIL_LUNAR_DANCE_CAME = 28,
-    TAIL_AFTER_YOU = 29,
-    TAIL_QUASH = 30,
-    TAIL_LIQUID_OOZE = 31,
-    TAIL_TGT_WOKE_UP = 32,
-    TAIL_ATK_CANT_ESCAPE = 33
+/* Tabela oficial (Gen 6-7) de Natural Gift para Berries 133..175: {tipo, BP} */
+static const u8 NATURAL_GIFT_TABLE[43][2] = {
+    {10u,  80u}, {11u,  80u}, {13u,  80u}, {12u,  80u}, {15u,  80u},
+    { 1u,  80u}, { 3u,  80u}, { 4u,  80u}, { 2u,  80u}, {14u,  80u},
+    { 6u,  80u}, { 5u,  80u}, { 7u,  80u}, {16u,  80u}, {17u,  80u},
+    { 8u,  80u}, {10u,  90u}, {11u,  90u}, {13u,  90u}, {12u,  90u},
+    {15u,  90u}, { 1u,  90u}, { 3u,  90u}, { 4u,  90u}, { 2u,  90u},
+    {14u,  90u}, { 6u,  90u}, { 5u,  90u}, { 7u,  90u}, {16u,  90u},
+    {17u,  90u}, { 8u,  90u}, {10u, 100u}, {11u, 100u}, {13u, 100u},
+    {12u, 100u}, {15u, 100u}, { 1u, 100u}, { 3u, 100u}, { 4u, 100u},
+    { 2u, 100u}, {14u, 100u}, { 6u, 100u},
 };
 
 static u32 read_u32_unaligned(const u8 *p)
@@ -253,140 +244,163 @@ static u32 read_u32_unaligned(const u8 *p)
 
 static u32 mon_tag(u8 bank)
 {
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * (bank & 3u);
+    bank &= 3u;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
     u32 pid = *(volatile u32 *)(m + 0x4Cu);
-    u32 slot = PARTY_INDEXES[bank & 3u];
+    u32 slot = PARTY_INDEXES[bank];
     return 0x80000000u | ((slot & 7u) << 28) | (pid & 0x0FFFFFFFu);
 }
 
-static void sync_battler_v9(u8 b)
+static u8 is_bank_alive(u8 bank)
 {
-    b &= 3u;
-    u32 tag = mon_tag(b);
-    if (V9_STATE->active_tag[b] != tag) {
-        V9_STATE->active_tag[b] = tag;
-        u8 inv = (u8)~(1u << b);
-        V9_STATE->aqua_ring_mask &= inv;
-        V9_STATE->tar_shot_mask &= inv;
-        V9_STATE->no_retreat_mask &= inv;
-        V9_STATE->gastro_acid_mask &= inv;
-        V9_STATE->extra_type[b] = 0u;
-        V9_STATE->laser_focus_turns[b] = 0u;
-        V9_STATE->octolock_active[b] = 0u;
-    }
-}
-
-static u8 is_bank_present_alive(u8 b)
-{
-    b &= 3u;
-    if (b >= BATTLERS_COUNT || (ABSENT_BATTLERS & (1u << b)) != 0u)
+    bank &= 3u;
+    if (bank >= BATTLERS_COUNT || (ABSENT_BATTLERS & (1u << bank)) != 0u)
         return 0u;
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
     return (*(volatile u16 *)(m + 0x2Au) > 0u) ? 1u : 0u;
 }
 
-static u8 is_behind_substitute(u8 b)
+static u8 has_substitute(u8 bank)
 {
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * (b & 3u);
-    return ((*(volatile u32 *)(m + 0x54u) & 0x01000000u) != 0u) ? 1u : 0u;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * (bank & 3u);
+    return ((*(volatile u32 *)(m + 0x54u) & STATUS2_SUBSTITUTE) != 0u) ? 1u : 0u;
 }
 
-static u8 is_heal_blocked(u8 b)
+static u8 is_heal_blocked(u8 bank)
 {
-    b &= 3u;
-    if (V7_STATE->heal_block_turns[b] == 0u)
+    bank &= 3u;
+    if (V7_STATE->heal_block_turns[bank] == 0u)
         return 0u;
-    if (V7_STATE->heal_block_pid[b] != mon_tag(b)) {
-        V7_STATE->heal_block_turns[b] = 0u;
+    if (V7_STATE->heal_block_pid[bank] != mon_tag(bank)) {
+        V7_STATE->heal_block_turns[bank] = 0u;
         return 0u;
     }
     return 1u;
 }
 
-static u8 has_type_v9(u8 b, u8 typ)
+static u8 get_extra_type(u8 bank)
 {
-    b &= 3u;
-    sync_battler_v9(b);
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-    return (m[0x22u] == typ || m[0x23u] == typ || V9_STATE->extra_type[b] == typ) ? 1u : 0u;
+    bank &= 3u;
+    u8 et = V9_STATE->extra_type[bank];
+    if (et == 0u)
+        return 0u;
+    if (V9_STATE->extra_type_tag[bank] != mon_tag(bank)) {
+        V9_STATE->extra_type[bank] = 0u;
+        return 0u;
+    }
+    return et;
 }
 
-static u8 is_magnet_risen_v8(u8 b)
+static u8 has_type_v9(u8 bank, u8 typ)
 {
-    b &= 3u;
-    if (V8_STATE->magnet_rise_turns[b] == 0u)
+    bank &= 3u;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
+    if (m[0x22u] == typ || m[0x23u] == typ)
+        return 1u;
+    return (get_extra_type(bank) == typ) ? 1u : 0u;
+}
+
+static u8 has_aqua_ring(u8 bank)
+{
+    bank &= 3u;
+    if (V9_STATE->aqua_ring_tag[bank] == 0u)
         return 0u;
-    if (V8_STATE->magnet_rise_pid[b] != mon_tag(b) || V8_STATE->gravity_turns > 0u)
+    if (V9_STATE->aqua_ring_tag[bank] != mon_tag(bank)) {
+        V9_STATE->aqua_ring_tag[bank] = 0u;
+        return 0u;
+    }
+    return 1u;
+}
+
+static u8 has_tar_shot(u8 bank)
+{
+    bank &= 3u;
+    if (V9_STATE->tar_shot_tag[bank] == 0u)
+        return 0u;
+    if (V9_STATE->tar_shot_tag[bank] != mon_tag(bank)) {
+        V9_STATE->tar_shot_tag[bank] = 0u;
+        return 0u;
+    }
+    return 1u;
+}
+
+static u8 has_no_retreat(u8 bank)
+{
+    bank &= 3u;
+    if (V9_STATE->no_retreat_tag[bank] == 0u)
+        return 0u;
+    if (V9_STATE->no_retreat_tag[bank] != mon_tag(bank)) {
+        V9_STATE->no_retreat_tag[bank] = 0u;
+        return 0u;
+    }
+    return 1u;
+}
+
+static u8 has_octolock(u8 bank)
+{
+    bank &= 3u;
+    if (V9_STATE->octolock_tgt_tag[bank] == 0u)
+        return 0u;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
+    u8 src = V9_STATE->octolock_src[bank] & 3u;
+    if ((*(volatile u32 *)(m + 0x54u) & STATUS2_ESCAPE_PREVENTION) == 0u
+        || V9_STATE->octolock_tgt_tag[bank] != mon_tag(bank)
+        || !is_bank_alive(src)
+        || V9_STATE->octolock_src_tag[bank] != mon_tag(src)) {
+        V9_STATE->octolock_tgt_tag[bank] = 0u;
+        return 0u;
+    }
+    return 1u;
+}
+
+static u8 is_magnet_risen_v9(u8 bank)
+{
+    bank &= 3u;
+    if (V8_STATE->magnet_rise_turns[bank] == 0u)
+        return 0u;
+    if (V8_STATE->magnet_rise_pid[bank] != mon_tag(bank) || V8_STATE->gravity_turns > 0u)
         return 0u;
     return 1u;
 }
 
-static u8 is_battler_grounded_v9(u8 b)
+static u8 is_grounded_v9(u8 bank)
 {
-    b &= 3u;
-    if ((STATUSES3[b] & 0x00000008u) != 0u)
+    bank &= 3u;
+    if ((STATUSES3[bank] & 0x00000008u) != 0u)
         return 0u;
-    if (V8_STATE->gravity_turns > 0u || (STATUSES3[b] & 0x00002000u) != 0u)
+    if (V8_STATE->gravity_turns > 0u || (STATUSES3[bank] & 0x00002000u) != 0u)
         return 1u;
-    if (is_magnet_risen_v8(b))
+    if (is_magnet_risen_v9(bank))
         return 0u;
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-    if (m[0x22u] == 2u || m[0x23u] == 2u)
+    if (has_type_v9(bank, 2u))
         return 0u;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
     if (*(volatile u16 *)(m + 0x20u) == 26u)
         return 0u;
     return 1u;
 }
 
-static u8 has_viable_party_replacement(u8 bank)
+static void *party_mon_ptr(u8 bank)
 {
-    u8 side = FN_GET_SIDE(bank & 3u);
-    /* Pokemon selvagem nunca faz troca em Healing Wish / Lunar Dance / Shed Tail. */
-    if (side == 1u && (BATTLE_TYPE_FLAGS & 0x08u) == 0u)
-        return 0u;
-    const u8 *party = (side == 0u) ? PLAYER_PARTY : ENEMY_PARTY;
-    u16 active0 = PARTY_INDEXES[bank & 3u];
-    u16 active2 = 0xFFFFu;
-    if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u) {
-        u8 partner = (u8)((bank ^ 2u) & 3u);
-        if ((ABSENT_BATTLERS & (1u << partner)) == 0u)
-            active2 = PARTY_INDEXES[partner];
-    }
-    for (u32 i = 0u; i < 6u; ++i) {
-        if (i == active0 || i == active2)
-            continue;
-        const u8 *mon = party + 100u * i;
-        if (FN_GET_MON_DATA(mon, 0x0Bu, 0) != 0u
-            && FN_GET_MON_DATA(mon, 0x2Du, 0) == 0u
-            && FN_GET_MON_DATA(mon, 0x39u, 0) > 0u) {
-            return 1u;
-        }
-    }
-    return 0u;
+    u16 slot = PARTY_INDEXES[bank & 3u];
+    if (slot > 5u)
+        slot = 0u;
+    u8 *base = (FN_GET_SIDE(bank & 3u) == 0u) ? PLAYER_PARTY_BASE : ENEMY_PARTY_BASE;
+    return (void *)(base + 100u * slot);
 }
 
-static u8 calc_slot_max_pp(volatile u8 *m, u8 slot)
+static void emit_status_sync(u8 bank)
 {
-    u16 move = *(volatile u16 *)(m + 0x0Cu + 2u * slot);
-    if (move == 0u || move >= 822u)
-        return 0u;
-    u32 base_pp = MOVE_TABLE[12u * move + 4u];
-    u32 bonus = ((u32)m[0x24u] >> (2u * slot)) & 3u;
-    return (u8)(base_pp + FN_UDIV32(base_pp * 20u * bonus, 100u));
+    bank &= 3u;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
+    u32 st = *(volatile u32 *)(m + 0x50u);
+    FN_SET_MON_DATA(party_mon_ptr(bank), 0x37u, &st);
+    ACTIVE_BATTLER = bank;
+    FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(m + 0x50u));
+    FN_MARK_BUFFER_EXEC(bank);
 }
 
-static u8 any_move_pp_below_max(u8 b)
-{
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * (b & 3u);
-    for (u8 s = 0u; s < 4u; ++s) {
-        u8 max_pp = calc_slot_max_pp(m, s);
-        if (max_pp > 0u && m[0x25u + s] < max_pp)
-            return 1u;
-    }
-    return 0u;
-}
-
-static void start_endturn_script_v9(const u8 *bs_ptr)
+static void start_endturn_script(const u8 *bs_ptr)
 {
     CURR_INSTR = bs_ptr;
     volatile u8 *cb_stack = *(volatile u8 **)(BATTLE_RESOURCES_PTR + 0x0Cu);
@@ -397,46 +411,7 @@ static void start_endturn_script_v9(const u8 *bs_ptr)
     BATTLE_MAIN_FUNC = 0x08054B91u;
 }
 
-static void queue_reset(u8 after_mode)
-{
-    V9_STATE->saved_target = TARGET;
-    V9_STATE->q_len = 0u;
-    V9_STATE->q_pos = 0u;
-    V9_STATE->q_after_mode = after_mode;
-}
-
-static void queue_push(u8 bank, u8 stat_id, u8 stages, u8 is_down)
-{
-    if (V9_STATE->q_len >= 12u)
-        return;
-    u8 idx = V9_STATE->q_len++;
-    V9_STATE->q_bank[idx] = bank & 3u;
-    V9_STATE->q_stat[idx] = (u8)((stat_id & 7u) | ((stages & 7u) << 4) | (is_down ? 0x80u : 0u));
-}
-
-static u8 is_copycat_banned_move(u16 m)
-{
-    /* Golpes que Copycat nao pode copiar (Gen 4-9 + equivalentes nativos). */
-    return (m == 0u || m >= 822u
-            || m == 18u  || m == 46u       /* Whirlwind, Roar */
-            || m == 68u  || m == 102u      /* Counter, Mimic */
-            || m == 118u || m == 119u      /* Metronome, Mirror Move */
-            || m == 144u || m == 165u      /* Transform, Struggle */
-            || m == 166u || m == 168u      /* Sketch, Thief */
-            || m == 182u || m == 194u      /* Protect, Destiny Bond */
-            || m == 197u || m == 203u      /* Detect, Endure */
-            || m == 214u || m == 243u      /* Sleep Talk, Mirror Coat */
-            || m == 264u || m == 266u      /* Focus Punch, Follow Me */
-            || m == 270u || m == 271u      /* Helping Hand, Trick */
-            || m == 274u || m == 289u      /* Assist, Snatch */
-            || m == 343u || m == 364u      /* Covet, Feint */
-            || m == 383u || m == 409u      /* Copycat, Switcheroo (se mapeado) */
-            || m == 509u || m == 511u      /* Circle Throw, Dragon Tail */
-            || m == 771u || m == 770u)     /* Chilly Reception, Shed Tail */
-        ? 1u : 0u;
-}
-
-/* ==================== Ciclo de Vida e Fim de Turno ======================= */
+/* ========================= Ciclo de vida e Item ========================= */
 
 void hook_battle_init_v9(void)
 {
@@ -449,46 +424,106 @@ void hook_battle_init_v9(void)
 void hook_turn_start_v9(void)
 {
     V9_STATE->electrified_mask = 0u;
-    V9_STATE->endturn_step = 0u;
-    for (u8 b = 0u; b < 4u; ++b) {
-        sync_battler_v9(b);
-        if (V9_STATE->laser_focus_turns[b] > 0u)
-            V9_STATE->laser_focus_turns[b]--;
+    V9_STATE->endturn_step_v9 = 0u;
+
+    for (u32 b = 0u; b < 4u; ++b) {
+        if (V9_STATE->laser_focus_turns[b] > 0u) {
+            if (!is_bank_alive((u8)b) || V9_STATE->laser_focus_tag[b] != mon_tag((u8)b))
+                V9_STATE->laser_focus_turns[b] = 0u;
+            else
+                V9_STATE->laser_focus_turns[b]--;
+        }
     }
+
+    if (V9_STATE->fairy_lock_turns > 0u) {
+        V9_STATE->fairy_lock_turns--;
+        if (V9_STATE->fairy_lock_turns == 0u) {
+            u8 mask = V9_STATE->fairy_lock_mask;
+            V9_STATE->fairy_lock_mask = 0u;
+            for (u32 b = 0u; b < 4u; ++b) {
+                if ((mask & (1u << b)) != 0u && !has_no_retreat((u8)b) && !has_octolock((u8)b)) {
+                    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
+                    *(volatile u32 *)(m + 0x54u) &= ~STATUS2_ESCAPE_PREVENTION;
+                }
+            }
+        }
+    }
+
     PREV_TURN_START_V8();
 }
 
-static u8 has_any_v9_endturn_effect(void)
+u8 hook_get_hold_effect_v9(u16 item_id)
 {
-    if (V9_STATE->aqua_ring_mask != 0u || V9_STATE->fairy_lock_turns > 0u)
+    if ((MAIN_IN_BATTLE_BYTE & 0x02u) != 0u
+        && BATTLE_OUTCOME == 0u
+        && V9_STATE->magic_room_turns > 0u) {
+        return 0u;
+    }
+    if (item_id > 0x025Cu)
+        return 0u;
+    return NEW_ITEMS_TABLE[44u * (u32)item_id + 0x12u];
+}
+
+/* ==================== Fim de Turno encadeado (v8 + v9) ================== */
+
+static u8 has_any_endturn_v8_v9(void)
+{
+    if ((BATTLE_WEATHER & WEATHER_SNOW_BIT) != 0u)
         return 1u;
-    for (u8 b = 0u; b < 4u; ++b) {
-        if (V9_STATE->octolock_active[b] != 0u)
+    if (V8_STATE->terrain_turns > 0u
+        || V8_STATE->trick_room_turns > 0u
+        || V8_STATE->wonder_room_turns > 0u
+        || V8_STATE->gravity_turns > 0u
+        || V8_STATE->tailwind_turns[0] > 0u
+        || V8_STATE->tailwind_turns[1] > 0u
+        || V8_STATE->aurora_veil_turns[0] > 0u
+        || V8_STATE->aurora_veil_turns[1] > 0u
+        || V9_STATE->magic_room_turns > 0u) {
+        return 1u;
+    }
+    for (u32 b = 0u; b < 4u; ++b) {
+        if (V8_STATE->magnet_rise_turns[b] > 0u
+            || V9_STATE->aqua_ring_tag[b] != 0u
+            || V9_STATE->octolock_tgt_tag[b] != 0u) {
             return 1u;
+        }
     }
     return 0u;
 }
 
 void hook_endturn_v9(void)
 {
-    if (!has_any_v9_endturn_effect()) {
-        V9_STATE->endturn_step = 0u;
-        BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V8_ADDR;
-        PREV_ENDTURN_V8();
+    if (!has_any_endturn_v8_v9()) {
+        V8_STATE->endturn_step = 0u;
+        V9_STATE->endturn_step_v9 = 0u;
+        BATTLE_MAIN_FUNC = 0x08053221u;
+        ORIG_BATTLE_TURN_PASSED();
         return;
     }
 
     if (CONTROLLER_EXEC_FLAGS != 0u)
         return;
 
+    if ((V8_STATE->terrain_type == TERRAIN_ELECTRIC || V8_STATE->terrain_type == TERRAIN_MISTY)
+        && V8_STATE->terrain_turns > 0u) {
+        u32 cnt = BATTLERS_COUNT;
+        if (cnt > 4u)
+            cnt = 4u;
+        for (u32 b = 0u; b < cnt; ++b) {
+            if ((STATUSES3[b] & 0x0800u) != 0u && is_grounded_v9((u8)b))
+                STATUSES3[b] &= ~0x1800u;
+        }
+    }
+
     if (BATTLE_OUTCOME != 0u) {
-        V9_STATE->endturn_step = 0u;
-        BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V8_ADDR;
-        PREV_ENDTURN_V8();
+        V8_STATE->endturn_step = 0u;
+        V9_STATE->endturn_step_v9 = 0u;
+        V9_STATE->magic_room_turns = 0u;
+        BATTLE_MAIN_FUNC = 0x08053221u;
+        ORIG_BATTLE_TURN_PASSED();
         return;
     }
 
-    /* Executa DoFieldEndTurnEffects nativo primeiro, preservando retorno para v9. */
     if (BATTLE_STRUCT_PTR[3] < 10u) {
         FN_TURN_VALUES_CLEANUP(1u);
         BATTLE_MAIN_FUNC = 0x08053221u;
@@ -498,102 +533,223 @@ void hook_endturn_v9(void)
                 volatile u8 *cb_stack = *(volatile u8 **)(BATTLE_RESOURCES_PTR + 0x0Cu);
                 u8 depth = cb_stack[0x20u];
                 if (depth > 0u)
-                    ((volatile u32 *)cb_stack)[depth - 1u] = ENTRY_ENDTURN_V9_ADDR;
+                    ((volatile u32 *)cb_stack)[depth - 1u] = ENTRY_ENDTURN_V9_THUMB;
             } else {
-                BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V9_ADDR;
+                BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V9_THUMB;
             }
             return;
         }
-        BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V9_ADDR;
+        BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V9_THUMB;
     }
 
-    while (V9_STATE->endturn_step < 9u) {
-        u8 step = V9_STATE->endturn_step++;
+    /* Passos 0..16: identicos ao motor_v8 */
+    while (V8_STATE->endturn_step < 17u) {
+        u8 step = V8_STATE->endturn_step++;
 
-        /* Passos 0..3: Aqua Ring cura 1/16 do HP maximo por turno */
         if (step < 4u) {
-            sync_battler_v9(step);
-            if ((V9_STATE->aqua_ring_mask & (1u << step)) != 0u
-                && is_bank_present_alive(step)
+            if (V8_STATE->terrain_type == TERRAIN_GRASSY
+                && V8_STATE->terrain_turns > 0u
+                && is_bank_alive(step)
+                && is_grounded_v9(step)
                 && !is_heal_blocked(step)) {
                 volatile u8 *m = BATTLE_MONS + 0x5Cu * step;
                 u16 hp = *(volatile u16 *)(m + 0x2Au);
                 u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
-                if (hp > 0u && hp < max_hp) {
+                if (hp < max_hp) {
                     s32 heal = (s32)(max_hp >> 4);
                     if (heal < 1)
                         heal = 1;
                     SCRIPTING_BATTLER = step;
                     BATTLE_MOVE_DMG = -heal;
                     MOVE_RESULT_FLAGS &= (u8)~0x29u;
-                    BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V9_ADDR;
-                    start_endturn_script_v9(BS_V9_ENDTURN_AQUA_RING);
+                    start_endturn_script(BS_V8_ENDTURN_GRASSY);
                     return;
                 }
             }
             continue;
         }
-
-        /* Passos 4..7: Octolock reduz Def -1 e Sp. Def -1 enquanto ambos em campo */
-        if (step >= 4u && step < 8u) {
-            u8 b = (u8)(step - 4u);
-            sync_battler_v9(b);
-            if (V9_STATE->octolock_active[b] != 0u) {
-                u8 src = V9_STATE->octolock_trapper[b] & 3u;
-                sync_battler_v9(src);
-                if (!is_bank_present_alive(b)
-                    || !is_bank_present_alive(src)
-                    || mon_tag(src) != V9_STATE->octolock_src_tag[b]) {
-                    V9_STATE->octolock_active[b] = 0u;
+        if (step == 4u) {
+            if ((BATTLE_WEATHER & WEATHER_SNOW_BIT) != 0u && WEATHER_DURATION > 0u) {
+                WEATHER_DURATION--;
+                if (WEATHER_DURATION == 0u) {
+                    BATTLE_WEATHER &= (u16)~WEATHER_SNOW_BIT;
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 0u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step == 5u || step == 6u) {
+            u8 side = (u8)(step - 5u);
+            if (V8_STATE->tailwind_turns[side] > 0u) {
+                V8_STATE->tailwind_turns[side]--;
+                if (V8_STATE->tailwind_turns[side] == 0u) {
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 1u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step == 7u || step == 8u) {
+            u8 side = (u8)(step - 7u);
+            if (V8_STATE->aurora_veil_turns[side] > 0u) {
+                V8_STATE->aurora_veil_turns[side]--;
+                if (V8_STATE->aurora_veil_turns[side] == 0u) {
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 2u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step == 9u) {
+            if (V8_STATE->terrain_turns > 0u) {
+                V8_STATE->terrain_turns--;
+                if (V8_STATE->terrain_turns == 0u) {
+                    V8_STATE->terrain_type = TERRAIN_NONE;
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 3u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step == 10u) {
+            if (V8_STATE->gravity_turns > 0u) {
+                V8_STATE->gravity_turns--;
+                if (V8_STATE->gravity_turns == 0u) {
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 4u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step == 11u) {
+            if (V8_STATE->trick_room_turns > 0u) {
+                V8_STATE->trick_room_turns--;
+                if (V8_STATE->trick_room_turns == 0u) {
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 5u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step == 12u) {
+            if (V8_STATE->wonder_room_turns > 0u) {
+                V8_STATE->wonder_room_turns--;
+                if (V8_STATE->wonder_room_turns == 0u) {
+                    start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 6u);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step >= 13u && step <= 16u) {
+            u8 b = (u8)(step - 13u);
+            if (b < BATTLERS_COUNT && V8_STATE->magnet_rise_turns[b] > 0u) {
+                if (V8_STATE->magnet_rise_pid[b] != mon_tag(b)) {
+                    V8_STATE->magnet_rise_turns[b] = 0u;
                 } else {
-                    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-                    if (m[0x1Au] > 0u || m[0x1Du] > 0u) {
-                        V9_STATE->saved_attacker = ATTACKER;
-                        V9_STATE->saved_target = TARGET;
-                        ATTACKER = src;
-                        TARGET = b;
-                        BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V9_ADDR;
-                        start_endturn_script_v9(BS_V9_ENDTURN_OCTOLOCK);
+                    V8_STATE->magnet_rise_turns[b]--;
+                    if (V8_STATE->magnet_rise_turns[b] == 0u && is_bank_alive(b)) {
+                        SCRIPTING_BATTLER = b;
+                        start_endturn_script(BS_V8_ENDTURN_MSGS + 8u * 7u);
                         return;
                     }
                 }
             }
             continue;
         }
+    }
 
-        /* Passo 8: Fairy Lock decrementa contador e libera prisao ao expirar */
+    /* Passos v9 (0..8): Aqua Ring (0..3), Octolock (4..7) e Magic Room (8) */
+    while (V9_STATE->endturn_step_v9 < 9u) {
+        u8 step = V9_STATE->endturn_step_v9++;
+
+        if (step < 4u) {
+            if (is_bank_alive(step) && has_aqua_ring(step) && !is_heal_blocked(step)) {
+                volatile u8 *m = BATTLE_MONS + 0x5Cu * step;
+                u16 hp = *(volatile u16 *)(m + 0x2Au);
+                u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
+                if (hp < max_hp) {
+                    s32 heal = (s32)(max_hp >> 4);
+                    if (heal < 1)
+                        heal = 1;
+                    SCRIPTING_BATTLER = step;
+                    BATTLE_MOVE_DMG = -heal;
+                    MOVE_RESULT_FLAGS &= (u8)~0x29u;
+                    start_endturn_script(BS_V9_ENDTURN_AQUA_RING);
+                    return;
+                }
+            }
+            continue;
+        }
+        if (step >= 4u && step < 8u) {
+            u8 b = (u8)(step - 4u);
+            if (is_bank_alive(b) && has_octolock(b)) {
+                volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
+                if (m[0x1Au] > 0u || m[0x1Du] > 0u) {
+                    V9_STATE->saved_tgt = TARGET;
+                    V9_STATE->saved_atk = ATTACKER;
+                    ATTACKER = V9_STATE->octolock_src[b] & 3u;
+                    TARGET = b;
+                    SCRIPTING_BATTLER = b;
+                    start_endturn_script(BS_V9_ENDTURN_OCTOLOCK);
+                    return;
+                }
+            }
+            continue;
+        }
         if (step == 8u) {
-            if (V9_STATE->fairy_lock_turns > 0u) {
-                V9_STATE->fairy_lock_turns--;
-                if (V9_STATE->fairy_lock_turns == 0u) {
-                    for (u8 b = 0u; b < 4u; ++b) {
-                        sync_battler_v9(b);
-                        if ((V9_STATE->fairy_lock_mask & (1u << b)) != 0u
-                            && (V9_STATE->no_retreat_mask & (1u << b)) == 0u
-                            && V9_STATE->octolock_active[b] == 0u) {
-                            volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-                            *(volatile u32 *)(m + 0x54u) &= ~0x04000000u;
-                        }
-                    }
-                    V9_STATE->fairy_lock_mask = 0u;
+            if (V9_STATE->magic_room_turns > 0u) {
+                V9_STATE->magic_room_turns--;
+                if (V9_STATE->magic_room_turns == 0u) {
+                    start_endturn_script(BS_V9_ENDTURN_MROOM);
+                    return;
                 }
             }
             continue;
         }
     }
 
-    V9_STATE->endturn_step = 0u;
-    BATTLE_MAIN_FUNC = ENTRY_ENDTURN_V8_ADDR;
-    PREV_ENDTURN_V8();
+    V8_STATE->endturn_step = 0u;
+    V9_STATE->endturn_step_v9 = 0u;
+    BATTLE_MAIN_FUNC = 0x08053221u;
+    ORIG_BATTLE_TURN_PASSED();
 }
 
-void hook_octolock_restore_v9(void)
+void hook_restore_tgt_v9(void)
 {
-    ATTACKER = V9_STATE->saved_attacker;
-    TARGET = V9_STATE->saved_target;
+    TARGET = V9_STATE->saved_tgt;
+    ATTACKER = V9_STATE->saved_atk;
 }
 
-/* =================== Hooks Relocados da CMD_TABLE_V9 ===================== */
+/* ================== Comandos Relocados em CMD_TABLE_V9 ================== */
+
+static u8 is_v9_heal_blocked_move(u16 move, u8 atk)
+{
+    if (!is_heal_blocked(atk))
+        return 0u;
+    if (move == 392u || move == 623u || move == 640u)
+        return 1u;
+    if (move == 710u || move == 742u) {
+        volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+        if (*(volatile u32 *)(a + 0x50u) != 0u)
+            return 0u;
+        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u) {
+            u8 ally = (u8)(atk ^ 2u);
+            if (is_bank_alive(ally)) {
+                volatile u8 *al = BATTLE_MONS + 0x5Cu * ally;
+                if (*(volatile u32 *)(al + 0x50u) != 0u)
+                    return 0u;
+                if (!is_heal_blocked(ally)
+                    && *(volatile u16 *)(al + 0x2Au) < *(volatile u16 *)(al + 0x2Eu)) {
+                    return 0u;
+                }
+            }
+        }
+        return 1u;
+    }
+    return 0u;
+}
 
 void hook_attackcanceler_v9(void)
 {
@@ -602,18 +758,16 @@ void hook_attackcanceler_v9(void)
     if (CURR_INSTR != before + 1)
         return;
 
-    u8 atk = ATTACKER & 3u;
-    sync_battler_v9(atk);
-    V9_STATE->work_idx = 0u;
-    V9_STATE->work_mode = 0u;
-
-    /* Electrify converte o tipo do golpe deste battler em Eletrico (13). */
-    if ((V9_STATE->electrified_mask & (1u << atk)) != 0u)
-        BATTLE_STRUCT_PTR[0x13u] = (u8)(0x40u | 13u);
-
-    /* Registra o ultimo golpe executado para Copycat (383). */
     u16 move = CURRENT_MOVE;
-    if (!is_copycat_banned_move(move))
+    u8 atk = ATTACKER & 3u;
+
+    if (is_v9_heal_blocked_move(move, atk)) {
+        V7_STATE->passed_canceler_mask &= (u8)~(1u << atk);
+        CURR_INSTR = BS_HEAL_BLOCK_CANCEL;
+        return;
+    }
+
+    if (move != 0u && move != 165u && move != 383u)
         V9_STATE->last_used_move = move;
 }
 
@@ -622,20 +776,45 @@ void hook_critcalc_v9(void)
     PREV_CRITCALC_V7();
 
     u8 atk = ATTACKER & 3u;
-    u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    if (V9_STATE->laser_focus_turns[atk] == 0u)
-        return;
-    if ((BATTLE_TYPE_FLAGS & 0x00010200u) != 0u || FN_OAK_TUTORIAL() != 0u)
-        return;
-    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-    u16 t_ab = *(volatile u16 *)(t + 0x20u);
-    if (t_ab == 4u || t_ab == 75u)
-        return;
-    CRIT_MULTIPLIER = 2u;
+    if (V9_STATE->laser_focus_turns[atk] > 0u
+        && V9_STATE->laser_focus_tag[atk] == mon_tag(atk)) {
+        u8 tgt = TARGET & 3u;
+        volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
+        u16 t_ab = *(volatile u16 *)(t + 0x20u);
+        if (t_ab != 4u && t_ab != 75u && (STATUSES3[tgt] & 0x00008000u) == 0u)
+            CRIT_MULTIPLIER = 2u;
+    }
 }
 
-static u8 lookup_type_eff(u8 atk_type, u8 def_type, u8 foresight)
+void hook_damage_v9(void)
+{
+    u8 atk = ATTACKER & 3u;
+    u16 move = CURRENT_MOVE;
+    volatile u8 *bstruct = BATTLE_STRUCT_PTR;
+
+    if ((V9_STATE->electrified_mask & (1u << atk)) != 0u)
+        bstruct[0x13u] = (u8)(0x40u | 13u);
+
+    PREV_DAMAGE_V8();
+
+    if (BATTLE_MOVE_DMG > 0 && move > 0u && move < 822u) {
+        u8 et = get_extra_type(atk);
+        if (et != 0u) {
+            u8 mtype = (bstruct[0x13u] & 0x40u)
+                ? (bstruct[0x13u] & 0x3Fu)
+                : MOVE_TABLE[12u * move + 2u];
+            volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+            if (et == mtype && a[0x22u] != mtype && a[0x23u] != mtype) {
+                u32 dmg = ((u32)BATTLE_MOVE_DMG * 3u) >> 1;
+                if (dmg < 1u)
+                    dmg = 1u;
+                BATTLE_MOVE_DMG = (s32)dmg;
+            }
+        }
+    }
+}
+
+static u8 lookup_type_chart(u8 atk_type, u8 def_type, u8 foresight)
 {
     const u8 *p = TYPE_EFFECT_TABLE;
     u8 after_fe = 0u;
@@ -646,7 +825,7 @@ static u8 lookup_type_eff(u8 atk_type, u8 def_type, u8 foresight)
             continue;
         }
         if (p[0] == atk_type && p[1] == def_type) {
-            if (after_fe && foresight)
+            if (after_fe && foresight && p[2] == 0u)
                 return 10u;
             return p[2];
         }
@@ -655,982 +834,776 @@ static u8 lookup_type_eff(u8 atk_type, u8 def_type, u8 foresight)
     return 10u;
 }
 
+static s32 type_step_score(u8 atk_type, u8 def_type, u8 foresight, u8 grounded_override)
+{
+    if (atk_type == 4u && def_type == 2u && grounded_override)
+        return 0;
+    u8 rel = lookup_type_chart(atk_type, def_type, foresight);
+    if (rel == 20u)
+        return 1;
+    if (rel == 5u)
+        return -1;
+    return 0;
+}
+
 void hook_typecalc_v9(void)
 {
-    u16 move = CURRENT_MOVE;
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
-
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
+    u16 move = CURRENT_MOVE;
     volatile u8 *bstruct = BATTLE_STRUCT_PTR;
+
+    if ((V9_STATE->electrified_mask & (1u << atk)) != 0u)
+        bstruct[0x13u] = (u8)(0x40u | 13u);
+
+    PREV_TYPECALC_V8();
+
+    if ((MOVE_RESULT_FLAGS & 0x29u) != 0u)
+        return;
+
     u8 mtype = (bstruct[0x13u] & 0x40u)
         ? (bstruct[0x13u] & 0x3Fu)
         : ((move < 822u) ? MOVE_TABLE[12u * move + 2u] : 0u);
 
-    /* STAB do 3o tipo adicionado por Trick-or-Treat (7) ou Forest's Curse (12). */
-    u8 atk_et = V9_STATE->extra_type[atk];
-    if (atk_et != 0u && atk_et == mtype && a[0x22u] != mtype && a[0x23u] != mtype && move != 165u) {
-        BATTLE_MOVE_DMG = (s32)FN_UDIV32((u32)BATTLE_MOVE_DMG * 15u, 10u);
-    }
-
-    PREV_TYPECALC_V8();
-
-    if (move == 165u || (MOVE_RESULT_FLAGS & 0x09u) != 0u)
+    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
+    u8 et = get_extra_type(tgt);
+    u8 tar = (mtype == 10u && has_tar_shot(tgt)) ? 1u : 0u;
+    if ((et == 0u || et == t[0x22u] || et == t[0x23u]) && !tar)
         return;
 
-    /* Efetividade contra o 3o tipo do alvo (Trick-or-Treat / Forest's Curse). */
-    u8 tgt_et = V9_STATE->extra_type[tgt];
-    if (tgt_et != 0u && tgt_et != t[0x22u] && tgt_et != t[0x23u]) {
-        u8 foresight = ((*(volatile u32 *)(t + 0x54u) & 0x20000000u) != 0u) ? 1u : 0u;
-        u8 mult = lookup_type_eff(mtype, tgt_et, foresight);
-        if (mult != 10u)
-            FN_MODULATE_TYPE_EFF(mult);
+    u8 foresight = ((*(volatile u32 *)(t + 0x54u) & STATUS2_FORESIGHT) != 0u) ? 1u : 0u;
+    if (et != 0u && et != t[0x22u] && et != t[0x23u]) {
+        u8 rel = lookup_type_chart(mtype, et, foresight);
+        if (rel == 0u) {
+            BATTLE_MOVE_DMG = 0;
+            MOVE_RESULT_FLAGS = (u8)((MOVE_RESULT_FLAGS & ~0x06u) | 0x08u);
+            return;
+        }
+        if (rel == 20u) {
+            s32 dmg = BATTLE_MOVE_DMG << 1;
+            if (dmg < 1)
+                dmg = 1;
+            BATTLE_MOVE_DMG = dmg;
+        } else if (rel == 5u) {
+            s32 dmg = BATTLE_MOVE_DMG >> 1;
+            if (dmg < 1)
+                dmg = 1;
+            BATTLE_MOVE_DMG = dmg;
+        }
     }
 
-    /* Tar Shot: dobra eficacia de golpes de Fogo (10) contra o alvo marcado. */
-    if ((MOVE_RESULT_FLAGS & 0x09u) == 0u
-        && (V9_STATE->tar_shot_mask & (1u << tgt)) != 0u
-        && mtype == 10u) {
-        FN_MODULATE_TYPE_EFF(20u);
+    if (tar) {
+        s32 dmg = BATTLE_MOVE_DMG << 1;
+        if (dmg < 1)
+            dmg = 1;
+        BATTLE_MOVE_DMG = dmg;
     }
+
+    u8 g_over = (V8_STATE->gravity_turns > 0u || (STATUSES3[tgt] & 0x00002000u) != 0u) ? 1u : 0u;
+    s32 net = type_step_score(mtype, t[0x22u], foresight, g_over);
+    if (t[0x23u] != t[0x22u])
+        net += type_step_score(mtype, t[0x23u], foresight, g_over);
+    if (et != 0u && et != t[0x22u] && et != t[0x23u])
+        net += type_step_score(mtype, et, foresight, g_over);
+    if (tar)
+        net += 1;
+
+    MOVE_RESULT_FLAGS &= (u8)~0x06u;
+    if (net > 0)
+        MOVE_RESULT_FLAGS |= 0x02u;
+    else if (net < 0)
+        MOVE_RESULT_FLAGS |= 0x04u;
+}
+
+/* ============= Switch-in: Healing Wish & Lunar Dance (0x52) ============= */
+
+static u8 max_pp_for_slot(volatile u8 *m, u32 slot)
+{
+    u16 mv = *(volatile u16 *)(m + 0x0Cu + 2u * slot);
+    if (mv == 0u || mv >= 822u)
+        return 0u;
+    u32 base_pp = MOVE_TABLE[12u * mv + 4u];
+    u32 bonus = ((u32)m[0x24u] >> (2u * slot)) & 3u;
+    return (u8)(base_pp + FN_UDIV32(base_pp * bonus, 5u));
 }
 
 void hook_switchineffects_v9(void)
 {
     const u8 *instr = CURR_INSTR;
     u8 b = FN_GET_SCRIPT_BANK(instr[1]) & 3u;
-    sync_battler_v9(b);
-
-    /* Antes dos hazards de entrada: se o substituto ja entra ferido/statusado/PP gasto,
-     * Healing Wish / Lunar Dance cura primeiro (evitando KO prematuro por Stealth Rock). */
-    if (V8_STATE->switchin_hazard_step == 0u && is_bank_present_alive(b)) {
-        u8 side0 = FN_GET_SIDE(b);
-        u8 mode0 = V9_STATE->healing_wish_pending[side0];
-        if (mode0 != 0u) {
-            volatile u8 *m0 = BATTLE_MONS + 0x5Cu * b;
-            u16 hp0 = *(volatile u16 *)(m0 + 0x2Au);
-            u16 max0 = *(volatile u16 *)(m0 + 0x2Eu);
-            u32 st0 = *(volatile u32 *)(m0 + 0x50u);
-            if (hp0 < max0 || st0 != 0u || (mode0 == 2u && any_move_pp_below_max(b))) {
-                V9_STATE->healing_wish_pending[side0] = 0u;
-                V9_STATE->work_bank = b;
-                V9_STATE->work_mode = mode0;
-                V9_STATE->work_idx = 0u;
-                SCRIPTING_BATTLER = b;
-                FN_BS_PUSH(instr);
-                CURR_INSTR = (mode0 == 2u) ? BS_V9_LUNAR_DANCE_IN : BS_V9_HEALING_WISH_IN;
-                return;
-            }
-        }
-    }
 
     PREV_SWITCHINEFFECTS_V8();
     if (CURR_INSTR != instr + 2)
         return;
 
-    sync_battler_v9(b);
-    if (!is_bank_present_alive(b))
+    if (!is_bank_alive(b))
         return;
 
-    /* Apos hazards (Gen 8/9): se entrou saudavel e sofreu dano/status de hazards, cura agora;
-     * caso contrario mantem o desejo armazenado para um aliado futuro. */
     u8 side = FN_GET_SIDE(b);
-    u8 mode = V9_STATE->healing_wish_pending[side];
-    if (mode == 0u)
+    u8 wish = V9_STATE->wish_pending[side];
+    if (wish == 0u)
         return;
 
     volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
     u16 hp = *(volatile u16 *)(m + 0x2Au);
     u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
     u32 st1 = *(volatile u32 *)(m + 0x50u);
-    u8 needs = (hp < max_hp || st1 != 0u || (mode == 2u && any_move_pp_below_max(b))) ? 1u : 0u;
-    if (!needs)
+    u8 need_pp = 0u;
+    if (wish == 2u) {
+        for (u32 i = 0u; i < 4u; ++i) {
+            u8 mpp = max_pp_for_slot(m, i);
+            if (mpp > 0u && m[0x25u + i] < mpp)
+                need_pp = 1u;
+        }
+    }
+
+    if (hp >= max_hp && st1 == 0u && !need_pp)
         return;
 
-    V9_STATE->healing_wish_pending[side] = 0u;
-    V9_STATE->work_bank = b;
-    V9_STATE->work_mode = mode;
-    V9_STATE->work_idx = 0u;
+    V9_STATE->wish_pending[side] = 0u;
+    void *pmon = party_mon_ptr(b);
+    if (st1 != 0u) {
+        u32 zero = 0u;
+        *(volatile u32 *)(m + 0x50u) = 0u;
+        FN_SET_MON_DATA(pmon, 0x37u, &zero);
+    }
+    if (wish == 2u) {
+        for (u32 i = 0u; i < 4u; ++i) {
+            u8 mpp = max_pp_for_slot(m, i);
+            if (mpp > 0u) {
+                m[0x25u + i] = mpp;
+                u32 v = mpp;
+                FN_SET_MON_DATA(pmon, 0x11u + i, &v);
+            }
+        }
+    }
+
     SCRIPTING_BATTLER = b;
-    FN_BS_PUSH(CURR_INSTR);
-    CURR_INSTR = (mode == 2u) ? BS_V9_LUNAR_DANCE_IN : BS_V9_HEALING_WISH_IN;
-}
-
-/* ================== Fila Reutilizavel de Atributos ======================= */
-
-void hook_stat_queue_step_v9(void)
-{
-    const u8 *p = CURR_INSTR;
-    const u8 *down_ptr = (const u8 *)read_u32_unaligned(p);
-    const u8 *done_ptr = (const u8 *)read_u32_unaligned(p + 4);
-
-    if (V9_STATE->q_pos >= V9_STATE->q_len) {
-        TARGET = V9_STATE->saved_target;
-        CURR_INSTR = done_ptr;
-        return;
-    }
-
-    u8 idx = V9_STATE->q_pos++;
-    u8 bank = V9_STATE->q_bank[idx] & 3u;
-    u8 sb = V9_STATE->q_stat[idx];
-    TARGET = bank;
-    STAT_ANIM_PLAYED = 0u;
-    STAT_CHANGER_BYTE = sb;
-    if ((sb & 0x80u) != 0u)
-        CURR_INSTR = down_ptr;
-    else
-        CURR_INSTR = p + 8;
-}
-
-void hook_stat_queue_after_v9(void)
-{
-    u8 mode = V9_STATE->q_after_mode;
-    V9_STATE->q_after_mode = 0u;
-
-    if (mode == 1u) {
-        /* No Retreat (673): prende o usuario apos elevar os 5 atributos */
-        u8 atk = ATTACKER & 3u;
-        sync_battler_v9(atk);
-        V9_STATE->no_retreat_mask |= (u8)(1u << atk);
-        volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-        if ((*(volatile u32 *)(a + 0x54u) & 0x04000000u) == 0u) {
-            *(volatile u32 *)(a + 0x54u) |= 0x04000000u;
-            DISABLE_STRUCTS_REAL[28u * atk + 0x14u] = atk;
-        }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_ATK_CANT_ESCAPE;
-        return;
-    }
-
-    if (mode == 2u) {
-        /* Tar Shot (674): aplica vulnerabilidade 2x a Fogo no alvo */
-        u8 tgt = TARGET & 3u;
-        sync_battler_v9(tgt);
-        if ((V9_STATE->tar_shot_mask & (1u << tgt)) == 0u) {
-            V9_STATE->tar_shot_mask |= (u8)(1u << tgt);
-            CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_TAR_SHOT;
-            return;
-        }
-        CURR_INSTR = BS_MOVE_END;
-        return;
-    }
-
-    if (mode == 3u) {
-        /* Toxic Thread (627): tenta envenenar o alvo apos reduzir Velocidade */
-        if (CONTROLLER_EXEC_FLAGS != 0u) {
-            V9_STATE->q_after_mode = 3u;
-            CURR_INSTR = CURR_INSTR - 5;
-            return;
-        }
-        u8 tgt = TARGET & 3u;
-        volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-        u8 side = FN_GET_SIDE(tgt);
-        u8 misty = (V8_STATE->terrain_type == TERRAIN_MISTY
-                    && V8_STATE->terrain_turns > 0u
-                    && is_battler_grounded_v9(tgt)) ? 1u : 0u;
-        if (!is_behind_substitute(tgt)
-            && *(volatile u32 *)(t + 0x50u) == 0u
-            && !has_type_v9(tgt, 3u)
-            && !has_type_v9(tgt, 8u)
-            && *(volatile u16 *)(t + 0x20u) != 17u
-            && (SIDE_STATUSES[side] & 0x0020u) == 0u
-            && !misty) {
-            *(volatile u32 *)(t + 0x50u) = 0x08u;
-            ACTIVE_BATTLER = tgt;
-            FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(t + 0x50u));
-            FN_MARK_BUFFER_EXEC(tgt);
-            EFFECT_BATTLER = tgt;
-            FN_BS_PUSH(BS_MOVE_END);
-            CURR_INSTR = BS_POISON_EFF;
-            return;
-        }
-        CURR_INSTR = BS_MOVE_END;
-        return;
-    }
-
-    if (mode == 4u) {
-        CURR_INSTR = BS_V9_CANT_ESCAPE_END;
-        return;
-    }
-
-    if (mode == 5u) {
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_FAIRY_LOCK;
-        return;
-    }
-
-    CURR_INSTR = BS_MOVE_END;
-}
-
-/* ==================== Efeito 243: Final Gambit (514) ===================== */
-
-void hook_final_gambit_calc_v9(void)
-{
-    u8 atk = ATTACKER & 3u;
-    u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
-
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-    u8 foresight = ((*(volatile u32 *)(t + 0x54u) & 0x20000000u) != 0u) ? 1u : 0u;
-
-    /* Verifica imunidades ao tipo Lutador (1) e Wonder Guard (25). */
-    u8 m1 = lookup_type_eff(1u, t[0x22u], foresight);
-    u8 m2 = (t[0x23u] != t[0x22u]) ? lookup_type_eff(1u, t[0x23u], foresight) : 10u;
-    u8 et = V9_STATE->extra_type[tgt];
-    u8 m3 = (et != 0u && et != t[0x22u] && et != t[0x23u]) ? lookup_type_eff(1u, et, foresight) : 10u;
-    if (m1 == 0u || m2 == 0u || m3 == 0u) {
-        MOVE_RESULT_FLAGS = 0x09u;
-        CURR_INSTR = BS_DOESNT_AFFECT;
-        return;
-    }
-    if (*(volatile u16 *)(t + 0x20u) == 25u) {
-        u32 prod = (u32)m1 * (u32)m2 * (u32)m3;
-        if (prod <= 1000u) {
-            MOVE_RESULT_FLAGS = 0x09u;
-            CURR_INSTR = BS_DOESNT_AFFECT;
-            return;
-        }
-    }
-
-    u16 user_hp = *(volatile u16 *)(a + 0x2Au);
-    if (user_hp < 1u)
-        user_hp = 1u;
-    V9_STATE->work_u16 = user_hp;
-    CRIT_MULTIPLIER = 1u;
-    MOVE_RESULT_FLAGS &= (u8)~0x2Fu;
-    BATTLE_MOVE_DMG = (s32)user_hp;
-}
-
-void hook_final_gambit_self_ko_v9(void)
-{
-    u8 atk = ATTACKER & 3u;
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-    u16 cur_hp = *(volatile u16 *)(a + 0x2Au);
-    BATTLE_MOVE_DMG = (s32)cur_hp;
+    BATTLE_MOVE_DMG = -((s32)max_hp - (s32)hp);
     MOVE_RESULT_FLAGS &= (u8)~0x29u;
-    HIT_MARKER |= 0x00000100u;
+    FN_BS_PUSH(instr + 2);
+    CURR_INSTR = (wish == 2u) ? BS_V9_SWITCHIN_LDANCE : BS_V9_SWITCHIN_HWISH;
 }
 
-/* ============= Efeito 244: Tipos, Habilidades e Electrify ================ */
+/* ============= Familia One-Shot (eff 243 com acc, 244 sem acc) ========== */
 
-void hook_type_ability_acc_v9(void)
+static u8 is_uncopyable_ability(u16 ab)
 {
-    const u8 *p = CURR_INSTR;
-    const u8 *acc100_branch = (const u8 *)read_u32_unaligned(p);
-    u16 move = CURRENT_MOVE;
-    if (move < 822u && move != 595u && MOVE_TABLE[12u * move + 3u] > 0u)
-        CURR_INSTR = acc100_branch;
-    else
-        CURR_INSTR = p + 4;
-}
-
-static u8 is_protected_ability_target(u16 ab)
-{
-    /* Truant (54), Wonder Guard (25), Forecast (59) nao sao sobrescritas no alvo. */
-    return (ab == 54u || ab == 25u || ab == 59u) ? 1u : 0u;
-}
-
-static u8 is_uncopyable_source_ability(u16 ab)
-{
-    /* None (0), Wonder Guard (25), Trace (36), Forecast (59). */
     return (ab == 0u || ab == 25u || ab == 36u || ab == 59u) ? 1u : 0u;
 }
 
-static u8 has_battler_still_to_act(u8 bank, u32 *pos_out)
+static int find_pending_turn_slot(u8 bank)
 {
     u32 cnt = BATTLERS_COUNT;
     if (cnt > 4u)
         cnt = 4u;
     for (u32 i = (u32)CURR_TURN_ACTION_NUM + 1u; i < cnt; ++i) {
-        if (BATTLER_BY_TURN[i] == bank) {
-            if (ACTIONS_BY_TURN[i] == 0u) {
-                if (pos_out != (u32 *)0)
-                    *pos_out = i;
-                return 1u;
-            }
-            return 0u;
-        }
+        if (BATTLER_BY_TURN[i] == bank)
+            return (int)i;
     }
-    return 0u;
+    return -1;
 }
 
-void hook_type_ability_prep_v9(void)
+void hook_oneshot_prep_v9(void)
 {
     u16 move = CURRENT_MOVE;
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
-
-    if (!is_bank_present_alive(tgt)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-
     volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
     volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-    u16 a_ab = *(volatile u16 *)(a + 0x20u);
-    u16 t_ab = *(volatile u16 *)(t + 0x20u);
 
-    if (move == 486u) {
-        /* Soak: falha sob Substitute ou se ja for puro Agua (11) */
-        if (is_behind_substitute(tgt)
-            || (t[0x22u] == 11u && t[0x23u] == 11u && V9_STATE->extra_type[tgt] == 0u)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        }
-        return;
-    }
-    if (move == 675u) {
-        /* Magic Powder: po (bloqueado por Planta 12), Substitute ou ja puro Psiquico (14) */
-        if (has_type_v9(tgt, 12u)
-            || is_behind_substitute(tgt)
-            || (t[0x22u] == 14u && t[0x23u] == 14u && V9_STATE->extra_type[tgt] == 0u)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        }
-        return;
-    }
-    if (move == 512u) {
-        /* Reflect Type: ignora Substitute; copia tipos do alvo */
-        return;
-    }
-    if (move == 563u) {
-        /* Trick-or-Treat: adiciona Ghost (7) */
-        if (is_behind_substitute(tgt) || has_type_v9(tgt, 7u))
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-    if (move == 567u) {
-        /* Forest's Curse: adiciona Grass (12) */
-        if (is_behind_substitute(tgt) || has_type_v9(tgt, 12u))
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-    if (move == 380u) {
-        /* Gastro Acid */
-        if (is_behind_substitute(tgt)
-            || t_ab == 0u
-            || (V9_STATE->gastro_acid_mask & (1u << tgt)) != 0u) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        }
-        return;
-    }
-    if (move == 388u) {
-        /* Worry Seed: muda habilidade para Insomnia (15) */
-        if (is_behind_substitute(tgt) || t_ab == 15u || is_protected_ability_target(t_ab))
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-    if (move == 493u) {
-        /* Entrainment */
-        if (is_behind_substitute(tgt)
-            || is_uncopyable_source_ability(a_ab)
-            || is_protected_ability_target(t_ab)
-            || a_ab == t_ab) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        }
-        return;
-    }
-    if (move == 759u) {
-        /* Doodle: copia habilidade do alvo para usuario (e parceiro em duplas) */
-        if (is_uncopyable_source_ability(t_ab) || t_ab == 54u) {
+    /* Golpes em alvo unico que exigem alvo vivo */
+    if (move != 379u && move != 392u && move != 477u && move != 583u && move != 628u) {
+        if (!is_bank_alive(tgt)) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        u8 changed_any = (a_ab != t_ab && !is_protected_ability_target(a_ab)) ? 1u : 0u;
-        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u) {
-            u8 ally = (u8)((atk ^ 2u) & 3u);
-            if (is_bank_present_alive(ally)) {
-                u16 al_ab = *(volatile u16 *)(BATTLE_MONS + 0x5Cu * ally + 0x20u);
-                if (al_ab != t_ab && !is_protected_ability_target(al_ab))
-                    changed_any = 1u;
-            }
-        }
-        if (!changed_any)
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
     }
-    if (move == 578u) {
-        /* Electrify: falha se o alvo ja agiu neste turno */
-        if (!has_battler_still_to_act(tgt, (u32 *)0)
-            || (V9_STATE->electrified_mask & (1u << tgt)) != 0u) {
+
+    if (move == 486u) { /* Soak */
+        if (has_substitute(tgt) || (t[0x22u] == 11u && t[0x23u] == 11u && get_extra_type(tgt) == 0u))
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 675u) { /* Magic Powder */
+        if (has_substitute(tgt) || (t[0x22u] == 14u && t[0x23u] == 14u && get_extra_type(tgt) == 0u))
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 512u) { /* Reflect Type */
+        if (t[0x22u] == 9u && t[0x23u] == 9u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 563u) { /* Trick-or-Treat */
+        if (has_substitute(tgt) || has_type_v9(tgt, 7u))
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 567u) { /* Forest's Curse */
+        if (has_substitute(tgt) || has_type_v9(tgt, 12u))
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 578u) { /* Electrify */
+        int slot = find_pending_turn_slot(tgt);
+        if (slot < 0 || ACTIONS_BY_TURN[slot] != 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 572u) { /* Topsy-Turvy */
+        if (has_substitute(tgt)) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
+            return;
+        }
+        u8 any = 0u;
+        for (u32 s = 1u; s <= 7u; ++s) {
+            if (t[0x18u + s] != 6u)
+                any = 1u;
+        }
+        if (!any)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 380u) { /* Gastro Acid */
+        u16 ab = *(volatile u16 *)(t + 0x20u);
+        if (has_substitute(tgt) || ab == 0u || (STATUSES3[tgt] & 0x00010000u) != 0u || is_uncopyable_ability(ab))
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 388u) { /* Worry Seed */
+        u16 ab = *(volatile u16 *)(t + 0x20u);
+        if (has_substitute(tgt) || ab == 15u || ab == 54u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 493u) { /* Entrainment */
+        u16 a_ab = *(volatile u16 *)(a + 0x20u);
+        u16 t_ab = *(volatile u16 *)(t + 0x20u);
+        if (has_substitute(tgt) || is_uncopyable_ability(a_ab) || t_ab == 54u || a_ab == t_ab)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 759u) { /* Doodle */
+        u16 t_ab = *(volatile u16 *)(t + 0x20u);
+        if (is_uncopyable_ability(t_ab)) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
+            return;
+        }
+        u8 any = (*(volatile u16 *)(a + 0x20u) != t_ab && *(volatile u16 *)(a + 0x20u) != 54u) ? 1u : 0u;
+        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u && is_bank_alive((u8)(atk ^ 2u))) {
+            volatile u8 *al = BATTLE_MONS + 0x5Cu * (atk ^ 2u);
+            u16 al_ab = *(volatile u16 *)(al + 0x20u);
+            if (al_ab != t_ab && al_ab != 54u)
+                any = 1u;
+        }
+        if (!any)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 392u) { /* Aqua Ring */
+        if (has_aqua_ring(atk))
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 583u) { /* Fairy Lock */
+        if (V9_STATE->fairy_lock_turns > 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 678u) { /* Octolock */
+        if (has_substitute(tgt) || has_octolock(tgt)
+            || (*(volatile u32 *)(t + 0x54u) & STATUS2_ESCAPE_PREVENTION) != 0u) {
             CURR_INSTR = BS_BUT_IT_FAILED;
         }
-        return;
+    } else if (move == 494u || move == 510u) { /* After You / Quash */
+        if (find_pending_turn_slot(tgt) < 0)
+            CURR_INSTR = BS_BUT_IT_FAILED;
     }
-    CURR_INSTR = BS_BUT_IT_FAILED;
 }
 
-void hook_type_ability_apply_v9(void)
+static void swap_u8_v9(volatile u8 *x, volatile u8 *y)
 {
-    if (CONTROLLER_EXEC_FLAGS != 0u)
-        return;
+    u8 tmp = *x;
+    *x = *y;
+    *y = tmp;
+}
 
+static void swap_u16_v9(volatile u16 *x, volatile u16 *y)
+{
+    u16 tmp = *x;
+    *x = *y;
+    *y = tmp;
+}
+
+void hook_oneshot_apply_v9(void)
+{
     u16 move = CURRENT_MOVE;
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
     volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
     volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
+    u32 tail_idx = 0u;
 
-    if (move == 486u) {
+    if (move == 392u) { /* Aqua Ring */
+        V9_STATE->aqua_ring_tag[atk] = mon_tag(atk);
+        tail_idx = 0u;
+    } else if (move == 486u) { /* Soak */
         t[0x22u] = 11u;
         t[0x23u] = 11u;
         V9_STATE->extra_type[tgt] = 0u;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_SOAK;
-        return;
-    }
-    if (move == 675u) {
+        tail_idx = 1u;
+    } else if (move == 675u) { /* Magic Powder */
         t[0x22u] = 14u;
         t[0x23u] = 14u;
         V9_STATE->extra_type[tgt] = 0u;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_MAGIC_POWDER;
-        return;
-    }
-    if (move == 512u) {
+        tail_idx = 2u;
+    } else if (move == 512u) { /* Reflect Type */
         a[0x22u] = t[0x22u];
         a[0x23u] = t[0x23u];
-        V9_STATE->extra_type[atk] = V9_STATE->extra_type[tgt];
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_REFLECT_TYPE;
-        return;
-    }
-    if (move == 563u) {
+        u8 et = get_extra_type(tgt);
+        V9_STATE->extra_type[atk] = et;
+        if (et != 0u)
+            V9_STATE->extra_type_tag[atk] = mon_tag(atk);
+        tail_idx = 3u;
+    } else if (move == 563u) { /* Trick-or-Treat */
         V9_STATE->extra_type[tgt] = 7u;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_TRICK_OR_TREAT;
-        return;
-    }
-    if (move == 567u) {
+        V9_STATE->extra_type_tag[tgt] = mon_tag(tgt);
+        tail_idx = 4u;
+    } else if (move == 567u) { /* Forest's Curse */
         V9_STATE->extra_type[tgt] = 12u;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_FORESTS_CURSE;
-        return;
-    }
-    if (move == 380u) {
+        V9_STATE->extra_type_tag[tgt] = mon_tag(tgt);
+        tail_idx = 5u;
+    } else if (move == 578u) { /* Electrify */
+        V9_STATE->electrified_mask |= (u8)(1u << tgt);
+        tail_idx = 6u;
+    } else if (move == 379u) { /* Power Trick */
+        swap_u16_v9((volatile u16 *)(a + 0x02u), (volatile u16 *)(a + 0x04u));
+        tail_idx = 7u;
+    } else if (move == 384u) { /* Power Swap */
+        swap_u8_v9(a + 0x19u, t + 0x19u);
+        swap_u8_v9(a + 0x1Cu, t + 0x1Cu);
+        tail_idx = 8u;
+    } else if (move == 385u) { /* Guard Swap */
+        swap_u8_v9(a + 0x1Au, t + 0x1Au);
+        swap_u8_v9(a + 0x1Du, t + 0x1Du);
+        tail_idx = 9u;
+    } else if (move == 391u) { /* Heart Swap */
+        for (u32 s = 1u; s <= 7u; ++s)
+            swap_u8_v9(a + 0x18u + s, t + 0x18u + s);
+        tail_idx = 10u;
+    } else if (move == 638u) { /* Speed Swap */
+        swap_u16_v9((volatile u16 *)(a + 0x06u), (volatile u16 *)(t + 0x06u));
+        tail_idx = 11u;
+    } else if (move == 469u) { /* Guard Split */
+        u16 avg_d = (u16)(((u32)(*(volatile u16 *)(a + 0x04u)) + *(volatile u16 *)(t + 0x04u)) >> 1);
+        u16 avg_s = (u16)(((u32)(*(volatile u16 *)(a + 0x0Au)) + *(volatile u16 *)(t + 0x0Au)) >> 1);
+        if (avg_d < 1u) avg_d = 1u;
+        if (avg_s < 1u) avg_s = 1u;
+        *(volatile u16 *)(a + 0x04u) = avg_d;
+        *(volatile u16 *)(t + 0x04u) = avg_d;
+        *(volatile u16 *)(a + 0x0Au) = avg_s;
+        *(volatile u16 *)(t + 0x0Au) = avg_s;
+        tail_idx = 12u;
+    } else if (move == 470u) { /* Power Split */
+        u16 avg_a = (u16)(((u32)(*(volatile u16 *)(a + 0x02u)) + *(volatile u16 *)(t + 0x02u)) >> 1);
+        u16 avg_s = (u16)(((u32)(*(volatile u16 *)(a + 0x08u)) + *(volatile u16 *)(t + 0x08u)) >> 1);
+        if (avg_a < 1u) avg_a = 1u;
+        if (avg_s < 1u) avg_s = 1u;
+        *(volatile u16 *)(a + 0x02u) = avg_a;
+        *(volatile u16 *)(t + 0x02u) = avg_a;
+        *(volatile u16 *)(a + 0x08u) = avg_s;
+        *(volatile u16 *)(t + 0x08u) = avg_s;
+        tail_idx = 13u;
+    } else if (move == 572u) { /* Topsy-Turvy */
+        u8 rose = 0u, fell = 0u;
+        for (u32 s = 1u; s <= 7u; ++s) {
+            u8 old_st = t[0x18u + s];
+            if (old_st != 6u && old_st <= 12u) {
+                u8 new_st = (u8)(12u - old_st);
+                t[0x18u + s] = new_st;
+                if (new_st > old_st)
+                    rose = 1u;
+                else
+                    fell = 1u;
+            }
+        }
+        if (rose) {
+            V7_STATE->stat_rose_mask |= (u8)(1u << tgt);
+            V7_STATE->rose_pid[tgt] = mon_tag(tgt);
+        }
+        if (fell) {
+            V7_STATE->stat_fell_mask |= (u8)(1u << tgt);
+            V7_STATE->fell_pid[tgt] = mon_tag(tgt);
+        }
+        tail_idx = 14u;
+    } else if (move == 380u) { /* Gastro Acid */
+        STATUSES3[tgt] |= 0x00010000u;
         *(volatile u16 *)(t + 0x20u) = 0u;
-        V9_STATE->gastro_acid_mask |= (u8)(1u << tgt);
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_GASTRO_ACID;
-        return;
-    }
-    if (move == 388u) {
+        tail_idx = 15u;
+    } else if (move == 388u) { /* Worry Seed */
         *(volatile u16 *)(t + 0x20u) = 15u;
         if ((*(volatile u32 *)(t + 0x50u) & 0x07u) != 0u) {
             *(volatile u32 *)(t + 0x50u) = 0u;
-            *(volatile u32 *)(t + 0x54u) &= ~0x08000000u;
-            ACTIVE_BATTLER = tgt;
-            FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(t + 0x50u));
-            FN_MARK_BUFFER_EXEC(tgt);
-            CURR_INSTR = BS_V9_WORRY_SEED_WOKE;
+            *(volatile u32 *)(t + 0x54u) &= ~0x08000000u; /* Nightmare */
+            emit_status_sync(tgt);
+            CURR_INSTR = BS_V9_WORRY_SEED_WAKE;
             return;
         }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_WORRY_SEED;
-        return;
-    }
-    if (move == 493u) {
+        tail_idx = 16u;
+    } else if (move == 493u) { /* Entrainment */
         *(volatile u16 *)(t + 0x20u) = *(volatile u16 *)(a + 0x20u);
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_ENTRAINMENT;
-        return;
-    }
-    if (move == 759u) {
-        u16 copied = *(volatile u16 *)(t + 0x20u);
-        if (!is_protected_ability_target(*(volatile u16 *)(a + 0x20u)))
-            *(volatile u16 *)(a + 0x20u) = copied;
-        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u) {
-            u8 ally = (u8)((atk ^ 2u) & 3u);
-            if (is_bank_present_alive(ally)) {
-                volatile u8 *al = BATTLE_MONS + 0x5Cu * ally;
-                if (!is_protected_ability_target(*(volatile u16 *)(al + 0x20u)))
-                    *(volatile u16 *)(al + 0x20u) = copied;
+        tail_idx = 17u;
+    } else if (move == 759u) { /* Doodle */
+        u16 t_ab = *(volatile u16 *)(t + 0x20u);
+        if (*(volatile u16 *)(a + 0x20u) != 54u)
+            *(volatile u16 *)(a + 0x20u) = t_ab;
+        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u && is_bank_alive((u8)(atk ^ 2u))) {
+            volatile u8 *al = BATTLE_MONS + 0x5Cu * (atk ^ 2u);
+            if (*(volatile u16 *)(al + 0x20u) != 54u)
+                *(volatile u16 *)(al + 0x20u) = t_ab;
+        }
+        tail_idx = 18u;
+    } else if (move == 628u) { /* Laser Focus */
+        V9_STATE->laser_focus_turns[atk] = 2u;
+        V9_STATE->laser_focus_tag[atk] = mon_tag(atk);
+        tail_idx = 19u;
+    } else if (move == 477u) { /* Magic Room */
+        if (V9_STATE->magic_room_turns > 0u) {
+            V9_STATE->magic_room_turns = 0u;
+            tail_idx = 21u;
+        } else {
+            V9_STATE->magic_room_turns = 5u;
+            tail_idx = 20u;
+        }
+    } else if (move == 583u) { /* Fairy Lock */
+        V9_STATE->fairy_lock_turns = 2u;
+        V9_STATE->fairy_lock_mask = 0u;
+        for (u32 b = 0u; b < BATTLERS_COUNT && b < 4u; ++b) {
+            if (is_bank_alive((u8)b) && !has_type_v9((u8)b, 7u)) {
+                volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
+                if ((*(volatile u32 *)(m + 0x54u) & STATUS2_ESCAPE_PREVENTION) == 0u) {
+                    *(volatile u32 *)(m + 0x54u) |= STATUS2_ESCAPE_PREVENTION;
+                    V9_STATE->fairy_lock_mask |= (u8)(1u << b);
+                }
             }
         }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_DOODLE;
+        tail_idx = 22u;
+    } else if (move == 494u) { /* After You */
+        int pos = find_pending_turn_slot(tgt);
+        int next = (int)CURR_TURN_ACTION_NUM + 1;
+        if (pos > next) {
+            u8 b_save = BATTLER_BY_TURN[pos];
+            u8 a_save = ACTIONS_BY_TURN[pos];
+            for (int k = pos; k > next; --k) {
+                BATTLER_BY_TURN[k] = BATTLER_BY_TURN[k - 1];
+                ACTIONS_BY_TURN[k] = ACTIONS_BY_TURN[k - 1];
+            }
+            BATTLER_BY_TURN[next] = b_save;
+            ACTIONS_BY_TURN[next] = a_save;
+        }
+        tail_idx = 23u;
+    } else if (move == 510u) { /* Quash */
+        int pos = find_pending_turn_slot(tgt);
+        int last = (int)BATTLERS_COUNT - 1;
+        if (pos >= 0 && pos < last) {
+            u8 b_save = BATTLER_BY_TURN[pos];
+            u8 a_save = ACTIONS_BY_TURN[pos];
+            for (int k = pos; k < last; ++k) {
+                BATTLER_BY_TURN[k] = BATTLER_BY_TURN[k + 1];
+                ACTIONS_BY_TURN[k] = ACTIONS_BY_TURN[k + 1];
+            }
+            BATTLER_BY_TURN[last] = b_save;
+            ACTIONS_BY_TURN[last] = a_save;
+        }
+        tail_idx = 24u;
+    } else if (move == 678u) { /* Octolock */
+        V9_STATE->octolock_src[tgt] = atk;
+        V9_STATE->octolock_src_tag[tgt] = mon_tag(atk);
+        V9_STATE->octolock_tgt_tag[tgt] = mon_tag(tgt);
+        CURR_INSTR = BS_V9_OCTOLOCK_SET;
         return;
     }
-    if (move == 578u) {
-        V9_STATE->electrified_mask |= (u8)(1u << tgt);
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_ELECTRIFY;
-        return;
-    }
-    CURR_INSTR = BS_MOVE_END;
+
+    CURR_INSTR = BS_V9_MSG_TAILS + 12u * tail_idx;
 }
 
-/* ======== Efeito 245: Trocas, Divisoes e Inversao de Atributos =========== */
+/* ============= Familia Multi-Boost / Stat Queue (eff 245/246) =========== */
 
-void hook_raw_swap_apply_v9(void)
+static void push_stat_op(u8 bank, u8 stat, u8 stages, u8 is_down)
 {
-    const u8 *p = CURR_INSTR;
-    u8 phase = p[0];
-    u16 move = CURRENT_MOVE;
-    u8 atk = ATTACKER & 3u;
-    u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
+    u8 idx = V9_STATE->op_count;
+    if (idx >= 12u)
+        return;
+    volatile u8 *m = BATTLE_MONS + 0x5Cu * (bank & 3u);
+    u8 cur = m[0x18u + stat];
+    if (!is_down && cur >= 12u)
+        return;
+    if (is_down && cur == 0u)
+        return;
+    V9_STATE->op_bank[idx] = bank & 3u;
+    V9_STATE->op_changer[idx] = (u8)(stat | (stages << 4) | (is_down ? 0x80u : 0u));
+    V9_STATE->op_count = (u8)(idx + 1u);
+}
 
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+static u8 can_poison_target(u8 tgt)
+{
+    if (!is_bank_alive(tgt) || has_substitute(tgt))
+        return 0u;
     volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-
-    if (move == 379u) {
-        if (phase == 0u) {
-            CURR_INSTR = p + 1;
-            return;
-        }
-        /* Power Trick: permuta Attack (+0x02) e Defense (+0x04) do usuario */
-        u16 tmp = *(volatile u16 *)(a + 0x02u);
-        *(volatile u16 *)(a + 0x02u) = *(volatile u16 *)(a + 0x04u);
-        *(volatile u16 *)(a + 0x04u) = tmp;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_POWER_TRICK;
-        return;
-    }
-
-    if (!is_bank_present_alive(tgt)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-
-    if (move == 572u) {
-        /* Topsy-Turvy: inverte estagios nao neutros do alvo */
-        if (is_behind_substitute(tgt)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        u8 any_non_neutral = 0u;
-        for (u8 i = 1u; i <= 7u; ++i) {
-            if (t[0x18u + i] != 6u)
-                any_non_neutral = 1u;
-        }
-        if (!any_non_neutral) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        if (phase == 0u) {
-            CURR_INSTR = p + 1;
-            return;
-        }
-        for (u8 i = 1u; i <= 7u; ++i) {
-            if (t[0x18u + i] != 6u)
-                t[0x18u + i] = (u8)(12u - t[0x18u + i]);
-        }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_TOPSY_TURVY;
-        return;
-    }
-
-    if (phase == 0u) {
-        CURR_INSTR = p + 1;
-        return;
-    }
-
-    if (move == 638u) {
-        /* Speed Swap */
-        u16 tmp = *(volatile u16 *)(a + 0x06u);
-        *(volatile u16 *)(a + 0x06u) = *(volatile u16 *)(t + 0x06u);
-        *(volatile u16 *)(t + 0x06u) = tmp;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_SPEED_SWAP;
-        return;
-    }
-    if (move == 470u) {
-        /* Power Split: media de Attack (+0x02) e Sp. Atk (+0x08) */
-        u16 avg_atk = (u16)(((u32)(*(volatile u16 *)(a + 0x02u)) + (u32)(*(volatile u16 *)(t + 0x02u))) >> 1);
-        u16 avg_spa = (u16)(((u32)(*(volatile u16 *)(a + 0x08u)) + (u32)(*(volatile u16 *)(t + 0x08u))) >> 1);
-        if (avg_atk < 1u) avg_atk = 1u;
-        if (avg_spa < 1u) avg_spa = 1u;
-        *(volatile u16 *)(a + 0x02u) = avg_atk;
-        *(volatile u16 *)(t + 0x02u) = avg_atk;
-        *(volatile u16 *)(a + 0x08u) = avg_spa;
-        *(volatile u16 *)(t + 0x08u) = avg_spa;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_POWER_SPLIT;
-        return;
-    }
-    if (move == 469u) {
-        /* Guard Split: media de Defense (+0x04) e Sp. Def (+0x0A) */
-        u16 avg_def = (u16)(((u32)(*(volatile u16 *)(a + 0x04u)) + (u32)(*(volatile u16 *)(t + 0x04u))) >> 1);
-        u16 avg_spd = (u16)(((u32)(*(volatile u16 *)(a + 0x0Au)) + (u32)(*(volatile u16 *)(t + 0x0Au))) >> 1);
-        if (avg_def < 1u) avg_def = 1u;
-        if (avg_spd < 1u) avg_spd = 1u;
-        *(volatile u16 *)(a + 0x04u) = avg_def;
-        *(volatile u16 *)(t + 0x04u) = avg_def;
-        *(volatile u16 *)(a + 0x0Au) = avg_spd;
-        *(volatile u16 *)(t + 0x0Au) = avg_spd;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_GUARD_SPLIT;
-        return;
-    }
-    if (move == 384u) {
-        /* Power Swap: permuta estagios de Atk (1) e Sp. Atk (4) */
-        u8 s1 = a[0x19u]; a[0x19u] = t[0x19u]; t[0x19u] = s1;
-        u8 s4 = a[0x1Cu]; a[0x1Cu] = t[0x1Cu]; t[0x1Cu] = s4;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_POWER_SWAP;
-        return;
-    }
-    if (move == 385u) {
-        /* Guard Swap: permuta estagios de Def (2) e Sp. Def (5) */
-        u8 s2 = a[0x1Au]; a[0x1Au] = t[0x1Au]; t[0x1Au] = s2;
-        u8 s5 = a[0x1Du]; a[0x1Du] = t[0x1Du]; t[0x1Du] = s5;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_GUARD_SWAP;
-        return;
-    }
-    if (move == 391u) {
-        /* Heart Swap: permuta todos os 7 estagios (Atk..Eva) */
-        for (u8 i = 1u; i <= 7u; ++i) {
-            u8 tmp = a[0x18u + i];
-            a[0x18u + i] = t[0x18u + i];
-            t[0x18u + i] = tmp;
-        }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_HEART_SWAP;
-        return;
-    }
-    CURR_INSTR = BS_BUT_IT_FAILED;
+    if (*(volatile u32 *)(t + 0x50u) != 0u)
+        return 0u;
+    if (has_type_v9(tgt, 3u) || has_type_v9(tgt, 8u))
+        return 0u;
+    if (*(volatile u16 *)(t + 0x20u) == 17u)
+        return 0u;
+    if ((SIDE_STATUSES[FN_GET_SIDE(tgt)] & 0x0020u) != 0u)
+        return 0u;
+    if (V8_STATE->terrain_type == TERRAIN_MISTY && V8_STATE->terrain_turns > 0u && is_grounded_v9(tgt))
+        return 0u;
+    return 1u;
 }
 
-/* =========== Efeito 246: Buffs/Debuffs Direcionados e Octolock =========== */
-
-void hook_target_buff_prep_v9(void)
+void hook_multi_prep_v9(void)
 {
     u16 move = CURRENT_MOVE;
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
 
-    if (move == 367u) {
-        /* Acupressure: +2 aleatorio em atributo < 12 do alvo (usuario/aliado) */
-        u8 bank = is_bank_present_alive(tgt) ? tgt : atk;
-        if (bank != atk && is_behind_substitute(bank)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        volatile u8 *m = BATTLE_MONS + 0x5Cu * bank;
+    V9_STATE->op_count = 0u;
+    V9_STATE->op_idx = 0u;
+    V9_STATE->multi_aux = 0u;
+    V9_STATE->saved_dmg = 0u;
+    V9_STATE->saved_tgt = tgt;
+
+    if (move == 367u) { /* Acupressure */
         u8 cand[7];
         u32 n = 0u;
         for (u8 s = 1u; s <= 7u; ++s) {
-            if (m[0x18u + s] < 12u)
+            if (a[0x18u + s] < 12u)
                 cand[n++] = s;
         }
         if (n == 0u) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        u8 chosen = cand[FN_UMOD32(FN_RANDOM(), n)];
-        queue_reset(0u);
-        queue_push(bank, chosen, 2u, 0u);
-        return;
-    }
-
-    if (move == 595u) {
-        /* Venom Drench: afeta oponentes envenenados (-1 Atk, -1 SpAtk, -1 Speed) */
-        queue_reset(0u);
-        u8 atk_side = FN_GET_SIDE(atk);
-        u32 cnt = BATTLERS_COUNT;
-        if (cnt > 4u)
-            cnt = 4u;
-        for (u8 b = 0u; b < cnt; ++b) {
-            if (FN_GET_SIDE(b) == atk_side || !is_bank_present_alive(b) || is_behind_substitute(b))
-                continue;
-            if ((PROTECT_STRUCTS[16u * b] & 0x01u) != 0u)
-                continue;
-            volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-            if ((*(volatile u32 *)(m + 0x50u) & 0x88u) == 0u)
-                continue;
-            if (m[0x19u] > 0u || m[0x1Cu] > 0u || m[0x1Bu] > 0u) {
-                if (m[0x19u] > 0u) queue_push(b, 1u, 1u, 1u);
-                if (m[0x1Cu] > 0u) queue_push(b, 4u, 1u, 1u);
-                if (m[0x1Bu] > 0u) queue_push(b, 3u, 1u, 1u);
-            }
-        }
-        if (V9_STATE->q_len == 0u)
-            CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-
-    if (!is_bank_present_alive(tgt)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-
-    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-
-    if (move == 684u) {
-        /* Decorate: +2 Atk, +2 Sp. Atk no alvo (ignora Substitute) */
-        if (t[0x19u] >= 12u && t[0x1Cu] >= 12u) {
+        u8 pick = cand[FN_UMOD32(FN_RANDOM(), n)];
+        push_stat_op(atk, pick, 2u, 0u);
+    } else if (move == 684u) { /* Decorate */
+        if (!is_bank_alive(tgt)) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        queue_reset(0u);
-        queue_push(tgt, 1u, 2u, 0u);
-        queue_push(tgt, 4u, 2u, 0u);
-        return;
-    }
-
-    if (is_behind_substitute(tgt)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-
-    if (move == 750u) {
-        /* Spicy Extract: +2 Atk e -2 Def no alvo */
-        if (t[0x19u] >= 12u && t[0x1Au] == 0u) {
+        push_stat_op(tgt, 1u, 2u, 0u);
+        push_stat_op(tgt, 4u, 2u, 0u);
+        if (V9_STATE->op_count == 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 750u) { /* Spicy Extract */
+        if (!is_bank_alive(tgt) || has_substitute(tgt)) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        queue_reset(0u);
-        if (t[0x19u] < 12u) queue_push(tgt, 1u, 2u, 0u);
-        if (t[0x1Au] > 0u)  queue_push(tgt, 2u, 2u, 1u);
-        return;
-    }
-
-    if (move == 627u) {
-        /* Toxic Thread: -1 Speed + envenena */
-        u8 side = FN_GET_SIDE(tgt);
-        u8 misty = (V8_STATE->terrain_type == TERRAIN_MISTY
-                    && V8_STATE->terrain_turns > 0u
-                    && is_battler_grounded_v9(tgt)) ? 1u : 0u;
-        u8 can_psn = (*(volatile u32 *)(t + 0x50u) == 0u
-                      && !has_type_v9(tgt, 3u)
-                      && !has_type_v9(tgt, 8u)
-                      && *(volatile u16 *)(t + 0x20u) != 17u
-                      && (SIDE_STATUSES[side] & 0x0020u) == 0u
-                      && !misty) ? 1u : 0u;
-        if (t[0x1Bu] == 0u && !can_psn) {
+        push_stat_op(tgt, 1u, 2u, 0u);
+        push_stat_op(tgt, 2u, 2u, 1u);
+        if (V9_STATE->op_count == 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 673u) { /* No Retreat */
+        if (has_no_retreat(atk)) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        queue_reset(3u);
-        if (t[0x1Bu] > 0u)
-            queue_push(tgt, 3u, 1u, 1u);
-        return;
-    }
-
-    if (move == 674u) {
-        /* Tar Shot: -1 Speed + marca 2x Fogo */
-        u8 already = ((V9_STATE->tar_shot_mask & (1u << tgt)) != 0u) ? 1u : 0u;
-        if (already && t[0x1Bu] == 0u) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        queue_reset(2u);
-        if (t[0x1Bu] > 0u)
-            queue_push(tgt, 3u, 1u, 1u);
-        return;
-    }
-
-    if (move == 678u) {
-        /* Octolock: prende alvo nao-Fantasma e reduz Def/SpDef ao fim do turno */
-        if (has_type_v9(tgt, 7u) || V9_STATE->octolock_active[tgt] != 0u) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        V9_STATE->octolock_active[tgt] = 1u;
-        V9_STATE->octolock_trapper[tgt] = atk;
-        V9_STATE->octolock_src_tag[tgt] = mon_tag(atk);
-        if ((*(volatile u32 *)(t + 0x54u) & 0x04000000u) == 0u) {
-            *(volatile u32 *)(t + 0x54u) |= 0x04000000u;
-            DISABLE_STRUCTS_REAL[28u * tgt + 0x14u] = atk;
-        }
-        queue_reset(4u);
-        return;
-    }
-
-    CURR_INSTR = BS_BUT_IT_FAILED;
-}
-
-/* ============= Efeito 247: Sinergias de Campo / Equipe (v9) ============== */
-
-void hook_field_team_prep_v9(void)
-{
-    u16 move = CURRENT_MOVE;
-    u8 atk = ATTACKER & 3u;
-    sync_battler_v9(atk);
-
-    u32 cnt = BATTLERS_COUNT;
-    if (cnt > 4u)
-        cnt = 4u;
-
-    if (move == 583u) {
-        /* Fairy Lock: bloqueia fuga/troca no turno seguinte */
-        if (V9_STATE->fairy_lock_turns > 0u) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        V9_STATE->fairy_lock_turns = 2u;
-        V9_STATE->fairy_lock_mask = 0u;
-        for (u8 b = 0u; b < cnt; ++b) {
-            sync_battler_v9(b);
-            if (!is_bank_present_alive(b) || has_type_v9(b, 7u))
-                continue;
-            volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-            if ((*(volatile u32 *)(m + 0x54u) & 0x04000000u) == 0u) {
-                *(volatile u32 *)(m + 0x54u) |= 0x04000000u;
-                DISABLE_STRUCTS_REAL[28u * b + 0x14u] = b;
-                V9_STATE->fairy_lock_mask |= (u8)(1u << b);
-            }
-        }
-        queue_reset(5u);
-        return;
-    }
-
-    queue_reset(0u);
-
-    if (move == 559u) {
-        /* Rototiller: +1 Atk, +1 SpAtk em Planta (12) aterrados */
-        for (u8 b = 0u; b < cnt; ++b) {
-            if (!is_bank_present_alive(b) || (STATUSES3[b] & 0x000400F8u) != 0u)
-                continue;
-            if (has_type_v9(b, 12u) && is_battler_grounded_v9(b)) {
-                volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-                if (m[0x19u] < 12u) queue_push(b, 1u, 1u, 0u);
-                if (m[0x1Cu] < 12u) queue_push(b, 4u, 1u, 0u);
-            }
-        }
-    } else if (move == 575u) {
-        /* Flower Shield: +1 Def em todos os Planta (12) em campo */
-        for (u8 b = 0u; b < cnt; ++b) {
-            if (!is_bank_present_alive(b) || (STATUSES3[b] & 0x000400F8u) != 0u)
-                continue;
-            if (has_type_v9(b, 12u)) {
-                volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-                if (m[0x1Au] < 12u) queue_push(b, 2u, 1u, 0u);
-            }
-        }
-    } else if (move == 598u || move == 629u) {
-        /* Magnetic Flux (Def/SpDef +1) e Gear Up (Atk/SpAtk +1) para Plus(57)/Minus(58) */
-        u8 atk_side = FN_GET_SIDE(atk);
-        for (u8 b = 0u; b < cnt; ++b) {
-            if (FN_GET_SIDE(b) != atk_side || !is_bank_present_alive(b))
-                continue;
-            volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-            u16 ab = *(volatile u16 *)(m + 0x20u);
-            if (ab != 57u && ab != 58u)
-                continue;
-            if (move == 598u) {
-                if (m[0x1Au] < 12u) queue_push(b, 2u, 1u, 0u);
-                if (m[0x1Du] < 12u) queue_push(b, 5u, 1u, 0u);
-            } else {
-                if (m[0x19u] < 12u) queue_push(b, 1u, 1u, 0u);
-                if (m[0x1Cu] < 12u) queue_push(b, 4u, 1u, 0u);
-            }
-        }
-    }
-
-    if (V9_STATE->q_len == 0u)
-        CURR_INSTR = BS_BUT_IT_FAILED;
-}
-
-/* ======== Efeito 248: Fillet Away / Clangorous Soul / No Retreat ========= */
-
-void hook_sacrifice_prep_v9(void)
-{
-    const u8 *p = CURR_INSTR;
-    const u8 *skip_hp_ptr = (const u8 *)read_u32_unaligned(p);
-    u16 move = CURRENT_MOVE;
-    u8 atk = ATTACKER & 3u;
-    sync_battler_v9(atk);
-
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-    u16 cur_hp = *(volatile u16 *)(a + 0x2Au);
-    u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
-
-    if (move == 760u) {
-        /* Fillet Away: consome maxHP/2 e sobe Atk/SpAtk/Speed +2 */
-        u16 cost = max_hp >> 1;
-        if (cost < 1u)
-            cost = 1u;
-        if (cur_hp <= cost || (a[0x19u] >= 12u && a[0x1Cu] >= 12u && a[0x1Bu] >= 12u)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        queue_reset(0u);
-        queue_push(atk, 1u, 2u, 0u);
-        queue_push(atk, 4u, 2u, 0u);
-        queue_push(atk, 3u, 2u, 0u);
-        BATTLE_MOVE_DMG = (s32)cost;
-        MOVE_RESULT_FLAGS &= (u8)~0x29u;
-        CURR_INSTR = p + 4;
-        return;
-    }
-
-    if (move == 682u) {
-        /* Clangorous Soul: consome maxHP/3 e sobe Atk..Speed +1 */
+        for (u8 s = 1u; s <= 5u; ++s)
+            push_stat_op(atk, s, 1u, 0u);
+        V9_STATE->multi_aux = 1u; /* trava no pos-efeito */
+    } else if (move == 682u) { /* Clangorous Soul */
+        u16 hp = *(volatile u16 *)(a + 0x2Au);
+        u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
         u16 cost = (u16)FN_UDIV32(max_hp, 3u);
         if (cost < 1u)
             cost = 1u;
-        u8 any_room = 0u;
-        for (u8 s = 1u; s <= 5u; ++s) {
-            if (a[0x18u + s] < 12u)
-                any_room = 1u;
-        }
-        if (cur_hp <= cost || !any_room) {
+        for (u8 s = 1u; s <= 5u; ++s)
+            push_stat_op(atk, s, 1u, 0u);
+        if (hp <= cost || V9_STATE->op_count == 0u) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        queue_reset(0u);
-        for (u8 s = 1u; s <= 5u; ++s)
-            queue_push(atk, s, 1u, 0u);
-        BATTLE_MOVE_DMG = (s32)cost;
-        MOVE_RESULT_FLAGS &= (u8)~0x29u;
-        CURR_INSTR = p + 4;
-        return;
-    }
-
-    if (move == 673u) {
-        /* No Retreat: falha se ja ativado por este Pokemon */
-        if ((V9_STATE->no_retreat_mask & (1u << atk)) != 0u) {
+        V9_STATE->saved_dmg = cost;
+    } else if (move == 760u) { /* Fillet Away */
+        u16 hp = *(volatile u16 *)(a + 0x2Au);
+        u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
+        u16 cost = (u16)(max_hp >> 1);
+        if (cost < 1u)
+            cost = 1u;
+        push_stat_op(atk, 1u, 2u, 0u);
+        push_stat_op(atk, 4u, 2u, 0u);
+        push_stat_op(atk, 3u, 2u, 0u);
+        if (hp <= cost || V9_STATE->op_count == 0u) {
             CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        queue_reset(1u);
-        for (u8 s = 1u; s <= 5u; ++s)
-            queue_push(atk, s, 1u, 0u);
-        CURR_INSTR = skip_hp_ptr;
-        return;
-    }
-
-    CURR_INSTR = BS_BUT_IT_FAILED;
-}
-
-/* ============= Efeito 249: Aqua Ring (392) / Laser Focus (628) =========== */
-
-void hook_self_volatile_apply_v9(void)
-{
-    const u8 *p = CURR_INSTR;
-    u8 phase = p[0];
-    u16 move = CURRENT_MOVE;
-    u8 atk = ATTACKER & 3u;
-    sync_battler_v9(atk);
-
-    if (move == 392u) {
-        if (phase == 0u) {
-            if ((V9_STATE->aqua_ring_mask & (1u << atk)) != 0u) {
-                CURR_INSTR = BS_BUT_IT_FAILED;
-                return;
+        V9_STATE->saved_dmg = cost;
+    } else if (move == 743u) { /* Take Heart */
+        u32 st1 = *(volatile u32 *)(a + 0x50u);
+        push_stat_op(atk, 4u, 1u, 0u);
+        push_stat_op(atk, 5u, 1u, 0u);
+        if (st1 == 0u && V9_STATE->op_count == 0u) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
+            return;
+        }
+        if (st1 != 0u)
+            V9_STATE->multi_aux = 2u; /* cura status antes dos boosts */
+    } else if (move == 595u) { /* Venom Drench */
+        u8 foes[2];
+        u32 nf = 1u;
+        foes[0] = tgt;
+        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u && is_bank_alive((u8)(tgt ^ 2u))) {
+            foes[1] = (u8)(tgt ^ 2u);
+            nf = 2u;
+        }
+        for (u32 i = 0u; i < nf; ++i) {
+            u8 f = foes[i];
+            if (!is_bank_alive(f) || has_substitute(f))
+                continue;
+            volatile u8 *fm = BATTLE_MONS + 0x5Cu * f;
+            if ((*(volatile u32 *)(fm + 0x50u) & 0x88u) != 0u) {
+                push_stat_op(f, 1u, 1u, 1u);
+                push_stat_op(f, 4u, 1u, 1u);
+                push_stat_op(f, 3u, 1u, 1u);
             }
-            CURR_INSTR = p + 1;
+        }
+        if (V9_STATE->op_count == 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 627u) { /* Toxic Thread */
+        if (!is_bank_alive(tgt) || has_substitute(tgt)) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        V9_STATE->aqua_ring_mask |= (u8)(1u << atk);
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_AQUA_RING_SET;
-        return;
-    }
-
-    if (move == 628u) {
-        if (phase == 0u) {
-            CURR_INSTR = p + 1;
+        push_stat_op(tgt, 3u, 1u, 1u);
+        u8 can_psn = can_poison_target(tgt);
+        if (V9_STATE->op_count == 0u && !can_psn) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        V9_STATE->laser_focus_turns[atk] = 2u;
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_LASER_FOCUS;
-        return;
+        if (can_psn)
+            V9_STATE->multi_aux = 3u;
+    } else if (move == 674u) { /* Tar Shot */
+        if (!is_bank_alive(tgt) || has_substitute(tgt)) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
+            return;
+        }
+        push_stat_op(tgt, 3u, 1u, 1u);
+        u8 can_tar = has_tar_shot(tgt) ? 0u : 1u;
+        if (V9_STATE->op_count == 0u && !can_tar) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
+            return;
+        }
+        if (can_tar)
+            V9_STATE->multi_aux = 4u;
+    } else if (move == 598u || move == 629u) { /* Magnetic Flux / Gear Up */
+        u8 banks[2];
+        u32 nb = 1u;
+        banks[0] = atk;
+        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u && is_bank_alive((u8)(atk ^ 2u))) {
+            banks[1] = (u8)(atk ^ 2u);
+            nb = 2u;
+        }
+        for (u32 i = 0u; i < nb; ++i) {
+            u8 b = banks[i];
+            volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
+            u16 ab = *(volatile u16 *)(m + 0x20u);
+            if (ab == 57u || ab == 58u) {
+                if (move == 598u) {
+                    push_stat_op(b, 2u, 1u, 0u);
+                    push_stat_op(b, 5u, 1u, 0u);
+                } else {
+                    push_stat_op(b, 1u, 1u, 0u);
+                    push_stat_op(b, 4u, 1u, 0u);
+                }
+            }
+        }
+        if (V9_STATE->op_count == 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
+    } else if (move == 575u || move == 559u) { /* Flower Shield / Rototiller */
+        for (u32 b = 0u; b < BATTLERS_COUNT && b < 4u; ++b) {
+            if (!is_bank_alive((u8)b) || !has_type_v9((u8)b, 12u))
+                continue;
+            if (move == 559u && !is_grounded_v9((u8)b))
+                continue;
+            if (move == 575u) {
+                push_stat_op((u8)b, 2u, 1u, 0u);
+            } else {
+                push_stat_op((u8)b, 1u, 1u, 0u);
+                push_stat_op((u8)b, 4u, 1u, 0u);
+            }
+        }
+        if (V9_STATE->op_count == 0u)
+            CURR_INSTR = BS_BUT_IT_FAILED;
     }
-
-    CURR_INSTR = BS_BUT_IT_FAILED;
 }
 
-/* =================== Efeito 250: Strength Sap (623) ====================== */
+void hook_multi_pre_fx_v9(void)
+{
+    /* Layout no script logo apos callasm: [0..3]=ptr_hp_cost, [4..7]=ptr_cure, [8..11]=ptr_loop */
+    const u8 *instr = CURR_INSTR;
+    const u8 *ptr_hp = (const u8 *)read_u32_unaligned(instr);
+    const u8 *ptr_cure = (const u8 *)read_u32_unaligned(instr + 4);
+    const u8 *ptr_loop = (const u8 *)read_u32_unaligned(instr + 8);
+
+    if (V9_STATE->saved_dmg > 0u) {
+        u16 dmg = V9_STATE->saved_dmg;
+        V9_STATE->saved_dmg = 0u;
+        BATTLE_MOVE_DMG = (s32)dmg;
+        MOVE_RESULT_FLAGS &= (u8)~0x29u;
+        CURR_INSTR = ptr_hp;
+        return;
+    }
+    if (V9_STATE->multi_aux == 2u) {
+        V9_STATE->multi_aux = 0u;
+        u8 atk = ATTACKER & 3u;
+        volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+        *(volatile u32 *)(a + 0x50u) = 0u;
+        SCRIPTING_BATTLER = atk;
+        emit_status_sync(atk);
+        CURR_INSTR = ptr_cure;
+        return;
+    }
+    CURR_INSTR = ptr_loop;
+}
+
+void hook_multi_next_stat_v9(void)
+{
+    /* Layout: [0..3]=ptr_up, [4..7]=ptr_down, [8..11]=ptr_post */
+    const u8 *instr = CURR_INSTR;
+    const u8 *ptr_up = (const u8 *)read_u32_unaligned(instr);
+    const u8 *ptr_down = (const u8 *)read_u32_unaligned(instr + 4);
+    const u8 *ptr_post = (const u8 *)read_u32_unaligned(instr + 8);
+
+    u8 idx = V9_STATE->op_idx;
+    if (idx >= V9_STATE->op_count) {
+        TARGET = V9_STATE->saved_tgt;
+        CURR_INSTR = ptr_post;
+        return;
+    }
+    V9_STATE->op_idx = (u8)(idx + 1u);
+    u8 b = V9_STATE->op_bank[idx] & 3u;
+    u8 chg = V9_STATE->op_changer[idx];
+    TARGET = b;
+    SCRIPTING_BATTLER = b;
+    ANIM_ARG1_BYTE = 0u;
+    STAT_BUFF_ADDR = chg;
+    CURR_INSTR = ((chg & 0x80u) != 0u) ? ptr_down : ptr_up;
+}
+
+void hook_multi_post_fx_v9(void)
+{
+    u8 atk = ATTACKER & 3u;
+    u8 tgt = V9_STATE->saved_tgt & 3u;
+    TARGET = tgt;
+
+    u8 aux = V9_STATE->multi_aux;
+    V9_STATE->multi_aux = 0u;
+    if (aux == 1u) { /* No Retreat */
+        volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+        *(volatile u32 *)(a + 0x54u) |= STATUS2_ESCAPE_PREVENTION;
+        V9_STATE->no_retreat_tag[atk] = mon_tag(atk);
+        CURR_INSTR = BS_V9_MSG_TAILS + 12u * 25u;
+        return;
+    }
+    if (aux == 3u) { /* Toxic Thread */
+        if (can_poison_target(tgt)) {
+            CURR_INSTR = BS_V9_TOXIC_THREAD_PSN;
+            return;
+        }
+    } else if (aux == 4u) { /* Tar Shot */
+        V9_STATE->tar_shot_tag[tgt] = mon_tag(tgt);
+        CURR_INSTR = BS_V9_MSG_TAILS + 12u * 26u;
+        return;
+    }
+    CURR_INSTR = BS_MOVE_END;
+}
+
+/* ============= Strength Sap (247), Wishes (248) & Shed Tail (249) ======= */
 
 void hook_strength_sap_prep_v9(void)
 {
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
-
-    if (!is_bank_present_alive(tgt) || is_behind_substitute(tgt)) {
+    if (!is_bank_alive(tgt) || has_substitute(tgt) || is_heal_blocked(atk)) {
         CURR_INSTR = BS_BUT_IT_FAILED;
         return;
     }
@@ -1646,255 +1619,225 @@ void hook_strength_sap_prep_v9(void)
     u32 eff_atk = FN_UDIV32(raw_atk * STAT_STAGE_RATIOS[2u * stage], STAT_STAGE_RATIOS[2u * stage + 1u]);
     if (eff_atk < 1u)
         eff_atk = 1u;
-    if (eff_atk > 0xFFFFu)
-        eff_atk = 0xFFFFu;
-    V9_STATE->work_u16 = (u16)eff_atk;
-    V9_STATE->work_idx = stage;
+    if (eff_atk > 0x7FFFu)
+        eff_atk = 0x7FFFu;
+    V9_STATE->saved_dmg = (u16)eff_atk;
+    ANIM_ARG1_BYTE = 0u;
+    STAT_BUFF_ADDR = (u8)(1u | (1u << 4) | 0x80u);
 }
 
 void hook_strength_sap_heal_v9(void)
 {
+    /* Layout: [0..3]=ptr_heal, [4..7]=ptr_ooze */
+    const u8 *instr = CURR_INSTR;
+    const u8 *ptr_heal = (const u8 *)read_u32_unaligned(instr);
+    const u8 *ptr_ooze = (const u8 *)read_u32_unaligned(instr + 4);
+
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
     volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
     volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
+    s32 amt = (s32)V9_STATE->saved_dmg;
 
-    /* Se o Ataque nao diminuiu (ex.: Clear Body / Hyper Cutter / Mist), nao cura. */
-    if (t[0x19u] >= V9_STATE->work_idx) {
-        CURR_INSTR = BS_MOVE_END;
-        return;
-    }
-    if (is_heal_blocked(atk)) {
-        CURR_INSTR = BS_HEAL_BLOCK_CANCEL;
-        return;
-    }
-
-    s32 amt = (s32)V9_STATE->work_u16;
-    if (*(volatile u16 *)(t + 0x20u) == 64u) {
-        /* Liquid Ooze (64): causa dano em vez de curar */
+    if (*(volatile u16 *)(t + 0x20u) == 64u) { /* Liquid Ooze */
         BATTLE_MOVE_DMG = amt;
         MOVE_RESULT_FLAGS &= (u8)~0x29u;
-        CURR_INSTR = BS_V9_LIQUID_OOZE_TAIL;
+        CURR_INSTR = ptr_ooze;
         return;
     }
-
-    u16 cur_hp = *(volatile u16 *)(a + 0x2Au);
-    u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
-    if (cur_hp >= max_hp) {
+    if (*(volatile u16 *)(a + 0x2Au) >= *(volatile u16 *)(a + 0x2Eu)) {
         CURR_INSTR = BS_MOVE_END;
         return;
     }
     BATTLE_MOVE_DMG = -amt;
     MOVE_RESULT_FLAGS &= (u8)~0x29u;
+    CURR_INSTR = ptr_heal;
 }
 
-/* ====== Efeito 251: Clerigo (Psycho Shift / Purify / Take Heart / etc.) == */
-
-static u8 can_receive_psycho_shift(u8 tgt, u32 atk_st1)
+void hook_wish_sac_prep_v9(void)
 {
-    if (!is_bank_present_alive(tgt) || is_behind_substitute(tgt))
+    u8 atk = ATTACKER & 3u;
+    u8 side = FN_GET_SIDE(atk);
+    V9_STATE->wish_pending[side] = (CURRENT_MOVE == 460u) ? 2u : 1u;
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+    BATTLE_MOVE_DMG = (s32)(*(volatile u16 *)(a + 0x2Au));
+    FAINTED_BATTLER = atk;
+    MOVE_RESULT_FLAGS &= (u8)~0x29u;
+}
+
+void hook_shed_tail_prep_v9(void)
+{
+    u8 atk = ATTACKER & 3u;
+    if (has_substitute(atk)) {
+        CURR_INSTR = BS_BUT_IT_FAILED;
+        return;
+    }
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+    u16 hp = *(volatile u16 *)(a + 0x2Au);
+    u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
+    u16 cost = (u16)((max_hp + 1u) >> 1);
+    if (cost < 1u)
+        cost = 1u;
+    if (hp <= cost) {
+        CURR_INSTR = BS_BUT_IT_FAILED;
+        return;
+    }
+    u32 sub_hp = max_hp >> 2;
+    if (sub_hp < 1u)
+        sub_hp = 1u;
+    else if (sub_hp > 255u)
+        sub_hp = 255u;
+    V9_STATE->shed_tail_sub_hp = (u8)sub_hp;
+    BATTLE_MOVE_DMG = (s32)cost;
+    MOVE_RESULT_FLAGS &= (u8)~0x29u;
+}
+
+void hook_shed_tail_install_v9(void)
+{
+    u8 atk = ATTACKER & 3u;
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+    *(volatile u32 *)(a + 0x54u) |= STATUS2_SUBSTITUTE;
+    DISABLE_STRUCTS_REAL[28u * atk + 0x0Au] = V9_STATE->shed_tail_sub_hp;
+}
+
+/* ============= Cleanse / Psycho Shift / Dark Void (250/251) ============= */
+
+static u8 can_receive_psycho_shift(u8 tgt, u32 st1)
+{
+    if (!is_bank_alive(tgt) || has_substitute(tgt))
         return 0u;
     volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
     if (*(volatile u32 *)(t + 0x50u) != 0u)
         return 0u;
-    u8 side = FN_GET_SIDE(tgt);
-    if ((SIDE_STATUSES[side] & 0x0020u) != 0u)
+    if ((SIDE_STATUSES[FN_GET_SIDE(tgt)] & 0x0020u) != 0u)
         return 0u;
-    u8 grounded = is_battler_grounded_v9(tgt);
-    if (grounded && V8_STATE->terrain_turns > 0u && V8_STATE->terrain_type == TERRAIN_MISTY)
+    u8 grounded = is_grounded_v9(tgt);
+    if (V8_STATE->terrain_type == TERRAIN_MISTY && V8_STATE->terrain_turns > 0u && grounded)
         return 0u;
 
     u16 ab = *(volatile u16 *)(t + 0x20u);
-    if ((atk_st1 & 0x07u) != 0u) {
+    if ((st1 & 0x07u) != 0u) { /* Sleep */
         if (ab == 15u || ab == 72u)
             return 0u;
-        if (grounded && V8_STATE->terrain_turns > 0u && V8_STATE->terrain_type == TERRAIN_ELECTRIC)
+        if (V8_STATE->terrain_type == TERRAIN_ELECTRIC && V8_STATE->terrain_turns > 0u && grounded)
             return 0u;
-        return 1u;
-    }
-    if ((atk_st1 & 0x88u) != 0u) {
+    } else if ((st1 & 0x88u) != 0u) { /* Poison / Toxic */
         if (has_type_v9(tgt, 3u) || has_type_v9(tgt, 8u) || ab == 17u)
             return 0u;
-        return 1u;
-    }
-    if ((atk_st1 & 0x10u) != 0u) {
+    } else if ((st1 & 0x10u) != 0u) { /* Burn */
         if (has_type_v9(tgt, 10u) || ab == 41u)
             return 0u;
-        return 1u;
-    }
-    if ((atk_st1 & 0x40u) != 0u) {
+    } else if ((st1 & 0x40u) != 0u) { /* Paralysis */
         if (has_type_v9(tgt, 13u) || ab == 7u)
             return 0u;
-        return 1u;
+    } else if ((st1 & 0x20u) != 0u) { /* Freeze */
+        if (has_type_v9(tgt, 15u) || ab == 40u)
+            return 0u;
     }
-    return 0u;
+    return 1u;
 }
 
-void hook_cleric_prep_v9(void)
+void hook_cleanse_prep_v9(void)
 {
-    u16 move = CURRENT_MOVE;
-    u8 atk = ATTACKER & 3u;
-    u8 tgt = TARGET & 3u;
-    sync_battler_v9(atk);
-    sync_battler_v9(tgt);
-
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-    u32 a_st = *(volatile u32 *)(a + 0x50u);
-
-    if (move == 375u) {
-        /* Psycho Shift */
-        if (a_st == 0u || !can_receive_psycho_shift(tgt, a_st)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        V9_STATE->work_idx = 0u;
-        return;
-    }
-
-    if (move == 640u) {
-        /* Purify: exige que o alvo tenha status1 != 0 e nao esteja sob Substitute */
-        if (!is_bank_present_alive(tgt) || is_behind_substitute(tgt)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
-        if (*(volatile u32 *)(t + 0x50u) == 0u) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        V9_STATE->work_idx = 0u;
-        return;
-    }
-
-    if (move == 743u) {
-        /* Take Heart: cura status1 do usuario + SpAtk/SpDef +1 */
-        if (a_st == 0u && a[0x1Cu] >= 12u && a[0x1Du] >= 12u) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        V9_STATE->work_idx = 0u;
-        return;
-    }
-
-    if (move == 710u || move == 742u) {
-        /* Jungle Healing / Lunar Blessing: cura 1/4 HP + status1 em usuario e aliado */
-        u8 any_ok = 0u;
-        u8 banks[2];
-        u32 nb = 1u;
-        banks[0] = atk;
-        if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u && is_bank_present_alive((u8)(atk ^ 2u))) {
-            banks[1] = (u8)((atk ^ 2u) & 3u);
-            nb = 2u;
-        }
-        for (u32 i = 0u; i < nb; ++i) {
-            u8 b = banks[i];
-            volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-            u16 hp = *(volatile u16 *)(m + 0x2Au);
-            u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
-            if (*(volatile u32 *)(m + 0x50u) != 0u || (hp < max_hp && !is_heal_blocked(b)))
-                any_ok = 1u;
-        }
-        if (!any_ok) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        V9_STATE->work_idx = 0u;
-        return;
-    }
-
-    CURR_INSTR = BS_BUT_IT_FAILED;
-}
-
-void hook_cleric_step_v9(void)
-{
-    if (CONTROLLER_EXEC_FLAGS != 0u)
-        return;
-
-    const u8 *p = CURR_INSTR;
-    const u8 *cure_ui_branch = (const u8 *)read_u32_unaligned(p);
-    const u8 *heal_hp_branch = (const u8 *)read_u32_unaligned(p + 4);
-
+    /* Layout apos callasm: [0..3]=ptr_noacc_anim (pula 0x01 para golpes sem acc) */
+    const u8 *instr = CURR_INSTR;
+    const u8 *ptr_anim = (const u8 *)read_u32_unaligned(instr);
     u16 move = CURRENT_MOVE;
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
     volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
     volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
 
-    if (move == 375u) {
-        /* Psycho Shift: passo 0 aplica status no alvo; passo 1 limpa status do usuario */
-        if (V9_STATE->work_idx == 0u) {
-            V9_STATE->work_idx = 1u;
-            u32 a_st = *(volatile u32 *)(a + 0x50u);
-            u32 new_st = 0u;
-            const u8 *eff_bs = BS_POISON_EFF;
-            if ((a_st & 0x07u) != 0u) {
-                new_st = 2u + (FN_RANDOM() & 1u);
-                eff_bs = BS_V9_SLEEP_EFF;
-            } else if ((a_st & 0x80u) != 0u) {
-                new_st = 0x80u;
-                eff_bs = BS_TOXIC_EFF;
-            } else if ((a_st & 0x08u) != 0u) {
-                new_st = 0x08u;
-                eff_bs = BS_POISON_EFF;
-            } else if ((a_st & 0x10u) != 0u) {
-                new_st = 0x10u;
-                eff_bs = BS_BURN_EFF;
-            } else if ((a_st & 0x40u) != 0u) {
-                new_st = 0x40u;
-                eff_bs = BS_PARALYSIS_EFF;
-            }
-            *(volatile u32 *)(t + 0x50u) = new_st;
-            ACTIVE_BATTLER = tgt;
-            FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(t + 0x50u));
-            FN_MARK_BUFFER_EXEC(tgt);
-            EFFECT_BATTLER = tgt;
-            /* Reexecuta este callasm apos o sub-script de status terminar */
-            FN_BS_PUSH(p - 5);
-            CURR_INSTR = eff_bs;
+    V9_STATE->multi_step = 0u;
+
+    if (move == 375u) { /* Psycho Shift (usa 0x01 logo em instr + 4) */
+        u32 st1 = *(volatile u32 *)(a + 0x50u);
+        if (st1 == 0u || !can_receive_psycho_shift(tgt, st1)) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
             return;
         }
-        if (V9_STATE->work_idx == 1u) {
-            V9_STATE->work_idx = 2u;
+        if ((st1 & 0x80u) != 0u)
+            st1 = 0x0180u;
+        V9_STATE->saved_status = st1;
+        CURR_INSTR = instr + 4;
+        return;
+    }
+    if (move == 640u) { /* Purify */
+        if (!is_bank_alive(tgt) || has_substitute(tgt) || *(volatile u32 *)(t + 0x50u) == 0u) {
+            CURR_INSTR = BS_BUT_IT_FAILED;
+            return;
+        }
+        CURR_INSTR = ptr_anim;
+        return;
+    }
+    /* Jungle Healing (710) / Lunar Blessing (742) */
+    u8 any = 0u;
+    u8 banks[2];
+    u32 nb = 1u;
+    banks[0] = atk;
+    if ((BATTLE_TYPE_FLAGS & 0x01u) != 0u && is_bank_alive((u8)(atk ^ 2u))) {
+        banks[1] = (u8)(atk ^ 2u);
+        nb = 2u;
+    }
+    for (u32 i = 0u; i < nb; ++i) {
+        u8 b = banks[i];
+        volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
+        if (*(volatile u32 *)(m + 0x50u) != 0u)
+            any = 1u;
+        if (!is_heal_blocked(b) && *(volatile u16 *)(m + 0x2Au) < *(volatile u16 *)(m + 0x2Eu))
+            any = 1u;
+    }
+    if (!any) {
+        CURR_INSTR = BS_BUT_IT_FAILED;
+        return;
+    }
+    CURR_INSTR = ptr_anim;
+}
+
+void hook_cleanse_step_v9(void)
+{
+    u16 move = CURRENT_MOVE;
+    u8 atk = ATTACKER & 3u;
+    u8 tgt = TARGET & 3u;
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
+
+    if (move == 375u) { /* Psycho Shift */
+        u8 stp = V9_STATE->multi_step++;
+        if (stp == 0u) {
             *(volatile u32 *)(a + 0x50u) = 0u;
             *(volatile u32 *)(a + 0x54u) &= ~0x08000000u;
-            ACTIVE_BATTLER = atk;
-            FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(a + 0x50u));
-            FN_MARK_BUFFER_EXEC(atk);
-            EFFECT_BATTLER = atk;
-            SCRIPTING_BATTLER = atk;
-            CURR_INSTR = cure_ui_branch;
+            emit_status_sync(atk);
+            CURR_INSTR = BS_V9_PSHIFT_SELF_CURE;
             return;
         }
-        CURR_INSTR = BS_MOVE_END;
+        *(volatile u32 *)(t + 0x50u) = V9_STATE->saved_status;
+        emit_status_sync(tgt);
+        CURR_INSTR = BS_V9_PSHIFT_INFLICT;
         return;
     }
 
-    if (move == 640u) {
-        /* Purify: passo 0 cura alvo; passo 1 cura 50% do HP do usuario */
-        if (V9_STATE->work_idx == 0u) {
-            V9_STATE->work_idx = 1u;
+    if (move == 640u) { /* Purify */
+        u8 stp = V9_STATE->multi_step++;
+        if (stp == 0u) {
             *(volatile u32 *)(t + 0x50u) = 0u;
             *(volatile u32 *)(t + 0x54u) &= ~0x08000000u;
-            ACTIVE_BATTLER = tgt;
-            FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(t + 0x50u));
-            FN_MARK_BUFFER_EXEC(tgt);
-            EFFECT_BATTLER = tgt;
             SCRIPTING_BATTLER = tgt;
-            CURR_INSTR = cure_ui_branch;
+            emit_status_sync(tgt);
+            CURR_INSTR = BS_V9_CLEANSE_CURE_STEP;
             return;
         }
-        if (V9_STATE->work_idx == 1u) {
-            V9_STATE->work_idx = 2u;
+        if (stp == 1u && !is_heal_blocked(atk)) {
             u16 hp = *(volatile u16 *)(a + 0x2Au);
             u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
-            if (!is_heal_blocked(atk) && hp > 0u && hp < max_hp) {
+            if (hp < max_hp) {
                 s32 heal = (s32)((max_hp + 1u) >> 1);
                 if (heal < 1)
                     heal = 1;
                 SCRIPTING_BATTLER = atk;
                 BATTLE_MOVE_DMG = -heal;
                 MOVE_RESULT_FLAGS &= (u8)~0x29u;
-                CURR_INSTR = heal_hp_branch;
+                CURR_INSTR = BS_V9_CLEANSE_HEAL_STEP;
                 return;
             }
         }
@@ -1902,68 +1845,35 @@ void hook_cleric_step_v9(void)
         return;
     }
 
-    if (move == 743u) {
-        /* Take Heart: passo 0 cura status1 se houver; passo 1 enfileira SpAtk/SpDef +1 */
-        if (V9_STATE->work_idx == 0u) {
-            V9_STATE->work_idx = 1u;
-            if (*(volatile u32 *)(a + 0x50u) != 0u) {
-                *(volatile u32 *)(a + 0x50u) = 0u;
-                *(volatile u32 *)(a + 0x54u) &= ~0x08000000u;
-                ACTIVE_BATTLER = atk;
-                FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(a + 0x50u));
-                FN_MARK_BUFFER_EXEC(atk);
-                EFFECT_BATTLER = atk;
-                SCRIPTING_BATTLER = atk;
-                CURR_INSTR = cure_ui_branch;
-                return;
-            }
-        }
-        if (V9_STATE->work_idx == 1u) {
-            V9_STATE->work_idx = 2u;
-            queue_reset(0u);
-            if (a[0x1Cu] < 12u) queue_push(atk, 4u, 1u, 0u);
-            if (a[0x1Du] < 12u) queue_push(atk, 5u, 1u, 0u);
-            if (V9_STATE->q_len > 0u) {
-                CURR_INSTR = BS_V9_STAT_QUEUE;
-                return;
-            }
-        }
-        CURR_INSTR = BS_MOVE_END;
-        return;
-    }
-
-    /* Jungle Healing (710) / Lunar Blessing (742): passos 0..3 (atk HP, atk ST, ally HP, ally ST) */
-    while (V9_STATE->work_idx < 4u) {
-        u8 step = V9_STATE->work_idx++;
-        u8 b = (step < 2u) ? atk : (u8)((atk ^ 2u) & 3u);
-        if (step >= 2u && (BATTLE_TYPE_FLAGS & 0x01u) == 0u)
-            break;
-        if (!is_bank_present_alive(b))
+    /* Jungle Healing (710) / Lunar Blessing (742): passos 0..3 */
+    while (V9_STATE->multi_step < 4u) {
+        u8 stp = V9_STATE->multi_step++;
+        u8 b = (stp < 2u) ? atk : (u8)(atk ^ 2u);
+        if (stp >= 2u && ((BATTLE_TYPE_FLAGS & 0x01u) == 0u || !is_bank_alive(b)))
             continue;
         volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-        if ((step & 1u) == 0u) {
-            u16 hp = *(volatile u16 *)(m + 0x2Au);
-            u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
-            if (!is_heal_blocked(b) && hp < max_hp) {
-                s32 heal = (s32)(max_hp >> 2);
-                if (heal < 1)
-                    heal = 1;
-                SCRIPTING_BATTLER = b;
-                BATTLE_MOVE_DMG = -heal;
-                MOVE_RESULT_FLAGS &= (u8)~0x29u;
-                CURR_INSTR = heal_hp_branch;
-                return;
+        if ((stp & 1u) == 0u) {
+            if (!is_heal_blocked(b)) {
+                u16 hp = *(volatile u16 *)(m + 0x2Au);
+                u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
+                if (hp < max_hp) {
+                    s32 heal = (s32)(max_hp >> 2);
+                    if (heal < 1)
+                        heal = 1;
+                    SCRIPTING_BATTLER = b;
+                    BATTLE_MOVE_DMG = -heal;
+                    MOVE_RESULT_FLAGS &= (u8)~0x29u;
+                    CURR_INSTR = BS_V9_CLEANSE_HEAL_STEP;
+                    return;
+                }
             }
         } else {
             if (*(volatile u32 *)(m + 0x50u) != 0u) {
                 *(volatile u32 *)(m + 0x50u) = 0u;
                 *(volatile u32 *)(m + 0x54u) &= ~0x08000000u;
-                ACTIVE_BATTLER = b;
-                FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(m + 0x50u));
-                FN_MARK_BUFFER_EXEC(b);
-                EFFECT_BATTLER = b;
                 SCRIPTING_BATTLER = b;
-                CURR_INSTR = cure_ui_branch;
+                emit_status_sync(b);
+                CURR_INSTR = BS_V9_CLEANSE_CURE_STEP;
                 return;
             }
         }
@@ -1971,338 +1881,124 @@ void hook_cleric_step_v9(void)
     CURR_INSTR = BS_MOVE_END;
 }
 
-/* ==================== Efeito 252: Dark Void (463) ======================== */
-
 void hook_dark_void_step_v9(void)
 {
-    if (CONTROLLER_EXEC_FLAGS != 0u)
-        return;
-
-    const u8 *p = CURR_INSTR;
-    const u8 *anim_branch = (const u8 *)read_u32_unaligned(p);
+    /* Layout: [0..3]=ptr_try_foe (0x01 acc -> 09 0A -> sono -> volta a step) */
+    const u8 *instr = CURR_INSTR;
+    const u8 *ptr_try_foe = (const u8 *)read_u32_unaligned(instr);
     u8 atk = ATTACKER & 3u;
     volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
 
-    /* Apenas Darkrai (species == 491) pode executar Dark Void (Gen 7-9). */
-    if (*(volatile u16 *)(a + 0x00u) != 491u) {
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_DARK_VOID_BLOCK;
-        return;
-    }
-
-    if (V9_STATE->work_idx == 0u && V9_STATE->work_mode == 0u) {
-        V9_STATE->saved_target = TARGET;
-    }
-
-    if (V9_STATE->work_mode == 2u) {
-        V9_STATE->work_mode = 1u;
-        u8 b = V9_STATE->work_bank & 3u;
-        volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-        *(volatile u32 *)(m + 0x50u) = 2u + (FN_RANDOM() & 1u);
-        ACTIVE_BATTLER = b;
-        FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(m + 0x50u));
-        FN_MARK_BUFFER_EXEC(b);
-        EFFECT_BATTLER = b;
-        FN_BS_PUSH(p - 5);
-        CURR_INSTR = BS_V9_SLEEP_EFF;
-        return;
-    }
-
-    u8 atk_side = FN_GET_SIDE(atk);
-    u32 cnt = BATTLERS_COUNT;
-    if (cnt > 4u)
-        cnt = 4u;
-
-    while (V9_STATE->work_idx < cnt) {
-        u8 b = V9_STATE->work_idx++;
-        if (FN_GET_SIDE(b) == atk_side || !is_bank_present_alive(b))
-            continue;
-        if ((PROTECT_STRUCTS[16u * b] & 0x01u) != 0u || is_behind_substitute(b))
-            continue;
-        volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-        if (*(volatile u32 *)(m + 0x50u) != 0u)
-            continue;
-        u8 b_side = FN_GET_SIDE(b);
-        if ((SIDE_STATUSES[b_side] & 0x0020u) != 0u)
-            continue;
-        u16 ab = *(volatile u16 *)(m + 0x20u);
-        if (ab == 15u || ab == 72u)
-            continue;
-        if (is_battler_grounded_v9(b)
-            && V8_STATE->terrain_turns > 0u
-            && (V8_STATE->terrain_type == TERRAIN_ELECTRIC || V8_STATE->terrain_type == TERRAIN_MISTY)) {
-            continue;
-        }
-
-        /* Checagem de precisao (50% base, 5/3x em Gravity, estagios Acc/Eva) */
-        u32 calc = 50u;
-        s32 buff = (s32)a[0x1Eu] + 6 - (s32)m[0x1Fu];
-        if (buff < 0) buff = 0;
-        else if (buff > 12) buff = 12;
-        const u8 *acc_tbl = (const u8 *)0x08209BD0u;
-        calc = FN_UDIV32(calc * acc_tbl[2u * (u32)buff], acc_tbl[2u * (u32)buff + 1u]);
-        if (*(volatile u16 *)(a + 0x20u) == 14u)
-            calc = FN_UDIV32(calc * 130u, 100u);
-        if (V8_STATE->gravity_turns > 0u)
-            calc = FN_UDIV32(calc * 5u, 3u);
-        if ((FN_UMOD32(FN_RANDOM(), 100u) + 1u) > calc)
-            continue;
-
-        TARGET = b;
-        V9_STATE->work_bank = b;
-        if (V9_STATE->work_mode == 0u) {
-            V9_STATE->work_mode = 2u;
-            CURR_INSTR = anim_branch;
+    if (V9_STATE->multi_step == 0u) {
+        if (*(volatile u16 *)(a + 0x00u) != 491u) {
+            CURR_INSTR = BS_V9_MSG_TAILS + 12u * 27u;
             return;
         }
-        /* Segundo alvo em duplas: aplica sono direto */
-        *(volatile u32 *)(m + 0x50u) = 2u + (FN_RANDOM() & 1u);
-        ACTIVE_BATTLER = b;
-        FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(m + 0x50u));
-        FN_MARK_BUFFER_EXEC(b);
-        EFFECT_BATTLER = b;
-        FN_BS_PUSH(p - 5);
-        CURR_INSTR = BS_V9_SLEEP_EFF;
+        V9_STATE->saved_tgt = TARGET & 3u;
+        V9_STATE->multi_aux = 0u;
+    }
+
+    while (V9_STATE->multi_step < 2u) {
+        u8 idx = V9_STATE->multi_step++;
+        u8 foe = (idx == 0u) ? V9_STATE->saved_tgt : (u8)(V9_STATE->saved_tgt ^ 2u);
+        if (idx == 1u && (BATTLE_TYPE_FLAGS & 0x01u) == 0u)
+            continue;
+        if (!is_bank_alive(foe))
+            continue;
+        if (!can_receive_psycho_shift(foe, 1u))
+            continue;
+        TARGET = foe;
+        V9_STATE->multi_aux = 1u;
+        CURR_INSTR = ptr_try_foe;
         return;
     }
 
-    TARGET = V9_STATE->saved_target;
-    if (V9_STATE->work_mode == 0u) {
+    TARGET = V9_STATE->saved_tgt;
+    CURR_INSTR = (V9_STATE->multi_aux == 0u) ? BS_BUT_IT_FAILED : BS_MOVE_END;
+}
+
+/* ============= Copycat (252), Final Gambit (253), Natural Gift (254) ==== */
+
+static u8 is_copycat_banned(u16 m)
+{
+    if (m == 0u || m >= 822u)
+        return 1u;
+    /* Golpes proibidos pelo Copycat oficial (Gen 4-9) presentes na ROM */
+    switch (m) {
+    case 18u:  case 46u:  case 68u:  case 102u: case 111u: case 118u:
+    case 119u: case 144u: case 165u: case 166u: case 168u: case 182u:
+    case 194u: case 197u: case 203u: case 214u: case 226u: case 243u:
+    case 252u: case 264u: case 266u: case 270u: case 271u: case 274u:
+    case 277u: case 289u: case 343u: case 364u: case 383u: case 507u:
+    case 521u: case 584u: case 616u: case 692u: case 755u: case 761u:
+    case 770u: case 771u: case 785u: case 821u:
+        return 1u;
+    default:
+        return 0u;
+    }
+}
+
+void hook_turn_ctrl_exec_v9(void)
+{
+    u16 m = V9_STATE->last_used_move;
+    if (is_copycat_banned(m)) {
         CURR_INSTR = BS_BUT_IT_FAILED;
         return;
     }
-    CURR_INSTR = BS_MOVE_END;
+    CURRENT_MOVE = m;
+    HIT_MARKER = (HIT_MARKER & ~0x00000400u) | 0x00000200u;
+    TARGET = FN_GET_MOVE_TARGET(m, 0u);
+    CURR_INSTR = SCRIPT_TABLE[MOVE_TABLE[12u * m]];
 }
 
-/* ============ Efeito 253: Healing Wish (361) / Lunar Dance (460) ========= */
-
-void hook_healing_wish_prep_v9(void)
+void hook_final_gambit_prep_v9(void)
 {
-    u16 move = CURRENT_MOVE;
-    u8 atk = ATTACKER & 3u;
-    if (!has_viable_party_replacement(atk)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-    u8 side = FN_GET_SIDE(atk);
-    V9_STATE->healing_wish_pending[side] = (move == 460u) ? 2u : 1u;
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-    BATTLE_MOVE_DMG = (s32)(*(volatile u16 *)(a + 0x2Au));
-    MOVE_RESULT_FLAGS &= (u8)~0x29u;
-}
-
-void hook_hwish_cure_status_v9(void)
-{
-    if (CONTROLLER_EXEC_FLAGS != 0u)
-        return;
-    const u8 *p = CURR_INSTR;
-    const u8 *pp_step = (const u8 *)read_u32_unaligned(p);
-    u8 b = V9_STATE->work_bank & 3u;
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-    if (*(volatile u32 *)(m + 0x50u) == 0u) {
-        CURR_INSTR = pp_step;
-        return;
-    }
-    *(volatile u32 *)(m + 0x50u) = 0u;
-    *(volatile u32 *)(m + 0x54u) &= ~0x08000000u;
-    ACTIVE_BATTLER = b;
-    FN_EMIT_SET_MON_DATA(0u, 0x28u, 0u, 4u, (const void *)(m + 0x50u));
-    FN_MARK_BUFFER_EXEC(b);
-    EFFECT_BATTLER = b;
-    CURR_INSTR = p + 4;
-}
-
-void hook_hwish_restore_pp_v9(void)
-{
-    if (CONTROLLER_EXEC_FLAGS != 0u)
-        return;
-    const u8 *p = CURR_INSTR;
-    const u8 *hp_step = (const u8 *)read_u32_unaligned(p);
-    if (V9_STATE->work_mode != 2u) {
-        CURR_INSTR = hp_step;
-        return;
-    }
-    u8 b = V9_STATE->work_bank & 3u;
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-    while (V9_STATE->work_idx < 4u) {
-        u8 slot = V9_STATE->work_idx++;
-        u8 max_pp = calc_slot_max_pp(m, slot);
-        if (max_pp > 0u && m[0x25u + slot] < max_pp) {
-            m[0x25u + slot] = max_pp;
-            ACTIVE_BATTLER = b;
-            FN_EMIT_SET_MON_DATA(0u, (u8)(0x09u + slot), 0u, 1u, (const void *)(m + 0x25u + slot));
-            FN_MARK_BUFFER_EXEC(b);
-            /* Permanece nesta instrucao callasm ate sincronizar todos os slots */
-            CURR_INSTR = p - 5;
-            return;
-        }
-    }
-    CURR_INSTR = hp_step;
-}
-
-void hook_hwish_prep_hp_v9(void)
-{
-    if (CONTROLLER_EXEC_FLAGS != 0u)
-        return;
-    const u8 *p = CURR_INSTR;
-    const u8 *ret_step = (const u8 *)read_u32_unaligned(p);
-    u8 b = V9_STATE->work_bank & 3u;
-    volatile u8 *m = BATTLE_MONS + 0x5Cu * b;
-    u16 hp = *(volatile u16 *)(m + 0x2Au);
-    u16 max_hp = *(volatile u16 *)(m + 0x2Eu);
-    if (hp >= max_hp) {
-        CURR_INSTR = ret_step;
-        return;
-    }
-    SCRIPTING_BATTLER = b;
-    BATTLE_MOVE_DMG = -((s32)(max_hp - hp));
-    MOVE_RESULT_FLAGS &= (u8)~0x29u;
-    HIT_MARKER |= 0x00100100u;
-    CURR_INSTR = p + 4;
-}
-
-/* ==================== Efeito 254: Shed Tail (770) ======================== */
-
-void hook_shed_tail_prep_v9(void)
-{
-    const u8 *p = CURR_INSTR;
-    const u8 *already_sub_ptr = (const u8 *)read_u32_unaligned(p);
-    const u8 *too_weak_ptr = (const u8 *)read_u32_unaligned(p + 4);
-
-    u8 atk = ATTACKER & 3u;
-    sync_battler_v9(atk);
-    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-
-    if ((*(volatile u32 *)(a + 0x54u) & 0x01000000u) != 0u) {
-        CURR_INSTR = already_sub_ptr;
-        return;
-    }
-    if (!has_viable_party_replacement(atk)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-    u16 cur_hp = *(volatile u16 *)(a + 0x2Au);
-    u16 max_hp = *(volatile u16 *)(a + 0x2Eu);
-    u16 cost = (u16)((max_hp + 1u) >> 1);
-    if (cost < 1u)
-        cost = 1u;
-    if (cur_hp <= cost) {
-        CURR_INSTR = too_weak_ptr;
-        return;
-    }
-
-    u32 sub_hp = max_hp >> 2;
-    if (sub_hp < 1u)
-        sub_hp = 1u;
-    if (sub_hp > 255u)
-        sub_hp = 255u;
-
-    V9_STATE->shed_tail_sub_hp[atk] = (u8)sub_hp;
-    *(volatile u32 *)(a + 0x54u) = (*(volatile u32 *)(a + 0x54u) & 0xFFFF1FFFu) | 0x01000000u;
-    DISABLE_STRUCTS_REAL[28u * atk + 0x0Au] = (u8)sub_hp;
-    BATTLE_MOVE_DMG = (s32)cost;
-    MOVE_RESULT_FLAGS &= (u8)~0x29u;
-    HIT_MARKER |= 0x00000100u;
-    CURR_INSTR = p + 8;
-}
-
-void hook_shed_tail_post_switch_v9(void)
-{
-    u8 atk = ATTACKER & 3u;
-    sync_battler_v9(atk);
-    u8 sub_hp = V9_STATE->shed_tail_sub_hp[atk];
-    V9_STATE->shed_tail_sub_hp[atk] = 0u;
-    if (sub_hp > 0u) {
-        volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
-        *(volatile u32 *)(a + 0x54u) |= 0x01000000u;
-        DISABLE_STRUCTS_REAL[28u * atk + 0x0Au] = sub_hp;
-    }
-}
-
-/* ======== Efeito 255: Copycat (383) / After You (494) / Quash (510) ====== */
-
-void hook_turn_copy_ctrl_v9(void)
-{
-    const u8 *p = CURR_INSTR;
-    u8 phase = p[0];
-    u16 move = CURRENT_MOVE;
     u8 atk = ATTACKER & 3u;
     u8 tgt = TARGET & 3u;
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+    volatile u8 *t = BATTLE_MONS + 0x5Cu * tgt;
 
-    if (move == 383u) {
-        /* Copycat: redireciona para o ultimo golpe executado na batalha */
-        u16 copied = V9_STATE->last_used_move;
-        if (is_copycat_banned_move(copied)) {
-            CURR_INSTR = BS_BUT_IT_FAILED;
-            return;
-        }
-        CURRENT_MOVE = copied;
-        HIT_MARKER = (HIT_MARKER & ~0x00000400u) | 0x00000800u;
-        TARGET = FN_GET_MOVE_TARGET(copied, 0u);
-        u8 eff = MOVE_TABLE[12u * copied];
-        CURR_INSTR = SCRIPT_TABLE_ROM[eff];
+    u8 foresight = ((*(volatile u32 *)(t + 0x54u) & STATUS2_FORESIGHT) != 0u) ? 1u : 0u;
+    if (!foresight && has_type_v9(tgt, 7u)) {
+        MOVE_RESULT_FLAGS = (u8)((MOVE_RESULT_FLAGS & ~0x06u) | 0x08u);
+        CURR_INSTR = BS_MISS_AFTER_PP;
         return;
     }
+    u16 hp = *(volatile u16 *)(a + 0x2Au);
+    V9_STATE->saved_dmg = hp;
+    BATTLE_MOVE_DMG = (s32)hp;
+    FAINTED_BATTLER = atk;
+    MOVE_RESULT_FLAGS &= (u8)~0x29u;
+}
 
-    if (!is_bank_present_alive(tgt) || atk == tgt) {
+void hook_final_gambit_dmg_v9(void)
+{
+    FAINTED_BATTLER = TARGET & 3u;
+    BATTLE_MOVE_DMG = (s32)V9_STATE->saved_dmg;
+    MOVE_RESULT_FLAGS &= (u8)~0x29u;
+}
+
+void hook_natural_gift_prep_v9(void)
+{
+    u8 atk = ATTACKER & 3u;
+    volatile u8 *a = BATTLE_MONS + 0x5Cu * atk;
+    u16 item = *(volatile u16 *)(a + 0x30u);
+
+    if (V9_STATE->magic_room_turns > 0u || item < 133u || item > 175u) {
         CURR_INSTR = BS_BUT_IT_FAILED;
         return;
     }
 
-    if (move == 510u && is_behind_substitute(tgt)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
+    u32 idx = (u32)(item - 133u);
+    u8 ntype = NATURAL_GIFT_TABLE[idx][0];
+    u8 npwr = NATURAL_GIFT_TABLE[idx][1];
+    DYNAMIC_POWER = npwr;
+    BATTLE_STRUCT_PTR[0x13u] = (u8)(0x40u | ntype);
 
-    u32 pos = 0u;
-    if (!has_battler_still_to_act(tgt, &pos)) {
-        CURR_INSTR = BS_BUT_IT_FAILED;
-        return;
-    }
-
-    if (phase == 0u) {
-        CURR_INSTR = p + 1;
-        return;
-    }
-
-    u32 cnt = BATTLERS_COUNT;
-    if (cnt > 4u)
-        cnt = 4u;
-
-    if (move == 494u) {
-        /* After You: move tgt para CURR_TURN_ACTION_NUM + 1 */
-        u32 dest = (u32)CURR_TURN_ACTION_NUM + 1u;
-        if (pos > dest) {
-            u8 b_save = BATTLER_BY_TURN[pos];
-            u8 a_save = ACTIONS_BY_TURN[pos];
-            for (u32 k = pos; k > dest; --k) {
-                BATTLER_BY_TURN[k] = BATTLER_BY_TURN[k - 1u];
-                ACTIONS_BY_TURN[k] = ACTIONS_BY_TURN[k - 1u];
-            }
-            BATTLER_BY_TURN[dest] = b_save;
-            ACTIONS_BY_TURN[dest] = a_save;
-        }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_AFTER_YOU;
-        return;
-    }
-
-    if (move == 510u) {
-        /* Quash: move tgt para o ultimo slot de acao do turno */
-        u32 last = cnt - 1u;
-        while (last > pos && ACTIONS_BY_TURN[last] != 0u)
-            last--;
-        if (pos < last) {
-            u8 b_save = BATTLER_BY_TURN[pos];
-            u8 a_save = ACTIONS_BY_TURN[pos];
-            for (u32 k = pos; k < last; ++k) {
-                BATTLER_BY_TURN[k] = BATTLER_BY_TURN[k + 1u];
-                ACTIONS_BY_TURN[k] = ACTIONS_BY_TURN[k + 1u];
-            }
-            BATTLER_BY_TURN[last] = b_save;
-            ACTIONS_BY_TURN[last] = a_save;
-        }
-        CURR_INSTR = BS_V9_STR_TAILS + 12u * TAIL_QUASH;
-        return;
-    }
-
-    CURR_INSTR = BS_BUT_IT_FAILED;
+    u16 zero = 0u;
+    *(volatile u16 *)(a + 0x30u) = 0u;
+    FN_SET_MON_DATA(party_mon_ptr(atk), 0x0Cu, &zero);
+    ACTIVE_BATTLER = atk;
+    FN_EMIT_SET_MON_DATA(0u, 0x02u, 0u, 2u, (const void *)(a + 0x30u));
+    FN_MARK_BUFFER_EXEC(atk);
 }

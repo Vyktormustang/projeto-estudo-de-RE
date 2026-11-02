@@ -1,4 +1,4 @@
-# Motor parcial `v9` — +49 Golpes de Subida de Nível (+368 entradas → 14.995; 695/729 = 95,3% restauradas) preservando 229/229 TMs de Scarlet/Violet
+# Motor parcial `v9` — +51 golpes não-TM de subida de nível (+378 aprendizados → 15.005; 705/729 = 96,7% restaurados, preservando 229/229 TMs SV)
 
 > **Escopo e regras de segurança:** este documento aplica-se exclusivamente à trilha **FireRed PT-BR Gen 1–9 (32 MiB)** (`VYK-57`), sobre `motor_v8.gba`. Nunca misture endereços ou estados com a ROM histórica de 16 MiB (`BAG_MOD`). Nenhuma ROM comercial (`.gba`), save pessoal (`.sav`) ou save-state é versionado no Git; todos os testes de integração usam exclusivamente saves e estados sintéticos descartáveis em mGBA `0.10.5`.
 
@@ -14,147 +14,149 @@
 | Motor parcial `v6` | `scripts/motor_v6.py` | `cf1de0e2...` | `75d66d3c36e560df29f6c613666b91a6c81ce24663b6a3f76f4dd2ea7d747ce6` |
 | Motor parcial `v7` | `scripts/motor_v7.py` | `75d66d3c...` | `6321d8e2900cc44dcaefb2dedfbaf5b0952b2796ca27a4cb9d8dc0875827de09` |
 | Motor parcial `v8` | `scripts/motor_v8.py` | `6321d8e2...` | `32fd47c87b581952f54f05656f590c5f7da55d5cc3d186d81951508899ec54f0` |
-| **Motor parcial `v9`** | `scripts/motor_v9.py` | `32fd47c8...` | **`ad911117b4e1072f614ae51d1d6b1b99643562d2b9cdf7701fbcd04baab3a297`** |
+| **Motor parcial `v9`** | `scripts/motor_v9.py` | `32fd47c8...` | **`2936a08fc95f40c7788b6136f209ab5cab31aec062d615f2a458f45b123e0e6f`** |
 
 Insumos versionados verificados por SHA-256 antes de aplicar `scripts/motor_v9.py`:
 
 | Arquivo | Tamanho | SHA-256 |
 |---|---:|---|
-| `patches/motor_v9/payload.bin` | `12.296` B | `71283bda3341ad5b55e7cd0b9fecf40bf53e49a26737ed20d2a05484d9553f24` |
-| `data/learnsets_motor_v9.csv` | `415.049` B | `a9fee458d097a83a6dde27af745bb3efc3bb603b84208b960c1c9dcb424ce4d8` |
+| `patches/motor_v9/payload.bin` | `12.692` B | `0cdc8e30ea289e49b5ea6f7c645078f8bec59f1ebc1f4d8eeeb1c4db93f67749` |
+| `data/learnsets_motor_v9.csv` | `415.359` B | `de3f00717240a20c513899422789082d20e7e56f911671677c92abbf26ccfeae` |
 | `data/learnsets_motor_v8.csv` | `404.233` B | `19abc5661267157524b9dcdc9ad769cdf12a20f9f44a3be63f134ae2ec9120f7` |
+
+*(Observação: o SHA-256 de `payload.bin` acima reflete exatamente o binário compilado em `patches/motor_v9/payload.bin` e verificado em `scripts/motor_v9.py`.)*
 
 ---
 
 ## 2. O que foi implementado em `motor_v9` (fatos confirmados)
 
-Ocupando de forma estruturada os **13 slots livres remanescentes (`243..255`)** da tabela de scripts de batalha (`gBattleScriptsForMoveEffects` em `0x0900A000`), o `motor_v9` implementa **49 golpes** agrupados em 5 famílias mecânicas e restaura **+368 entradas de subida de nível** antes omitidas (`14.627` → **`14.995` linhas**, alcançando **`695 / 729` = `95,3%`** das entradas históricas de `docs/golpes_pendentes_complemento.csv`), preservando byte a byte as **229/229 TMs de Scarlet/Violet**, as 8 HMs infinitas, o estojo paginável `estojo_v2`, a loja, o treino EV/IV e as tabelas de encontros/eventos.
+`motor_v9` preserva integralmente (byte a byte) todas as **229/229 TMs de Scarlet/Violet**, a loja ampliada, a matriz de compatibilidade `compatibilidade_tms_motor_v8.bin`, as 8 HMs infinitas, o `estojo_v2` paginado, o `treino_ev` e os eventos fixos, e ocupa `12` slots livres de `gBattleScriptsForMoveEffects` (`243..254`, mantendo `255` livre) para implementar **51 golpes não-TM** em seis famílias mecânicas compartilhadas:
 
-### 2.1. Família 1 — Alteração de tipos, 3º tipo efêmero e vulnerabilidade elemental (`6` golpes, `+48` entradas)
+### 2.1. Família A — Modificação de tipo, 3º tipo efêmero e eletrificação (`6` golpes, `+50` registros)
 
-| Golpe interno (PokéAPI) | Nome | Slot de efeito | Mecânica implementada e validada em mGBA |
-|---:|---|---:|---|
-| `486` (`487`) | `Soak` | `244` | Converte o alvo para tipo Água puro (`type1=11, type2=11`, limpando 3º tipo); falha sob `Substitute` ou se o alvo já for Água puro. |
-| `675` (`750`) | `Magic Powder` | `244` | Converte o alvo para tipo Psíquico puro (`type1=14, type2=14`, limpando 3º tipo); bloqueado por alvos de tipo Planta (`12`), `Substitute` ou já Psíquico puro. |
-| `512` (`513`) | `Reflect Type` | `244` | Copia `type1`, `type2` e eventual `extra_type` do alvo para o usuário (ignora `Substitute`). |
-| `563` (`567`) | `Trick-or-Treat` | `244` | Adiciona Fantasma (`extra_type = 7`) como 3º tipo do alvo, concedendo STAB `1,5x` e aplicando imunidades (`0x` Lutador/Normal) e fraquezas (`2x` Sombrio/Fantasma) em `hook_typecalc_v9`. |
-| `567` (`571`) | `Forest's Curse` | `244` | Adiciona Planta (`extra_type = 12`) como 3º tipo do alvo (STAB, eficácia elemental e imunidade a `Magic Powder` / reconhecimento em `Rototiller` e `Flower Shield`). |
-| `674` (`749`) | `Tar Shot` | `246` | Reduz `Speed -1` do alvo e marca `tar_shot_mask`, dobrando (`2x`) a eficácia de golpes de tipo Fogo (`10`) contra o alvo marcado. |
+- `Soak` (`486`, eff `243`): converte o alvo para Água pura `(11, 11)`; falha atrás de `Substitute`, contra `Multitype`/Arceus (`#493`) ou se o alvo já for Água pura `(11, 11)`.
+- `Magic Powder` (`675`, eff `243`): converte o alvo para Psíquico puro `(14, 14)` com as mesmas guardas.
+- `Reflect Type` (`512`, eff `244`): copia `(type1, type2)` do alvo para o usuário (inclusive através de `Substitute`, exceto quando o alvo não tem tipo válido).
+- `Trick-or-Treat` (`563`, eff `243`) e `Forest's Curse` (`567`, eff `243`): gravam um 3º tipo efêmero (`Ghost = 7` ou `Grass = 12`) vinculado à tag de identidade do Pokémon em campo (`PID ^ slot`), avaliado em `hook_typecalc_v9` (`0x06`, incluindo imunidades `0x`, super-eficácia/resistência líquida e STAB/imunidades de solo/status).
+- `Electrify` (`578`, eff `244`): eletrifica o próximo golpe do alvo neste turno (`bstruct[0x13] = 0x40 | 13` em `hook_damage_v9` e `hook_typecalc_v9`); falha se o alvo já agiu no turno.
 
-### 2.2. Família 2 — Manipulação de habilidades nativas Gen 3 e eletrificação (`5` golpes, `+70` entradas)
+### 2.2. Família B — Trocas, divisões, inversões e impulsos compostos de stats (`21` golpes, `+101` registros)
 
-| Golpe interno (PokéAPI) | Nome | Slot de efeito | Mecânica implementada e validada em mGBA |
-|---:|---|---:|---|
-| `380` (`380`) | `Gastro Acid` | `244` | Suprime a habilidade ativa do alvo (`ability = 0`, ex.: anula `Levitate` permitindo `Earthquake`); falha sob `Substitute` ou se já suprimida. |
-| `388` (`388`) | `Worry Seed` | `244` | Muda a habilidade do alvo para `Insomnia` (`15`) e, se o alvo estiver dormindo (`status1 & 0x07`), acorda-o imediatamente sincronizando `MON_DATA_STATUS` via `EmitSetMonData`. |
-| `493` (`494`) | `Entrainment` | `244` | Transfere a habilidade do usuário para o alvo (respeitando habilidades protegidas Gen 3: `Wonder Guard` `25`, `Truant` `54`, `Forecast` `59` e `Trace` `36`). |
-| `759` (`867`) | `Doodle` | `244` | Copia a habilidade do alvo para o usuário (e para o parceiro ativo em batalhas em dupla), respeitando a mesma lista de habilidades não copiáveis. |
-| `578` (`582`) | `Electrify` | `244` | Se o alvo ainda não agiu no turno atual, marca `electrified_mask` convertendo o tipo dinâmico (`bstruct[0x13] = 0x40 | 13`) do golpe do alvo neste turno em Elétrico (`13`). |
+- **Trocas e divisões diretas (eff `244`):**
+  - `Power Trick` (`379`): permuta `Atk` ↔ `Def` brutos em `BattlePokemon` (`+0x02` ↔ `+0x04`).
+  - `Speed Swap` (`638`): permuta `Speed` bruto entre usuário e alvo (`+0x06`).
+  - `Power Swap` (`384`), `Guard Swap` (`385`) e `Heart Swap` (`391`): permutam entre usuário e alvo os estágios `Atk/SpA`, `Def/SpD` ou todos os `7` estágios (`1..7`).
+  - `Guard Split` (`469`) e `Power Split` (`470`): igualam `Def/SpD` ou `Atk/SpA` de usuário e alvo à média inteira `(a + b) >> 1` (mínimo `1`).
+  - `Topsy-Turvy` (`572`): inverte todos os estágios não neutros do alvo (`stage' = 12 - stage`); falha atrás de `Substitute` ou quando todos os estágios são `6`.
+- **Fila sequencial animada de stats com efeitos acoplados (eff `245` c/ precisão, eff `246` s/ precisão):**
+  - `Acupressure` (`367`, eff `246`): escolhe uniformemente um atributo `< +6` entre `Atk..Evasion` e eleva `+2`.
+  - `Decorate` (`684`, eff `246`): eleva `Atk +2` e `SpA +2` do alvo (incluindo aliado em Duplas).
+  - `Spicy Extract` (`750`, eff `246`): aplica `Atk +2` e `Def -2` no alvo (bloqueado por `Substitute`).
+  - `No Retreat` (`673`, eff `246`): eleva `Atk/Def/Speed/SpA/SpD +1`, aplica `STATUS2_ESCAPE_PREVENTION` (`0x04000000`) + tag dedicada `no_retreat_tag` e falha em uso repetido enquanto a trava persistir.
+  - `Clangorous Soul` (`682`, eff `246`, `acc=0, tgt=0x10`): consome `floor(maxHP / 3)` de HP e eleva `Atk/Def/Speed/SpA/SpD +1` (falha se `HP <= custo` ou todos os 5 atributos já estiverem em `+6`).
+  - `Fillet Away` (`760`, eff `246`): consome `floor(maxHP / 2)` de HP e eleva `Atk/SpA/Speed +2` com a mesma guarda de HP/teto.
+  - `Take Heart` (`743`, eff `246`, `10` PP): cura condições não voláteis de status do usuário (sincronizando `BattlePokemon`, `Pokemon` da equipe via `MON_DATA_STATUS = 0x37` e ícone de HUD via `0x98`) e eleva `SpA +1` e `SpD +1`.
+  - `Venom Drench` (`595`, eff `245`, `tgt=0x08`): reduz `Atk/SpA/Speed -1` em oponentes envenenados (`Poison` ou `Bad Poison`); falha se nenhum alvo válido estiver envenenado.
+  - `Toxic Thread` (`627`, eff `245`): reduz `Speed -1` e envenena o alvo (`0x08`).
+  - `Tar Shot` (`674`, eff `245`): reduz `Speed -1` e marca `tar_shot_tag[tgt]`, dobrando (`2x`) o dano recebido de golpes de Fogo (`10`) em `hook_typecalc_v9`.
+  - `Rototiller` (`559`, eff `246`, `tgt=0x10`): eleva `Atk/SpA +1` de todos os Pokémon de Planta (`12`) **aterrados** em campo.
+  - `Flower Shield` (`575`, eff `246`, `tgt=0x10`): eleva `Def +1` de todos os Pokémon de Planta (`12`) em campo (aterrados ou não).
+  - `Magnetic Flux` (`598`, eff `246`, `tgt=0x10`) e `Gear Up` (`629`, eff `246`, `tgt=0x10`): elevam `Def/SpD +1` ou `Atk/SpA +1` do usuário e do aliado (em Duplas) que possuam `Plus` (`57`) ou `Minus` (`58`).
 
-### 2.3. Família 3 — Trocas, divisões, inversão, sinergias de campo/equipe e `Strength Sap` (`18` golpes, `+100` entradas)
+### 2.3. Família C — Regeneração, drenagem por Atk, sacrifício/substituto e purificação (`11` golpes, `+60` registros)
 
-| Golpes internos | Nomes | Slots | Mecânica implementada e validada em mGBA |
-|---|---|---:|---|
-| `379`, `638` | `Power Trick`, `Speed Swap` | `245` | Permutam respectivamente `Attack ↔ Defense` brutos do usuário (`+0x02`/`+0x04`) ou `Speed` bruta (`+0x06`) entre usuário e alvo. |
-| `470`, `469` | `Power Split`, `Guard Split` | `245` | Igualam `Attack` e `Sp. Atk` (`Power Split`) ou `Defense` e `Sp. Def` (`Guard Split`) de usuário e alvo à média aritmética inteira `(a + t) >> 1`. |
-| `384`, `385`, `391` | `Power Swap`, `Guard Swap`, `Heart Swap` | `245` | Permutam estágios de `Atk`/`Sp. Atk` (`Power Swap`), `Def`/`Sp. Def` (`Guard Swap`) ou todos os `7` estágios `Atk..Eva` (`Heart Swap`) entre usuário e alvo. |
-| `572` | `Topsy-Turvy` | `245` | Inverte todos os estágios não neutros do alvo (`stage = 12 - stage`); falha sob `Substitute` ou quando todos os estágios são `6`. |
-| `367`, `684`, `750` | `Acupressure`, `Decorate`, `Spicy Extract` | `246` | `Acupressure`: `+2` aleatório em atributo `< 12` do usuário; `Decorate`: `+2 Atk` e `+2 Sp. Atk` no alvo (ignora `Substitute`); `Spicy Extract`: `+2 Atk` e `-2 Def` no alvo. |
-| `595`, `627` | `Venom Drench`, `Toxic Thread` | `246` | `Venom Drench`: `-1 Atk / -1 Sp. Atk / -1 Speed` em oponentes envenenados; `Toxic Thread`: `-1 Speed` + envenena o alvo (`0x08`, respeitando tipos/habilidades/`Misty Terrain`). |
-| `559`, `575`, `598`, `629` | `Rototiller`, `Flower Shield`, `Magnetic Flux`, `Gear Up` | `247` (`tgt=0x10`) | `Rototiller`: `+1 Atk / +1 Sp. Atk` em Planta (`12`) aterrados; `Flower Shield`: `+1 Def` em todos os Planta (`12`) em campo; `Magnetic Flux` (`+1 Def/Sp. Def`) e `Gear Up` (`+1 Atk/Sp. Atk`) para aliados com `Plus` (`57`) ou `Minus` (`58`). |
-| `623` | `Strength Sap` | `250` | Calcula o Ataque efetivo atual do alvo (com estágios), reduz `Attack -1` via `statbuffchange` (respeitando `Clear Body` / `Hyper Cutter` / `Mist`), bloqueia cura sob `Psychic Noise`, causa dano ao usuário contra `Liquid Ooze` (`64`) ou restaura HP igual ao Ataque efetivo pré-queda. |
+- `Aqua Ring` (`392`, eff `244`): ativa véu de água no usuário, curando `max(1, maxHP / 16)` ao fim de cada turno (`hook_endturn_v9`, respeitando `Psychic Noise` / `Heal Block`).
+- `Strength Sap` (`623`, eff `247`): calcula o `Atk` efetivo do alvo (com estágio atual), reduz `Atk -1` do alvo e cura o usuário por esse valor (respeitando `Heal Block`; contra `Liquid Ooze` `64`, causa esse mesmo valor em dano ao usuário).
+- `Healing Wish` (`361`, eff `248`) e `Lunar Dance` (`460`, eff `248`): sacrificam o usuário (quando há reserva apta) e armam `wish_pending[side]` (`1` ou `2`). Em `hook_switchineffects_v9` (`0x52`), o próximo aliado que entrar ferido/com status/com PP gasto recebe restauração total de HP, limpeza de status (`BattlePokemon` + `MON_DATA_STATUS = 0x37` + `0x98`) e, no caso de `Lunar Dance`, restauração completa dos PPs dos 4 golpes considerando `ppBonuses` (`MON_DATA_PP1..4 = 0x11..0x14`).
+- `Shed Tail` (`770`, eff `249`): exige reserva apta, ausência de `Substitute` ativo e `HP > ceil(maxHP / 2)`; consome `ceil(maxHP / 2)` de HP, executa troca automática de pivot (`51 01 02` + `4E 01 01` preservando bit de substituto) e instala no aliado entrante um `Substitute` de `max(1, maxHP_usuario / 4)` em `gDisableStructs[bank].substituteHP` (`0x02021648 + 28*bank + 0x0A`).
+- `Psycho Shift` (`375`, eff `250`): transfere a condição não volátil do usuário ao alvo (respeitando imunidades elementais, habilidades Gen 3, `Safeguard` e `Misty Terrain`) e cura o próprio usuário.
+- `Purify` (`640`, eff `250`): cura a condição não volátil do alvo e restaura `max(1, maxHP / 2)` do usuário; falha se o alvo não tiver condição de status.
+- `Jungle Healing` (`710`, eff `250`) e `Lunar Blessing` (`742`, eff `250`): curam `max(1, maxHP / 4)` e removem condições não voláteis do usuário (e do parceiro vivo em Duplas).
+- `Dark Void` (`463`, eff `251`, `50%` acc, `tgt=0x08`): adormece ambos os oponentes em Duplas (ou o oponente em Simples) e falha explicitamente com `"Mas {ATK} não consegue usar o golpe!"` quando a espécie do usuário não é **Darkrai (`#491`)** (regra oficial Gen 7+).
 
-### 2.4. Família 4 — Sacrifício de HP, clérigo, cura contínua, crítico garantido, pivot com `Substitute` e `Dark Void` (`15` golpes, `+85` entradas)
+### 2.4. Família D — Manipulação de habilidade (`4` golpes, `+82` registros)
 
-| Golpes internos | Nomes | Slots | Mecânica implementada e validada em mGBA |
-|---|---|---:|---|
-| `514` | `Final Gambit` | `243` | Verifica imunidades a Lutador (`Ghost`, `Wonder Guard`); se atingir, causa dano fixo exato igual ao HP atual do usuário (`0x69` `adjustnormaldamage2`, respeitando `Endure`) e sacrifica o usuário. |
-| `760`, `682`, `673` | `Fillet Away`, `Clangorous Soul`, `No Retreat` | `248` | `Fillet Away`: consome `maxHP / 2` e eleva `Atk / Sp. Atk / Speed +2`; `Clangorous Soul` (`acc=0`): consome `maxHP / 3` e eleva `Atk..Speed +1`; `No Retreat`: eleva `Atk..Speed +1`, aplica `STATUS2_ESCAPE_PREVENTION` (`0x04000000`) e falha se reutilizado enquanto `no_retreat_mask` estiver ativo. |
-| `392`, `628` | `Aqua Ring`, `Laser Focus` | `249` | `Aqua Ring`: cura `max(1, maxHP / 16)` por turno ao fim do turno (respeitando `Psychic Noise`); `Laser Focus`: garante acerto crítico (`CRIT_MULTIPLIER = 2`) até o fim do próximo turno do usuário (exceto contra `Battle Armor`/`Shell Armor`). |
-| `375`, `640`, `743`, `710`, `742` | `Psycho Shift`, `Purify`, `Take Heart` (`pp=10`), `Jungle Healing`, `Lunar Blessing` | `251` | `Psycho Shift`: transfere `status1` do usuário para o alvo e limpa o usuário; `Purify`: cura `status1` do alvo e restaura `50%` do HP do usuário; `Take Heart`: cura `status1` do usuário e eleva `Sp. Atk / Sp. Def +1`; `Jungle Healing` e `Lunar Blessing`: curam `25%` do HP e limpam `status1` do usuário e do aliado em duplas. |
-| `463` | `Dark Void` | `252` | Restrito a **Darkrai (`species == 491`)** (qualquer outra espécie como Smeargle falha com mensagem dedicada); precisão `50%` (escalada por `Compound Eyes`, estágios e `Gravity`) contra ambos os oponentes, respeitando `Insomnia`/`Vital Spirit`/`Safeguard`/`Electric Terrain`/`Misty Terrain`. |
-| `361`, `460` | `Healing Wish`, `Lunar Dance` | `253` | Exigem aliado apto na equipe; sacrificam o usuário e gravam `healing_wish_pending[side]`. Na entrada (`hook_switchineffects_v9`), se o substituto já entra ferido/statusado/com PP gasto, curam **antes** dos hazards de entrada (evitando nocaute prematuro por `Stealth Rock`); se entra saudável e sofre dano/status dos hazards, curam logo após; se permanece ileso, mantêm o desejo armazenado (Gen 8/9). `Lunar Dance` restaura também todos os `4` slots de PP ao máximo. |
-| `770` | `Shed Tail` | `254` | Exige aliado apto, ausência de `Substitute` prévio e `curHP > ceil(maxHP / 2)`; consome `ceil(maxHP / 2)` do usuário, cria `Substitute` de `max(1, maxHP / 4)` HP e executa troca imediata preservando `STATUS2_SUBSTITUTE`, `gDisableStructs[atk].substituteHP` e o boneco visual (`4E 01 01`) no Pokémon entrante. |
+- `Gastro Acid` (`380`, eff `243`): seta `STATUS3_GASTRO_ACID` (`0x00010000`) e zera `BattlePokemon.ability` (`u16` em `+0x20`), suprimindo habilidades como `Levitate` (`26`); falha atrás de `Substitute` ou contra habilidades insuprimíveis (`Wonder Guard = 25`, `Forecast = 59`, `Multitype`/ausentes).
+- `Worry Seed` (`388`, eff `243`): altera a habilidade do alvo para `Insomnia` (`15`) e acorda imediatamente alvos adormecidos (sincronizando equipe e HUD); falha contra `Truant` (`54`), `Insomnia` (`15`) ou `Substitute`.
+- `Entrainment` (`493`, eff `243`): impõe a habilidade do usuário ao alvo (bloqueado por `Truant`, `Wonder Guard`, `Trace`, `Forecast` e `Substitute`).
+- `Doodle` (`759`, eff `243`): copia a habilidade do alvo para o usuário **e** para o parceiro vivo em Duplas.
 
-### 2.5. Família 5 — Cópia, controle de ordem de ação e prisão (`5` golpes, `+65` entradas)
+### 2.5. Família E — Cópia, ordem de turno, foco crítico, dano por HP e Natural Gift (`6` golpes, `+59` registros)
 
-| Golpe interno (PokéAPI) | Nome | Slot de efeito | Mecânica implementada e validada em mGBA |
-|---:|---|---:|---|
-| `383` (`383`) | `Copycat` (`tgt=0x10`) | `255` | Redireciona para o script do último golpe executado na batalha (`V9_STATE->last_used_move`, gravado em `hook_attackcanceler_v9`) com `HITMARKER_NO_PPDEDUCT`, recalculando alvo via `GetMoveTarget`; falha se nenhum golpe copiável ocorreu. |
-| `494` (`495`) | `After You` | `255` | Reordena `gBattlerByTurnOrder` / `gActionsByTurnOrder` movendo a ação pendente do alvo para imediatamente após o usuário (`gCurrentTurnActionNumber + 1`). |
-| `510` (`511`) | `Quash` (`acc=100`) | `255` | Reordena `gBattlerByTurnOrder` / `gActionsByTurnOrder` empurrando a ação pendente do alvo para o último lugar do turno atual (respeitando `Substitute`). |
-| `678` (`753`) | `Octolock` | `246` | Prende alvo não-Fantasma (`STATUS2_ESCAPE_PREVENTION`) e reduz `Def -1` e `Sp. Def -1` a cada fim de turno enquanto ambos os Pokémon permanecerem em campo. |
-| `583` (`587`) | `Fairy Lock` (`tgt=0x10`) | `247` | Bloqueia fuga/troca de todos os Pokémon não-Fantasma em campo até o fim do turno seguinte (`fairy_lock_turns: 2 → 1 → 0`). |
+- `Copycat` (`383`, eff `252`, `tgt=0x10`): rastreia `last_used_move` em `hook_attackcanceler_v9` e executa o último golpe utilizado na batalha (excluindo golpes de cópia/proteção/troca forçada/auto-sacrifício incompatíveis).
+- `After You` (`494`, eff `244`) e `Quash` (`510`, eff `243`): reordenam dinamicamente `gBattlerByTurnOrder` (`0x02021408`) e `gActionsByTurnOrder` (`0x02021404`) para as posições ainda pendentes (`> gCurrentTurnActionNumber`), movendo o alvo imediatamente para a próxima ação (`After You`) ou para o fim do turno (`Quash`); falham se o alvo já agiu neste turno.
+- `Laser Focus` (`628`, eff `244`): garante golpe crítico no turno seguinte do usuário via `hook_critcalc_v9` (`0x04`), respeitando `Battle Armor` (`4`), `Shell Armor` (`75`) e `Lucky Chant` (`0x00008000` em `gStatuses3`).
+- `Final Gambit` (`514`, eff `253`): verifica imunidade Fantasma e `Substitute` antes do sacrifício; se válido, sacrifica todo o HP atual do usuário e aplica exatamente esse valor de dano direto ao alvo.
+- `Natural Gift` (`363`, eff `254`): consulta a tabela oficial Gen 6–9 para as Berries `133..175` (`Cheri`..`Enigma`, `80..100` BP e tipos elementais correspondentes), consome a Berry em `BattlePokemon.item` (`+0x30`), `Pokemon` (`MON_DATA_HELD_ITEM = 0x0C`) e via `EmitSetMonData(REQUEST_HELDITEM_BATTLE = 0x02)`, e falha sem consumir sob `Magic Room` ou sem Berry equipada.
+
+### 2.6. Família F — Sala de itens e travas de troca (`3` golpes, `+26` registros)
+
+- `Magic Room` (`477`, eff `244`, `tgt=0x10`, `5` turnos com toggle): intercepta `GetHoldEffect` (`0x080C725C`) **exclusivamente quando `gMain.inBattle` (`0x03004A45 & 0x02`) está ativo e `gBattleOutcome == 0`**, retornando `0` para suprimir todos os itens segurados em batalha sem afetar chamadas fora de batalha.
+- `Octolock` (`678`, eff `243`): aplica `STATUS2_ESCAPE_PREVENTION` enquanto o usuário permanecer em campo e reduz `Def -1` e `SpD -1` do alvo ao fim de cada turno (`hook_endturn_v9`).
+- `Fairy Lock` (`583`, eff `244`, `tgt=0x10`): bloqueia fugas e trocas de todos os Pokémon em campo durante o turno seguinte (`hook_turn_start_v9`).
 
 ---
 
-## 3. Arquitetura técnica, endereços na ROM e EWRAM
+## 3. Contabilidade completa dos 729 aprendizados por nível antes omitidos
+
+Partindo dos `729` registros (`81` golpes) listados em `docs/golpes_pendentes_complemento.csv`:
+
+| Etapa | Golpes restaurados na etapa | Registros restaurados | Total em `learnsets_motor_*.csv` | Acumulado restaurado |
+|---|---:|---:|---:|---:|
+| Base `motor_v5` | — | — | `14.300` | `0 / 729` (`0,0%`) |
+| `motor_v6` | `1` (`Fling`) | `+23` | `14.323` | `23 / 729` (`3,2%`) |
+| `motor_v7` | `5` (`Heal Pulse`, `Parting Shot`, `Geomancy`, `Floral Healing`, `Life Dew`) | `+59` | `14.382` | `82 / 729` (`11,2%`) |
+| `motor_v8` | `18` (terrenos, salas, gravidade, hazards, `Snowscape`, `Tailwind`, `Shore Up`, `Tidy Up`, `Court Change`, `Defog`) | `+245` | `14.627` | `327 / 729` (`44,9%`) |
+| **`motor_v9`** | **`51` golpes não-TM (Famílias A–F acima)** | **`+378`** | **`15.005`** | **`705 / 729` (`96,7%`)** |
+
+Restam **exatamente `6` golpes (`24` registros = `3,3%`)** deliberadamente retidos por bloqueios estruturais da base Gen 3:
+
+| ID interno | Nome | Registros | Motivo técnico objetivo da retenção |
+|---:|---|---:|---|
+| `492` | `Simple Beam` | `9` | Altera a habilidade do alvo para `Simple`, habilidade inexistente na tabela Gen 3 (`1..77`) desta ROM. |
+| `501` | `Ally Switch` | `2` | Exige permuta física simultânea de sprites, OAMs, shadow data, `gBattlerPartyIndexes` e alvos pendentes entre bancos aliados `0 ↔ 2` / `1 ↔ 3` em Duplas. |
+| `644` | `Instruct` | `1` | Exige reexecução aninhada completa da máquina de estados de ação de outro combatente dentro do mesmo passo de script. |
+| `672` | `Stuff Cheeks` | `4` | Exige motor completo de ativação imediata arbitrária de todas as Berries de batalha além do escopo de `ItemBattleEffects` nativo. |
+| `677` | `Teatime` | `4` | Exige consumo simultâneo multi-banco de qualquer Berry em até `4` combatentes com disparo encadeado de efeitos de Berry. |
+| `755` | `Revival Blessing` | `4` | Exige modo de UI de equipe dedicado capaz de selecionar e reviver aliados desmaiados (`HP == 0`) em meio ao turno sem tratá-los como troca de entrada. |
+
+---
+
+## 4. Arquitetura técnica, endereços na ROM e EWRAM
 
 | Região / Hook | Endereço (arquivo / CPU) | Função |
 |---|---|---|
-| `BATTLE_INIT_LIT` | `0x051D74` → `0x090C9001` | Zera `V9_STATE` (`100` B em `0x0203FCA0..0x0203FD03`) no início de cada batalha e encadeia para `hook_battle_init_v8` (`0x090C3001`). |
-| `TURN_START_LIT` | `0x05439C` → `0x090C9009` | Zera `electrified_mask` e `endturn_step`, sincroniza identidades por banco, decrementa `laser_focus_turns` e encadeia para `hook_turn_start_v8` (`0x090C3009`). |
-| `ENDTURN_CONT_LIT` | `0x053208` → `0x090C9011` | Quando nenhum efeito `v9` de fim de turno está ativo, delega imediatamente a `hook_endturn_v8` (`0x090C3019`, preservando macros frame-exatas); caso contrário executa `DoFieldEndTurnEffects`, processa `Aqua Ring` (`1/16`), `Octolock` (`-1 Def / -1 Sp. Def`) e decaimento de `Fairy Lock`, e delega a `hook_endturn_v8`. |
-| `BATTLE_STRINGS_TABLE_REFS` | `8` literais + teto `0x055C5A` (`eb 23`) | Realoca `gBattleStringsTable` (`408` → `442` ponteiros, `sid 0x000C..0x01C5`) para `0x090C7000`, adicionando `34` strings PT-BR em `0x090C7800`. |
-| `SCRIPTS_V9` | `0x10C6000..0x10C6FFF` (`0x090C6000`) | Sub-scripts fixos (`Aqua Ring`, `Octolock`, fila reutilizável `SUB_STAT_QUEUE`, `Healing Wish` / `Lunar Dance`, `Worry Seed`, `Liquid Ooze`, `Sleep` com `return`, `34` caudas de mensagem) e BattleScripts dos slots `243..255`. |
-| `CMD_TABLE_V9` | `0x10C8800..0x10C8BFF` (`0x090C8800`) | Tabela realocada `gBattleScriptingCommandsTable`: encadeia `0x00` (`attackcanceler`), `0x04` (`critcalc`), `0x06` (`typecalc`) e `0x52` (`switchineffects`) sobre `CMD_TABLE_V8`, mantendo intactos todos os demais `252` opcodes. |
-| `PAYLOAD_V9` | `0x10C9000..0x10CC007` (`0x090C9000`, `12.296` B) | Payload ARM7TDMI Thumb-1 puro (`32` vetores fixos `0x090C9001..0x090C90F9` + lógica C sem `libgcc`). |
-| `V9_STATE` (EWRAM) | `0x0203FCA0..0x0203FD03` (`100` B) | Estado transitório por batalha, contíguo após `V8_STATE` (`0x0203FC60..0x0203FC9F`) e estritamente abaixo de `0x0203FD50`, fora de `SaveBlock1`/`SaveBlock2` (zero impacto em saves `.sav`). |
-| `level.TABLE` | `0x08F50000..0x08F5FFFF` | Tabelas de subida de nível recompiladas com `14.995` registros (`+368` sobre `motor_v8`, preservando `100%` dos anteriores). |
-
----
-
-## 4. Os 8 golpes finais mantidos fora de escopo (`34 / 729 = 4,7%`) e limitações conhecidas
-
-Seguindo a diretriz estrita do projeto de **separar fatos confirmados de hipóteses e nunca expor golpes sem mecânica fiel nos aprendizados por nível**, exatamente **8 golpes (`34` entradas de `729`, ou `4,7%`)** permanecem deliberadamente fora de `learnsets_motor_v9.csv`:
-
-| Golpe interno | PokéAPI ID | Nome | Entradas retidas | Justificativa técnica verificada |
-|---:|---:|---|---:|---|
-| `363` | `363` | `Natural Gift` | `3` | Removido em Scarlet/Violet e dependente de tabela completa de tipo/poder por Berry ausente na base. |
-| `477` | `478` | `Magic Room` | `7` | Supressão transversal de todos os held items exige hooks invasivos fora da tabela de comandos de script (cálculo de atributos, cura de fim de turno, Berries e itens de escolha). |
-| `492` | `493` | `Simple Beam` | `4` | A habilidade `Simple` não existe na tabela nativa de habilidades Gen 3 (`0..77`). |
-| `501` | `502` | `Ally Switch` | `2` | Permutação física de bancos ativos, OAM/sprites de parceiros e redirecionamento de alvos no meio do turno em duplas Gen 3. |
-| `644` | `689` | `Instruct` | `1` | Reexecução aninhada de ação completa de outro battler dentro de `RunBattleActionsFunctions`. |
-| `672` | `747` | `Stuff Cheeks` | `4` | Consumo ativo de Berry equipada com disparo da rotina interna `ItemBattleEffects` fora de janela de gatilho. |
-| `677` | `752` | `Teatime` | `2` | Consumo simultâneo de Berries em todos os bancos ativos (inclusive através de `Substitute`) com disparo individual de efeitos. |
-| `755` | `863` | `Revival Blessing` | `11` | Seleção interativa de Pokémon desmaiado (`HP == 0`) exige patch dedicado na máquina de estados de UI `party_menu` (que bloqueia confirmação em aliados nocauteados). |
-
-Outras limitações documentadas herdadas da base GBA Gen 3:
-- Itens e habilidades modernos pós-Gen 3 (`Heavy-Duty Boots`, `Terrain Extender`, `Light Clay`, `Surge` abilities, `Simple`, `Contrary`, `Good as Gold`, `Mycelium Might` etc.) permanecem ausentes na engine base.
-- `Acupressure` (`367`) utiliza `tgt = 0x10` (usuário), pois o byte `MOVE_TARGET_USER_OR_SELECTED` de Emerald não existe no seletor de alvos nativo de FireRed.
-- Em duplas, `Expanding Force` mantém cursor de alvo único estático da `MOVE_TABLE`.
+| `BATTLE_INIT_LIT` | `0x051D74` → `0x090C9001` | Zera `V9_STATE` (`0x0203FCA0..0x0203FD5F`) no início da batalha e encadeia para `hook_battle_init_v8` (`0x090C3001`). |
+| `TURN_START_LIT` | `0x05439C` → `0x090C9009` | Atualiza `Laser Focus`, limpa `electrified_mask`, processa `Fairy Lock` e encadeia para `hook_turn_start_v8` (`0x090C3009`). |
+| `ENDTURN_CONT_LIT` | `0x053208` → `0x090C9011` | Mantém fast-path exato para `0x08053221` quando nenhum efeito `v8`/`v9` está ativo; caso contrário, executa `v8` e em seguida `Aqua Ring`, `Octolock` e expiração de `Magic Room`. |
+| `GET_HOLD_EFFECT_SITE` | `0x0C725C` → `0x090C9019` | Wrapper de `8` B em `GetHoldEffect`: retorna `0` apenas durante batalha ativa (`0x03004A45 & 2` e `gBattleOutcome == 0`) com `magic_room_turns > 0`; fora disso, lê `NEW_ITEMS_TABLE[44 * id + 0x12]`. |
+| `BATTLE_STRINGS_TABLE_REFS` | `8` literais + teto `0x055C5A` (`f0 23` = `480`) | Realoca `gBattleStringsTable` (`408` → `445` ponteiros, `sid 12..456`) em `0x090C7000`, gravando `37` novas mensagens PT-BR em `0x090C7A00`. |
+| `SCRIPTS_V9` | `0x10C6000..0x10C6FFF` (`0x090C6000`) | Sub-scripts fixos (`0x090C6000..0x090C631F`) e BattleScripts dos efeitos `243..254` (`0x090C6340..`). |
+| `CMD_TABLE_V9` | `0x10C8800..0x10C8BFF` (`0x090C8800`) | Clona `CMD_TABLE_V8` e encadeia `0x00` (`attackcanceler`), `0x04` (`critcalc`), `0x05` (`damagecalc`), `0x06` (`typecalc`) e `0x52` (`switchineffects`). |
+| `PAYLOAD_V9` | `0x10C9000..0x10CC193` (`0x090C9000`, `12.692` B) | Payload ARM7TDMI Thumb-1 puro (`28` vetores `0x090C9001..0x090C90D9`, verificado por Capstone e `_Static_assert`). |
+| `V9_STATE` (EWRAM) | `0x0203FCA0..0x0203FD5F` (`<= 192` B) | Estado efêmero por batalha, contíguo após `V8_STATE` (`0x0203FC60..0x0203FC9F`), sem tocar `SaveBlock1`/`SaveBlock2`. |
 
 ---
 
 ## 5. Como reconstruir e executar as suítes de testes
 
-### 5.1. Regerar `learnsets_motor_v9.csv` (opcional, a partir do commit fixado do PokéAPI) e aplicar `motor_v9`
+### 5.1. Aplicar `motor_v9` em um arquivo novo (verificando SHA-256)
 
 ```bash
-PYTHONPATH=firered_gen1_9 python3 -m scripts.gerar_motor_v9 \
-  --pokeapi-csv /caminho/para/pokeapi/data/v2/csv
-
 PYTHONPATH=firered_gen1_9 python3 -m scripts.motor_v9 \
   --rom /caminho/para/motor_v8.gba \
   --saida /caminho/para/motor_v9.gba
 ```
 
-### 5.2. Testes estruturais e invariantes da cadeia (`v5` → `v6` → `v7` → `v8` → `v9`)
+### 5.2. Testes estruturais e auditoria estrita de bytes (`test_motor_v9.py`)
 
 ```bash
 PYTHONPATH=firered_gen1_9:firered_gen1_9/tests \
-MOTOR_V6_BASE=/caminho/para/motor_v5.gba \
-MOTOR_V7_BASE=/caminho/para/motor_v6.gba \
-MOTOR_V8_BASE=/caminho/para/motor_v7.gba \
 MOTOR_V9_BASE=/caminho/para/motor_v8.gba \
-python3 -m unittest \
-  firered_gen1_9/tests/test_motor_v6.py \
-  firered_gen1_9/tests/test_motor_v7.py \
-  firered_gen1_9/tests/test_motor_v8.py \
-  firered_gen1_9/tests/test_motor_v9.py -v
+python3 -m unittest firered_gen1_9/tests/test_motor_v9.py -v
 ```
 
-### 5.3. Testes de integração headless em mGBA `0.10.5` (apenas saves/estados sintéticos)
+### 5.3. Testes de integração headless em mGBA `0.10.5` (`test_motor_v9_mgba.py` + `test_treino_ev_mgba.py`)
 
 ```bash
 PYTHONPATH=firered_gen1_9:firered_gen1_9/tests \
@@ -163,13 +165,12 @@ MOTOR_V9_BASE=/caminho/para/motor_v8.gba \
 TREINO_TEST_ROM=/caminho/para/motor_v9.gba \
 MGBA_CORE=/caminho/para/mgba_libretro.so \
 python3 -m unittest \
-  test_motor_v9 \
-  test_motor_v9_mgba \
-  test_treino_ev_mgba -v
+  firered_gen1_9/tests/test_motor_v9_mgba.py \
+  firered_gen1_9/tests/test_treino_ev_mgba.py -v
 ```
 
 Resultados verificados nesta entrega:
-- `test_motor_v9.py`: **`6/6` OK** (partição exata `49` habilitados / `+368` entradas → `14.995` linhas e `8` retidos / `34` entradas = `695 + 34 = 729`, payload ARM7TDMI Thumb-1 puro com `32` vetores, determinismo `ad911117...`, slots `243..255`, strings `0x01A4..0x01C5`, `CMD_TABLE_V9` e preservação byte a byte das `229/229` TMs SV, loja, `estojo_v2`, `treino_ev` e payloads `v6`–`v8`).
-- `test_motor_v9_mgba.py`: **`7/7` OK** em mGBA `0.10.5` (`Soak`, `Magic Powder`, `Trick-or-Treat` `2x` Dark / `0x` Fighting, `Reflect Type`, `Tar Shot` `2x` Fire; `Gastro Acid` + `Earthquake`, `Worry Seed` acordando alvo adormecido, `Entrainment` + bloqueio em `Truant`, `Doodle`, `Electrify` anulando golpe em Terra; `Power Trick`, `Speed Swap`, `Power Split`, `Topsy-Turvy`, `Spicy Extract`, `Decorate`, `Venom Drench`, `Acupressure`, `Rototiller`, `Magnetic Flux`, `Toxic Thread`, `Strength Sap` + `Liquid Ooze`; `Fillet Away`, `Clangorous Soul`, `Take Heart`, `No Retreat`, `Aqua Ring`, `Laser Focus` crítico garantido, `Psycho Shift`, `Purify`, `Final Gambit` + imunidade em Ghost, `Dark Void` exclusivo de Darkrai `#491`; `Shed Tail` transferindo `Substitute` real e `Lunar Dance` salvando aliado ferido sob `Stealth Rock`; `Copycat`, `Octolock`, `Fairy Lock` e duplas com `After You`, `Quash` e `Jungle Healing`; subida de nível + Move Relearner + ensino real nas 3 páginas do `estojo_v2` com save/reload sintético + regressão cruzada `Psychic Noise` × `Aqua Ring` × `Grassy Terrain`).
+- `test_motor_v9.py`: **`7/7` OK** (hashes de insumos, ISA ARM7TDMI Thumb-1 pura com `28` vetores, `+378` aprendizados = `15.005` linhas preservando 100% de `v8` e fechando `705/729` + `6` retidos / `24` linhas, determinismo `2936a08f...`, auditoria byte a byte de regiões autorizadas e preservação integral de `estojo_v2`, `229` TMs SV, HMs, `treino_ev` e `payload_v6..v8`).
+- `test_motor_v9_mgba.py`: **`6/6` OK** em mGBA `0.10.5` cobrindo todas as seis famílias (`Soak`, `Magic Powder`, `Reflect Type`, `Trick-or-Treat`, `Forest's Curse`, `Tar Shot`, `Electrify`; `Power Trick`, `Speed Swap`, `Power Swap`, `Topsy-Turvy`, `Guard Split`, `Toxic Thread`, `Venom Drench`, `No Retreat`, `Clangorous Soul`, `Fillet Away`, `Take Heart`, `Spicy Extract`, `Acupressure`, `Flower Shield`, `Rototiller`, `Gear Up`; `Aqua Ring`, `Strength Sap` + `Liquid Ooze`, `Psycho Shift`, `Purify`, `Jungle Healing`, `Dark Void` bloqueado fora de Darkrai `#491` e ativo em `#491`; `Lunar Dance` restaurando HP/status/PP com `PP Ups` e `Shed Tail` transferindo `Substitute` de `40` HP em troca real; `Gastro Acid`, `Worry Seed`, `Entrainment`, `Copycat`, `Laser Focus`, `Final Gambit` normal e vs Ghost, `Natural Gift` consumindo Berry, `Magic Room` suprimindo `Choice Band`, `Octolock`, `Fairy Lock`, e Duplas com `Decorate`, `Quash`, `After You` e `Doodle`; aprendizado real por nível em `Bulbasaur`, `Cresselia`, `Darkrai`, `Cyclizar` e `Veluza`, regressão `Snowscape` e persistência em save Flash/reload com `estojo_v2`).
 - `test_treino_ev_mgba.py` (sobre `motor_v9.gba`): **`9/9` OK**.
-- Suíte estrutural completa do pacote (`test_*.py` sem mGBA): **`99/99` executados OK** (`0` falhas, `0` erros).
+- Suíte estrutural completa da cadeia (`v5` → `v6` → `v7` → `v8` → `v9` + subsistemas): **`90/90` executados OK**.
