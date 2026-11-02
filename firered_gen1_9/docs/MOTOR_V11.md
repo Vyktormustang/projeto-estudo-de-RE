@@ -2,6 +2,8 @@
 
 **02/11/2026 — etapa concluída; projeto ainda parcial.** Esta versão corrige um defeito demonstrado no motor v10, sem habilitar golpes novos, modificar IA ou alterar o formato do save. Testes exclusivamente sintéticos em mGBA 0.10.5, sem saves pessoais. ROMs permanecem fora do Git.
 
+> **Adendo da auditoria v12 (02/11/2026):** o teste original de Substitute abaixo parava numa mensagem aguardando confirmação; não demonstrava o fim do turno nem conformidade moderna. Foi reforçado e renomeado para caracterizar o limite legado. Novos testes confirmaram que Substitute intercepta Eerie Spell e Shield Dust não impede o dreno; ambos seguem abertos. Soundproof também falhava em v11 e foi corrigido isoladamente no v12. Consulte [MOTOR_V12.md](MOTOR_V12.md). Os 28/28 abaixo são o registro histórico da execução original, não prova de fidelidade integral.
+
 ## Fato reproduzido e correção
 
 `Eerie Spell` (ID interno **720**) no helper `hook_post_hit_v10` procurava o **primeiro slot com golpe e PP**, não o último golpe usado pelo alvo. O comentário no código mencionava o último golpe, mas o laço não consultava histórico algum.

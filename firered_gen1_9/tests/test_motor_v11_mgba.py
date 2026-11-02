@@ -70,10 +70,21 @@ class MotorV11MGBATests(unittest.TestCase):
     def test_defeito_reproduzido_na_base_v10(self):
         self.assertEqual(self.baseline_pp, [7,10,10,10])
 
-    def test_substitute_nao_drena(self):
+    def test_limite_substitute_legado_nao_drena_apos_turno_completo(self):
+        # Caracterização de limite, NÃO conformidade Gen 6+: Eerie Spell
+        # deveria atravessar Substitute. Não medir enquanto o texto <fb>
+        # aguarda confirmação (isso ocorria na primeira versão deste teste).
         st = bytearray(self.eerie_state(status2=0x01000000))
-        st[old.offset(old.DISABLE_STRUCTS_REAL_ADDR)+28+10] = 200
+        sub_hp = old.offset(old.DISABLE_STRUCTS_REAL_ADDR)+28+10
+        st[sub_hp] = 200
         out, _ = self._run_turn(bytes(st))
+        for _ in range(8):
+            self.f.pulse('B',90)
+        out = self.f.state()
+        txt = old.decode_gba_str(out[old.offset(old.DISP_STR):old.offset(old.DISP_STR)+80])
+        self.assertIn('vai fazer?',txt)
+        self.assertLess(out[sub_hp],200)
+        self.assertEqual(old.u16(out,old.FOE_BATTLE+0x2A),480)
         self.assertEqual(list(out[old.FOE_BATTLE+0x25:old.FOE_BATTLE+0x29]), [10]*4)
 
     def test_ultimo_golpe_slot2_e_checksum_equipe(self):

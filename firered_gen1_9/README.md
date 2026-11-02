@@ -1,5 +1,11 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Motor parcial `v12` — Eerie Spell e Soundproof
+
+Corrige o bloqueio de **Eerie Spell (720) por Soundproof**, estendendo somente a lista nativa: um literal de 4 bytes e uma tabela de 24 bytes, sem código executável ou RAM novos. **34 verificações aprovadas**, incluindo **duas caracterizações de defeitos ainda abertos**: Substitute intercepta o golpe e Shield Dust permite o dreno de PP. O teste histórico de Substitute do v11 foi reforçado para exigir término do turno; o resultado antigo não provava conformidade moderna.
+
+Saída SHA-256 `fb28ad767a11add187d0fa69dec0164b3de73a9887a0c5834c5feccc675725c1`, gerada por `scripts/motor_v12.py` sobre v11, em arquivo novo. Catálogo inalterado: 15.008 linhas, 708/729 omissões restauradas. Veja [MOTOR_V12.md — correção, defeitos abertos, reprodução e testes](docs/MOTOR_V12.md). Continua parcial; esta correção **não** moderniza todos os golpes sonoros.
+
 ## Motor parcial `v11` — correção de Eerie Spell
 
 Corrige a redução de PP de **Eerie Spell (720)**: agora consulta o último golpe usado pelo alvo, sem drenar indevidamente o primeiro slot disponível. Protege os PPs originais durante Transform/Mimic e preserva todos os bytes fora de três pequenas regiões. **28/28 testes** nesta etapa (5 estruturais, 8 dirigidos, 6 regressões de batalha/estojo/save e 9 de treino EV/IV). Mighty Cleave já atravessava Protect no v10; a hipótese de defeito foi descartada por teste.
