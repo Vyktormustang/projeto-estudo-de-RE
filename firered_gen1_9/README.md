@@ -1,5 +1,11 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Motor parcial `v13` — Eerie Spell atravessa Substitute e respeita Shield Dust
+
+Corrige os dois desvios confirmados no v12: **Eerie Spell atinge o alvo através de Substitute sem consumir o boneco**, e **Shield Dust bloqueia somente o dreno de PP**. Preserva Soundproof, Endure, proteção dos PPs de Transform/Mimic e comportamento dos outros golpes. Testes dedicados incluem Substitute criado durante o turno e seleção de alvos em duplas. Payload de 454 bytes, sem RAM nova ou mudanças no catálogo.
+
+**42 verificações aprovadas, nenhuma pulada**, incluindo **uma observação intermediária de KO/EXP, não validação de vitória**: a fixture permanece na experiência tanto no controle v12 quanto no v13; a causa ainda precisa ser investigada. Saída SHA-256 `71756c820ebb71c0c64735b0e8f36cf420da29ac419f8ee09a39109d9cb4951c`, gerada em arquivo novo por `scripts/motor_v13.py`. Veja [MOTOR_V13.md — correções, testes, hashes e ressalva KO/EXP](docs/MOTOR_V13.md). A engine continua parcial; 15.008 aprendizados e 708/729 omissões restauradas, sem novas inclusões nesta etapa.
+
 ## Motor parcial `v12` — Eerie Spell e Soundproof
 
 Corrige o bloqueio de **Eerie Spell (720) por Soundproof**, estendendo somente a lista nativa: um literal de 4 bytes e uma tabela de 24 bytes, sem código executável ou RAM novos. **34 verificações aprovadas**, incluindo **duas caracterizações de defeitos ainda abertos**: Substitute intercepta o golpe e Shield Dust permite o dreno de PP. O teste histórico de Substitute do v11 foi reforçado para exigir término do turno; o resultado antigo não provava conformidade moderna.

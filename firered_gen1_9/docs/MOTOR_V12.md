@@ -2,6 +2,8 @@
 
 **02/11/2026 — correção isolada concluída; engine ainda parcial.** Entrada v11 validada por SHA-256, saída em novo arquivo e testes exclusivamente sintéticos em mGBA 0.10.5. Nenhuma ROM, save ou asset comercial entra no Git.
 
+> **Adendo v13 (02/11/2026):** os desvios de Eerie Spell com Substitute e Shield Dust descritos abaixo foram corrigidos e testados no [MOTOR_V13.md](MOTOR_V13.md), inclusive com seleção de alvos em duplas. Este relatório continua registrando o estado histórico do v12. A etapa seguinte também identificou uma espera no controller de experiência em uma fixture de KO, reproduzível no controle v12; origem ainda indeterminada, não validada como vitória/retorno ao mapa.
+
 ## Resultado desta etapa
 
 - **Corrigido:** Eerie Spell (ID interno **720**, API 826) agora é bloqueado por Soundproof (habilidade **43**) pelo fluxo nativo de FireRed: mensagem, consumo de PP próprio e término da ação.
