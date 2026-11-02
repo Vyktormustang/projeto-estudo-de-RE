@@ -2,6 +2,8 @@
 
 **02/11/2026 — auditoria dirigida concluída no motor v13, sem patch de ROM.** Foram acrescentados oito testes (dois de preparação de dados e seis de integração) e reexecutadas regressões v13/EV-IV. Somente estados sintéticos, mGBA 0.10.5 e ROM identificada por SHA-256; nenhum save pessoal.
 
+> **Adendo posterior (02/11/2026):** a [auditoria dedicada de potência](AUDITORIA_ROLLOUT_POTENCIA.md) confirmou a progressão de Rollout/Ice Ball e o bônus de Defense Curl, mas encontrou um desvio separado: Protect interrompendo uma sequência ativa desconta um PP extra. Esse caso não estava coberto pela presente suíte. O defeito segue aberto, sem mudança no v13; a conclusão abaixo permanece restrita aos cenários originais.
+
 ## Resultado e decisão
 
 **Não foi demonstrado defeito que exija uma nova ROM nos cenários testados.** O v13:

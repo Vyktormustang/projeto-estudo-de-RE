@@ -1,6 +1,12 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
-## Auditoria de histórico e PP — v13 mantido
+## Auditoria de Rollout/Ice Ball — potência correta, defeito de PP aberto
+
+A potência foi medida em cada impacto: **30→60→120→240→480**, ou **60→120→240→480→960** após Defense Curl, inclusive com PP zerado por Eerie Spell. Entretanto, **Protect interrompendo uma sequência ativa desconta um PP extra no v13**, reproduzido em Rollout e Ice Ball, com/sem Defense Curl. O reset de potência funciona; o desconto extra **ainda não foi corrigido**.
+
+Foram executadas **27 verificações, incluindo uma caracterização desse defeito em quatro subcasos**, sem testes pulados. Esse `ok` não significa conformidade moderna no caso de Protect. **ROM v13 inalterada, sem v14**; próximo passo prioritário é corrigir o gasto sem afetar o primeiro uso ou outras ações. Veja [AUDITORIA_ROLLOUT_POTENCIA.md — medições, diagnóstico, reprodução e critérios de correção](docs/AUDITORIA_ROLLOUT_POTENCIA.md).
+
+## Auditoria anterior de histórico e PP — v13 mantido
 
 **Trocas manuais, cancelamento e retorno** preservam os PPs corretamente e limpam o histórico apenas quando há troca. **Thrash, Rollout e SolarBeam continuam suas sequências já iniciadas após Eerie Spell zerar os PPs**, compatível com a referência moderna consultada; não foi adicionado o cancelamento legado de Spite. Oito testes novos e regressões reexecutadas: **50/50 nesta etapa, nenhum pulado**. Não há mudança na ROM nem motor v14. Veja [AUDITORIA_EERIE_HISTORICO_PP.md — evidências, reprodução e limites](docs/AUDITORIA_EERIE_HISTORICO_PP.md). Isso não valida toda a potência de Rollout, todas as travas ou todos os tipos de troca.
 

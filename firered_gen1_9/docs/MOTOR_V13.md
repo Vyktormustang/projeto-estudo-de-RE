@@ -6,6 +6,8 @@
 
 > **Adendo de histórico/PP (02/11/2026):** trocas manuais, cancelamento e retorno, além das sequências Thrash/Rollout/SolarBeam esgotadas por Eerie Spell, agora têm testes dedicados. Os resultados não exigiram patch; o cancelamento legado de Spite não foi copiado. Veja [AUDITORIA_EERIE_HISTORICO_PP.md](AUDITORIA_EERIE_HISTORICO_PP.md) para o escopo restrito e as limitações restantes.
 
+> **Defeito aberto identificado na auditoria seguinte (02/11/2026):** Rollout/Ice Ball têm progressão de potência correta nos cenários medidos, mas Protect interrompendo uma sequência ativa desconta um PP extra. Reproduzido com/sem Defense Curl; ainda sem correção e sem v14. Veja [AUDITORIA_ROLLOUT_POTENCIA.md](AUDITORIA_ROLLOUT_POTENCIA.md). Os resultados positivos anteriores não incluíam essa interrupção.
+
 ## Correções confirmadas
 
 1. **Eerie Spell (720) atravessa Substitute:** o alvo recebe dano e perde até três PPs do último golpe usado; o boneco mantém seu HP e seu bit de status.
