@@ -30,6 +30,7 @@ EXPECTED_ROMS = {
     "6321d8e2900cc44dcaefb2dedfbaf5b0952b2796ca27a4cb9d8dc0875827de09",  # motor parcial v7
     "32fd47c87b581952f54f05656f590c5f7da55d5cc3d186d81951508899ec54f0",  # motor parcial v8
     "2936a08fc95f40c7788b6136f209ab5cab31aec062d615f2a458f45b123e0e6f",  # motor parcial v9
+    "a533d1812812e2348bbe62a95a8c3817dd9d8372a89ff283f0e747c6c7ddeb09",  # motor parcial v10
 }
 
 

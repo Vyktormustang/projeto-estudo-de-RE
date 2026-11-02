@@ -1,0 +1,35 @@
+.syntax unified
+.cpu arm7tdmi
+.thumb
+.section .entry,"ax",%progbits
+.align 2
+.global entry_battle_init_v10,entry_turn_start_v10,entry_endturn_v10
+.global entry_attackcanceler_v10,entry_accuracycheck_v10,entry_critcalc_v10
+.global entry_damage_v10,entry_typecalc_v10,entry_datahpupdate_v10
+.global entry_negativedamage_v10,entry_lowkick_v10
+.global entry_dispatch_v10,entry_post_hit_v10
+.global entry_berry_step_v10,entry_stat_queue_step_v10,entry_restore_banks_v10
+.macro VECTOR name,dest
+.thumb_func
+\name:
+ ldr r3,1f
+ bx r3
+ .align 2
+1: .word \dest
+.endm
+VECTOR entry_battle_init_v10,hook_battle_init_v10
+VECTOR entry_turn_start_v10,hook_turn_start_v10
+VECTOR entry_endturn_v10,hook_endturn_v10
+VECTOR entry_attackcanceler_v10,hook_attackcanceler_v10
+VECTOR entry_accuracycheck_v10,hook_accuracycheck_v10
+VECTOR entry_critcalc_v10,hook_critcalc_v10
+VECTOR entry_damage_v10,hook_damage_v10
+VECTOR entry_typecalc_v10,hook_typecalc_v10
+VECTOR entry_datahpupdate_v10,hook_datahpupdate_v10
+VECTOR entry_negativedamage_v10,hook_negativedamage_v10
+VECTOR entry_lowkick_v10,hook_lowkick_v10
+VECTOR entry_dispatch_v10,hook_dispatch_v10
+VECTOR entry_post_hit_v10,hook_post_hit_v10
+VECTOR entry_berry_step_v10,hook_berry_step_v10
+VECTOR entry_stat_queue_step_v10,hook_stat_queue_step_v10
+VECTOR entry_restore_banks_v10,hook_restore_banks_v10
