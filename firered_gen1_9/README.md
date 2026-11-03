@@ -1,5 +1,9 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria ampliada do v14 — duplas e interrupções naturais
+
+**21/21 verificações concluídas, sem skips**, incluindo sete testes novos com 22 subcasos. Rollout/Ice Ball foram testados com usuários nos quatro bancos: o bloqueio por Protect não desconta PP da continuação nem isenta os outros participantes. Flinch por Stomp, autoataque por Confuse Ray e imobilidade por Thunder Wave encerram a sequência sem PP extra; o próximo impacto reinicia a potência em 30. **Nenhuma mudança na ROM; v14 mantido, sem v15.** Veja [AUDITORIA_V14_DUPLAS_INTERRUPCOES.md](docs/AUDITORIA_V14_DUPLAS_INTERRUPCOES.md) para a matriz exata, a correção da fixture e as limitações. Não se validaram probabilidades modernas de status nem todas as combinações de alvos/AI.
+
 ## Motor parcial `v14` — PP correto após Protect/Detect interromper Rollout/Ice Ball
 
 **Corrigido o desconto extra de PP de uma continuação bloqueada.** Protect/Detect continuam encerrando a sequência; primeiro uso e reinício continuam gastando PP. Mantidas potência progressiva, Defense Curl, Pressure e sequências a PP zero. Testes incluem os dois lados em singles, miss por Sand Attack, sono por Hypnosis e Tackle posterior sem herdar isenção.

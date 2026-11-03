@@ -2,6 +2,8 @@
 
 **03/11/2026 — correção dirigida sobre o v13 exato.** A saída é gravada em arquivo novo; apenas ROM identificada por SHA-256 e estados sintéticos. Nenhum save pessoal foi usado.
 
+> **Adendo da auditoria ampliada (03/11/2026):** sem mudar o payload ou a ROM, foram acrescentados testes de usuários nos quatro bancos em duplas e de flinch/confusão/paralisia criados por golpes reais. A etapa concluiu 21 verificações, incluindo sete testes novos; veja [AUDITORIA_V14_DUPLAS_INTERRUPCOES.md](AUDITORIA_V14_DUPLAS_INTERRUPCOES.md). O escopo e os números abaixo conservam o registro da entrega original do v14; algumas lacunas de interrupções/duplas foram reduzidas pela auditoria posterior, não eliminadas integralmente.
+
 ## Defeito e resultado
 
 O [desvio de PP auditado no v13](AUDITORIA_ROLLOUT_POTENCIA.md) ocorre porque o ramo de Protect limpa a trava antes de o script verificar se deve dispensar o desconto de PP. O v14 conserva o cancelamento da sequência, mas impede o desconto adicional de uma ação que já era continuação.
