@@ -1,12 +1,18 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v15 — pivôs, trocas forçadas e um defeito ainda aberto
+
+O histórico de Eerie Spell é limpo nas trocas efetivamente realizadas por U-turn, Volt Switch, Flip Turn, Parting Shot, Roar, Whirlwind, Dragon Tail e Circle Throw, nos cenários descritos. Entrada, nova ação e retorno preservam os PPs; Suction Cups bloqueia a troca sem apagar o histórico.
+
+**Defeito confirmado e ainda não corrigido:** Dragon Tail/Circle Throw podem causar dano, mas falhar em trocar um alvo de nível superior por causa da probabilidade legada nativa, inclusive no contexto de treinador. **25 verificações concluídas, sem skips, incluindo uma caracterização negativa em dois subcasos** — esse `ok` não significa conformidade moderna do phazing. Nenhuma mudança na ROM, sem v16. Veja [AUDITORIA_V15_PIVOS_PHAZING.md](docs/AUDITORIA_V15_PIVOS_PHAZING.md). Próxima etapa: correção dirigida dessa checagem de nível e seus controles. Drive não atualizado.
+
 ## Motor parcial `v15` — duração de Disable e Encore
 
 **Disable por quatro ações do alvo; Encore por três**, incluindo a ação ainda pendente no turno de aplicação. Corrige os contadores aleatórios legados, demonstrados separadamente na v14. Preserva verificações nativas, PP e travas: Disable interrompe Rollout/Ice Ball sem PP extra; a expiração de Encore não cancela a sequência própria desses golpes.
 
 **76/76 verificações concluídas, sem skips:** nove testes dirigidos, 53 regressões positivas e 14 verificações de build/treino EV/IV. Payload de **304 bytes**, dois intervalos físicos escritos, sem RAM persistente ou catálogo novos. Aplicador `scripts/motor_v15.py`, entrada v14 exata, sempre saída nova. SHA-256 v15: `a6b454f7cbafad8c05e1b8aa2028087a596bbeff4f0184c826a92ebb7e554147`.
 
-Veja [MOTOR_V15.md — evidências, hashes, reprodução e limites](docs/MOTOR_V15.md). **Correção de duração, não implementação integral de Encore/Disable modernos.** Histórico de pivôs/trocas forçadas e cobertura completa de duração em duplas continuam pendentes. Drive não atualizado. As seções abaixo conservam os registros históricos das etapas anteriores.
+Veja [MOTOR_V15.md — evidências, hashes, reprodução e limites](docs/MOTOR_V15.md). **Correção de duração, não implementação integral de Encore/Disable modernos.** A auditoria posterior de pivôs/trocas forçadas está registrada acima; cobertura completa de duração em duplas continua pendente. Drive não atualizado. As seções abaixo conservam os registros históricos das etapas anteriores.
 
 ## Auditoria ampliada do v14 — duplas e interrupções naturais
 

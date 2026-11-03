@@ -2,6 +2,8 @@
 
 **03/11/2026 — correção restrita sobre v14 exato.** FireRed Gen 1–9 / VYK-57, não o hook BAG_MOD da outra ROM. Entrada identificada por SHA-256, saída em arquivo novo e testes somente com equipes/saves sintéticos. ROMs e saves não integram o Git.
 
+> **Adendo da auditoria posterior (03/11/2026):** histórico/PP após pivôs e trocas forçadas foi testado sem alterar a ROM. Foram concluídas 25 verificações, incluindo uma caracterização de **outro defeito ainda aberto**: phazing por Dragon Tail/Circle Throw pode falhar por nível mesmo após causar dano em contexto de treinador. Veja [AUDITORIA_V15_PIVOS_PHAZING.md](AUDITORIA_V15_PIVOS_PHAZING.md). Os 76 testes e a correção de duração abaixo conservam o registro da entrega original; não certificam esse comportamento de phazing.
+
 ## Defeito confirmado e correção
 
 A rotina nativa mantinha durações aleatórias da geração III: Disable sorteava 2–5 e Encore 3–6. A v15 fixa **Disable em quatro oportunidades de ação do alvo** e **Encore em três**, contando a ação do turno de aplicação se ainda estiver pendente. Quando o alvo já agiu, acrescenta-se uma unidade ao contador, pois o motor decrementa o timer no fim desse mesmo turno.
@@ -113,6 +115,6 @@ cmp /tmp/v15-rebuilt.bin firered_gen1_9/patches/motor_v15/payload.bin
 
 A nova matriz de duração usa singles e alvo no banco 1. Regressões de duplas anteriores não constituem teste de todas as posições de aplicação de Encore/Disable, redirecionamento, alterações da fila, alvos já impedidos ou efeitos simultâneos. Essas combinações ficam abertas.
 
-**Próxima auditoria:** histórico de pivôs (`U-turn`, `Volt Switch`, `Flip Turn`, `Parting Shot`) e trocas forçadas; não foi iniciada nesta etapa. Campanha integral, link, Teachy TV completa e migração de saves pessoais tampouco foram certificados. Catálogo permanece em 15.008 registros, 708/729 omissões restauradas, sem novas inclusões.
+**Na entrega original, a próxima auditoria era:** histórico de pivôs (`U-turn`, `Volt Switch`, `Flip Turn`, `Parting Shot`) e trocas forçadas. Essa auditoria foi posteriormente realizada no recorte descrito no adendo acima; a correção da chance legada de phazing por nível permanece pendente. Campanha integral, link, Teachy TV completa e migração de saves pessoais tampouco foram certificados. Catálogo permanece em 15.008 registros, 708/729 omissões restauradas, sem novas inclusões.
 
 **Drive não atualizado nesta etapa.** O pacote/ROM anteriormente armazenado lá não passa automaticamente a ser v15.
