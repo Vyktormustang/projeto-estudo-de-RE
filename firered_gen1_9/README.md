@@ -1,5 +1,13 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Motor parcial `v15` — duração de Disable e Encore
+
+**Disable por quatro ações do alvo; Encore por três**, incluindo a ação ainda pendente no turno de aplicação. Corrige os contadores aleatórios legados, demonstrados separadamente na v14. Preserva verificações nativas, PP e travas: Disable interrompe Rollout/Ice Ball sem PP extra; a expiração de Encore não cancela a sequência própria desses golpes.
+
+**76/76 verificações concluídas, sem skips:** nove testes dirigidos, 53 regressões positivas e 14 verificações de build/treino EV/IV. Payload de **304 bytes**, dois intervalos físicos escritos, sem RAM persistente ou catálogo novos. Aplicador `scripts/motor_v15.py`, entrada v14 exata, sempre saída nova. SHA-256 v15: `a6b454f7cbafad8c05e1b8aa2028087a596bbeff4f0184c826a92ebb7e554147`.
+
+Veja [MOTOR_V15.md — evidências, hashes, reprodução e limites](docs/MOTOR_V15.md). **Correção de duração, não implementação integral de Encore/Disable modernos.** Histórico de pivôs/trocas forçadas e cobertura completa de duração em duplas continuam pendentes. Drive não atualizado. As seções abaixo conservam os registros históricos das etapas anteriores.
+
 ## Auditoria ampliada do v14 — duplas e interrupções naturais
 
 **21/21 verificações concluídas, sem skips**, incluindo sete testes novos com 22 subcasos. Rollout/Ice Ball foram testados com usuários nos quatro bancos: o bloqueio por Protect não desconta PP da continuação nem isenta os outros participantes. Flinch por Stomp, autoataque por Confuse Ray e imobilidade por Thunder Wave encerram a sequência sem PP extra; o próximo impacto reinicia a potência em 30. **Nenhuma mudança na ROM; v14 mantido, sem v15.** Veja [AUDITORIA_V14_DUPLAS_INTERRUPCOES.md](docs/AUDITORIA_V14_DUPLAS_INTERRUPCOES.md) para a matriz exata, a correção da fixture e as limitações. Não se validaram probabilidades modernas de status nem todas as combinações de alvos/AI.

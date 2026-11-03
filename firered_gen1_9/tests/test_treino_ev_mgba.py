@@ -19,6 +19,7 @@ from mgba_treino_harness import (
 ROM = os.environ.get("TREINO_TEST_ROM")
 CORE = os.environ.get("MGBA_CORE")
 EXPECTED_ROMS = {
+    "a6b454f7cbafad8c05e1b8aa2028087a596bbeff4f0184c826a92ebb7e554147",  # motor parcial v15
     "1123e7995b37008a75c818f09fb852bfd4910e1f074ae2e630cbd9c8af994abc",  # treino
     "c563d43a8f15976314ad5fb271ad44a83cdf3143749389311f261ffd506a466b",  # treino + fixos comuns retirados
     "412bcd89214d4126d92f6c2256a56227c6f30fa138e0b262ef287f5b12b3997b",  # com listas de golpes
