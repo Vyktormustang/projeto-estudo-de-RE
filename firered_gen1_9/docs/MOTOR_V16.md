@@ -4,6 +4,8 @@
 
 > **Adendo posterior (03/11/2026):** sem alterar a ROM, a auditoria de duplas/múltiplas reservas concluiu 29 verificações, incluindo cinco testes novos com 60 subcasos. Veja [AUDITORIA_V16_DUPLAS_PHAZING.md](AUDITORIA_V16_DUPLAS_PHAZING.md). Os 85 testes e a matriz de singles abaixo conservam o registro da entrega original; as lacunas de duplas foram reduzidas nesse recorte, não eliminadas integralmente.
 
+> **Segundo adendo — hazards/KO (03/11/2026):** mantendo a ROM, a auditoria de Spikes/Stealth Rock concluiu 41 verificações, incluindo sete métodos novos com 27 subcasos de entrada, desmaio, reposição, histórico/PP, EXP e vitória/retorno ao mapa. O recorte é singles no lado adversário; veja [AUDITORIA_V16_HAZARDS_KO.md](AUDITORIA_V16_HAZARDS_KO.md).
+
 ## Defeito e comparação
 
 A [auditoria v15](AUDITORIA_V15_PIVOS_PHAZING.md) demonstrou Dragon Tail e Circle Throw causando dano, mas sem trocar um alvo de nível superior apesar de haver reserva viva e contexto de treinador. O comando nativo `0x8F` ainda chama `TryDoForceSwitchOut`, que pode falhar por um sorteio baseado nos níveis.

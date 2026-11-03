@@ -1,5 +1,11 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v16 — Spikes, Stealth Rock e KO na entrada
+
+**41/41 verificações concluídas, sem skips**, incluindo sete testes novos com **27 subcasos**. Hazards são colocados por golpes reais: dano de entrada, KO, reposição, histórico/PP e EXP são conferidos. Também passaram dois desmaios em cadeia com vitória e retorno ao mapa, o KO pelo próprio golpe de phazing e a interrupção dos hazards quando Spikes já derruba o entrante.
+
+**ROM v16 inalterada, sem v17 e sem novo defeito demonstrado nesse recorte.** Veja [AUDITORIA_V16_HAZARDS_KO.md](docs/AUDITORIA_V16_HAZARDS_KO.md). A matriz nova é singles, no lado adversário, com uma camada de Spikes e/ou Stealth Rock; não certifica todos os hazards nem a fórmula moderna de EXP. Próximos controles: entrada/KO no lado do jogador e em duplas. Drive não atualizado.
+
 ## Auditoria v16 — phazing em duplas e múltiplas reservas
 
 **29/29 verificações concluídas, sem skips**, incluindo cinco testes novos com **60 subcasos**. Roar, Whirlwind, Dragon Tail e Circle Throw foram testados nos quatro bancos, com três reservas, uma única elegível e nenhuma elegível. A seleção exclui os dois membros ativos, desmaiados, ovos e vazios nos cenários auditados. PP, níveis, EXP e identidade permanecem coerentes; Eerie Spell respeita o histórico do entrante.
