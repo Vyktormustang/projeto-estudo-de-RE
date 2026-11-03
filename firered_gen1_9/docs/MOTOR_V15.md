@@ -4,6 +4,8 @@
 
 > **Adendo da auditoria posterior (03/11/2026):** histórico/PP após pivôs e trocas forçadas foi testado sem alterar a ROM. Foram concluídas 25 verificações, incluindo uma caracterização de **outro defeito ainda aberto**: phazing por Dragon Tail/Circle Throw pode falhar por nível mesmo após causar dano em contexto de treinador. Veja [AUDITORIA_V15_PIVOS_PHAZING.md](AUDITORIA_V15_PIVOS_PHAZING.md). Os 76 testes e a correção de duração abaixo conservam o registro da entrega original; não certificam esse comportamento de phazing.
 
+> **Atualização posterior:** a chance legada de phazing por nível identificada na auditoria acima foi corrigida na [v16](MOTOR_V16.md). A presente entrega v15 e seus testes permanecem como registro histórico.
+
 ## Defeito confirmado e correção
 
 A rotina nativa mantinha durações aleatórias da geração III: Disable sorteava 2–5 e Encore 3–6. A v15 fixa **Disable em quatro oportunidades de ação do alvo** e **Encore em três**, contando a ação do turno de aplicação se ainda estiver pendente. Quando o alvo já agiu, acrescenta-se uma unidade ao contador, pois o motor decrementa o timer no fim desse mesmo turno.

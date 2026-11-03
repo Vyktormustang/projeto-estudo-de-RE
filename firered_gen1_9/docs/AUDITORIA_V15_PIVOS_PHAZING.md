@@ -2,6 +2,8 @@
 
 **03/11/2026 — FireRed Gen 1–9 / VYK-57.** Auditoria sobre a v15 exata, somente com equipes e estados sintéticos. **Nenhuma mudança na ROM; não há v16 nesta etapa.**
 
+> **Adendo posterior:** o defeito de nível registrado abaixo foi corrigido na [v16](MOTOR_V16.md), com comparação v15/v16 e controles. Este relatório conserva a evidência negativa original; a ROM v15 continua inalterada.
+
 ## Resultado e ressalva principal
 
 O histórico usado por Eerie Spell é limpo nas trocas efetivamente realizadas pelos quatro pivôs e pelos quatro golpes de troca forçada testados. O entrante não herda o último golpe do ocupante anterior; depois de agir, passa a ter histórico próprio. Os PPs persistentes de ambos os membros são preservados nas saídas e retornos.

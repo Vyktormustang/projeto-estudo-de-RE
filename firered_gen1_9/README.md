@@ -1,10 +1,18 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
-## Auditoria v15 — pivôs, trocas forçadas e um defeito ainda aberto
+## Motor parcial `v16` — corrigida a falha de phazing por nível em treinador
+
+Roar, Whirlwind, Dragon Tail e Circle Throw deixam de falhar **apenas pela chance legada de nível** em batalhas de treinador. A rotina nativa continua verificando a reserva e escolhendo o substituto. Níveis não ficam alterados; ausência de reserva, Suction Cups, Ingrain e os controles de Protect/imunidade testados são preservados. Oito cenários selvagens mantêm os resultados da v15.
+
+**85/85 verificações concluídas, sem skips:** dez dirigidas (incluindo a reprodução do defeito na base v15), 61 regressões positivas e 14 de build/treino EV/IV. Payload de **300 bytes**, dois intervalos escritos, sem nova RAM persistente ou catálogo. Aplicador `scripts/motor_v16.py`, base v15 exata e saída nova. SHA-256 v16: `644b140dc4fd1f4fab4c7ed9304fb266865d3e81825140c01c2c275564dc0fcc`.
+
+Veja [MOTOR_V16.md — correção, hashes, testes e limites](docs/MOTOR_V16.md). **Engine parcial:** matriz nova de phazing em singles; duplas/múltiplas reservas e demais interações exigem controles específicos. Drive não atualizado. As seções seguintes conservam o histórico das entregas anteriores.
+
+## Auditoria anterior v15 — pivôs, trocas forçadas e diagnóstico do defeito
 
 O histórico de Eerie Spell é limpo nas trocas efetivamente realizadas por U-turn, Volt Switch, Flip Turn, Parting Shot, Roar, Whirlwind, Dragon Tail e Circle Throw, nos cenários descritos. Entrada, nova ação e retorno preservam os PPs; Suction Cups bloqueia a troca sem apagar o histórico.
 
-**Defeito confirmado e ainda não corrigido:** Dragon Tail/Circle Throw podem causar dano, mas falhar em trocar um alvo de nível superior por causa da probabilidade legada nativa, inclusive no contexto de treinador. **25 verificações concluídas, sem skips, incluindo uma caracterização negativa em dois subcasos** — esse `ok` não significa conformidade moderna do phazing. Nenhuma mudança na ROM, sem v16. Veja [AUDITORIA_V15_PIVOS_PHAZING.md](docs/AUDITORIA_V15_PIVOS_PHAZING.md). Próxima etapa: correção dirigida dessa checagem de nível e seus controles. Drive não atualizado.
+**Defeito confirmado na v15 e corrigido pela v16 acima:** Dragon Tail/Circle Throw podem causar dano, mas falhar em trocar um alvo de nível superior por causa da probabilidade legada nativa, inclusive no contexto de treinador. **25 verificações concluídas, sem skips, incluindo uma caracterização negativa em dois subcasos** — esse `ok` não significa conformidade moderna do phazing. Naquela auditoria não houve mudança na ROM. Veja [AUDITORIA_V15_PIVOS_PHAZING.md](docs/AUDITORIA_V15_PIVOS_PHAZING.md); a correção subsequente e seus controles estão no relatório v16 acima. Drive não atualizado.
 
 ## Motor parcial `v15` — duração de Disable e Encore
 
