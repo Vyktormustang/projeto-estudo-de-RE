@@ -2,6 +2,8 @@
 
 **03/11/2026 — correção dirigida sobre v15 exato, FireRed Gen 1–9 / VYK-57.** Entrada verificada por SHA-256, saída em arquivo novo, somente saves/equipes sintéticos. Não é o projeto BAG_MOD da ROM histórica.
 
+> **Adendo posterior (03/11/2026):** sem alterar a ROM, a auditoria de duplas/múltiplas reservas concluiu 29 verificações, incluindo cinco testes novos com 60 subcasos. Veja [AUDITORIA_V16_DUPLAS_PHAZING.md](AUDITORIA_V16_DUPLAS_PHAZING.md). Os 85 testes e a matriz de singles abaixo conservam o registro da entrega original; as lacunas de duplas foram reduzidas nesse recorte, não eliminadas integralmente.
+
 ## Defeito e comparação
 
 A [auditoria v15](AUDITORIA_V15_PIVOS_PHAZING.md) demonstrou Dragon Tail e Circle Throw causando dano, mas sem trocar um alvo de nível superior apesar de haver reserva viva e contexto de treinador. O comando nativo `0x8F` ainda chama `TryDoForceSwitchOut`, que pode falhar por um sorteio baseado nos níveis.

@@ -1,12 +1,18 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v16 — phazing em duplas e múltiplas reservas
+
+**29/29 verificações concluídas, sem skips**, incluindo cinco testes novos com **60 subcasos**. Roar, Whirlwind, Dragon Tail e Circle Throw foram testados nos quatro bancos, com três reservas, uma única elegível e nenhuma elegível. A seleção exclui os dois membros ativos, desmaiados, ovos e vazios nos cenários auditados. PP, níveis, EXP e identidade permanecem coerentes; Eerie Spell respeita o histórico do entrante.
+
+**ROM v16 mantida, sem v17 e sem novo defeito demonstrado nesta matriz.** Veja [AUDITORIA_V16_DUPLAS_PHAZING.md](docs/AUDITORIA_V16_DUPLAS_PHAZING.md) para as combinações, a escolha de alvos da IA e os limites. Próximo recorte: KO e hazards durante a troca/entrada. Link/multi e phazing simultâneo continuam pendentes. Drive não atualizado.
+
 ## Motor parcial `v16` — corrigida a falha de phazing por nível em treinador
 
 Roar, Whirlwind, Dragon Tail e Circle Throw deixam de falhar **apenas pela chance legada de nível** em batalhas de treinador. A rotina nativa continua verificando a reserva e escolhendo o substituto. Níveis não ficam alterados; ausência de reserva, Suction Cups, Ingrain e os controles de Protect/imunidade testados são preservados. Oito cenários selvagens mantêm os resultados da v15.
 
 **85/85 verificações concluídas, sem skips:** dez dirigidas (incluindo a reprodução do defeito na base v15), 61 regressões positivas e 14 de build/treino EV/IV. Payload de **300 bytes**, dois intervalos escritos, sem nova RAM persistente ou catálogo. Aplicador `scripts/motor_v16.py`, base v15 exata e saída nova. SHA-256 v16: `644b140dc4fd1f4fab4c7ed9304fb266865d3e81825140c01c2c275564dc0fcc`.
 
-Veja [MOTOR_V16.md — correção, hashes, testes e limites](docs/MOTOR_V16.md). **Engine parcial:** matriz nova de phazing em singles; duplas/múltiplas reservas e demais interações exigem controles específicos. Drive não atualizado. As seções seguintes conservam o histórico das entregas anteriores.
+Veja [MOTOR_V16.md — correção, hashes, testes e limites](docs/MOTOR_V16.md). **Engine parcial:** matriz inicial de phazing em singles, posteriormente ampliada pela auditoria de duplas acima; demais interações continuam exigindo controles específicos. Drive não atualizado. As seções seguintes conservam o histórico das entregas anteriores.
 
 ## Auditoria anterior v15 — pivôs, trocas forçadas e diagnóstico do defeito
 
