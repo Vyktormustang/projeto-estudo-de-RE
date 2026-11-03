@@ -2,6 +2,8 @@
 
 **02/11/2026 — auditoria no motor v13 exato, sem alteração da ROM.**
 
+> **Atualização em 03/11/2026:** o desconto extra descrito aqui foi corrigido no [motor v14](MOTOR_V14.md), com saída nova e controles comparativos. Este relatório e seus testes permanecem como registro da auditoria e reprodução no **v13**, que não foi alterado. As menções a “defeito aberto” e “sem v14” abaixo descrevem a situação em 02/11.
+
 ## Conclusão
 
 A progressão de potência está correta nos cenários medidos:

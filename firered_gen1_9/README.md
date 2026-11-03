@@ -1,10 +1,18 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
-## Auditoria de Rollout/Ice Ball — potência correta, defeito de PP aberto
+## Motor parcial `v14` — PP correto após Protect/Detect interromper Rollout/Ice Ball
 
-A potência foi medida em cada impacto: **30→60→120→240→480**, ou **60→120→240→480→960** após Defense Curl, inclusive com PP zerado por Eerie Spell. Entretanto, **Protect interrompendo uma sequência ativa desconta um PP extra no v13**, reproduzido em Rollout e Ice Ball, com/sem Defense Curl. O reset de potência funciona; o desconto extra **ainda não foi corrigido**.
+**Corrigido o desconto extra de PP de uma continuação bloqueada.** Protect/Detect continuam encerrando a sequência; primeiro uso e reinício continuam gastando PP. Mantidas potência progressiva, Defense Curl, Pressure e sequências a PP zero. Testes incluem os dois lados em singles, miss por Sand Attack, sono por Hypnosis e Tackle posterior sem herdar isenção.
 
-Foram executadas **27 verificações, incluindo uma caracterização desse defeito em quatro subcasos**, sem testes pulados. Esse `ok` não significa conformidade moderna no caso de Protect. **ROM v13 inalterada, sem v14**; próximo passo prioritário é corrigir o gasto sem afetar o primeiro uso ou outras ações. Veja [AUDITORIA_ROLLOUT_POTENCIA.md — medições, diagnóstico, reprodução e critérios de correção](docs/AUDITORIA_ROLLOUT_POTENCIA.md).
+**61/61 verificações concluídas, sem skips**: build/controles dirigidos, regressões de batalha/estojo/save/histórico e treino EV/IV. Payload de **210 bytes**, dois intervalos escritos, sem RAM ou catálogo novos. Aplicador `scripts/motor_v14.py`, entrada v13 exata, sempre saída nova. SHA-256 v14: `2302ba1c88194fec190d0da062f91380ba062ee06e5a4a626902767412a9682c`.
+
+Veja [MOTOR_V14.md — correção, hashes, testes, reprodução e limites](docs/MOTOR_V14.md). A engine continua parcial; os novos cenários Rollout/Protect não equivalem à validação de todas as interrupções ou de todos os alvos em duplas. **Drive não atualizado nesta etapa.**
+
+## Auditoria anterior de Rollout/Ice Ball — registro do defeito no v13
+
+A potência foi medida em cada impacto: **30→60→120→240→480**, ou **60→120→240→480→960** após Defense Curl, inclusive com PP zerado por Eerie Spell. Entretanto, **Protect interrompendo uma sequência ativa desconta um PP extra no v13**, reproduzido em Rollout e Ice Ball, com/sem Defense Curl. O reset de potência funciona; o desconto extra **permanece no v13 e foi corrigido no v14 acima**.
+
+Foram executadas **27 verificações, incluindo uma caracterização desse defeito em quatro subcasos**, sem testes pulados. Esse `ok` não significa conformidade moderna no caso de Protect. Naquela etapa a **ROM v13 permaneceu inalterada**; a correção e seus controles foram entregues posteriormente no v14. Veja [AUDITORIA_ROLLOUT_POTENCIA.md — medições, diagnóstico, reprodução e critérios de correção](docs/AUDITORIA_ROLLOUT_POTENCIA.md).
 
 ## Auditoria anterior de histórico e PP — v13 mantido
 

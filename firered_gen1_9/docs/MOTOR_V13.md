@@ -8,6 +8,8 @@
 
 > **Defeito aberto identificado na auditoria seguinte (02/11/2026):** Rollout/Ice Ball têm progressão de potência correta nos cenários medidos, mas Protect interrompendo uma sequência ativa desconta um PP extra. Reproduzido com/sem Defense Curl; ainda sem correção e sem v14. Veja [AUDITORIA_ROLLOUT_POTENCIA.md](AUDITORIA_ROLLOUT_POTENCIA.md). Os resultados positivos anteriores não incluíam essa interrupção.
 
+> **Atualização em 03/11/2026:** o desconto extra de Rollout/Ice Ball interrompidos por Protect/Detect foi corrigido no [motor v14](MOTOR_V14.md). A ROM v13 e sua reprodução negativa continuam intactas; os adendos anteriores registram o diagnóstico antes dessa correção.
+
 ## Correções confirmadas
 
 1. **Eerie Spell (720) atravessa Substitute:** o alvo recebe dano e perde até três PPs do último golpe usado; o boneco mantém seu HP e seu bit de status.
