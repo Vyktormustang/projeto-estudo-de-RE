@@ -1,5 +1,13 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v17 — hazards combinados nas reposições do jogador
+
+**23/23 métodos distintos aprovados, sem skips**, incluindo cinco métodos novos / **30 cenários**. Escolhas reais pela tela de equipe, três quantidades de camadas, ordem de dano/mensagens, KO durante a entrada, rejeição de candidatos inválidos, absorção de Toxic Spikes nos dois bancos e histórico/PP dos entrantes. O veneno residual é separado de uma reaplicação indevida de hazard.
+
+Os hazards são colocados por golpes reais e levados ao jogador por Court Change; a fixture inicial controla quando a IA pode usar Rock Slide. Não é auditoria de colocação adversária direta nem da duração moderna de Disable. **ROM/payload/aplicador inalterados, sem v18; nenhum novo defeito de engine demonstrado neste recorte.** Veja [AUDITORIA_V17_HAZARDS_COMBINADOS_JOGADOR.md](docs/AUDITORIA_V17_HAZARDS_COMBINADOS_JOGADOR.md).
+
+Próximo recorte recomendado: trocas voluntárias e pivôs do jogador sob hazards combinados, com aliado ainda ativo. Engine parcial; **Drive não atualizado**. Os resultados de entrega da v17 abaixo são históricos, não somados aos desta auditoria.
+
 ## Motor parcial v17 — hazards na ordem de criação
 
 A correção dirigida substitui a prioridade fixa Spikes→Stealth Rock por uma fila de criação por lado. Camadas adicionais preservam a posição; limpeza/recolocação e Court Change atualizam a fila. O entrante já desmaiado não recebe os hazards seguintes nem executa Intimidate no controle dirigido.
