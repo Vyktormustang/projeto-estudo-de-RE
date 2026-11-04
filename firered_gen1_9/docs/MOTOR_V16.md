@@ -6,6 +6,8 @@
 
 > **Segundo adendo — hazards/KO (03/11/2026):** mantendo a ROM, a auditoria de Spikes/Stealth Rock concluiu 41 verificações, incluindo sete métodos novos com 27 subcasos de entrada, desmaio, reposição, histórico/PP, EXP e vitória/retorno ao mapa. O recorte é singles no lado adversário; veja [AUDITORIA_V16_HAZARDS_KO.md](AUDITORIA_V16_HAZARDS_KO.md).
 
+> **Terceiro adendo — hazards no jogador (04/11/2026):** 26/26 verificações, sem skips, incluindo cinco métodos novos / 52 subcasos em singles e duplas. Seleção após KO nos dois bancos do jogador, rejeição de aliado ativo/reserva desmaiado, dano de reentrada e continuação da batalha. ROM inalterada; veja [AUDITORIA_V16_HAZARDS_JOGADOR.md](AUDITORIA_V16_HAZARDS_JOGADOR.md).
+
 ## Defeito e comparação
 
 A [auditoria v15](AUDITORIA_V15_PIVOS_PHAZING.md) demonstrou Dragon Tail e Circle Throw causando dano, mas sem trocar um alvo de nível superior apesar de haver reserva viva e contexto de treinador. O comando nativo `0x8F` ainda chama `TryDoForceSwitchOut`, que pode falhar por um sorteio baseado nos níveis.

@@ -1,5 +1,11 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v16 — hazards no jogador e seleção após KO
+
+**26/26 verificações concluídas, sem skips**, incluindo cinco métodos novos com **52 subcasos** de Spikes/Stealth Rock no lado do jogador, em singles e duplas. A seleção após desmaio foi exercitada nos dois bancos do jogador: rejeita aliado ativo e reserva morto, aceita o substituto vivo e aplica o dano da nova entrada. PP, identidade, histórico, aliado e continuação da batalha são conferidos.
+
+**ROM v16 inalterada, sem v17 e sem novo defeito demonstrado nesse recorte.** Relatório: [AUDITORIA_V16_HAZARDS_JOGADOR.md](docs/AUDITORIA_V16_HAZARDS_JOGADOR.md). A UI reordena a equipe temporariamente; o observador acompanha HP por PID. Próximo recorte: KO/reposição adversária em duplas e, depois, dois desmaios com seleção de dois substitutos. Drive não atualizado.
+
 ## Auditoria v16 — Spikes, Stealth Rock e KO na entrada
 
 **41/41 verificações concluídas, sem skips**, incluindo sete testes novos com **27 subcasos**. Hazards são colocados por golpes reais: dano de entrada, KO, reposição, histórico/PP e EXP são conferidos. Também passaram dois desmaios em cadeia com vitória e retorno ao mapa, o KO pelo próprio golpe de phazing e a interrupção dos hazards quando Spikes já derruba o entrante.
