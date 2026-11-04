@@ -1,12 +1,20 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Motor parcial v17 — hazards na ordem de criação
+
+A correção dirigida substitui a prioridade fixa Spikes→Stealth Rock por uma fila de criação por lado. Camadas adicionais preservam a posição; limpeza/recolocação e Court Change atualizam a fila. O entrante já desmaiado não recebe os hazards seguintes nem executa Intimidate no controle dirigido.
+
+Aplicador `scripts/motor_v17.py`, **base v16 exata e saída nova**. Payload de **3.148 bytes**, nove intervalos de escrita e oito bytes efêmeros dentro da reserva v8, sem mudança no formato de save. SHA-256 da saída: `5db05cbb54add61a6c50e08d3e392ba610e87ca3ef462095de168de5d3e32957`. Veja [MOTOR_V17.md](docs/MOTOR_V17.md) para testes, implementação, hashes e limites.
+
+**46/46 métodos distintos concluídos, sem skips**, incluindo um negativo na base v16. Os dez métodos positivos novos de batalha cobrem **33 subcasos**; mais dois subcasos reproduzem o defeito na base. Build, treino EV/IV e 21 regressões foram reexecutados. A validação separa a reprodução negativa na v16 das expectativas modernas na v17. Não é certificação integral de Scarlet/Violet, campanha, link/multi ou migração de saves pessoais. **Drive não atualizado.**
+
 ## Auditoria v16 — defeito na ordem de hazards combinados
 
-**Defeito confirmado e ainda aberto:** a v16 executa Spikes antes de Stealth Rock mesmo quando Stealth Rock foi colocado primeiro. A regra moderna de referência exige ordem de criação. O dano final pode coincidir; eventos intermediários de HP e mensagens expõem a diferença, inclusive no hazard que causa o KO.
+**Defeito confirmado na v16, tratado pela v17 acima:** a v16 executa Spikes antes de Stealth Rock mesmo quando Stealth Rock foi colocado primeiro. A regra moderna de referência exige ordem de criação. O dano final pode coincidir; eventos intermediários de HP e mensagens expõem a diferença, inclusive no hazard que causa o KO.
 
 **20 métodos distintos concluídos, sem skips:** 16 regressões reexecutadas e quatro novos. A matriz nova cobre três quantidades de camadas e reposições adversárias em duplas: **10 controles positivos e 10 reproduções negativas**, em quatro métodos. Um `ok` nos negativos confirma o defeito, **não conformidade moderna**. Relatório: [AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md](docs/AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md).
 
-**ROM/payload inalterados; sem v17 e sem atualização do Drive.** Próximo trabalho recomendado: correção dirigida da ordem de criação e do ciclo de vida dos hazards, não simplesmente inverter sua prioridade fixa. As seções abaixo conservam os resultados e escopos das auditorias anteriores.
+**Na etapa de auditoria abaixo, ROM/payload permaneceram inalterados, ainda sem v17 e sem atualização do Drive.** Próximo trabalho então recomendado: correção dirigida da ordem de criação e do ciclo de vida dos hazards, não simplesmente inverter sua prioridade fixa. As seções abaixo conservam os resultados e escopos das auditorias anteriores.
 
 ## Auditoria v16 — reservas insuficientes e fim da batalha em duplas
 

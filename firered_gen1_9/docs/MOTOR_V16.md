@@ -14,6 +14,8 @@
 
 > **Sexto adendo — hazards combinados (04/11/2026):** defeito de ordem confirmado e ainda não corrigido. Spikes sempre antecede Stealth Rock, inclusive se colocado depois. 20 métodos distintos concluídos, sem skips (16 regressões e quatro novos). A matriz nova separa 10 controles positivos de 10 reproduções negativas; `ok` na caracterização não é aprovação moderna. Veja [AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md](AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md). ROM inalterada, sem v17.
 
+> **Correção posterior — v17 (04/11/2026):** a ordem fixa dos hazards identificada no sexto adendo foi substituída por uma fila de criação por lado. A v16 continua sendo a base negativa; a nova saída tem SHA distinto e fixtures próprias. Veja [MOTOR_V17.md](MOTOR_V17.md). Os resultados abaixo preservam o registro histórico da v16.
+
 ## Defeito e comparação
 
 A [auditoria v15](AUDITORIA_V15_PIVOS_PHAZING.md) demonstrou Dragon Tail e Circle Throw causando dano, mas sem trocar um alvo de nível superior apesar de haver reserva viva e contexto de treinador. O comando nativo `0x8F` ainda chama `TryDoForceSwitchOut`, que pode falhar por um sorteio baseado nos níveis.

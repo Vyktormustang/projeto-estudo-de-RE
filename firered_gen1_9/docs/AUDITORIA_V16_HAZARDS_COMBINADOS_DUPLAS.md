@@ -2,7 +2,9 @@
 
 **04/11/2026 — FireRed Gen 1–9 / VYK-57.** mGBA 0.10.5, ROM v16 exata, somente equipes e estados sintéticos. **Auditoria: ROM, payload e aplicador inalterados; não há v17 nesta etapa.**
 
-## Defeito confirmado, ainda não corrigido
+> **Atualização posterior (04/11/2026):** a correção dirigida foi implementada na [v17](MOTOR_V17.md), com base v16 e saída nova. Esta auditoria permanece como reprodução negativa na v16, não como descrição da saída corrigida.
+
+## Defeito confirmado — situação ao concluir esta auditoria
 
 A v16 executa **Spikes antes de Stealth Rock mesmo quando Stealth Rock foi colocado primeiro**. O oráculo moderno fixado exige a **ordem de criação dos hazards**, não uma prioridade fixa por espécie de hazard.
 
