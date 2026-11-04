@@ -8,6 +8,8 @@
 
 > **Terceiro adendo — hazards no jogador (04/11/2026):** 26/26 verificações, sem skips, incluindo cinco métodos novos / 52 subcasos em singles e duplas. Seleção após KO nos dois bancos do jogador, rejeição de aliado ativo/reserva desmaiado, dano de reentrada e continuação da batalha. ROM inalterada; veja [AUDITORIA_V16_HAZARDS_JOGADOR.md](AUDITORIA_V16_HAZARDS_JOGADOR.md).
 
+> **Quarto adendo — KO e duas reposições em duplas (04/11/2026):** 23/23 verificações distintas aprovadas, sem skips, incluindo quatro métodos novos / 52 subcasos. Hazards/KO adversário, duas reservas pela IA, duas escolhas do jogador, EXP, histórico e continuidade. Cinco repetições não aumentam o total. ROM inalterada; veja [AUDITORIA_V16_DUPLAS_KO_REPOSICAO.md](AUDITORIA_V16_DUPLAS_KO_REPOSICAO.md).
+
 ## Defeito e comparação
 
 A [auditoria v15](AUDITORIA_V15_PIVOS_PHAZING.md) demonstrou Dragon Tail e Circle Throw causando dano, mas sem trocar um alvo de nível superior apesar de haver reserva viva e contexto de treinador. O comando nativo `0x8F` ainda chama `TryDoForceSwitchOut`, que pode falhar por um sorteio baseado nos níveis.

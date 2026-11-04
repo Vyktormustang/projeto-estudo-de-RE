@@ -1,5 +1,11 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v16 — KO e duas reposições em duplas
+
+**23/23 verificações distintas aprovadas, sem skips**, incluindo quatro métodos novos com **52 subcasos**. KO adversário por hazard, duas reposições pela IA, dois desmaios do jogador por um golpe de área e duas escolhas pela UI: dano de entrada, EXP, PP, histórico, recusa de duplicata e continuidade da batalha conferidos.
+
+**ROM v16 inalterada, sem v17 e sem novo defeito demonstrado nesse recorte.** Relatório: [AUDITORIA_V16_DUPLAS_KO_REPOSICAO.md](docs/AUDITORIA_V16_DUPLAS_KO_REPOSICAO.md). A contagem desconta cinco repetições acidentais de descoberta do unittest (corrigida). Próximo recorte: reservas insuficientes, KO durante reposição e encerramento da batalha em duplas. Drive não atualizado.
+
 ## Auditoria v16 — hazards no jogador e seleção após KO
 
 **26/26 verificações concluídas, sem skips**, incluindo cinco métodos novos com **52 subcasos** de Spikes/Stealth Rock no lado do jogador, em singles e duplas. A seleção após desmaio foi exercitada nos dois bancos do jogador: rejeita aliado ativo e reserva morto, aceita o substituto vivo e aplica o dano da nova entrada. PP, identidade, histórico, aliado e continuação da batalha são conferidos.
