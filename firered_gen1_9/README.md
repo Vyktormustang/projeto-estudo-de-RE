@@ -1,5 +1,13 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v16 — defeito na ordem de hazards combinados
+
+**Defeito confirmado e ainda aberto:** a v16 executa Spikes antes de Stealth Rock mesmo quando Stealth Rock foi colocado primeiro. A regra moderna de referência exige ordem de criação. O dano final pode coincidir; eventos intermediários de HP e mensagens expõem a diferença, inclusive no hazard que causa o KO.
+
+**20 métodos distintos concluídos, sem skips:** 16 regressões reexecutadas e quatro novos. A matriz nova cobre três quantidades de camadas e reposições adversárias em duplas: **10 controles positivos e 10 reproduções negativas**, em quatro métodos. Um `ok` nos negativos confirma o defeito, **não conformidade moderna**. Relatório: [AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md](docs/AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md).
+
+**ROM/payload inalterados; sem v17 e sem atualização do Drive.** Próximo trabalho recomendado: correção dirigida da ordem de criação e do ciclo de vida dos hazards, não simplesmente inverter sua prioridade fixa. As seções abaixo conservam os resultados e escopos das auditorias anteriores.
+
 ## Auditoria v16 — reservas insuficientes e fim da batalha em duplas
 
 **21/21 verificações aprovadas, sem skips**, incluindo cinco métodos novos com **44 subcasos**. Uma reserva sobrevivente mantém a batalha com o outro banco ausente; KOs em cadeia pelos hazards levam a vitória/derrota, com EXP concluída, retorno ao campo e cura de HP/PP após derrota. Inclui controle de whiteout em dupla selvagem sintética, sem escolher fuga.

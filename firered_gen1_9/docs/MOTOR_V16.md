@@ -12,6 +12,8 @@
 
 > **Quinto adendo — reservas insuficientes e encerramento em duplas (04/11/2026):** 21/21 verificações, sem skips, incluindo cinco métodos novos / 44 subcasos. Bancos ausentes, KO dos substitutos, vitória/derrota, EXP, cura e retorno ao campo; controle adicional de whiteout selvagem. ROM inalterada; veja [AUDITORIA_V16_DUPLAS_RESERVAS_FIM.md](AUDITORIA_V16_DUPLAS_RESERVAS_FIM.md).
 
+> **Sexto adendo — hazards combinados (04/11/2026):** defeito de ordem confirmado e ainda não corrigido. Spikes sempre antecede Stealth Rock, inclusive se colocado depois. 20 métodos distintos concluídos, sem skips (16 regressões e quatro novos). A matriz nova separa 10 controles positivos de 10 reproduções negativas; `ok` na caracterização não é aprovação moderna. Veja [AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md](AUDITORIA_V16_HAZARDS_COMBINADOS_DUPLAS.md). ROM inalterada, sem v17.
+
 ## Defeito e comparação
 
 A [auditoria v15](AUDITORIA_V15_PIVOS_PHAZING.md) demonstrou Dragon Tail e Circle Throw causando dano, mas sem trocar um alvo de nível superior apesar de haver reserva viva e contexto de treinador. O comando nativo `0x8F` ainda chama `TryDoForceSwitchOut`, que pode falhar por um sorteio baseado nos níveis.
