@@ -1,12 +1,20 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v17 — trocas e pivôs com aliado ativo
+
+**22/22 métodos distintos aprovados, sem skips**, incluindo quatro métodos novos / **32 cenários**. Trocas voluntárias nos dois bancos, U-turn, Volt Switch, Flip Turn e Parting Shot sob hazards combinados, com sobrevivência ou KO do entrante e segunda seleção. HP/atributos/histórico do aliado acompanhados por frame, PP e continuidade do turno conferidos; quatro controles incluem absorção, Web e veneno residual.
+
+**ROM/payload/aplicador inalterados, sem v18; nenhum novo defeito de engine demonstrado neste recorte.** Uma camada de Spikes na matriz nova; nos pivôs, velocidade e ordem estão acopladas ao banco, não cobrem todas as combinações. Veja [AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md](docs/AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md) para a matriz, execução e limites.
+
+Próximo recorte sugerido: pivôs impedidos/falhos e reservas inelegíveis. Engine parcial; **Drive não atualizado**. Os números das auditorias anteriores abaixo são históricos e não foram somados aos desta etapa.
+
 ## Auditoria v17 — hazards combinados nas reposições do jogador
 
 **23/23 métodos distintos aprovados, sem skips**, incluindo cinco métodos novos / **30 cenários**. Escolhas reais pela tela de equipe, três quantidades de camadas, ordem de dano/mensagens, KO durante a entrada, rejeição de candidatos inválidos, absorção de Toxic Spikes nos dois bancos e histórico/PP dos entrantes. O veneno residual é separado de uma reaplicação indevida de hazard.
 
 Os hazards são colocados por golpes reais e levados ao jogador por Court Change; a fixture inicial controla quando a IA pode usar Rock Slide. Não é auditoria de colocação adversária direta nem da duração moderna de Disable. **ROM/payload/aplicador inalterados, sem v18; nenhum novo defeito de engine demonstrado neste recorte.** Veja [AUDITORIA_V17_HAZARDS_COMBINADOS_JOGADOR.md](docs/AUDITORIA_V17_HAZARDS_COMBINADOS_JOGADOR.md).
 
-Próximo recorte recomendado: trocas voluntárias e pivôs do jogador sob hazards combinados, com aliado ainda ativo. Engine parcial; **Drive não atualizado**. Os resultados de entrega da v17 abaixo são históricos, não somados aos desta auditoria.
+O recorte então recomendado — trocas voluntárias e pivôs com aliado ativo — foi auditado na seção acima. Engine parcial; **Drive não atualizado**. Os resultados de entrega da v17 abaixo são históricos, não somados aos desta auditoria.
 
 ## Motor parcial v17 — hazards na ordem de criação
 

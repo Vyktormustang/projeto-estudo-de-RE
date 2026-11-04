@@ -2,6 +2,8 @@
 
 **04/11/2026 — FireRed Gen 1–9 / VYK-57.** Correção dirigida sobre a v16 exata, com saída nova e equipes/estados exclusivamente sintéticos. Não é o BAG_MOD histórico e não certifica o motor completo de Scarlet/Violet.
 
+> **Adendo mais recente — trocas e pivôs com aliado ativo (04/11/2026):** 22/22 métodos aprovados, sem skips, incluindo quatro novos / 32 cenários. Trocas manuais, quatro pivôs, KO na entrada e nova seleção; preservação do aliado, PP/histórico e controles com quatro hazards. ROM inalterada, sem v18. Veja [AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md](AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md). Resultados anteriores abaixo são históricos, não cumulativos.
+
 > **Adendo posterior — seleção do jogador em duplas (04/11/2026):** 23/23 métodos aprovados, sem skips, incluindo cinco novos / 30 cenários. Hazards combinados via Court Change, duas escolhas pela UI, KO do entrante, absorção, rejeição de candidatos inválidos, histórico/PP e continuidade. ROM inalterada, sem v18. Veja [AUDITORIA_V17_HAZARDS_COMBINADOS_JOGADOR.md](AUDITORIA_V17_HAZARDS_COMBINADOS_JOGADOR.md). As 46 verificações abaixo conservam o registro da entrega original.
 
 ## Defeito da base e regra da saída
