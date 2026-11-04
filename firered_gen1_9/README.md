@@ -1,5 +1,11 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v16 — reservas insuficientes e fim da batalha em duplas
+
+**21/21 verificações aprovadas, sem skips**, incluindo cinco métodos novos com **44 subcasos**. Uma reserva sobrevivente mantém a batalha com o outro banco ausente; KOs em cadeia pelos hazards levam a vitória/derrota, com EXP concluída, retorno ao campo e cura de HP/PP após derrota. Inclui controle de whiteout em dupla selvagem sintética, sem escolher fuga.
+
+**ROM v16 inalterada, sem v17 e sem novo defeito de engine demonstrado nesse recorte.** Relatório: [AUDITORIA_V16_DUPLAS_RESERVAS_FIM.md](docs/AUDITORIA_V16_DUPLAS_RESERVAS_FIM.md). Corrigida uma suposição do observador sobre a ordem dos alvos de Rock Slide; matriz inteira reexecutada. Próximo recorte: hazards combinados e múltiplas camadas na reposição em duplas. Drive não atualizado.
+
 ## Auditoria v16 — KO e duas reposições em duplas
 
 **23/23 verificações distintas aprovadas, sem skips**, incluindo quatro métodos novos com **52 subcasos**. KO adversário por hazard, duas reposições pela IA, dois desmaios do jogador por um golpe de área e duas escolhas pela UI: dano de entrada, EXP, PP, histórico, recusa de duplicata e continuidade da batalha conferidos.
