@@ -2,6 +2,8 @@
 
 **04/11/2026 — FireRed Gen 1–9 / VYK-57.** Não é o BAG_MOD histórico.
 
+> **Entrega posterior:** a correção dirigida foi validada na [v18](MOTOR_V18.md), com nova ROM e testes positivos. Este relatório conserva o diagnóstico e os resultados da base v17, que permanece inalterada. A descrição da tabela sonora ativa foi precisada abaixo após conferir o literal da v12.
+
 ## Resultado e estado
 
 **Duas divergências de mecânica confirmadas em seis reproduções finais:** Volt Switch troca contra um alvo Ground apesar de reconhecer a imunidade; Parting Shot ignora Soundproof, reduz os atributos e troca. A segunda já estava declarada como limitação no cabeçalho das fontes v7 e foi agora reproduzida na v17.
@@ -78,9 +80,9 @@ Parting Shot é sonoro. Soundproof deve bloquear o golpe antes das quedas: Attac
 
 O cabeçalho de `patches/motor_v7/motor_v7.c` já declara Parting Shot entre os golpes sonoros novos sem interação com Soundproof. Não se atribui essa lacuna ao novo scheduler de hazards v17 nem se afirma regressão introduzida nele.
 
-Na ROM v17 exata, a sequência nativa de golpes de Soundproof aparece uma única vez, no offset **`0x20F4E8`** (endereço GBA `0x0820F4E8`): IDs **45, 46, 47, 48, 103, 173, 253, 319, 320, 304, 65535**. O terminador 65535 encerra a lista; Parting Shot local 571 não consta. O fonte nativo fixa essa mesma lista em `sSoundMovesTable` e a consulta em `ABILITYEFFECT_MOVES_BLOCK`.
+Na ROM v17 exata, a sequência nativa de golpes de Soundproof aparece uma única vez, no offset **`0x20F4E8`** (endereço GBA `0x0820F4E8`): IDs **45, 46, 47, 48, 103, 173, 253, 319, 320, 304, 65535**. O terminador 65535 encerra a lista; Parting Shot local 571 não consta. **Precisão verificada na etapa v18:** essa é a tabela original preservada, não a ativa. O literal em `0x6F840` já aponta desde a v12 para `0x090D7002` (tabela em `0x10D7000` + 2), com os dez IDs acima **mais Eerie Spell 720** e o terminador. A lista ativa também não contém 571. Localizar a sequência original, isoladamente, não demonstrava qual tabela era consultada. A correção dessa atribuição não altera os resultados negativos observados.
 
-`is_sound_move_v10` inclui 571, mas seu uso no cancelamento v10 é para **Throat Chop**. A existência desse catálogo não comprova que Soundproof o utilize. O comportamento observado confirma que a imunidade sonora continua ausente neste caso.
+`is_sound_move_v10` inclui 571, mas seu uso no cancelamento v10 é para **Throat Chop**. A existência desse catálogo não comprova que Soundproof o utilize; Soundproof/Eerie já tinha sua correção própria pela tabela v12. O comportamento observado confirma que a imunidade sonora continua ausente neste caso.
 
 ## Controles positivos e invariantes
 

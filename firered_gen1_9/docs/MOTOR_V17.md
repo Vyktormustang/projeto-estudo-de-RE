@@ -2,6 +2,8 @@
 
 **04/11/2026 — FireRed Gen 1–9 / VYK-57.** Correção dirigida sobre a v16 exata, com saída nova e equipes/estados exclusivamente sintéticos. Não é o BAG_MOD histórico e não certifica o motor completo de Scarlet/Violet.
 
+> **Entrega posterior — v18 (04/11/2026):** os dois caminhos de pivô identificados abaixo foram corrigidos em nova saída sobre esta v17 exata. 41 métodos concluídos sem skips, sendo dois negativos somente na base. A ROM v17 permanece inalterada. Veja [MOTOR_V18.md](MOTOR_V18.md), inclusive a precisão sobre a tabela sonora ativa v12 e o histórico nativo `FFFF` de Soundproof.
+
 > **Adendo mais recente — auditoria negativa de pivôs bloqueados (04/11/2026):** Volt Switch troca contra Ground apesar da imunidade; Parting Shot ignora Soundproof (limitação antiga confirmada). 23 métodos concluídos sem skips: 21 controles positivos e dois negativos; 36 cenários novos, 30 positivos/seis negativos. **Não corrigidos nesta etapa; v17 inalterada, sem v18.** Veja [AUDITORIA_V17_PIVOS_BLOQUEADOS.md](AUDITORIA_V17_PIVOS_BLOQUEADOS.md) para evidência, causa e correção recomendada. OK nos negativos significa reprodução do defeito.
 
 > **Adendo anterior — trocas e pivôs com aliado ativo (04/11/2026):** 22/22 métodos aprovados, sem skips, incluindo quatro novos / 32 cenários. Trocas manuais, quatro pivôs, KO na entrada e nova seleção; preservação do aliado, PP/histórico e controles com quatro hazards. ROM inalterada, sem v18. Veja [AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md](AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md). Resultados anteriores abaixo são históricos, não cumulativos.

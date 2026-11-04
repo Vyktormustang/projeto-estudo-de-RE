@@ -1,12 +1,22 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Motor parcial v18 — pivô sem efeito e Parting Shot/Soundproof
+
+**Corrigidos os dois caminhos demonstrados na v17:** Volt Switch contra Ground não troca nem aplica hazards; Parting Shot é bloqueado por Soundproof antes das quedas de atributos. Eerie Spell e os sons nativos da lista permanecem preservados.
+
+**41 métodos distintos concluídos, sem skips:** 39 controles positivos/build e dois negativos exclusivamente na base v17. Inclui 36 cenários de correção/controle de pivôs, 32 de trocas/KO sob hazards, ciclo de vida, histórico/PP, Soundproof legado e EV/IV. Não são 41 testes de fidelidade integral.
+
+Aplicador `scripts/motor_v18.py`: base v17 exata, saída nova, payload de **94 bytes**, tabela de **26 bytes**, quatro intervalos de escrita e nenhuma RAM adicional. SHA-256 da saída: `f9a96edec0f070578dfec3d134dcb6decd5b4a5f7c296fef2c8346d7b9f504b2`. Veja [MOTOR_V18.md](docs/MOTOR_V18.md) para hashes, reprodução, evidências e limites.
+
+**Histórico Soundproof mantém a semântica nativa `FFFF`, não o zero de uma troca; não certifica lastMove moderno.** Próximo recorte sugerido: histórico/consumo de PP após bloqueio por habilidade e seus consumidores. Engine parcial; nenhum save pessoal utilizado; Drive não atualizado. As seções abaixo preservam o histórico, sem somar seus resultados aos atuais.
+
 ## Auditoria v17 — divergências em pivôs bloqueados
 
 **Confirmado:** Volt Switch troca contra Ground mesmo reconhecendo a imunidade; Parting Shot ignora Soundproof, reduz atributos e troca. A segunda lacuna já era declarada nas fontes v7 e foi reproduzida na v17. As trocas indevidas aplicam hazards ao reserva.
 
 **23 métodos distintos concluídos, sem skips: 21 controles positivos e dois negativos que reproduzem os problemas.** Oito métodos novos / **36 cenários (30 positivos + seis negativos)**. Protect, absorção, Clear Body, mínimos parciais/totais, reservas inelegíveis, PP/histórico e continuidade do aliado conferidos no recorte. **OK nos testes negativos não significa conformidade moderna.**
 
-**Problemas ainda não corrigidos; ROM/payload/aplicador v17 inalterados, sem v18.** Próxima etapa: correção dirigida do veto de troca por imunidade e do bloqueio de Parting Shot por Soundproof, mantendo os controles de efeitos parciais e falta de reservas. Veja [AUDITORIA_V17_PIVOS_BLOQUEADOS.md](docs/AUDITORIA_V17_PIVOS_BLOQUEADOS.md). Engine parcial; Drive não atualizado. Resultados anteriores abaixo são históricos, não cumulativos.
+**Naquela auditoria, os problemas ainda não estavam corrigidos e a ROM v17 permaneceu inalterada. A correção posterior foi entregue na v18 acima**, mantendo os controles de efeitos parciais e falta de reservas. Veja [AUDITORIA_V17_PIVOS_BLOQUEADOS.md](docs/AUDITORIA_V17_PIVOS_BLOQUEADOS.md). Engine parcial; Drive não atualizado. Resultados anteriores abaixo são históricos, não cumulativos.
 
 ## Auditoria v17 — trocas e pivôs com aliado ativo
 
