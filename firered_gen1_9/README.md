@@ -1,12 +1,20 @@
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
+## Auditoria v17 — divergências em pivôs bloqueados
+
+**Confirmado:** Volt Switch troca contra Ground mesmo reconhecendo a imunidade; Parting Shot ignora Soundproof, reduz atributos e troca. A segunda lacuna já era declarada nas fontes v7 e foi reproduzida na v17. As trocas indevidas aplicam hazards ao reserva.
+
+**23 métodos distintos concluídos, sem skips: 21 controles positivos e dois negativos que reproduzem os problemas.** Oito métodos novos / **36 cenários (30 positivos + seis negativos)**. Protect, absorção, Clear Body, mínimos parciais/totais, reservas inelegíveis, PP/histórico e continuidade do aliado conferidos no recorte. **OK nos testes negativos não significa conformidade moderna.**
+
+**Problemas ainda não corrigidos; ROM/payload/aplicador v17 inalterados, sem v18.** Próxima etapa: correção dirigida do veto de troca por imunidade e do bloqueio de Parting Shot por Soundproof, mantendo os controles de efeitos parciais e falta de reservas. Veja [AUDITORIA_V17_PIVOS_BLOQUEADOS.md](docs/AUDITORIA_V17_PIVOS_BLOQUEADOS.md). Engine parcial; Drive não atualizado. Resultados anteriores abaixo são históricos, não cumulativos.
+
 ## Auditoria v17 — trocas e pivôs com aliado ativo
 
 **22/22 métodos distintos aprovados, sem skips**, incluindo quatro métodos novos / **32 cenários**. Trocas voluntárias nos dois bancos, U-turn, Volt Switch, Flip Turn e Parting Shot sob hazards combinados, com sobrevivência ou KO do entrante e segunda seleção. HP/atributos/histórico do aliado acompanhados por frame, PP e continuidade do turno conferidos; quatro controles incluem absorção, Web e veneno residual.
 
 **ROM/payload/aplicador inalterados, sem v18; nenhum novo defeito de engine demonstrado neste recorte.** Uma camada de Spikes na matriz nova; nos pivôs, velocidade e ordem estão acopladas ao banco, não cobrem todas as combinações. Veja [AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md](docs/AUDITORIA_V17_TROCAS_PIVOS_HAZARDS.md) para a matriz, execução e limites.
 
-Próximo recorte sugerido: pivôs impedidos/falhos e reservas inelegíveis. Engine parcial; **Drive não atualizado**. Os números das auditorias anteriores abaixo são históricos e não foram somados aos desta etapa.
+O recorte então sugerido — pivôs impedidos/falhos e reservas inelegíveis — foi auditado acima e revelou divergências fora da matriz desta etapa anterior. Engine parcial; **Drive não atualizado**. Os números das auditorias anteriores abaixo são históricos e não foram somados aos desta etapa.
 
 ## Auditoria v17 — hazards combinados nas reposições do jogador
 
