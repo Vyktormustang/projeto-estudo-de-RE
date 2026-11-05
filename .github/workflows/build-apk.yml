@@ -73,8 +73,22 @@ jobs:
       - name: 4. Gradle (com cache)
         uses: gradle/actions/setup-gradle@v4
 
-      - name: 5. Android SDK (o runner já traz platform 34 + build-tools 34)
-        uses: android-actions/setup-android@v3
+      - name: 5. Conferir o Android SDK (já vem na imagem do runner)
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK" ] || [ ! -d "$SDK" ]; then
+            echo "::error::ANDROID_HOME/ANDROID_SDK_ROOT não definido no runner"
+            exit 1
+          fi
+          echo "SDK em: $SDK"
+          echo "platforms: $(ls "$SDK/platforms" 2>/dev/null | tr '\n' ' ')"
+          echo "build-tools: $(ls "$SDK/build-tools" 2>/dev/null | tr '\n' ' ')"
+          if [ ! -d "$SDK/platforms/android-34" ]; then
+            echo "::warning::platform android-34 não encontrada; o Gradle vai tentar baixar"
+          fi
+          # Garante que o Gradle ache o SDK mesmo sem local.properties
+          echo "sdk.dir=$SDK" > android/local.properties
 
       - name: 6. Instalar dependências do frontend (versões fixadas)
         run: npm ci --no-audit --no-fund
