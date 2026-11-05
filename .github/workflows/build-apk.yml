@@ -30,7 +30,7 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write   # necessário para publicar o APK numa Release (download direto)
 
 concurrency:
   group: speaknatural-apk-${{ github.ref }}
@@ -170,7 +170,46 @@ jobs:
           if-no-files-found: error
           retention-days: 90
 
-      - name: 17. Resumo do build
+      - name: 17. Publicar o APK numa Release (link direto para baixar no celular)
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="speaknatural-v${VERSION}"
+          APK="../build-out/SpeakNatural-${VERSION}-debug.apk"
+          NOTES=$(cat <<EOF
+          ## SpeakNatural v${VERSION} — APK para Android
+
+          **Baixe o arquivo \`SpeakNatural-${VERSION}-debug.apk\` (aba *Assets* abaixo) e instale no celular.**
+
+          Como instalar:
+          1. baixe o .apk direto no celular (ou transfira por cabo/Drive);
+          2. toque no arquivo e permita "instalar apps de fontes desconhecidas";
+          3. abra o app, vá na aba **Servidor**, digite \`http://IP-DO-SEU-PC:8000\` e toque em **Testar conexão**.
+
+          Lembre-se: o APK é só a "tela"; a análise de pronúncia roda no seu PC
+          (\`start-server.bat\`). Guia completo: [speaknatural/README.md](../blob/main/speaknatural/README.md).
+
+          - commit: \`${GITHUB_SHA::7}\`
+          - gerado por: workflow "SpeakNatural — APK" (run ${GITHUB_RUN_ID})
+          EOF
+          )
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG já existe: atualizando o APK."
+            gh release upload "$TAG" "$APK" --clobber
+            gh release edit "$TAG" --notes "$NOTES" --latest
+          else
+            gh release create "$TAG" "$APK" \
+              --title "SpeakNatural v${VERSION} — APK" \
+              --notes "$NOTES" \
+              --latest
+          fi
+          echo "### Download direto" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 18. Resumo do build
         run: |
           {
             echo "### SpeakNatural — APK pronto ✅"

@@ -375,6 +375,17 @@ respeita o `.gitignore` automaticamente e é muito mais seguro.
 6. Baixe o `.zip`, e **descompacte**. Dentro está o `app-debug.apk`
    (e `SpeakNatural-1.0.0-debug.apk`, o mesmo arquivo com nome bonito).
 
+### 🎁 Atalho: link direto do APK (mais fácil no celular)
+
+Além do artifact, o workflow publica o APK numa **Release** do repositório. É o jeito
+mais rápido de instalar: **o link abre no celular e baixa o `.apk` direto** (não precisa
+de zip, nem de conta).
+
+1. No seu repositório, clique em **Releases** (coluna da direita, na página inicial).
+2. Abra a release **“SpeakNatural v1.0.0 — APK”**.
+3. Na seção **Assets**, toque em **`SpeakNatural-1.0.0-debug.apk`** — o download começa.
+4. Vá para o [PASSO 7](#9-passo-7--instalar-o-apk-no-celular).
+
 > ⚠️ O APK debug é assinado com uma chave de teste do Android. É **normal** o Android
 > avisar “app de fonte desconhecida”. Para uso pessoal, é exatamente assim que deve ser.
 >
@@ -385,7 +396,9 @@ respeita o `.gitignore` automaticamente e é muito mais seguro.
 ## 9. PASSO 7 — Instalar o APK no celular
 
 1. Envie o `app-debug.apk` para o celular de **qualquer** jeito:
-   * Google Drive (mais fácil: baixe pelo próprio celular);
+   * **mais fácil:** abra o link da **Release** (veja o atalho no PASSO 6) no próprio
+     celular e baixe o `.apk` — o arquivo cai na pasta *Downloads*;
+   * Google Drive;
    * WhatsApp para você mesmo, como **documento**;
    * cabo USB, arrastando para a pasta *Downloads*.
 2. No celular, toque no arquivo `.apk`.
