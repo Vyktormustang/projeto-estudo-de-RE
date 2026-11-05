@@ -1,0 +1,33 @@
+{
+  "name": "speaknatural-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SpeakNatural - treino de pronúncia do inglês (app web + APK)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "cap:sync": "cap sync android",
+    "cap:add": "cap add android",
+    "android": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor-community/text-to-speech": "5.1.0",
+    "@capacitor/android": "6.2.0",
+    "@capacitor/core": "6.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "6.2.0",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@vitejs/plugin-react": "4.3.4",
+    "typescript": "5.7.2",
+    "vite": "6.3.6",
+    "vitest": "2.1.8"
+  }
+}

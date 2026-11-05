@@ -13,3 +13,19 @@ forja/dist/
 forja/web/.vite/
 *.apk
 !forja/**/*.apk
+
+# --- SPEAKNATURAL ---
+speaknatural/backend/.venv/
+speaknatural/backend/data/
+speaknatural/backend/**/__pycache__/
+speaknatural/backend/.pytest_cache/
+speaknatural/frontend/node_modules/
+speaknatural/frontend/dist/
+speaknatural/frontend/android/.gradle/
+speaknatural/frontend/android/build/
+speaknatural/frontend/android/app/build/
+speaknatural/frontend/android/local.properties
+speaknatural/frontend/android/app/src/main/assets/public/
+speaknatural/frontend/android/app/src/main/assets/capacitor.config.json
+speaknatural/frontend/android/app/src/main/assets/capacitor.plugins.json
+speaknatural/build-out/
