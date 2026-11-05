@@ -15,7 +15,10 @@ import threading
 from functools import lru_cache
 from pathlib import Path
 
-from ..config import PHONEMIZER_LANGUAGE
+import os
+import sys
+
+from ..config import ESPEAK_PATH, PHONEMIZER_LANGUAGE
 from . import ipa
 
 logger = logging.getLogger(__name__)
@@ -43,6 +46,34 @@ def _load_fallback() -> dict[str, str]:
     return _fallback_dict
 
 
+def _configure_espeak_path() -> None:
+    """Ajuda o phonemizer a achar o espeak-ng quando ele nao esta no PATH.
+
+    Use SN_ESPEAK_PATH (ex.: C:\\Program Files\\eSpeak NG). O phonemizer le
+    PHONEMIZER_ESPEAK_LIBRARY / PHONEMIZER_ESPEAK_PATH, entao apontamos as duas
+    coisas e, no Windows, tambem liberamos a DLL da pasta.
+    """
+    if not ESPEAK_PATH:
+        return
+    folder = Path(ESPEAK_PATH)
+    if not folder.is_dir():
+        logger.warning("SN_ESPEAK_PATH aponta para uma pasta inexistente: %s", folder)
+        return
+    os.environ["PATH"] = f"{folder}{os.pathsep}" + os.environ.get("PATH", "")
+    if sys.platform.startswith("win"):
+        library = folder / "libespeak-ng.dll"
+        executable = folder / "espeak-ng.exe"
+        if library.exists():
+            os.environ.setdefault("PHONEMIZER_ESPEAK_LIBRARY", str(library))
+            if hasattr(os, "add_dll_directory"):
+                try:
+                    os.add_dll_directory(str(folder))
+                except OSError:  # pragma: no cover
+                    pass
+        if executable.exists():
+            os.environ.setdefault("PHONEMIZER_ESPEAK_PATH", str(executable))
+
+
 def _get_backend():
     """Cria (uma vez) o backend espeak-ng. Devolve None se nao for possivel."""
     global _backend, _backend_tried, _backend_ok, _backend_error
@@ -53,6 +84,7 @@ def _get_backend():
             return _backend
         _backend_tried = True
         try:
+            _configure_espeak_path()
             from phonemizer.backend import EspeakBackend
 
             backend = EspeakBackend(

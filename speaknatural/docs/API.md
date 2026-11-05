@@ -230,6 +230,8 @@ curl http://localhost:8000/history
 | `SN_MAX_AUDIO_SECONDS` | `60` | duração máxima aceita |
 | `SN_SILENCE_RMS` | `0.004` | sensibilidade para considerar “silêncio” |
 | `SN_FFMPEG_BIN` | `ffmpeg` | caminho do ffmpeg, se não estiver no PATH |
+| `SN_ESPEAK_PATH` | (vazio) | pasta do espeak-ng, se ele não estiver no PATH (ex.: `C:\Program Files\eSpeak NG`) |
+| `SN_PHONEMIZER_LANGUAGE` | `en-us` | idioma do espeak-ng (fonemas esperados) |
 | `SN_CORS_ORIGINS` | `*` | origens permitidas (separadas por vírgula) |
 | `SN_DATA_DIR` | `backend/data` | onde ficam banco e áudios temporários |
 | `SN_FAKE_MODELS` | `0` | `1` = modo demonstração (notas simuladas, sem IA) |

@@ -83,14 +83,19 @@ fi
 
 # ------------------------------- 5. IP --------------------------------------
 echo
+# (os "|| true" evitam que o `set -e` derrube o script quando não há IP)
 if command -v ip >/dev/null 2>&1; then
-  IPS=$(ip -4 -o addr show scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | paste -sd' ' -)
+  IPS=$(ip -4 -o addr show scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | paste -sd' ' - || true)
 elif command -v ifconfig >/dev/null 2>&1; then
-  IPS=$(ifconfig 2>/dev/null | awk '/inet /{print $2}' | grep -v '^127\.' | paste -sd' ' -)
+  IPS=$( (ifconfig 2>/dev/null | awk '/inet /{print $2}' | grep -v '^127\.' | paste -sd' ' -) || true)
 else
   IPS=""
 fi
-[ -n "${IPS:-}" ] && echo "[info] IP deste PC na rede: $IPS"
+if [ -n "${IPS:-}" ]; then
+  echo "[info] IP deste PC na rede: $IPS"
+else
+  echo "[info] Não consegui detectar o IP. Rode 'ip addr' ou 'ifconfig' para ver."
+fi
 echo "[info] No celular, use: http://IP-ACIMA:8000  (tela \"Servidor\" do app)"
 echo
 

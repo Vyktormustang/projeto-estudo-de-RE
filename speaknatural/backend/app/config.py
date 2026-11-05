@@ -63,6 +63,10 @@ PHONEME_MODEL = os.environ.get("SN_PHONEME_MODEL", "facebook/wav2vec2-xlsr-53-es
 #: Idioma para o phonemizer / espeak-ng.
 PHONEMIZER_LANGUAGE = os.environ.get("SN_PHONEMIZER_LANGUAGE", "en-us")
 
+#: Pasta onde o espeak-ng foi instalado, caso ele NAO esteja no PATH.
+#: Windows (padrao do instalador): C:\Program Files\eSpeak NG
+ESPEAK_PATH = os.environ.get("SN_ESPEAK_PATH", "").strip()
+
 #: Se "1", usa modelos falsos deterministicos (dev/testes, sem baixar 2 GB).
 #: NUNCA ligue isso no uso real: os scores passam a ser simulados.
 FAKE_MODELS = os.environ.get("SN_FAKE_MODELS", "0") == "1"

@@ -176,9 +176,18 @@ where espeak-ng
 Deve mostrar o caminho do `espeak-ng.exe`.
 
 > **Sem o espeak-ng o app funciona** — ele usa um dicionário interno de fonemas
-> (menos preciso) e mostra um aviso na tela. Se o instalador esqueceu o PATH, rode o
-> servidor assim no Prompt (dentro da pasta `speaknatural\backend`):
-> `set SN_ESPEAK_PATH=C:\Program Files\eSpeak NG` **ou** adicione essa pasta ao `Path`.
+> (menos preciso) e mostra um aviso na tela.
+>
+> Se o instalador **não** colocou o espeak-ng no PATH, o servidor avisa isso na tela
+> “Servidor” do app. Para resolver, rode o servidor apontando a pasta (Prompt, dentro de
+> `speaknatural\backend`):
+>
+> ```bat
+> set SN_ESPEAK_PATH=C:\Program Files\eSpeak NG
+> ..\start-server.bat
+> ```
+>
+> (ou adicione `C:\Program Files\eSpeak NG` ao `Path` do Windows e reabra o Prompt)
 
 <details>
 <summary><strong>Instalar no Linux (Ubuntu/Debian)</strong></summary>

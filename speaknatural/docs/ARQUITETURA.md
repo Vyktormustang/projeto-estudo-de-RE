@@ -166,7 +166,7 @@ idioma + `language` no `asr.transcribe` (hoje fixo em `"en"`).
 
 ```bash
 cd backend && python -m pytest -q       # 26 testes: IPA, alinhamento, notas, API completa
-cd frontend && npm test                 # 19 testes: formatação, endereço do servidor
+cd frontend && npm test                 # 21 testes: formatação, endereço do servidor, render sem crash
 cd frontend && npm run typecheck        # TypeScript estrito
 ```
 
