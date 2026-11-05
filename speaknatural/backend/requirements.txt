@@ -1,0 +1,27 @@
+# SpeakNatural - backend
+# Python 3.11 (testado em 3.11.2)
+# Instale com:  pip install -r requirements.txt
+# As versoes estao FIXADAS (pinadas) para o app funcionar igual em qualquer PC.
+
+# --- API ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+pydantic==2.10.4
+
+# --- Banco de dados ---
+SQLAlchemy==2.0.36
+
+# --- Reconhecimento de fala (transcricao + palavras) ---
+faster-whisper==1.1.0
+
+# --- Fonemas (IPA) com wav2vec2 ---
+transformers==4.47.1
+torch==2.5.1
+
+# --- Fonemas esperados (espeak-ng via phonemizer) ---
+phonemizer==3.3.0
+
+# --- Audio ---
+numpy==1.26.4
+soundfile==0.12.1
