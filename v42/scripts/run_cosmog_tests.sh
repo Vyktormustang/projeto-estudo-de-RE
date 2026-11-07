@@ -22,7 +22,20 @@ say() { echo "$@" | tee -a "$LOG"; }
 if [ ! -d "$WORK/firered_gen1_9" ]; then
   say "[setup] extraindo firered_gen1_9/ de $REF"
   mkdir -p "$WORK"
-  git -C "$ROOT" archive "$REF" firered_gen1_9 | tar -x -C "$WORK"
+  # O commit do motor NÃO existe em todo clone (vive no branch do PR #9). Sem
+  # buscá-lo, `git archive` falha e o tar engole um erro — o script seguia e
+  # reportava "3 falhas" como se fosse defeito de código. Buscamos a ref antes.
+  if ! git -C "$ROOT" cat-file -e "$REF^{commit}" 2>/dev/null; then
+    say "[setup] $REF ausente neste clone — buscando a ref do motor"
+    git -C "$ROOT" fetch --depth=1 origin "${GEN19_REF_BRANCH:-arena/8b7d7c0a-projeto-estudo-de-re}" >>"$LOG" 2>&1 \
+      || { say "[ERRO] não foi possível buscar o commit do motor ($REF)"; exit 2; }
+    git -C "$ROOT" cat-file -e "$REF^{commit}" 2>/dev/null \
+      || { say "[ERRO] $REF continua ausente após o fetch"; exit 2; }
+  fi
+  if ! git -C "$ROOT" archive "$REF" firered_gen1_9 | tar -x -C "$WORK"; then
+    say "[ERRO] falha ao extrair firered_gen1_9/ de $REF"; exit 2
+  fi
+  [ -d "$WORK/firered_gen1_9" ] || { say "[ERRO] extração vazia: $WORK/firered_gen1_9"; exit 2; }
 fi
 GEN="$WORK/firered_gen1_9"
 
@@ -34,12 +47,41 @@ mkdir -p "$WORK/harness"
 [ -f "$WORK/harness/gba_libretro_emu.py" ] || \
   cp "$GEN/legado/v3_original/scripts/gba_libretro_emu.py" "$WORK/harness/"
 
+# A eclosão exige ~30.600 passos reais. Com orçamento menor o teste é SKIP, e
+# unittest SAI com 0 — ou seja, "0 falhas" com a eclosão nunca executada. Este
+# piso garante que a prova não seja silenciosamente desligada.
+HATCH_MIN="${COSMOG_HATCH_MAX_STEPS_MIN:-36000}"
+if [ -n "${COSMOG_HATCH_MAX_STEPS:-}" ] && [ "${COSMOG_HATCH_MAX_STEPS}" -lt "$HATCH_MIN" ] 2>/dev/null; then
+  echo "[ERRO] COSMOG_HATCH_MAX_STEPS=${COSMOG_HATCH_MAX_STEPS} < $HATCH_MIN: a eclosão" \
+       "não seria provada e o resultado sairia como verde falso." | tee -a "$LOG"
+  exit 2
+fi
+
 FALHAS=0
 roda() {
   local nome="$1"; shift
   say "=== [$nome] ==="
   if "$@" >>"$LOG" 2>&1; then say "  PASSOU"; else say "  FALHOU"; FALHAS=$((FALHAS+1)); fi
 }
+
+# A evidência tem de SOBREVIVER ao ambiente. Os .log ficam fora do Git
+# (logs/*.log no .gitignore) e já se perderam num reset de sessão — então, ao
+# final, as linhas-prova são extraídas para um arquivo VERSIONADO.
+exportar_evidencia() {
+  local saida="$ROOT/reports/v42/EVIDENCIA_COSMOG_V42.txt"
+  [ -f "$LOG" ] || return 0
+  {
+    echo "# Evidência da suíte do Cosmog na V42 — gerada por v42/scripts/run_cosmog_tests.sh"
+    echo "# data: $(date -Is)"
+    echo "# ROM sha256: $(sha256sum "$ROM" 2>/dev/null | cut -d' ' -f1)"
+    echo "# log completo (NÃO versionado): $LOG"
+    echo
+    grep -aE '^(=== \[|  (PASSOU|FALHOU))|^Ran [0-9]+ tests|^OK|^FAILED|HATCH_[A-Z_]+|DAYCARE_SCORE|EGG_CONTRACT|NATIVE_EGG|^resumo:' "$LOG" \
+      | tr -d '\000'
+  } >"$saida"
+  say "[evidência] $saida"
+}
+trap exportar_evidencia EXIT
 
 cd "$GEN"
 export PYTHONPATH="$WORK/harness:$GEN:$GEN/tests"

@@ -282,11 +282,17 @@ class CosmogHatchTests(unittest.TestCase):
                 print(f"HATCH_PROGRESS steps={total} s={time.time()-t0:.0f} "
                       f"ainda_ovo=1 coords={pos}", flush=True)
         if not hatched:
-            self.skipTest(
-                f"orçamento de {limite} passos insuficiente: o ovo de 120 ciclos "
-                f"exige ~30.600 passos; amostragem a {self.SAMPLE_FRAMES} frames "
-                f"rende ~50 tiles/s, então aumente COSMOG_HATCH_MAX_STEPS."
-            )
+            # ATENÇÃO: unittest sai com código 0 quando o teste é SKIP, então um
+            # orçamento curto demais produzia "0 falhas" com a eclosão jamais
+            # executada — falso verde (aconteceu com COSMOG_HATCH_MAX_STEPS=200).
+            # Só pula quando o operador assumir explicitamente que não quer a
+            # prova; caso contrário, é FALHA.
+            msg = (f"orçamento de {limite} passos insuficiente: o ovo de 120 ciclos "
+                   f"exige ~30.600 passos; amostragem a {self.SAMPLE_FRAMES} frames "
+                   f"rende ~50 tiles/s, então use COSMOG_HATCH_MAX_STEPS>=36000.")
+            if os.environ.get("COSMOG_HATCH_ALLOW_SKIP") == "1":
+                self.skipTest(msg + " (skip autorizado por COSMOG_HATCH_ALLOW_SKIP=1)")
+            self.fail("NÃO CERTIFICADO: a eclosão não ocorreu. " + msg)
         self.shot("HATCH_ECLOSAO.png")
         print(f"HATCH_OCCURRED steps={total}", flush=True)
 
