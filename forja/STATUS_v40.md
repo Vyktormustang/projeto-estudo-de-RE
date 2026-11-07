@@ -70,6 +70,22 @@ O dev server (`npx vite`) agora aceita hostnames dinâmicos
 recebia **403 Blocked request** do Vite. Isso afeta **só** o dev server; o APK
 continua servindo de `file:///android_asset/`.
 
+## Build publicado (CI verde)
+
+| Item | Valor |
+|---|---|
+| Run | `FORJA — APK assinado`, commit `66b32a7` — **23/23 passos OK** |
+| Artefato | `forja-apk-40.0.0` |
+| Release | `forja-v40.0.0-canario` (pre-release) |
+| APK | `Forja_Apice_v40.0.0.apk` — 46 089 B |
+| SHA-256 | `fe78f88de74683e4cc0932b1b52b681f329b0ea849fc66408ebf792e5a07fabf` |
+| Certificado | `15:E9:23:…:8B:7C` (mesmo do v39), v1+v2+v3, zipalign OK, `uses-permission=0` |
+| Reprodutibilidade | build duplo no mesmo run → SHA idêntico |
+
+O bundle publicado foi conferido por conteúdo: `ceu-fundo`, `ceu-marcador`,
+`Madrugada`, `Entardecer` e `Ciclo de dia e noite` estão no JS/CSS do APK — o
+binário lançado carrega o ciclo do v40, não um bundle velho.
+
 ## O que o v40 NÃO faz (honesto)
 
 - **Não** traz a UI/conteúdo do v38 — o bloqueio continua o mesmo: o Drive só
