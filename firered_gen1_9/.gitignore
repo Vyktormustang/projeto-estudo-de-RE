@@ -1,0 +1,10 @@
+# ROMs, save files and downloads from the user's private Drive stay local.
+*.gba
+*.agb
+*.sav
+*.st[0-9]
+google_drive/
+rom/
+rom_mod/
+*.pyc
+__pycache__/

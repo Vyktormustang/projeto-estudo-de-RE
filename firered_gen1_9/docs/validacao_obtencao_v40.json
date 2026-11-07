@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-06",
+  "version": "v40",
+  "purpose": "Read-only acquisition audit, no new ROM",
+  "rom_sha256": "10214ba64a38a543d381db9d41eb37f46458a0926057d028dda2839b1f87e7e1",
+  "core_version": "0.10.5",
+  "core_commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+  "core_sha256": "07ab56ae80ed30486eff67ab4907b345f46ebb5e60f47f98869dc534df18dad9",
+  "python": "3.11.2",
+  "tests_run": 14,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsed_seconds": 23.245,
+  "structural_methods": 10,
+  "native_probe_methods": 4,
+  "probe_observations": 46,
+  "individually_captured_species": 0,
+  "full_campaign_certified": false,
+  "tests": [
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_1025_unique_species_and_exclusive_structural_categories",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_active_and_parked_shared_objects_are_distinct",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_cli_requires_new_output_and_never_changes_rom",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_conditional_locations_are_not_promoted_to_ordinary_access",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_cosmog_chain_and_evolution_table_layout",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_csv_determinism_and_no_certification_leak",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_native_decoder_rejects_unknown_and_operand_false_positives",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_native_events_reachable_from_actual_map_roots",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_night_data_and_raw_tables_are_separately_accounted",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40.AcquisitionAuditTests.test_wrong_rom_and_corruption_rejected",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_altering_all_variants_and_invalid_fallback_type_null_only_at_seven",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_cosmoem_level_priority_not_time_branch_and_everstone",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_cosmog_threshold_and_everstone_day_and_night",
+      "status": "passed"
+    },
+    {
+      "id": "test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_tanoby_flag_gate_and_cresselia_native_generation",
+      "status": "passed"
+    }
+  ],
+  "historical_v40_suite_rerun": false,
+  "initial_setup_error": "Incorrect core path in initial run; corrected; final full run passed",
+  "scope_limits": [
+    "Synthetic isolated calls; no natural map travel or capture",
+    "Type: Null variant selector not established",
+    "Native island access and seven event captures not established",
+    "Full evolution scenes and second Cosmog copy/repeatability not established"
+  ]
+}

@@ -1,0 +1,4 @@
+especie,nome,nivel,flag_concluido,flag_ocultacao,save_continue_confirmado,objeto_ausente_apos_reload,chegada_sintetica,bola,obtencao_normal_bilhetes_comprovada
+249,Lugia,70,02F2,009B,True,True,True,Master Ball de teste,False
+250,Ho-Oh,70,02F3,009C,True,True,True,Master Ball de teste,False
+386,Deoxys,30,02E4,0099,True,True,True,Master Ball de teste,False

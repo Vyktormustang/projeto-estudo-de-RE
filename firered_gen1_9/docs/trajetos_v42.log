@@ -1,0 +1,79 @@
+test_path_respects_collision_and_unselected_warps (test_trajetos_v42.PathAlgorithmTests.test_path_respects_collision_and_unselected_warps) ... ok
+test_each_pair_of_exits_has_collision_free_path (test_trajetos_v42.IslandTopologyTests.test_each_pair_of_exits_has_collision_free_path) ... ok
+test_reciprocal_graph_and_complete_routes (test_trajetos_v42.IslandTopologyTests.test_reciprocal_graph_and_complete_routes) ... ok
+test_v41_geometry_unchanged_and_wrong_input_rejected (test_trajetos_v42.IslandTopologyTests.test_v41_geometry_unchanged_and_wrong_input_rejected) ... ok
+test_birth_roundtrip_full_puzzle_and_deoxys (test_trajetos_v42_mgba.ContinuousIslandJourneys.test_birth_roundtrip_full_puzzle_and_deoxys) ... test_birth_roundtrip_full_puzzle_and_deoxys: start {'map': [3, 5], 'xy': [24, 32], 'synthetic': ['arrival', 'progress', 'Rainbow Pass', 'Master Balls'], 'tickets_injected': False}
+test_birth_roundtrip_full_puzzle_and_deoxys: tickets_earned {'mystic': 1, 'aurora': 1}
+test_birth_roundtrip_full_puzzle_and_deoxys: boat {'origin': [3, 5], 'destination': [2, 58], 'xy': [8, 5]}
+test_birth_roundtrip_full_puzzle_and_deoxys: warp {'origin': [2, 58], 'destination': [2, 56], 'arrival': [15, 24]}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 1, 'native_step_counter': 11}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 2, 'native_step_counter': 4}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 3, 'native_step_counter': 8}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 4, 'native_step_counter': 8}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 5, 'native_step_counter': 8}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 6, 'native_step_counter': 4}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 7, 'native_step_counter': 4}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 8, 'native_step_counter': 4}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 9, 'native_step_counter': 6}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 10, 'native_step_counter': 3}
+test_birth_roundtrip_full_puzzle_and_deoxys: puzzle {'interaction': 11, 'native_step_counter': 3}
+test_birth_roundtrip_full_puzzle_and_deoxys: capture {'species': 386, 'level': 30, 'map': [2, 56], 'party_count': 2, 'save_continue': True, 'personality': '9ff999dd'}
+test_birth_roundtrip_full_puzzle_and_deoxys: warp {'origin': [2, 56], 'destination': [2, 58], 'arrival': [8, 3]}
+test_birth_roundtrip_full_puzzle_and_deoxys: boat {'origin': [2, 58], 'destination': [3, 5], 'xy': [23, 32]}
+test_birth_roundtrip_full_puzzle_and_deoxys: complete {'manual_steps': 84, 'warp_transitions': 2, 'boat_trips': 2, 'island_maps': [[2, 56], [2, 58]], 'captured': [386], 'returned_and_saved': True}
+ok
+test_navel_roundtrip_hooh_and_lugia (test_trajetos_v42_mgba.ContinuousIslandJourneys.test_navel_roundtrip_hooh_and_lugia) ... test_navel_roundtrip_hooh_and_lugia: start {'map': [3, 5], 'xy': [24, 32], 'synthetic': ['arrival', 'progress', 'Rainbow Pass', 'Master Balls'], 'tickets_injected': False}
+test_navel_roundtrip_hooh_and_lugia: tickets_earned {'mystic': 1, 'aurora': 1}
+test_navel_roundtrip_hooh_and_lugia: boat {'origin': [3, 5], 'destination': [2, 59], 'xy': [8, 5]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 59], 'destination': [2, 0], 'arrival': [9, 16]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 0], 'destination': [2, 36], 'arrival': [8, 23]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 36], 'destination': [2, 54], 'arrival': [4, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 54], 'destination': [2, 55], 'arrival': [13, 95]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 55], 'destination': [2, 39], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 39], 'destination': [2, 40], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 40], 'destination': [2, 41], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 41], 'destination': [2, 42], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 42], 'destination': [2, 37], 'arrival': [10, 18]}
+test_navel_roundtrip_hooh_and_lugia: capture {'species': 250, 'level': 70, 'map': [2, 37], 'party_count': 2, 'save_continue': True, 'personality': '13df5c8a'}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 37], 'destination': [2, 42], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 42], 'destination': [2, 41], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 41], 'destination': [2, 40], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 40], 'destination': [2, 39], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 39], 'destination': [2, 55], 'arrival': [3, 1]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 55], 'destination': [2, 43], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 43], 'destination': [2, 44], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 44], 'destination': [2, 45], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 45], 'destination': [2, 46], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 46], 'destination': [2, 47], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 47], 'destination': [2, 48], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 48], 'destination': [2, 49], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 49], 'destination': [2, 50], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 50], 'destination': [2, 51], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 51], 'destination': [2, 52], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 52], 'destination': [2, 53], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 53], 'destination': [2, 38], 'arrival': [13, 20]}
+test_navel_roundtrip_hooh_and_lugia: capture {'species': 249, 'level': 70, 'map': [2, 38], 'party_count': 3, 'save_continue': True, 'personality': '30c96c17'}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 38], 'destination': [2, 53], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 53], 'destination': [2, 52], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 52], 'destination': [2, 51], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 51], 'destination': [2, 50], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 50], 'destination': [2, 49], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 49], 'destination': [2, 48], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 48], 'destination': [2, 47], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 47], 'destination': [2, 46], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 46], 'destination': [2, 45], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 45], 'destination': [2, 44], 'arrival': [2, 2]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 44], 'destination': [2, 43], 'arrival': [4, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 43], 'destination': [2, 55], 'arrival': [26, 1]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 55], 'destination': [2, 54], 'arrival': [11, 5]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 54], 'destination': [2, 36], 'arrival': [8, 4]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 36], 'destination': [2, 0], 'arrival': [9, 9]}
+test_navel_roundtrip_hooh_and_lugia: warp {'origin': [2, 0], 'destination': [2, 59], 'arrival': [8, 3]}
+test_navel_roundtrip_hooh_and_lugia: boat {'origin': [2, 59], 'destination': [3, 5], 'xy': [23, 32]}
+test_navel_roundtrip_hooh_and_lugia: complete {'manual_steps': 465, 'warp_transitions': 42, 'boat_trips': 2, 'island_maps': [[2, 0], [2, 36], [2, 37], [2, 38], [2, 39], [2, 40], [2, 41], [2, 42], [2, 43], [2, 44], [2, 45], [2, 46], [2, 47], [2, 48], [2, 49], [2, 50], [2, 51], [2, 52], [2, 53], [2, 54], [2, 55], [2, 59]], 'captured': [249, 250], 'returned_and_saved': True}
+ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 97.980s
+
+OK

@@ -1,0 +1,14 @@
+test_gift_scripts_not_promoted_to_normal_acquisition_and_reject_bad_input (test_ilhas_v41.IslandStructureTests.test_gift_scripts_not_promoted_to_normal_acquisition_and_reject_bad_input) ... ok
+test_map_root_progress_and_two_ticket_flag_gates (test_ilhas_v41.IslandStructureTests.test_map_root_progress_and_two_ticket_flag_gates) ... ok
+test_native_event_paths_not_raw_species_matches (test_ilhas_v41.IslandStructureTests.test_native_event_paths_not_raw_species_matches) ... ok
+test_reproducible_cli_exclusive_output_and_unchanged_rom (test_ilhas_v41.IslandStructureTests.test_reproducible_cli_exclusive_output_and_unchanged_rom) ... ok
+test_deoxys_full_triangle_puzzle_capture_and_persistence (test_ilhas_v41_mgba.IslandNativeTests.test_deoxys_full_triangle_puzzle_capture_and_persistence) ... ok
+test_ferry_ticket_and_flag_matrix_and_actual_two_destinations (test_ilhas_v41_mgba.IslandNativeTests.test_ferry_ticket_and_flag_matrix_and_actual_two_destinations) ... ok
+test_fresh_game_does_not_start_with_tickets_or_enable_flags (test_ilhas_v41_mgba.IslandNativeTests.test_fresh_game_does_not_start_with_tickets_or_enable_flags) ... ok
+test_hooh_coordinate_trigger_capture_and_persistence (test_ilhas_v41_mgba.IslandNativeTests.test_hooh_coordinate_trigger_capture_and_persistence) ... ok
+test_lugia_native_interaction_capture_and_persistence (test_ilhas_v41_mgba.IslandNativeTests.test_lugia_native_interaction_capture_and_persistence) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 144.618s
+
+OK

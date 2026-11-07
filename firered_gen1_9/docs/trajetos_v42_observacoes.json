@@ -1,0 +1,8060 @@
+{
+  "rom_sha256": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "observations": [
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "start",
+      "map": [
+        3,
+        5
+      ],
+      "xy": [
+        24,
+        32
+      ],
+      "synthetic": [
+        "arrival",
+        "progress",
+        "Rainbow Pass",
+        "Master Balls"
+      ],
+      "tickets_injected": false
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "tickets_earned",
+      "mystic": 1,
+      "aurora": 1
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "boat",
+      "origin": [
+        3,
+        5
+      ],
+      "destination": [
+        2,
+        58
+      ],
+      "xy": [
+        8,
+        5
+      ]
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "warp",
+      "origin": [
+        2,
+        58
+      ],
+      "destination": [
+        2,
+        56
+      ],
+      "arrival": [
+        15,
+        24
+      ]
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 1,
+      "native_step_counter": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 2,
+      "native_step_counter": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 3,
+      "native_step_counter": 8
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 4,
+      "native_step_counter": 8
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 5,
+      "native_step_counter": 8
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 6,
+      "native_step_counter": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 7,
+      "native_step_counter": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 8,
+      "native_step_counter": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 9,
+      "native_step_counter": 6
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 10,
+      "native_step_counter": 3
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "puzzle",
+      "interaction": 11,
+      "native_step_counter": 3
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "capture",
+      "species": 386,
+      "level": 30,
+      "map": [
+        2,
+        56
+      ],
+      "party_count": 2,
+      "save_continue": true,
+      "personality": "9ff999dd"
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "warp",
+      "origin": [
+        2,
+        56
+      ],
+      "destination": [
+        2,
+        58
+      ],
+      "arrival": [
+        8,
+        3
+      ]
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "boat",
+      "origin": [
+        2,
+        58
+      ],
+      "destination": [
+        3,
+        5
+      ],
+      "xy": [
+        23,
+        32
+      ]
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "complete",
+      "manual_steps": 84,
+      "warp_transitions": 2,
+      "boat_trips": 2,
+      "island_maps": [
+        [
+          2,
+          56
+        ],
+        [
+          2,
+          58
+        ]
+      ],
+      "captured": [
+        386
+      ],
+      "returned_and_saved": true
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "start",
+      "map": [
+        3,
+        5
+      ],
+      "xy": [
+        24,
+        32
+      ],
+      "synthetic": [
+        "arrival",
+        "progress",
+        "Rainbow Pass",
+        "Master Balls"
+      ],
+      "tickets_injected": false
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "tickets_earned",
+      "mystic": 1,
+      "aurora": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "boat",
+      "origin": [
+        3,
+        5
+      ],
+      "destination": [
+        2,
+        59
+      ],
+      "xy": [
+        8,
+        5
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        59
+      ],
+      "destination": [
+        2,
+        0
+      ],
+      "arrival": [
+        9,
+        16
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        0
+      ],
+      "destination": [
+        2,
+        36
+      ],
+      "arrival": [
+        8,
+        23
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        36
+      ],
+      "destination": [
+        2,
+        54
+      ],
+      "arrival": [
+        4,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        54
+      ],
+      "destination": [
+        2,
+        55
+      ],
+      "arrival": [
+        13,
+        95
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        55
+      ],
+      "destination": [
+        2,
+        39
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        39
+      ],
+      "destination": [
+        2,
+        40
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        40
+      ],
+      "destination": [
+        2,
+        41
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        41
+      ],
+      "destination": [
+        2,
+        42
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        42
+      ],
+      "destination": [
+        2,
+        37
+      ],
+      "arrival": [
+        10,
+        18
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "capture",
+      "species": 250,
+      "level": 70,
+      "map": [
+        2,
+        37
+      ],
+      "party_count": 2,
+      "save_continue": true,
+      "personality": "13df5c8a"
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        37
+      ],
+      "destination": [
+        2,
+        42
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        42
+      ],
+      "destination": [
+        2,
+        41
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        41
+      ],
+      "destination": [
+        2,
+        40
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        40
+      ],
+      "destination": [
+        2,
+        39
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        39
+      ],
+      "destination": [
+        2,
+        55
+      ],
+      "arrival": [
+        3,
+        1
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        55
+      ],
+      "destination": [
+        2,
+        43
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        43
+      ],
+      "destination": [
+        2,
+        44
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        44
+      ],
+      "destination": [
+        2,
+        45
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        45
+      ],
+      "destination": [
+        2,
+        46
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        46
+      ],
+      "destination": [
+        2,
+        47
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        47
+      ],
+      "destination": [
+        2,
+        48
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        48
+      ],
+      "destination": [
+        2,
+        49
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        49
+      ],
+      "destination": [
+        2,
+        50
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        50
+      ],
+      "destination": [
+        2,
+        51
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        51
+      ],
+      "destination": [
+        2,
+        52
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        52
+      ],
+      "destination": [
+        2,
+        53
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        53
+      ],
+      "destination": [
+        2,
+        38
+      ],
+      "arrival": [
+        13,
+        20
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "capture",
+      "species": 249,
+      "level": 70,
+      "map": [
+        2,
+        38
+      ],
+      "party_count": 3,
+      "save_continue": true,
+      "personality": "30c96c17"
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        38
+      ],
+      "destination": [
+        2,
+        53
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        53
+      ],
+      "destination": [
+        2,
+        52
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        52
+      ],
+      "destination": [
+        2,
+        51
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        51
+      ],
+      "destination": [
+        2,
+        50
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        50
+      ],
+      "destination": [
+        2,
+        49
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        49
+      ],
+      "destination": [
+        2,
+        48
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        48
+      ],
+      "destination": [
+        2,
+        47
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        47
+      ],
+      "destination": [
+        2,
+        46
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        46
+      ],
+      "destination": [
+        2,
+        45
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        45
+      ],
+      "destination": [
+        2,
+        44
+      ],
+      "arrival": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        44
+      ],
+      "destination": [
+        2,
+        43
+      ],
+      "arrival": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        43
+      ],
+      "destination": [
+        2,
+        55
+      ],
+      "arrival": [
+        26,
+        1
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        55
+      ],
+      "destination": [
+        2,
+        54
+      ],
+      "arrival": [
+        11,
+        5
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        54
+      ],
+      "destination": [
+        2,
+        36
+      ],
+      "arrival": [
+        8,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        36
+      ],
+      "destination": [
+        2,
+        0
+      ],
+      "arrival": [
+        9,
+        9
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        0
+      ],
+      "destination": [
+        2,
+        59
+      ],
+      "arrival": [
+        8,
+        3
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "boat",
+      "origin": [
+        2,
+        59
+      ],
+      "destination": [
+        3,
+        5
+      ],
+      "xy": [
+        23,
+        32
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "complete",
+      "manual_steps": 465,
+      "warp_transitions": 42,
+      "boat_trips": 2,
+      "island_maps": [
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          36
+        ],
+        [
+          2,
+          37
+        ],
+        [
+          2,
+          38
+        ],
+        [
+          2,
+          39
+        ],
+        [
+          2,
+          40
+        ],
+        [
+          2,
+          41
+        ],
+        [
+          2,
+          42
+        ],
+        [
+          2,
+          43
+        ],
+        [
+          2,
+          44
+        ],
+        [
+          2,
+          45
+        ],
+        [
+          2,
+          46
+        ],
+        [
+          2,
+          47
+        ],
+        [
+          2,
+          48
+        ],
+        [
+          2,
+          49
+        ],
+        [
+          2,
+          50
+        ],
+        [
+          2,
+          51
+        ],
+        [
+          2,
+          52
+        ],
+        [
+          2,
+          53
+        ],
+        [
+          2,
+          54
+        ],
+        [
+          2,
+          55
+        ],
+        [
+          2,
+          59
+        ]
+      ],
+      "captured": [
+        249,
+        250
+      ],
+      "returned_and_saved": true
+    }
+  ],
+  "trace": [
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 5,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 4,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 3
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 3,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 2
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "warp",
+      "origin": [
+        2,
+        58
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        8,
+        2
+      ],
+      "destination": [
+        2,
+        56
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        15,
+        24
+      ]
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 24,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 23
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 23,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 22
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 22,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 21
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 21,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 20
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 20,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 19
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 19,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 18
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 18,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 17
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 17,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 16
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 16,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 15
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 15,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 14,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 13,
+      "button": "LEFT",
+      "next_x": 14,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 14,
+      "y": 13,
+      "button": "LEFT",
+      "next_x": 13,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 13,
+      "button": "LEFT",
+      "next_x": 12,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 12,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 12,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 12,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 13,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 14,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 14,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 15,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 14,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 13,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 12
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 12,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 11,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 10
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 10,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 9
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 9,
+      "button": "RIGHT",
+      "next_x": 16,
+      "next_y": 9
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 16,
+      "y": 9,
+      "button": "RIGHT",
+      "next_x": 17,
+      "next_y": 9
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 17,
+      "y": 9,
+      "button": "RIGHT",
+      "next_x": 18,
+      "next_y": 9
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 9,
+      "button": "DOWN",
+      "next_x": 18,
+      "next_y": 10
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 10,
+      "button": "DOWN",
+      "next_x": 18,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 11,
+      "button": "DOWN",
+      "next_x": 18,
+      "next_y": 12
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 18,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 18,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 17,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 17,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 16,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 16,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 15,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 14,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 14,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 13,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 14,
+      "button": "UP",
+      "next_x": 13,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 13,
+      "button": "UP",
+      "next_x": 13,
+      "next_y": 12
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 12,
+      "button": "UP",
+      "next_x": 13,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 11,
+      "button": "RIGHT",
+      "next_x": 14,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 14,
+      "y": 11,
+      "button": "RIGHT",
+      "next_x": 15,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 11,
+      "button": "RIGHT",
+      "next_x": 16,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 16,
+      "y": 11,
+      "button": "RIGHT",
+      "next_x": 17,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 17,
+      "y": 11,
+      "button": "LEFT",
+      "next_x": 16,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 16,
+      "y": 11,
+      "button": "LEFT",
+      "next_x": 15,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 11,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 12
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 13,
+      "button": "LEFT",
+      "next_x": 14,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 14,
+      "y": 13,
+      "button": "LEFT",
+      "next_x": 13,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 13,
+      "button": "LEFT",
+      "next_x": 12,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 12,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 12,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 12,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 13,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 13,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 14,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 14,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 15,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 16,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 16,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 17,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 17,
+      "y": 14,
+      "button": "RIGHT",
+      "next_x": 18,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 18,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 17,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 17,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 16,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 16,
+      "y": 14,
+      "button": "LEFT",
+      "next_x": 15,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 14,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 13,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 12
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 12,
+      "button": "UP",
+      "next_x": 15,
+      "next_y": 11
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 11,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 12
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 13
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 14
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 14,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 15
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 15,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 16
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 16,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 17
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 17,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 18
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 18,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 19
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 19,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 20
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 20,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 21
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 21,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 22
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 22,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 23
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 56,
+      "x": 15,
+      "y": 23,
+      "button": "DOWN",
+      "next_x": 15,
+      "next_y": 24
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "warp",
+      "origin": [
+        2,
+        56
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        15,
+        24
+      ],
+      "destination": [
+        2,
+        58
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        8,
+        3
+      ]
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 5
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 5,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 2,
+      "map": 58,
+      "x": 8,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 5
+    },
+    {
+      "journey": "test_birth_roundtrip_full_puzzle_and_deoxys",
+      "kind": "walk",
+      "group": 3,
+      "map": 5,
+      "x": 23,
+      "y": 32,
+      "button": "UP",
+      "next_x": 23,
+      "next_y": 31
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 5,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 4,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 3,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        59
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        8,
+        2
+      ],
+      "destination": [
+        2,
+        0
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        9,
+        16
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 16,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 15,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 14,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 13,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 12,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 11
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 11,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 10
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 10,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 9
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 9,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 8
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        0
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        9,
+        8
+      ],
+      "destination": [
+        2,
+        36
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        8,
+        23
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 23,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 22
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 22,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 21
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 21,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 20,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 19
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 19,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 18,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 17,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 16,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 15,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 14,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 13,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 12,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 11
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 11,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 10
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 10,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 9
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 9,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 8
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 8,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 7
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 7,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 6
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 6,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 5,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        36
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        8,
+        4
+      ],
+      "destination": [
+        2,
+        54
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 4,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 5,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 5,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 6,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 6,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 7,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 7,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 8,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 8,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 9,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 9,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 10,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 10,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 11,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 11,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 11,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 11,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        54
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        11,
+        5
+      ],
+      "destination": [
+        2,
+        55
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        13,
+        95
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 13,
+      "y": 95,
+      "button": "RIGHT",
+      "next_x": 14,
+      "next_y": 95
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 95,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 94
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 94,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 93
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 93,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 92
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 92,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 91
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 91,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 90
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 90,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 89
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 89,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 88
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 88,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 87
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 87,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 86
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 86,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 85
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 85,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 84
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 84,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 83
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 83,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 82
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 82,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 81
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 81,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 80
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 80,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 79
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 79,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 78
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 78,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 77
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 77,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 76
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 76,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 75
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 75,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 74
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 74,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 73
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 73,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 72
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 72,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 71
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 71,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 70
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 70,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 69
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 69,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 68
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 68,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 67
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 67,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 66
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 66,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 65
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 65,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 64
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 64,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 63
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 63,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 62
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 62,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 61
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 61,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 60
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 60,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 59
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 59,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 58
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 58,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 57
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 57,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 56
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 56,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 55
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 55,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 54
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 54,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 53
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 53,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 52
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 52,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 51
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 51,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 50
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 50,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 49
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 49,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 48
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 48,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 47
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 47,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 46
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 46,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 45
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 45,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 44
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 44,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 43
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 43,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 42
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 42,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 41
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 41,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 40
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 40,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 39
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 39,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 38
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 38,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 37
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 37,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 36
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 36,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 35
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 35,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 34
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 34,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 33
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 33,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 32
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 32,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 31
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 31,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 30
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 30,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 29
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 29,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 28
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 28,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 27
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 27,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 26
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 26,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 25
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 25,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 24
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 24,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 23
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 23,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 22
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 22,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 21
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 21,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 20,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 19
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 19,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 18,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 17,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 16,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 15,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 14,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 13,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 12,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 11
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 11,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 10
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 10,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 9
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 9,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 8
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 8,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 7
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 7,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 6
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 6,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 5,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 4,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 3,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 2,
+      "button": "UP",
+      "next_x": 14,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 13,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 13,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 12,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 12,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 11,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 11,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 10,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 10,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 9,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 9,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 8,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 8,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 7,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 7,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 6,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 6,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 5,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 5,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 4,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 4,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        55
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        3,
+        1
+      ],
+      "destination": [
+        2,
+        39
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        39
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        40
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        40
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        41
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        41
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        42
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        42
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        37
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        10,
+        18
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 10,
+      "y": 18,
+      "button": "UP",
+      "next_x": 10,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 10,
+      "y": 17,
+      "button": "UP",
+      "next_x": 10,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 10,
+      "y": 16,
+      "button": "LEFT",
+      "next_x": 9,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 16,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 15,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 14,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 13,
+      "button": "UP",
+      "next_x": 9,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 14,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 15,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 9,
+      "y": 16,
+      "button": "RIGHT",
+      "next_x": 10,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 10,
+      "y": 16,
+      "button": "DOWN",
+      "next_x": 10,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 37,
+      "x": 10,
+      "y": 17,
+      "button": "DOWN",
+      "next_x": 10,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        37
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        10,
+        18
+      ],
+      "destination": [
+        2,
+        42
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 42,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        42
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        41
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 41,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        41
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        40
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 40,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        40
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        39
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 39,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        39
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        55
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        3,
+        1
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 3,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 4,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 5,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 5,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 6,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 6,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 7,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 7,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 8,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 8,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 9,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 9,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 10,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 10,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 11,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 11,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 12,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 12,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 13,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 13,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 14,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 15,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 15,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 16,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 16,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 17,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 17,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 18,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 18,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 19,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 19,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 20,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 20,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 21,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 21,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 22,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 22,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 23,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 23,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 24,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 24,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 25,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 25,
+      "y": 1,
+      "button": "RIGHT",
+      "next_x": 26,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        55
+      ],
+      "warp_id": 2,
+      "warp_xy": [
+        26,
+        1
+      ],
+      "destination": [
+        2,
+        43
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        43
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        44
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        44
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        45
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        45
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        46
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        46
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        47
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        47
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        48
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        48
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        49
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        49
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        50
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        50
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        51
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        51
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        52
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 4,
+      "y": 4,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 3,
+      "y": 4,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 3,
+      "y": 3,
+      "button": "UP",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        52
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        53
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 3,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 4,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 4,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        53
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        38
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        13,
+        20
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 13,
+      "y": 20,
+      "button": "LEFT",
+      "next_x": 12,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 12,
+      "y": 20,
+      "button": "LEFT",
+      "next_x": 11,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 11,
+      "y": 20,
+      "button": "UP",
+      "next_x": 11,
+      "next_y": 19
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 11,
+      "y": 19,
+      "button": "UP",
+      "next_x": 11,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 11,
+      "y": 18,
+      "button": "LEFT",
+      "next_x": 10,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 10,
+      "y": 18,
+      "button": "UP",
+      "next_x": 10,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 10,
+      "y": 17,
+      "button": "UP",
+      "next_x": 10,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 10,
+      "y": 16,
+      "button": "DOWN",
+      "next_x": 10,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 10,
+      "y": 17,
+      "button": "DOWN",
+      "next_x": 10,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 10,
+      "y": 18,
+      "button": "RIGHT",
+      "next_x": 11,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 11,
+      "y": 18,
+      "button": "DOWN",
+      "next_x": 11,
+      "next_y": 19
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 11,
+      "y": 19,
+      "button": "DOWN",
+      "next_x": 11,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 11,
+      "y": 20,
+      "button": "RIGHT",
+      "next_x": 12,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 38,
+      "x": 12,
+      "y": 20,
+      "button": "RIGHT",
+      "next_x": 13,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        38
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        13,
+        20
+      ],
+      "destination": [
+        2,
+        53
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 53,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        53
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        52
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 52,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        52
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        51
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 51,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        51
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        50
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 50,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        50
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        49
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 49,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        49
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        48
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 48,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        48
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        47
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 47,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        47
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        46
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 46,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        46
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        45
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 45,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        45
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        44
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        2,
+        2
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 2,
+      "y": 2,
+      "button": "RIGHT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 3,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 3,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 3,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 44,
+      "x": 3,
+      "y": 4,
+      "button": "RIGHT",
+      "next_x": 4,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        44
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        4
+      ],
+      "destination": [
+        2,
+        43
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        4,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 4,
+      "y": 4,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 4,
+      "y": 3,
+      "button": "UP",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 4,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 3,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 43,
+      "x": 3,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 2,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        43
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        2,
+        2
+      ],
+      "destination": [
+        2,
+        55
+      ],
+      "destination_id": 2,
+      "arrival_xy": [
+        26,
+        1
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 26,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 25,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 25,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 24,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 24,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 23,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 23,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 22,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 22,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 21,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 21,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 20,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 20,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 19,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 19,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 18,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 18,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 17,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 17,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 16,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 16,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 15,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 15,
+      "y": 1,
+      "button": "LEFT",
+      "next_x": 14,
+      "next_y": 1
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 1,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 2,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 5,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 6
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 6,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 7
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 7,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 8
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 8,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 9
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 9,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 10
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 10,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 11
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 11,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 14,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 15,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 16,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 17,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 18,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 19
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 19,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 20,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 21
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 21,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 22
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 22,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 23
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 23,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 24
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 24,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 25
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 25,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 26
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 26,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 27
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 27,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 28
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 28,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 29
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 29,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 30
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 30,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 31
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 31,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 32
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 32,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 33
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 33,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 34
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 34,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 35
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 35,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 36
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 36,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 37
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 37,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 38
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 38,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 39
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 39,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 40
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 40,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 41
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 41,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 42
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 42,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 43
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 43,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 44
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 44,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 45
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 45,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 46
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 46,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 47
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 47,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 48
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 48,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 49
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 49,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 50
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 50,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 51
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 51,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 52
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 52,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 53
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 53,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 54
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 54,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 55
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 55,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 56
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 56,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 57
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 57,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 58
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 58,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 59
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 59,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 60
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 60,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 61
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 61,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 62
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 62,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 63
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 63,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 64
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 64,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 65
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 65,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 66
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 66,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 67
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 67,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 68
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 68,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 69
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 69,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 70
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 70,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 71
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 71,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 72
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 72,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 73
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 73,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 74
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 74,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 75
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 75,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 76
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 76,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 77
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 77,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 78
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 78,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 79
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 79,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 80
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 80,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 81
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 81,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 82
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 82,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 83
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 83,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 84
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 84,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 85
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 85,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 86
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 86,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 87
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 87,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 88
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 88,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 89
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 89,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 90
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 90,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 91
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 91,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 92
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 92,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 93
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 93,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 94
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 94,
+      "button": "DOWN",
+      "next_x": 14,
+      "next_y": 95
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 55,
+      "x": 14,
+      "y": 95,
+      "button": "LEFT",
+      "next_x": 13,
+      "next_y": 95
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        55
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        13,
+        95
+      ],
+      "destination": [
+        2,
+        54
+      ],
+      "destination_id": 1,
+      "arrival_xy": [
+        11,
+        5
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 5,
+      "button": "UP",
+      "next_x": 11,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 4,
+      "button": "UP",
+      "next_x": 11,
+      "next_y": 3
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 3,
+      "button": "UP",
+      "next_x": 11,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 11,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 10,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 10,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 9,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 9,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 8,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 8,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 7,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 7,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 6,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 6,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 5,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 54,
+      "x": 5,
+      "y": 2,
+      "button": "LEFT",
+      "next_x": 4,
+      "next_y": 2
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        54
+      ],
+      "warp_id": 0,
+      "warp_xy": [
+        4,
+        2
+      ],
+      "destination": [
+        2,
+        36
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        8,
+        4
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 5,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 6
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 6,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 7
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 7,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 8
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 8,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 9
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 9,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 10
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 10,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 11
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 11,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 14,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 15,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 16,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 17
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 17,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 18
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 18,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 19
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 19,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 20
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 20,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 21
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 21,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 22
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 36,
+      "x": 8,
+      "y": 22,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 23
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        36
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        8,
+        23
+      ],
+      "destination": [
+        2,
+        0
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        9,
+        9
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 9,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 10
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 10,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 11
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 11,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 12
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 12,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 13
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 13,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 14
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 14,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 15
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 0,
+      "x": 9,
+      "y": 15,
+      "button": "DOWN",
+      "next_x": 9,
+      "next_y": 16
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "warp",
+      "origin": [
+        2,
+        0
+      ],
+      "warp_id": 1,
+      "warp_xy": [
+        9,
+        16
+      ],
+      "destination": [
+        2,
+        59
+      ],
+      "destination_id": 0,
+      "arrival_xy": [
+        8,
+        3
+      ]
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 3,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 5,
+      "button": "UP",
+      "next_x": 8,
+      "next_y": 4
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 2,
+      "map": 59,
+      "x": 8,
+      "y": 4,
+      "button": "DOWN",
+      "next_x": 8,
+      "next_y": 5
+    },
+    {
+      "journey": "test_navel_roundtrip_hooh_and_lugia",
+      "kind": "walk",
+      "group": 3,
+      "map": 5,
+      "x": 23,
+      "y": 32,
+      "button": "UP",
+      "next_x": 23,
+      "next_y": 31
+    }
+  ]
+}

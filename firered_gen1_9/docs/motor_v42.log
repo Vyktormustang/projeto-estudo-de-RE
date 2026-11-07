@@ -1,0 +1,24 @@
+test_all_inventory_flag_combinations_idempotent_and_no_capture_reset (test_motor_v42.TicketScriptTests.test_all_inventory_flag_combinations_idempotent_and_no_capture_reset) ... ok
+test_full_bag_partial_delivery_retry_and_repair_without_room (test_motor_v42.TicketScriptTests.test_full_bag_partial_delivery_retry_and_repair_without_room) ... ok
+test_progress_pass_and_questlog_guards (test_motor_v42.TicketScriptTests.test_progress_pass_and_questlog_guards) ... ok
+test_text_bounds_and_reservations (test_motor_v42.TicketScriptTests.test_text_bounds_and_reservations) ... ok
+test_bad_input_rejected_and_item_ids_are_actual_rainbow_not_tea (test_motor_v42.MotorV42BuildTests.test_bad_input_rejected_and_item_ids_are_actual_rainbow_not_tea) ... ok
+test_cli_new_output_only_and_input_unchanged (test_motor_v42.MotorV42BuildTests.test_cli_new_output_only_and_input_unchanged) ... ok
+test_exact_rebuild_and_only_declared_three_ranges (test_motor_v42.MotorV42BuildTests.test_exact_rebuild_and_only_declared_three_ranges) ... ok
+test_previous_encounters_guide_events_and_evolutions_identical (test_motor_v42.MotorV42BuildTests.test_previous_encounters_guide_events_and_evolutions_identical) ... ok
+test_all_variants_1800_quantiles_plus_invalid_fallback_day_night (test_motor_v42_mgba.MotorV42NativeTests.test_all_variants_1800_quantiles_plus_invalid_fallback_day_night) ... ok
+test_deoxys_full_triangle_puzzle_capture_and_persistence (test_motor_v42_mgba.MotorV42NativeTests.test_deoxys_full_triangle_puzzle_capture_and_persistence) ... ok
+test_eligible_receive_both_repeat_and_native_trips (test_motor_v42_mgba.MotorV42NativeTests.test_eligible_receive_both_repeat_and_native_trips) ... ok
+test_ferry_ticket_and_flag_matrix_and_actual_two_destinations (test_motor_v42_mgba.MotorV42NativeTests.test_ferry_ticket_and_flag_matrix_and_actual_two_destinations) ... ok
+test_fresh_game_does_not_start_with_tickets_or_enable_flags (test_motor_v42_mgba.MotorV42NativeTests.test_fresh_game_does_not_start_with_tickets_or_enable_flags) ... ok
+test_full_key_pocket_partial_delivery_retry_and_capture_flags (test_motor_v42_mgba.MotorV42NativeTests.test_full_key_pocket_partial_delivery_retry_and_capture_flags) ... ok
+test_hooh_coordinate_trigger_capture_and_persistence (test_motor_v42_mgba.MotorV42NativeTests.test_hooh_coordinate_trigger_capture_and_persistence) ... ok
+test_lugia_native_interaction_capture_and_persistence (test_motor_v42_mgba.MotorV42NativeTests.test_lugia_native_interaction_capture_and_persistence) ... ok
+test_native_inventory_flag_matrix_repairs_without_duplicates (test_motor_v42_mgba.MotorV42NativeTests.test_native_inventory_flag_matrix_repairs_without_duplicates) ... ok
+test_native_progress_and_real_rainbow_pass_guards (test_motor_v42_mgba.MotorV42NativeTests.test_native_progress_and_real_rainbow_pass_guards) ... ok
+test_v41_save_upgrade_without_reentry_and_downgrade_roundtrip (test_motor_v42_mgba.MotorV42NativeTests.test_v41_save_upgrade_without_reentry_and_downgrade_roundtrip) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 220.527s
+
+OK

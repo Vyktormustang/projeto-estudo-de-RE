@@ -1,0 +1,602 @@
+{
+  "version": "v39",
+  "date": "2026-11-06",
+  "base_version": "v38",
+  "base_sha256": "e22695512ef007fbeacd36f643440393528e9e43fc17224eac83ea04e63593c2",
+  "output_sha256": "a7d35f5f92b8aae0618d32b8dc0b822d086c0325c030f509f0aaac8f2a08bac5",
+  "output_bytes": 33554432,
+  "payload_sha256": "3be6658a6340b27a7b2070dedf61f75e8fa85bce131ec63a9a9b0d449e2de327",
+  "payload_bytes": 296,
+  "compiler": "Zig 0.17.1",
+  "policy_sha256": "d8a12087ec21492fc29f32eeffcff6577748fb271467997ccb81531283039c95",
+  "core_version": "mGBA libretro 0.10.5",
+  "core_source_commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+  "core_sha256": "574d504a8b49338ee883f1461a92460a21c239f5620b47cea87d83ff848b0429",
+  "independent_payload_rebuild_identical": true,
+  "independent_rom_rebuild_identical": true,
+  "tests": 103,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 875.707,
+  "run_mode": "parallel, 3 isolated worker processes; wall time",
+  "test_ids": [
+    "test_motor_v39_audit_mgba.MotorV39AuditTests.test_berry_forest_day_night_capture_and_cold_flash",
+    "test_motor_v39_audit_mgba.MotorV39AuditTests.test_live_dawn_dusk_before_natural_encounter_visible_and_hidden",
+    "test_motor_v39_audit_mgba.MotorV39AuditTests.test_pattern_bush_day_night_capture_and_cold_flash",
+    "test_motor_v39_audit_mgba.MotorV39AuditTests.test_sevault_canyon_day_night_capture_and_cold_flash",
+    "test_motor_v39_audit_mgba.MotorV39AuditTests.test_sevault_entrance_day_night_capture_and_cold_flash",
+    "test_motor_v39_audit_mgba.MotorV39AuditTests.test_sevault_native_connection_roundtrip_day_night_and_flash",
+    "test_motor_v39.MotorV39BuildTests.test_complete_encounter_guide_and_native_tables_unchanged",
+    "test_motor_v39.MotorV39BuildTests.test_expanded_encounter_reserve_and_menu_boundaries",
+    "test_motor_v39.MotorV39BuildTests.test_hash_reproducibility_and_corruption_rejected",
+    "test_motor_v39.MotorV39BuildTests.test_old_65_menu_entries_preserved_and_twenty_lists_valid",
+    "test_motor_v39.MotorV39BuildTests.test_only_eight_ranges_and_previous_gameplay_payloads_untouched",
+    "test_motor_v39.MotorV39BuildTests.test_payload_vectors_hashes_and_corrupt_policy_rejected",
+    "test_motor_v39.MotorV39BuildTests.test_previous_sixty_night_tables_policy_and_guide_prefix_unchanged",
+    "test_motor_v39.MotorV39BuildTests.test_protected_slots_retained_and_new_replacements_reject_protected_species",
+    "test_motor_v39.MotorV39BuildTests.test_slot_exceptions_cannot_target_preserved_slots",
+    "test_motor_v39.MotorV39DataTests.test_exclusive_output",
+    "test_motor_v39.MotorV39DataTests.test_script_only_safe_commands_and_internal_branch_targets",
+    "test_motor_v39.MotorV39DataTests.test_text_layout_and_all_sixtyfour_species_pairs_match_policy",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_all_1440_minutes_leading_zeroes_and_invalid_values",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_busy_native_oam_and_affine_matrix_are_never_borrowed",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_context_fade_script_invalid_save_and_oam_disabled_hide_release",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_exact_pixels_and_only_owned_vram_palette_oam_modified",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_live_rollovers_and_saturated_native_play_time_remains_separate",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_live_start_party_help_and_return_without_overlay",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_new_wrapper_matches_v24_clock_and_save_bytes_and_preserves_abi",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_repeated_release_reacquire_and_separate_native_resets_no_leaks",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_resource_exhaustion_tiles_metadata_and_palettes_fail_closed",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_suppressed_native_oam_transfer_cleans_old_hud_without_affine_write",
+    "test_motor_v39_hud_mgba.MotorV39HudTests.test_unsupported_display_modes_hide_without_vram_or_palette_writes",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_all_64_single_bit_errors_foreign_records_and_invalid_pointers_refused",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_cold_migration_uses_real_legacy_pocket_and_refuses_foreign_extension",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_default_shown_and_read_only_no_automatic_bag_migration",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_hidden_keeps_pre_and_postcap_world_clock_running_and_releases_resources",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_live_native_settings_button_modes_and_select_remain_independent",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_live_select_hold_once_and_show_hide_without_changing_native_options",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_native_hidden_flash_reload_and_v38_downgrade_preserves_setting",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_native_navigation_chords_and_abi_pass_through",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_owned_preference_toggle_only_eight_save_bytes_and_clock_unchanged",
+    "test_motor_v39_preferences_mgba.MotorV39PreferenceTests.test_title_temporary_screens_fades_and_inactive_options_cannot_toggle",
+    "test_motor_v39_regressions.MotorV39BagTests.test_all_287_tm_hm_counts_and_clock_survive_native_flash",
+    "test_motor_v39_regressions.MotorV39BagTests.test_all_58_legacy_and_229_modern",
+    "test_motor_v39_regressions.MotorV39BagTests.test_live_pages_teaching_and_help_option",
+    "test_motor_v39_regressions.MotorV39BagTests.test_native_bag_backup_preserves_extension",
+    "test_motor_v39_regressions.MotorV39BagTests.test_quantity_limits_and_neighbors",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_cold_migration_deferred_outside_normal_outdoor_field",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_corrupt_foreign_and_out_of_range_records_fail_closed",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_cycles_boundaries_native_stop_start_reset_and_unknown_mode",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_lazy_existing_migration_precedes_clock_and_preserves_legacy_tms",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_live_two_complete_world_days_and_paused_time",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_native_pokedude_temporary_pocket_cannot_initialize_clock",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_postcap_live_night_palette_party_menu_and_return",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_postcap_real_battle_eevee_evolutions_day_and_night",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_precap_native_frames_seconds_hours_and_exact_transition",
+    "test_motor_v39_regressions.MotorV39ClockTests.test_unsafe_pointers_fields_and_getter_read_only_abi",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_all_100_native_slot_rolls_sixtyfour_maps_day_night_levels_and_checksums",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_live_new_dungeons_night_encounters_native_palette_and_clock_after_flash_bootstrap",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_live_walking_night_encounter_and_native_sweet_scent_on_route1",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_postcap_sixtyfour_maps_with_panel_shown_and_hidden",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_repel_still_blocks_lower_levels_but_unchecked_generation_works",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_selector_boundaries_maps_area_guards_and_no_rng_or_save_writes",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_sign_native_helper_uses_only_transient_result_not_saved_flags",
+    "test_motor_v39_encounters_mgba.MotorV39EncounterTests.test_water_and_nonpilot_cave_generation_identical_to_native_at_night",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_all_sixtyfour_area_choices_both_periods_and_no_saved_flags",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_b_returns_submenu_to_correct_parent_and_exits_top",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_existing_native_menu_ids_render_and_cancel",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_explicit_voltar_and_sair_options",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_hidden_preference_and_postcap_clock_continue_inside_guide",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_menu_wrap_and_repeated_open_close_without_stuck_tasks",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_rules_complete_and_period_snapshot_refresh",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_rules_from_second_page_refresh_and_return_to_first",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_rules_from_third_page_refresh_and_return_to_first",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_second_page_wrap_and_sair",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_third_page_back_voltar_wrap_and_sair",
+    "test_motor_v39_guide_mgba.MotorV39GuideTests.test_utilities_cancel_and_explicit_voltar_return_to_origin",
+    "test_motor_v39_regressions.MotorV39ExperienceTests.test_batalha_natural_sem_editar_hp_atributos_nivel_ou_exp",
+    "test_motor_v39_regressions.MotorV39ExperienceTests.test_subida_nivel10_para11_e_retorno_ao_mapa",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_budew_riolu_day_only_other_evolutions_and_item_modes_unchanged",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_clock_start_hour_day_rollovers_and_saved_old_playtime",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_eevee_day_night_thresholds_everstone_and_sylveon_priority",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_flash_save_reload_keeps_clock_phase_and_native_format",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_indoor_cave_underwater_fade_and_disabled_transfer_not_tinted",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_invalid_pointer_and_fields_safe_default",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_live_field_menu_progress_and_restore_without_writes_during_play",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_live_night_palette_field_party_and_return",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_phases_boundaries",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_real_battle_evolution_day_night_and_clock_progress",
+    "test_motor_v39_regressions.MotorV39PriorClockTests.test_tint_terrain_only_all_four_phases_preserves_source_ui_obj",
+    "test_motor_v39_regressions.MotorV39SoundproofTests.test_growl_e_hyper_voice_nativos_continuam_bloqueados",
+    "test_motor_v39_regressions.MotorV39SoundproofTests.test_historico_soundproof_nativo_e_acao_seguinte",
+    "test_motor_v39_gameplay_mgba.MotorV39GameplayTests.test_capture_day_and_night_identity_ball_consumption_and_flash_reload",
+    "test_motor_v39_gameplay_mgba.MotorV39GameplayTests.test_native_v38_v39_flash_pre_and_postcap_and_downgrade_roundtrip",
+    "test_motor_v39_gameplay_mgba.MotorV39GameplayTests.test_natural_pallet_route1_roundtrip_day_and_night",
+    "test_motor_v39_gameplay_mgba.MotorV39GameplayTests.test_night_escape_returns_control_without_adding_pokemon",
+    "test_motor_v39_gameplay_mgba.MotorV39GameplayTests.test_poke_ball_capture_consumption_and_native_ball_metadata",
+    "test_treino_ev_mgba.TreinoMGBATests.test_510_e_evs_253_255_sao_preservados",
+    "test_treino_ev_mgba.TreinoMGBATests.test_60_segundos_com_rascunho_nao_alteram_equipe",
+    "test_treino_ev_mgba.TreinoMGBATests.test_cancelar_descarta_rascunho",
+    "test_treino_ev_mgba.TreinoMGBATests.test_confirmar_so_redistribui_pontos_e_preserva_outros_dados",
+    "test_treino_ev_mgba.TreinoMGBATests.test_contextos_inseguros_e_checksum_invalido_nao_editam",
+    "test_treino_ev_mgba.TreinoMGBATests.test_copia_desatualizada_nao_sobrescreve_equipe",
+    "test_treino_ev_mgba.TreinoMGBATests.test_hp_desmaiado_ferido_e_underflow",
+    "test_treino_ev_mgba.TreinoMGBATests.test_limite_255_transferencia_parcial_e_saldo",
+    "test_treino_ev_mgba.TreinoMGBATests.test_seis_slots_e_troca_na_tela"
+  ],
+  "synthetic_only": true,
+  "personal_saves_used": false,
+  "total_encounter_areas": 64,
+  "new_areas": [
+    "MAP_CERULEAN_CAVE_1F",
+    "MAP_CERULEAN_CAVE_2F",
+    "MAP_CERULEAN_CAVE_B1F",
+    "MAP_SEAFOAM_ISLANDS_1F"
+  ],
+  "previous_areas_preserved": 60,
+  "previous_policy_rows_preserved": 120,
+  "previous_csv_rows_preserved": 1440,
+  "new_save_fields": 0,
+  "hud_clock_options_unchanged": true,
+  "new_night_species": [
+    {
+      "map": "MAP_CERULEAN_CAVE_1F",
+      "slots": [
+        2,
+        3
+      ],
+      "species": [
+        197,
+        461
+      ],
+      "nominal_percent_each": 10
+    },
+    {
+      "map": "MAP_CERULEAN_CAVE_2F",
+      "slots": [
+        2,
+        3
+      ],
+      "species": [
+        94,
+        442
+      ],
+      "nominal_percent_each": 10
+    },
+    {
+      "map": "MAP_CERULEAN_CAVE_B1F",
+      "slots": [
+        2,
+        3
+      ],
+      "species": [
+        635,
+        452
+      ],
+      "nominal_percent_each": 10
+    },
+    {
+      "map": "MAP_SEAFOAM_ISLANDS_1F",
+      "slots": [
+        3,
+        4
+      ],
+      "species": [
+        225,
+        220
+      ],
+      "nominal_percent_each": 10
+    }
+  ],
+  "guide": {
+    "place": "Route1 sign; original directions retained",
+    "groups": [
+      "Rotas 1,2,22 / Floresta",
+      "Rotas 3,4,24,25",
+      "Rotas 5 a 8",
+      "Rotas 9 a 12",
+      "Rotas 13 a 16",
+      "Rotas 17,18,21N,23",
+      "Ilhas 1,2,3",
+      "Ilhas 5,6",
+      "Bosques / Ilha 7",
+      "Grutas de Kanto",
+      "Icefall - Ilha 4",
+      "Mansao Pokemon",
+      "Liga / Usina",
+      "Seafoam - Subsolos",
+      "Mt. Ember - Rubi",
+      "Cerulean / Seafoam"
+    ],
+    "menu_ids": [
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84
+    ],
+    "old_native_menu_entries_preserved": 65,
+    "area_pages": 64,
+    "top_menu_options": 8,
+    "utility_menu": [
+      "Horarios / regras",
+      "Voltar",
+      "Sair"
+    ],
+    "B_at_top_exits": true,
+    "entry_delay_frames": 2,
+    "persistent_state": false,
+    "group_selection_pages": 3,
+    "second_page_options": 8,
+    "menu_counts": [
+      8,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      3,
+      8,
+      7
+    ],
+    "B_at_second_page_returns_to_first": true,
+    "utilities_return_to_origin": true,
+    "third_page_options": 7,
+    "third_page_groups": [
+      "Mansao Pokemon",
+      "Liga / Usina",
+      "Seafoam - Subsolos",
+      "Mt. Ember - Rubi",
+      "Cerulean / Seafoam"
+    ],
+    "B_at_third_page_returns_to_second": true,
+    "utility_origins": 3,
+    "previous_area_texts_preserved": 60
+  },
+  "patch_ranges": [
+    {
+      "offset": "00164340",
+      "size": 8
+    },
+    {
+      "offset": "01125000",
+      "size": 296
+    },
+    {
+      "offset": "01126000",
+      "size": 4352
+    },
+    {
+      "offset": "001393B0",
+      "size": 4
+    },
+    {
+      "offset": "007C20D8",
+      "size": 4
+    },
+    {
+      "offset": "01128000",
+      "size": 1528
+    },
+    {
+      "offset": "01128600",
+      "size": 2197
+    },
+    {
+      "offset": "01129000",
+      "size": 4482
+    }
+  ],
+  "coverage": {
+    "area_consultations": 128,
+    "old_native_menu_ids_tested": [
+      0,
+      15,
+      31,
+      39,
+      64
+    ],
+    "formatter_minutes": 1440,
+    "bitmap_minutes": 1440,
+    "live_world_frames": 172800,
+    "hidden_continuity_checks_frames": 120,
+    "encounter_quantile_cases": 12800,
+    "postcap_selector_cases_with_visible_hidden_preference": 1280,
+    "guide_csv_rows": 1536,
+    "policy_rows": 128,
+    "tm_hm_quantities_with_clock_and_hidden_preference": 287,
+    "new_indoor_idle_frames_each_period": 120,
+    "new_indoor_palette_colors_compared": 208,
+    "new_indoor_periods_each": 2,
+    "new_indoors_with_both_night_species_naturally_encountered": 4
+  },
+  "native_flash_paths": [
+    "v38 -> v39 -> v38 -> v39, default visible, pre/post cap",
+    "v39 -> v39 -> v38 -> v39, hidden, pre/post cap"
+  ],
+  "command": "MOTOR_V39_ROM=deliver/v39/FireRed_Gen1-9_motor_v39.gba MOTOR_V39_BASE=deliver/v38/FireRed_Gen1-9_motor_v38.gba MGBA_CORE=/path/mgba_libretro.so TREINO_TEST_ROM=deliver/v39/FireRed_Gen1-9_motor_v39.gba python firered_gen1_9/scripts/validar_motor_v39.py --jobs 3 --log /tmp/v39-final.log",
+  "limitations": [
+    "Selected regression suite, not full campaign or hardware certification",
+    "New-area arrival uses a warp-only copy then native flash into exact ROM; no normal Cerulean Cave/Seafoam access, postgame requirements, Surf/Strength puzzles, Mewtwo/Articuno/fixed events or full progression proof",
+    "Water, fishing, Rock Smash, access requirements and events unchanged",
+    "Five old menus opened/cancelled with temporary scripts, not full service workflows",
+    "Quantiles are deterministic, not natural walking frequency estimates",
+    "No personal save used or certified",
+    "Hidden continuity probes use 120 frames; long two-day probe uses visible preference",
+    "No RTC/offline progression or real-link certification",
+    "Distribution is project design, not full Scarlet/Violet fidelity",
+    "Six prior audit methods cover the v32 island areas, not captures in the new Cerulean Cave/Seafoam 1F areas"
+  ],
+  "repel_synthetic_leader_level": 100,
+  "repel_fixture_note": "Synthetic leader 100 exceeds all covered levels, including retained native 67 slots; no ROM level changed for tests.",
+  "screenshots_visual_check": {
+    "count": 14,
+    "exact_release_rom": true,
+    "synthetic_only": true
+  },
+  "story_scripts_unchanged": true,
+  "new_area_retained_slot_examples": [
+    {
+      "map": "MAP_CERULEAN_CAVE_1F",
+      "slot": 5,
+      "species": 798,
+      "level": 52,
+      "nominal_percent": 10
+    },
+    {
+      "map": "MAP_CERULEAN_CAVE_2F",
+      "slot": 5,
+      "species": 987,
+      "level": 55,
+      "nominal_percent": 10
+    },
+    {
+      "map": "MAP_CERULEAN_CAVE_B1F",
+      "slot": 4,
+      "species": 993,
+      "level": 52,
+      "nominal_percent": 10
+    },
+    {
+      "map": "MAP_SEAFOAM_ISLANDS_1F",
+      "slot": 2,
+      "species": 795,
+      "level": 31,
+      "nominal_percent": 10
+    }
+  ],
+  "new_area_native_rates": [
+    7,
+    7,
+    7,
+    7
+  ],
+  "prior_audit_coverage_rerun": {
+    "capture_cold_flash_cases": 12,
+    "capture_ball": "Master Ball; deterministic capture path, not catch-rate study",
+    "capture_day_controls": 4,
+    "capture_night_hidden_pre_cap": 4,
+    "capture_night_visible_post_cap": 4,
+    "captured_identity_and_full_100_bytes_preserved": true,
+    "initial_party_mon_preserved": true,
+    "ball_consumption_persists": true,
+    "live_dawn_dusk_cases": 4,
+    "live_dawn_dusk_wait_frames_each": 120,
+    "boundary_area": "MAP_THREE_ISLAND_BERRY_FOREST",
+    "local_connection_roundtrips_and_flash": 2,
+    "connection_maps": [
+      [
+        3,
+        63
+      ],
+      [
+        3,
+        64
+      ]
+    ],
+    "connection_cases": [
+      "day / visible HUD",
+      "night / hidden HUD"
+    ],
+    "area_cases": [
+      {
+        "map": "MAP_THREE_ISLAND_BERRY_FOREST",
+        "day": [
+          858,
+          32
+        ],
+        "night_hidden": [
+          708,
+          32
+        ],
+        "night_postcap": [
+          756,
+          30
+        ]
+      },
+      {
+        "map": "MAP_SIX_ISLAND_PATTERN_BUSH",
+        "day": [
+          919,
+          14
+        ],
+        "night_hidden": [
+          48,
+          14
+        ],
+        "night_postcap": [
+          168,
+          6
+        ]
+      },
+      {
+        "map": "MAP_SEVEN_ISLAND_SEVAULT_CANYON_ENTRANCE",
+        "day": [
+          622,
+          10
+        ],
+        "night_hidden": [
+          228,
+          10
+        ],
+        "night_postcap": [
+          198,
+          48
+        ]
+      },
+      {
+        "map": "MAP_SEVEN_ISLAND_SEVAULT_CANYON",
+        "day": [
+          937,
+          46
+        ],
+        "night_hidden": [
+          229,
+          46
+        ],
+        "night_postcap": [
+          430,
+          50
+        ]
+      }
+    ]
+  },
+  "prior_audit_methods_rerun": 6,
+  "slot_exceptions": {
+    "MAP_ROUTE13": [
+      3,
+      4
+    ],
+    "MAP_POKEMON_MANSION_1F": [
+      3,
+      4
+    ],
+    "MAP_POKEMON_MANSION_3F": [
+      3,
+      4
+    ],
+    "MAP_POKEMON_MANSION_B1F": [
+      2,
+      4
+    ],
+    "MAP_VICTORY_ROAD_3F": [
+      3,
+      4
+    ],
+    "MAP_SEAFOAM_ISLANDS_B2F": [
+      2,
+      5
+    ],
+    "MAP_SEAFOAM_ISLANDS_B3F": [
+      2,
+      4
+    ],
+    "MAP_SEAFOAM_ISLANDS_B4F": [
+      3,
+      4
+    ],
+    "MAP_MT_EMBER_RUBY_PATH_1F": [
+      3,
+      4
+    ],
+    "MAP_MT_EMBER_RUBY_PATH_B3F": [
+      2,
+      4
+    ],
+    "MAP_SEAFOAM_ISLANDS_1F": [
+      3,
+      4
+    ]
+  },
+  "new_indoor_bootstrap": {
+    "own_boot_in_warp_only_copy": true,
+    "native_flash_into_exact_release": true,
+    "no_cross_rom_savestate": true,
+    "delivered_rom_has_warps": false
+  },
+  "new_indoor_night_tint_added": false,
+  "new_area_native_map_types": [
+    4,
+    4,
+    4,
+    4
+  ],
+  "focused_validation": [
+    {
+      "suite": "Cerulean Cave and Seafoam 1F walking/palette/clock",
+      "passed": true,
+      "methods": 1,
+      "areas": 4,
+      "seconds": 175.752
+    },
+    {
+      "suite": "third-page navigation, rules and utilities",
+      "passed": true,
+      "methods": 3,
+      "seconds": 53.414
+    }
+  ],
+  "unexpanded_ruby_stairs": [
+    {
+      "map": "MAP_MT_EMBER_RUBY_PATH_B1F_STAIRS",
+      "group": 1,
+      "number": 107,
+      "unchanged": true,
+      "night_table_added": false
+    },
+    {
+      "map": "MAP_MT_EMBER_RUBY_PATH_B2F_STAIRS",
+      "group": 1,
+      "number": 108,
+      "unchanged": true,
+      "night_table_added": false
+    }
+  ],
+  "seafoam_1f_added_in_this_release": {
+    "night_table_added": true,
+    "selected_slots": [
+      3,
+      4
+    ],
+    "retained_example": {
+      "slot": 2,
+      "species": 795,
+      "level": 31
+    }
+  },
+  "layout_guards": {
+    "encounter_table_bytes": 4352,
+    "encounter_reserve_bytes": 8192,
+    "menu_table_bytes": 1528,
+    "menu_reserved_bytes": 1536,
+    "old_4KiB_reserve_rejected": true,
+    "menu_script_overlap_rejected": true
+  }
+}

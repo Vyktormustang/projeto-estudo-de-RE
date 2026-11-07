@@ -1,0 +1,163 @@
+{
+  "date": "2026-11-06",
+  "version": "v41",
+  "base_sha256": "10214ba64a38a543d381db9d41eb37f46458a0926057d028dda2839b1f87e7e1",
+  "output_sha256": "662225325c50af5aeb568da97a10110cff300aff55e1a6ec87f0d11c1a5f5d50",
+  "rom_size": 33554432,
+  "changed_bytes": 30,
+  "records_changed": 8,
+  "changed_ranges": [
+    {
+      "offset": "007B7660",
+      "size": 4
+    },
+    {
+      "offset": "007B7698",
+      "size": 4
+    },
+    {
+      "offset": "007B76D0",
+      "size": 4
+    },
+    {
+      "offset": "007B7708",
+      "size": 4
+    },
+    {
+      "offset": "007B7740",
+      "size": 4
+    },
+    {
+      "offset": "007B7778",
+      "size": 4
+    },
+    {
+      "offset": "007B77B0",
+      "size": 4
+    },
+    {
+      "offset": "007B7820",
+      "size": 4
+    }
+  ],
+  "tests_run": 15,
+  "passed": 15,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "elapsed_seconds": 84.083,
+  "structural_methods": 8,
+  "mgba_methods": 7,
+  "quantile_cases": 2200,
+  "previous_night_selector_cases": 272,
+  "live_captures": [
+    {
+      "probe": "walking_capture_flash_roundtrip",
+      "minute": 600,
+      "variant": 0,
+      "species": 772,
+      "level": 20,
+      "ball": "synthetic Master Ball",
+      "natural_island_travel": false,
+      "delay": 4,
+      "party_preserved": true,
+      "v41_save_counter": 2,
+      "v40_resave_counter": 3
+    },
+    {
+      "probe": "walking_capture_flash_roundtrip",
+      "minute": 1320,
+      "variant": 0,
+      "species": 772,
+      "level": 20,
+      "ball": "synthetic Master Ball",
+      "natural_island_travel": false,
+      "delay": 4,
+      "party_preserved": true,
+      "v41_save_counter": 2,
+      "v40_resave_counter": 3
+    }
+  ],
+  "mechanism": {
+    "script_offset": "008799BA",
+    "variable": "4024",
+    "increment": 1,
+    "reset_at": 10,
+    "cave_objects": 0,
+    "cave_coordinate_events": 0,
+    "cave_background_events": 0,
+    "normal_delivery_verified": false
+  },
+  "tests": [
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_all_nine_variants_one_type_null_no_species_removed",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_complete_reproducible_csv",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_exact_hash_rebuild_and_only_30_changed_bytes",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_fixed_native_events_and_evolutions_identical",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_mystery_event_script_and_no_local_selector",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_night_tables_and_guide_preserved",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_original_variant7_and_all_other_maps_unchanged",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41.MotorV41BuildTests.test_reject_wrong_input_existing_output_and_links",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_68_existing_night_selectors_preserved_at_boundaries",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_all_variants_1800_quantiles_plus_invalid_fallback_day_night",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_cosmoem_level_priority_not_time_branch_and_everstone",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_cosmog_threshold_and_everstone_day_and_night",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_live_walk_capture_day_night_flash_and_v40_roundtrip",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_repel_blocks_type_null_and_unchecked_generation_works",
+      "status": "passed"
+    },
+    {
+      "id": "test_motor_v41_mgba.MotorV41NativeTests.test_tanoby_flag_gate_and_cresselia_native_generation",
+      "status": "passed"
+    }
+  ],
+  "core_version": "0.10.5",
+  "core_commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+  "core_sha256": "07ab56ae80ed30486eff67ab4907b345f46ebb5e60f47f98869dc534df18dad9",
+  "historical_103_test_suite_rerun": false,
+  "limits": [
+    "Synthetic cave arrival, not full campaign travel",
+    "Master Ball capture, not ordinary catch-rate validation",
+    "Live captures on variant 0; isolated generation covers all variants",
+    "No personal saves, external event delivery or hardware tested"
+  ]
+}

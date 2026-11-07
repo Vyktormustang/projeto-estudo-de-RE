@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "tests": 19,
+  "expected": 19,
+  "seconds": 220.527,
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "base_sha256": "662225325c50af5aeb568da97a10110cff300aff55e1a6ec87f0d11c1a5f5d50",
+  "rom_sha256": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "core_sha256": "07ab56ae80ed30486eff67ab4907b345f46ebb5e60f47f98869dc534df18dad9",
+  "classes": [
+    "test_motor_v42.TicketScriptTests",
+    "test_motor_v42.MotorV42BuildTests",
+    "test_motor_v42_mgba.MotorV42NativeTests"
+  ],
+  "synthetic_only": true
+}

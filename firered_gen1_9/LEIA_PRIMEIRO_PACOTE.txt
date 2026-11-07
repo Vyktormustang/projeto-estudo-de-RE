@@ -1,0 +1,6 @@
+Repasse de 31/10/2026; veja docs/REPASSE_CLAUDE.md e a issue VYK-57.
+Fontes experimentais, não versão final. Não inclui ROM, save, save state ou core mGBA.
+O ZIP histórico aninhado foi reduzido ao driver e fontes/hex necessários.
+O builder legado registra um mod defeituoso e pode sobrescrever sua saída.
+Verifique integridade com: sha256sum -c MANIFESTO_SHA256.txt
+Dados PokéAPI: veja data/POKEAPI_LICENSE.txt.

@@ -1,0 +1,61 @@
+{
+  "base_sha256": "662225325c50af5aeb568da97a10110cff300aff55e1a6ec87f0d11c1a5f5d50",
+  "rom_sha256": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "size": 33554432,
+  "changed_bytes": 535,
+  "ranges": [
+    {
+      "offset": "0x18f32d",
+      "length": 7,
+      "changed_bytes": 6
+    },
+    {
+      "offset": "0x1135000",
+      "length": 247,
+      "changed_bytes": 247
+    },
+    {
+      "offset": "0x1135400",
+      "length": 287,
+      "changed_bytes": 282
+    }
+  ],
+  "sailor_pointer_offset": "0x7c0f3c",
+  "sailor_pointer_unchanged": true,
+  "original_prefix_replayed": "6a5a217e400300",
+  "native_resume": "0x818f334",
+  "guards": {
+    "scene_var": "407E",
+    "scene_value": 3,
+    "progress_var": "4076",
+    "minimum_progress": 5,
+    "rainbow_pass_item": 368,
+    "questlog_playback_guard": true,
+    "questlog_playback_test": "structural only"
+  },
+  "ticket_items": [
+    370,
+    371
+  ],
+  "enabled_flags": [
+    "084A",
+    "084B"
+  ],
+  "persistent_save_format_changed": false,
+  "reverse_proof": true,
+  "observation_counts": {
+    "variant_quantiles": 22,
+    "deoxys_puzzle_stage": 10,
+    "deoxys_puzzle_solved": 1,
+    "native_event_capture": 3,
+    "earned_ticket_trip": 2,
+    "ferry_matrix": 16,
+    "ferry_stage": 2,
+    "native_ferry_trip": 2,
+    "fresh_game": 2,
+    "v42_capacity": 1,
+    "v42_delivery_matrix": 16,
+    "v42_guard": 7,
+    "v42_legacy_flash": 1
+  }
+}

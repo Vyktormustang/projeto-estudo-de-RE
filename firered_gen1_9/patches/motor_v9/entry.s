@@ -1,0 +1,56 @@
+.syntax unified
+.cpu arm7tdmi
+.thumb
+.section .entry,"ax",%progbits
+.align 2
+.global entry_battle_init_v9,entry_turn_start_v9,entry_endturn_v9
+.global entry_get_hold_effect_v9
+.global entry_attackcanceler_v9,entry_critcalc_v9
+.global entry_damage_v9,entry_typecalc_v9,entry_switchineffects_v9
+.global entry_oneshot_prep_v9,entry_oneshot_apply_v9
+.global entry_multi_prep_v9,entry_multi_pre_fx_v9
+.global entry_multi_next_stat_v9,entry_multi_post_fx_v9
+.global entry_strength_sap_prep_v9,entry_strength_sap_heal_v9
+.global entry_wish_sac_prep_v9
+.global entry_shed_tail_prep_v9,entry_shed_tail_install_v9
+.global entry_cleanse_prep_v9,entry_cleanse_step_v9
+.global entry_turn_ctrl_exec_v9
+.global entry_final_gambit_prep_v9,entry_final_gambit_dmg_v9
+.global entry_natural_gift_prep_v9
+.global entry_restore_tgt_v9,entry_dark_void_step_v9
+.macro VECTOR name,dest
+.thumb_func
+\name:
+ ldr r3,1f
+ bx r3
+ .align 2
+1: .word \dest
+.endm
+VECTOR entry_battle_init_v9,hook_battle_init_v9
+VECTOR entry_turn_start_v9,hook_turn_start_v9
+VECTOR entry_endturn_v9,hook_endturn_v9
+VECTOR entry_get_hold_effect_v9,hook_get_hold_effect_v9
+VECTOR entry_attackcanceler_v9,hook_attackcanceler_v9
+VECTOR entry_critcalc_v9,hook_critcalc_v9
+VECTOR entry_damage_v9,hook_damage_v9
+VECTOR entry_typecalc_v9,hook_typecalc_v9
+VECTOR entry_switchineffects_v9,hook_switchineffects_v9
+VECTOR entry_oneshot_prep_v9,hook_oneshot_prep_v9
+VECTOR entry_oneshot_apply_v9,hook_oneshot_apply_v9
+VECTOR entry_multi_prep_v9,hook_multi_prep_v9
+VECTOR entry_multi_pre_fx_v9,hook_multi_pre_fx_v9
+VECTOR entry_multi_next_stat_v9,hook_multi_next_stat_v9
+VECTOR entry_multi_post_fx_v9,hook_multi_post_fx_v9
+VECTOR entry_strength_sap_prep_v9,hook_strength_sap_prep_v9
+VECTOR entry_strength_sap_heal_v9,hook_strength_sap_heal_v9
+VECTOR entry_wish_sac_prep_v9,hook_wish_sac_prep_v9
+VECTOR entry_shed_tail_prep_v9,hook_shed_tail_prep_v9
+VECTOR entry_shed_tail_install_v9,hook_shed_tail_install_v9
+VECTOR entry_cleanse_prep_v9,hook_cleanse_prep_v9
+VECTOR entry_cleanse_step_v9,hook_cleanse_step_v9
+VECTOR entry_turn_ctrl_exec_v9,hook_turn_ctrl_exec_v9
+VECTOR entry_final_gambit_prep_v9,hook_final_gambit_prep_v9
+VECTOR entry_final_gambit_dmg_v9,hook_final_gambit_dmg_v9
+VECTOR entry_natural_gift_prep_v9,hook_natural_gift_prep_v9
+VECTOR entry_restore_tgt_v9,hook_restore_tgt_v9
+VECTOR entry_dark_void_step_v9,hook_dark_void_step_v9
