@@ -172,3 +172,91 @@ footer {
   margin-top: 28px;
   line-height: 1.6;
 }
+
+/* ---------------- ciclo de dia e noite (v40) ---------------- */
+
+.cartao-ceu {
+  position: relative;
+  overflow: hidden;
+  transition:
+    background-color 1.2s ease,
+    color 1.2s ease,
+    border-color 1.2s ease;
+  background: var(--ceu-fundo, var(--bg-2));
+  border-color: color-mix(in srgb, var(--ceu-destaque, var(--brasa)) 35%, transparent);
+  color: var(--ceu-texto, var(--texto));
+}
+
+.cartao-ceu h2 {
+  color: var(--ceu-destaque, var(--brasa));
+}
+
+.ceu-topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ceu-topo strong {
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+}
+
+.ceu-sol {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: radial-gradient(
+    circle at 35% 35%,
+    var(--ceu-destaque, var(--brasa-2)),
+    transparent 70%
+  );
+  box-shadow: 0 0 18px 2px color-mix(in srgb, var(--ceu-destaque, var(--brasa)) 55%, transparent);
+  transition: opacity 1.2s ease;
+}
+
+.ceu-barra {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  margin: 6px 0 12px;
+  background: linear-gradient(
+    90deg,
+    #07070c 0%,
+    #2a1e26 18%,
+    #ffb347 28%,
+    #f2efe9 42%,
+    #ff8c3a 66%,
+    #ff6b2c 74%,
+    #0a0d1a 84%,
+    #07070c 100%
+  );
+}
+
+.ceu-marcador {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 16px;
+  margin-left: -2px;
+  border-radius: 2px;
+  transform: translateY(-50%);
+  background: #fff;
+  box-shadow: 0 0 6px 1px rgba(0, 0, 0, 0.7);
+  transition: left 0.6s ease;
+}
+
+.cartao-ceu .nota {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--ceu-texto, var(--texto)) 70%, transparent);
+}
+
+.cartao-ceu .botoes button {
+  background: var(--ceu-superficie, var(--bg-2));
+  color: var(--ceu-texto, var(--texto));
+  border-color: color-mix(in srgb, var(--ceu-destaque, var(--brasa)) 45%, transparent);
+}

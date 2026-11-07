@@ -1,0 +1,48 @@
+{
+  "base": {
+    "arquivo": "FireRed_Gen1-9_motor_v42.gba",
+    "sha256": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+    "tamanho": 33554432,
+    "fonte": "Google Drive (pasta Motor v42)"
+  },
+  "mod": {
+    "arquivo": "rom_mod/MOD_BAG_V42.gba",
+    "sha256": "c1a861eb0ecef1b14d19248d9594dfa94f392ea9a9ccbe50884396581b3a5721",
+    "tamanho": 33554432
+  },
+  "hook": {
+    "site": "0x0808EB88",
+    "callsites": 203,
+    "prologo": "30 b5 81 b0 6b 46 04 04",
+    "veneer": "00 4b 18 47 01 0c eb 08",
+    "trampolim": "0x08EB0C00",
+    "tamanho_trampolim": 154
+  },
+  "mochila": {
+    "pocket_items": "0x0202B79C",
+    "slots": "0x202d3ac",
+    "capacidade": 42,
+    "pocket_balls": "0x0202B7A4",
+    "capacidade_balls": 30,
+    "slot_vazio": "00 00 69 25",
+    "leitura": "ponteiro resolvido em runtime"
+  },
+  "combo": "A+B+DOWN",
+  "porque_esse_combo": "na base Gen1-9 o motor usa L/R e SELECT para telas de AJUDA; L+R abre AJUDA, SELECT abre dica (controle negativo), e qualquer um deles impede o menu START de abrir depois. A+B+DOWN não colide: o menu abre idêntico à ROM limpa (md5 263f4133).",
+  "evidencia": {
+    "itens_escritos": "01 00 63 00 02 00 63 00 03 00 63 00 04 00 63 00 0d 00 63 00 13 00 63 00 2d 00 63 00 39 00 63 00",
+    "menu_md5": "263f4133 (igual à ROM limpa)",
+    "screenshot": "reports/ptbr_v42_bolsa_cheia.png"
+  },
+  "armadilhas_confirmadas": [
+    "0x08AEC910 está OCUPADO na V42 (trampolim sobre dados = congelamento)",
+    "o site 0x080BDB58 congela o jogo ao ser desviado (qualquer payload)",
+    "o pocket mudou de 0x0202B718 para 0x0202B79C (+0x84)",
+    "L+R+START, START+SELECT e variantes colidem com a AJUDA nativa do motor"
+  ],
+  "nao_certificado": [
+    "persistência após SAVE/Continuar no hardware",
+    "combo em mapas com scripts de NPC ativos",
+    "campanha completa (chegadas e progresso são sintéticos)"
+  ]
+}

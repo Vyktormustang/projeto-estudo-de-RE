@@ -1,0 +1,37 @@
+=== [gba_callgraph] ===
+self-test: 7/7 verificações OK
+  self-test: PASSOU
+=== [gba_disasm] ===
+self-test: 9/9 verificações OK
+  self-test: PASSOU
+=== [gba_hook_code] ===
+self-test: 7/7 verificações OK
+  self-test: PASSOU
+=== [gba_ident] ===
+self-test: 16/16 verificações OK (fixture: /home/user/gba-re/tests/fixture_sintetico.gba — ROM SINTÉTICA, não é um jogo)
+  self-test: PASSOU
+=== [gba_libretro_emu] ===
+  [PASS] core .so existe
+  [PASS] 22 símbolos libretro exportados
+  [PASS] retro_api_version==1
+  [PASS] FMT_CODES mapeia os 3 formats libretro
+  [PASS] encoder PNG produz assinatura PNG
+self-test: 5/5 verificações OK
+  self-test: PASSOU
+=== [gba_patch_text] ===
+self-test: 7/7 verificações OK
+  self-test: PASSOU
+=== [gba_poketext] ===
+self-test: 13/13 verificações OK
+  self-test: PASSOU
+=== [gba_state_dump] ===
+usage: gba_state_dump.py [-h] [--read READ] [--patch PATCH] [-o O]
+                         [--diff STATE_B 0xINI 0xFIM]
+                         state
+gba_state_dump.py: error: the following arguments are required: state
+  self-test: FALHOU
+=== [gba_table_probe] ===
+self-test: 3/3 verificações OK
+  self-test: PASSOU
+===============================
+resumo: 1 script(s) com self-test falho — log: logs/tests_20261015_012129.log

@@ -1,0 +1,19 @@
+{
+  "_comentario": "Remap do charset Pokemon Gen3 descoberto EMPIRICAMENTE nesta ROM (traducao PT-BR). Cada entrada tem evidencia em hypotheses.md (H-0006): pares 'sonda com curinga' -> byte observado em 100% ou ampla maioria dos hits, com contextos decodificados legiveis. Entradas apenas no bloco EXTENSAO; o nucleo (letras/digitos/espaco) nao foi alterado pela traducao.",
+  "_evidencias": {
+    "0x17": "'está'(287 hits dominação da sonda), 'vários', 'fácil'",
+    "0x19": "'opções' (curinga dupla: byte=0x19 antes de 0xF5), 'criança', 'Saudações'",
+    "0x1B": "'POKéMON' (1811 hits, byte-3 sempre 0x1B), 'é' em 'Você é bom nisso'",
+    "0x1C": "'Você ' (sonda: 556/556 hits com 0x1C)",
+    "0x68": "'importância' (contexto unico, 1 ocorrência — confiança média)",
+    "0xF4": "'não', 'botão' (17/17), 'chão', 'estão' — slot livre da tabela original",
+    "0xF5": "'botões' (4/4), 'opções', 'Saudações' — slot livre da tabela original"
+  },
+  "0x17": "á",
+  "0x19": "ç",
+  "0x1B": "é",
+  "0x1C": "ê",
+  "0x68": "â",
+  "0xF4": "ã",
+  "0xF5": "õ"
+}

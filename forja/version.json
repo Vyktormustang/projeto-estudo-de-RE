@@ -1,6 +1,6 @@
 {
-  "name": "39.0.0",
-  "code": 3900,
+  "name": "40.0.0",
+  "code": 4000,
   "applicationId": "br.forja.apice",
   "minSdk": 24,
   "targetSdk": 34,

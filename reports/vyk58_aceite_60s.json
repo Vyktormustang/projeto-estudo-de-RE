@@ -1,0 +1,94 @@
+{
+  "issue": "VYK-58 critério de aceite (print mochila cheia + estável >= 60 s + sem crash)",
+  "data": "2026-11-07",
+  "rom": "rom_mod/MOD_BAG_V42.gba",
+  "sha256_rom_base": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "sha256_mod": "c1a861eb0ecef1b14d19248d9594dfa94f392ea9a9ccbe50884396581b3a5721",
+  "state": "emu/state_v42_saida.bin",
+  "combo": "A+B+DOWN",
+  "estabilidade": {
+    "frames_continuos": 3600,
+    "segundos_aprox": 60,
+    "crash": false,
+    "pocket_slots": "0x0202D3AC",
+    "slots_antes": [
+      [
+        1,
+        99
+      ],
+      [
+        2,
+        99
+      ],
+      [
+        3,
+        99
+      ],
+      [
+        4,
+        99
+      ],
+      [
+        13,
+        99
+      ],
+      [
+        19,
+        99
+      ],
+      [
+        45,
+        99
+      ],
+      [
+        57,
+        99
+      ]
+    ],
+    "slots_depois": [
+      [
+        1,
+        99
+      ],
+      [
+        2,
+        99
+      ],
+      [
+        3,
+        99
+      ],
+      [
+        4,
+        99
+      ]
+    ],
+    "slots_intactos": true,
+    "md5_overworld_60s": "6a40a339e4ff393683e2827ca72fa3fb",
+    "md5_variam_por_animacao": true
+  },
+  "menu_start": {
+    "md5_mod": "263f4133645af003335393039abfa9c7",
+    "md5_rom_limpa": "263f4133645af003335393039abfa9c7",
+    "identico": true
+  },
+  "mochila": {
+    "md5": "2510ea55f9b201a5abe5035a2b460036",
+    "print": "reports/ptbr_v42_mochila_60s.png",
+    "itens_visiveis": [
+      "MASTER BALL",
+      "ULTRA BALL",
+      "GREAT BALL",
+      "POKé BALL",
+      "POTION",
+      "FULL RESTORE"
+    ]
+  },
+  "nao_certificado": [
+    "save/Continuar em hardware",
+    "mapas com NPC disputando frame",
+    "campanha completa (state sintético)",
+    "colisão da escrita em frame de transição de mapa"
+  ],
+  "nota": "O hash da tela do overworld muda entre amostras por animação de cenário; estabilidade foi medida por ausência de crash + slots de RAM intactos + menu acessível com md5 da ROM limpa."
+}

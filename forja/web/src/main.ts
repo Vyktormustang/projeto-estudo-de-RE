@@ -9,6 +9,18 @@
  */
 import './style.css';
 import {
+  avancar,
+  faseDe,
+  horaFormatada,
+  luminosidade,
+  minutosAteProximaFase,
+  minutosDaData,
+  minutosDe,
+  paletaDe,
+  rotuloFase,
+  type MinutosDoDia,
+} from './dia-noite';
+import {
   categoriaElo,
   CHAVE_COFRE,
   cofreVazio,
@@ -23,7 +35,7 @@ declare const __FORJA_VERSAO__: string;
 declare const __FORJA_COMMIT__: string;
 declare const __FORJA_BUILD_TIME__: string;
 
-const VERSAO = typeof __FORJA_VERSAO__ === 'string' ? __FORJA_VERSAO__ : '39.0.0';
+const VERSAO = typeof __FORJA_VERSAO__ === 'string' ? __FORJA_VERSAO__ : '40.0.0';
 const COMMIT = typeof __FORJA_COMMIT__ === 'string' ? __FORJA_COMMIT__ : 'local';
 const BUILD = typeof __FORJA_BUILD_TIME__ === 'string' ? __FORJA_BUILD_TIME__ : new Date().toISOString();
 
@@ -58,6 +70,31 @@ raiz.innerHTML = `
         <p class="sub">Sistema do Ápice · v${VERSAO} · build de canário</p>
       </div>
     </header>
+
+    <section class="cartao cartao-ceu" id="ceu">
+      <h2>Ciclo de dia e noite</h2>
+      <div class="ceu-topo">
+        <span class="ceu-sol" id="ceu-sol" aria-hidden="true"></span>
+        <div>
+          <strong id="ceu-hora" class="mono">--:--</strong>
+          <span id="ceu-fase" class="sub">—</span>
+        </div>
+      </div>
+      <div class="ceu-barra" role="img" aria-label="Posição do dia">
+        <span id="ceu-marcador" class="ceu-marcador"></span>
+      </div>
+      <div class="linha"><span>Luminosidade</span><span id="ceu-lum" class="mono">—</span></div>
+      <div class="linha"><span>Próxima mudança</span><span id="ceu-proxima" class="mono">—</span></div>
+      <div class="botoes" style="margin-top:12px">
+        <button id="ceu-menos">− 1 h</button>
+        <button id="ceu-agora">Agora</button>
+        <button id="ceu-mais">+ 1 h</button>
+      </div>
+      <p class="nota">
+        O relógio começa no horário do aparelho e a paleta acompanha a fase:
+        madrugada, amanhecer, dia, entardecer e noite.
+      </p>
+    </section>
 
     <section class="cartao">
       <h2>Pipeline de APK</h2>
@@ -115,6 +152,74 @@ raiz.querySelectorAll<HTMLButtonElement>('button[data-res]').forEach((btn) => {
     cofre = registrarPartida(cofre, 1500, res);
     salvarCofre(cofre);
     pintar();
+
+/* ---------------- ciclo de dia e noite ---------------- */
+
+const elCeu = document.querySelector<HTMLElement>('#ceu');
+const elHora = document.querySelector<HTMLElement>('#ceu-hora');
+const elFase = document.querySelector<HTMLElement>('#ceu-fase');
+const elLum = document.querySelector<HTMLElement>('#ceu-lum');
+const elProxima = document.querySelector<HTMLElement>('#ceu-proxima');
+const elMarcador = document.querySelector<HTMLElement>('#ceu-marcador');
+const elSol = document.querySelector<HTMLElement>('#ceu-sol');
+
+let agora: MinutosDoDia = minutosDaData(new Date());
+
+function pintarCeu(): void {
+  const fase = faseDe(agora);
+  const paleta = paletaDe(agora);
+  const lum = luminosidade(agora);
+
+  if (elCeu) {
+    elCeu.style.setProperty('--ceu-fundo', paleta.fundo);
+    elCeu.style.setProperty('--ceu-superficie', paleta.superficie);
+    elCeu.style.setProperty('--ceu-texto', paleta.texto);
+    elCeu.style.setProperty('--ceu-destaque', paleta.destaque);
+    elCeu.dataset.fase = fase;
+  }
+  if (elHora) elHora.textContent = horaFormatada(agora);
+  if (elFase) elFase.textContent = rotuloFase(fase);
+  if (elLum) elLum.textContent = `${Math.round(lum * 100)}%`;
+  if (elProxima) {
+    const falta = minutosAteProximaFase(agora);
+    const h = Math.floor(falta / 60);
+    const m = falta % 60;
+    elProxima.textContent = h > 0 ? `${h} h ${m} min` : `${m} min`;
+  }
+  if (elMarcador) elMarcador.style.left = `${((agora % 1440) / 1440) * 100}%`;
+  if (elSol) elSol.style.opacity = String(0.25 + 0.75 * lum);
+}
+
+document.querySelector<HTMLButtonElement>('#ceu-mais')?.addEventListener('click', () => {
+  agora = avancar(agora, 60);
+  pintarCeu();
+});
+document.querySelector<HTMLButtonElement>('#ceu-menos')?.addEventListener('click', () => {
+  agora = avancar(agora, -60);
+  pintarCeu();
+});
+document.querySelector<HTMLButtonElement>('#ceu-agora')?.addEventListener('click', () => {
+  agora = minutosDaData(new Date());
+  pintarCeu();
+});
+
+pintarCeu();
+
+// avança 1 minuto de jogo por minuto real (o app soma também os minutos de estudo)
+window.setInterval(() => {
+  agora = avancar(agora, 1);
+  pintarCeu();
+}, 60_000);
+
+// exposto para o modo de desenvolvimento e para o harness de smoke
+(globalThis as unknown as Record<string, unknown>).__forja_ceu = {
+  minutos: (): MinutosDoDia => agora,
+  definir: (m: number): void => {
+    agora = minutosDe(0, m);
+    pintarCeu();
+  },
+  fase: (): string => rotuloFase(faseDe(agora)),
+};
     btn.textContent = `${res === 'vitoria' ? 'Vitória' : res === 'empate' ? 'Empate' : 'Derrota'} ${delta >= 0 ? '+' : ''}${delta}`;
     window.setTimeout(() => {
       btn.textContent = res === 'vitoria' ? 'Vitória' : res === 'empate' ? 'Empate' : 'Derrota';
@@ -123,3 +228,71 @@ raiz.querySelectorAll<HTMLButtonElement>('button[data-res]').forEach((btn) => {
 });
 
 pintar();
+
+/* ---------------- ciclo de dia e noite ---------------- */
+
+const elCeu = document.querySelector<HTMLElement>('#ceu');
+const elHora = document.querySelector<HTMLElement>('#ceu-hora');
+const elFase = document.querySelector<HTMLElement>('#ceu-fase');
+const elLum = document.querySelector<HTMLElement>('#ceu-lum');
+const elProxima = document.querySelector<HTMLElement>('#ceu-proxima');
+const elMarcador = document.querySelector<HTMLElement>('#ceu-marcador');
+const elSol = document.querySelector<HTMLElement>('#ceu-sol');
+
+let agora: MinutosDoDia = minutosDaData(new Date());
+
+function pintarCeu(): void {
+  const fase = faseDe(agora);
+  const paleta = paletaDe(agora);
+  const lum = luminosidade(agora);
+
+  if (elCeu) {
+    elCeu.style.setProperty('--ceu-fundo', paleta.fundo);
+    elCeu.style.setProperty('--ceu-superficie', paleta.superficie);
+    elCeu.style.setProperty('--ceu-texto', paleta.texto);
+    elCeu.style.setProperty('--ceu-destaque', paleta.destaque);
+    elCeu.dataset.fase = fase;
+  }
+  if (elHora) elHora.textContent = horaFormatada(agora);
+  if (elFase) elFase.textContent = rotuloFase(fase);
+  if (elLum) elLum.textContent = `${Math.round(lum * 100)}%`;
+  if (elProxima) {
+    const falta = minutosAteProximaFase(agora);
+    const h = Math.floor(falta / 60);
+    const m = falta % 60;
+    elProxima.textContent = h > 0 ? `${h} h ${m} min` : `${m} min`;
+  }
+  if (elMarcador) elMarcador.style.left = `${((agora % 1440) / 1440) * 100}%`;
+  if (elSol) elSol.style.opacity = String(0.25 + 0.75 * lum);
+}
+
+document.querySelector<HTMLButtonElement>('#ceu-mais')?.addEventListener('click', () => {
+  agora = avancar(agora, 60);
+  pintarCeu();
+});
+document.querySelector<HTMLButtonElement>('#ceu-menos')?.addEventListener('click', () => {
+  agora = avancar(agora, -60);
+  pintarCeu();
+});
+document.querySelector<HTMLButtonElement>('#ceu-agora')?.addEventListener('click', () => {
+  agora = minutosDaData(new Date());
+  pintarCeu();
+});
+
+pintarCeu();
+
+// avança 1 minuto de jogo por minuto real (o app soma também os minutos de estudo)
+window.setInterval(() => {
+  agora = avancar(agora, 1);
+  pintarCeu();
+}, 60_000);
+
+// exposto para o modo de desenvolvimento e para o harness de smoke
+(globalThis as unknown as Record<string, unknown>).__forja_ceu = {
+  minutos: (): MinutosDoDia => agora,
+  definir: (m: number): void => {
+    agora = minutosDe(0, m);
+    pintarCeu();
+  },
+  fase: (): string => rotuloFase(faseDe(agora)),
+};

@@ -1,0 +1,182 @@
+{
+  "meta": {
+    "ferramenta": "gba_ident.py",
+    "versao": "1.0.0",
+    "utc": "2026-10-14T16:36:13+00:00"
+  },
+  "arquivo": {
+    "nome": "fixture_sintetico.gba",
+    "caminho": "/home/user/gba-re/tests/fixture_sintetico.gba",
+    "tamanho_bytes": 32768,
+    "tamanho_humano": "32.0 KiB",
+    "potencia_de_dois": true,
+    "tamanhos_tipicos_mib": [
+      4,
+      8,
+      16,
+      32
+    ],
+    "ultimo_byte_util_hex": "0x0000300f",
+    "md5": "fd6cf27c9d46cc37d5895325fba9519c",
+    "sha1": "97a15e58d5add413f5d44c73a713ac41e0ee9971",
+    "sha256": "0aa75c5c0bea1cacf7eb86ce00ce576ca9a44dcf77e0fe9ffb8a400f989d9e65"
+  },
+  "cabecalho": {
+    "titulo_ascii": "TESTFIXTURE",
+    "titulo_raw_hex": "544553544649585455524500",
+    "codigo_jogo": "TZNE",
+    "categoria_game_code": {
+      "letra": "T",
+      "indicativo": "DESCONHECIDO — verificar GBATEK"
+    },
+    "regiao_idioma": {
+      "letra": "E",
+      "indicativo": "América / Inglês",
+      "observacao": "indício do cabeçalho, não prova de região/versão"
+    },
+    "codigo_fabricante": "01",
+    "fabricante_nome": "Nintendo",
+    "fixo_0x96_ok": true,
+    "unit_code": "0x00",
+    "device_type": "0x00",
+    "versao_software": 0,
+    "checksum": {
+      "armazenado": "0x48",
+      "calculado": "0x48",
+      "valido": true
+    },
+    "logo_nintendo_valido": true,
+    "ponto_entrada": {
+      "instrucao_hex": "0xea00002e",
+      "eh_branch_incondicional": true,
+      "mnemonico": "B",
+      "destino_hex": "0x080000c0",
+      "observacao": null
+    }
+  },
+  "bytes_globais": {
+    "entropia_global": 1.9712,
+    "pct_00": 80.72,
+    "pct_ff": 0.04,
+    "histograma_top10": [
+      [
+        "0x00",
+        26450,
+        80.72
+      ],
+      [
+        "0xf0",
+        1047,
+        3.2
+      ],
+      [
+        "0xf8",
+        1044,
+        3.19
+      ],
+      [
+        "0x04",
+        30,
+        0.09
+      ],
+      [
+        "0xd6",
+        28,
+        0.09
+      ],
+      [
+        "0x30",
+        27,
+        0.08
+      ],
+      [
+        "0x2e",
+        26,
+        0.08
+      ],
+      [
+        "0x52",
+        26,
+        0.08
+      ],
+      [
+        "0xfb",
+        26,
+        0.08
+      ],
+      [
+        "0xe9",
+        26,
+        0.08
+      ]
+    ]
+  },
+  "strings": {
+    "min_len": 6,
+    "total": 9,
+    "amostra_primeiras_200": [
+      {
+        "offset_hex": "0x000000a0",
+        "texto": "TESTFIXTURE"
+      },
+      {
+        "offset_hex": "0x000000ac",
+        "texto": "TZNE01"
+      },
+      {
+        "offset_hex": "0x00002027",
+        "texto": "}3%hO5"
+      },
+      {
+        "offset_hex": "0x000020f8",
+        "texto": "ZyU!PM"
+      },
+      {
+        "offset_hex": "0x0000248e",
+        "texto": "<BXR9%2"
+      },
+      {
+        "offset_hex": "0x00002bec",
+        "texto": "\\.h&%g"
+      },
+      {
+        "offset_hex": "0x00002ca4",
+        "texto": "/+T[1|"
+      },
+      {
+        "offset_hex": "0x00002e02",
+        "texto": ".\"{#KD"
+      },
+      {
+        "offset_hex": "0x00003000",
+        "texto": "HELLO GBA WORLD!"
+      }
+    ],
+    "aviso": "somente ASCII; textos com encoding próprio não aparecem aqui"
+  },
+  "regioes": {
+    "tamanho_bloco": 65536,
+    "total_blocos": 1,
+    "resumo_classes": {
+      "CODIGO_CANDIDATO": 1
+    },
+    "blocos": [
+      {
+        "classe": "CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)",
+        "entropia": 1.9712,
+        "pct_00_ff": 0.8076,
+        "thumb_bl": 1026,
+        "arm_bl": 3,
+        "densidade_bl_por_kib": 32.16,
+        "offset_hex": "0x00000000",
+        "endereco_gba_hex": "0x08000000"
+      }
+    ],
+    "aviso": "classificacao HEURISTICA — nivel HIPOTESE ate validacao por desassembly (Fase 2)"
+  },
+  "limitacoes": [
+    "Campos do cabecalho sao INDICIOS, nao prova de identidade/versao/regiao.",
+    "Classificacao codigo/dados por entropia+BL e heuristica (gera hipoteses).",
+    "Sem desassembly real nesta fase — isso e trabalho da Fase 2 (Ghidra/capstone)."
+  ]
+}
