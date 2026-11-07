@@ -7,6 +7,18 @@
 
 ---
 
+> ⚠ **ATUALIZAÇÃO 2026-11-07 (fim do ciclo): o mod FOI validado na ROM real do
+> usuário** — que é outra base (`pokefirered_gen1-9_ptbr.gba`, sha256 `e96d1a53…`),
+> não a de `inventory.json`. Resumo do que mudou:
+> - site do hook **descoberto automaticamente** nesta base: `0x08095F88`
+>   (1 chamada por frame, vive em overworld **e** com o menu aberto);
+> - mochila: pocket em `0x0202B718` → `{ItemSlot* slots; u8 cap}` → slots em
+>   `0x0202D31C` (items, cap 42) — o payload agora **lê o ponteiro em runtime**;
+> - **L+R+START não serve nesta base**: L+R abre a ajuda nativa e o site deixa de
+>   rodar. O combo que funciona é **START+SELECT**;
+> - evidência: `reports/ptbr_bolsa_cheia_prova.png` (ITENS — MASTER BALL ×?14,
+>   ULTRA BALL, GREAT BALL, POKé BALL, POTION, FULL RESTORE…).
+
 ## 0. Estado resumido (1 parágrafo)
 
 O mod está **mecanicamente pronto e provado em emulador**. O motivo de o v3 não

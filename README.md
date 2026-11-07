@@ -28,7 +28,7 @@ por prova em frames/screenshots/dumps de RAM.
 | **Mapa da mochila**: array @ `0x020258B8`, 4 B/slot `{id:u16, qty:u16}` | ✅ CONFIRMADO | este README ↓ |
 | **Montador de mods** com trava ARMv4T + simulação obrigatória antes de gravar | ✅ | `scripts/gba_modkit.py` |
 | **Mod v4** (veneer correto + combo L+R+START → 8 slots) | ✅ provado em emulador (ROM de bancada) | `scripts/apply_mod.py` |
-| Configuração completa (screenshots da mochila no FireRed) | ⏳ depende da sua ROM | `HANDOFF.md` §2 |
+| **Prova na ROM real do usuário** (PT-BR Gen1-9): combo → mochila cheia, screenshot | ✅ CONFIRMADO | `reports/ptbr_bolsa_cheia_prova.png` |
 
 ---
 
