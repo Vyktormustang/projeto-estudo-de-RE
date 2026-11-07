@@ -58,6 +58,13 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   say "[core] $CORE"
   roda "cosmog:nativos"   python3 -B -m unittest -v tests.test_cosmog_v42_mgba
   roda "cosmog:eclosao"   python3 -B -m unittest -v tests.test_cosmog_hatch_v42_mgba
+  # sonda do shim próprio: prova que o .so abre a V42 e que a leitura de memória
+  # pelo barramento custa microssegundos (é a razão de existir do shim)
+  if [ -f "$ROOT/tools/gba_shim/build/gba_shim.so" ]; then
+    roda "cosmog:shim"    python3 -B "$ROOT/v42/scripts/probe_shim_rom.py"
+  else
+    say "[pulado] shim ausente — rode: make -C tools/gba_shim shim"
+  fi
 else
   say "[pulado] fonte do mGBA ausente — só estruturais rodaram"
   say "         reconstrua com: make -C tools/gba_shim libmgba"

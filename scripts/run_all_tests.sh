@@ -39,6 +39,13 @@ roda "vyk59:auditoria-v42"    python3 scripts/auditoria_vyk59.py --self-test
 roda "vyk59:auditoria-v3"     python3 scripts/auditoria_vyk59_v3.py --self-test
 roda "vyk60:sempre-escreve"   python3 scripts/teste_vyk60_sempre_escreve.py --self-test
 
+# sondas do plano de eclosão da V42: rodam SEM ROM/core/motor extraído, só a
+# aritmética de cada instrumento. A execução real fica em v42/scripts/run_cosmog_tests.sh.
+for s in v42/scripts/probe_shim_rom.py v42/scripts/hatch_probe.py \
+         v42/scripts/hatch_calibra.py v42/scripts/diag_hatch_walk.py; do
+  roda "v42:$(basename "$s" .py)" python3 "$s" --self-test
+done
+
 # auditoria da V42 (motor Gen 1-9): estruturais sempre; nativas se houver ROM e
 # core. Sem a ROM (não versionada) o script sai em 2 — isso NÃO derruba a bateria.
 if bash v42/scripts/run_cosmog_tests.sh >>"$LOG" 2>&1; then
