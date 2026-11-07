@@ -1,0 +1,15 @@
+{
+  "escreveu": true,
+  "decisao": "hook e endereço corretos; resta a leitura das teclas",
+  "valor_lido_mod": "0xA5A55A5A",
+  "valor_lido_limpa": "0x25690000",
+  "controle_limpa_intacto": true,
+  "frame_mod": 320,
+  "frame_controle": 320,
+  "alvo": "0x0202D3AC",
+  "site": "0x0808EB88",
+  "tramp": "0x08EB0C00",
+  "sha256_rom_base": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "sha256_rom_teste": "140372d7da9a8520c3a84d4656453f0605a933d775b266b4cb80d0df57edaef6",
+  "sha256_state": "c4fdd8192abaf4782dc8127ea2cce52f0810a2a786e9db208a3ea9b841459b21"
+}

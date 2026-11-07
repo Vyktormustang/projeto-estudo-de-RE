@@ -1,0 +1,90 @@
+{
+  "confere_tudo": true,
+  "site": "0x808eb88",
+  "tramp": "0x8eb0c00",
+  "combo": "A+B+DOWN",
+  "itens": [
+    {
+      "item": "prólogo original realocável (sem b/bl/ldr [pc])",
+      "confere": true,
+      "detalhe": "bytes originais no site: 30 b5 81 b0 6b 46 04 04"
+    },
+    {
+      "item": "site = ldr r3,[pc,#0] + bx r3 + literal tramp|1",
+      "confere": true,
+      "detalhe": "gravado: 00 4b 18 47 01 0c eb 08 (literal esperado 01 0c eb 08)"
+    },
+    {
+      "item": "literal aponta para a ROM com bit Thumb",
+      "confere": true,
+      "detalhe": "literal 0x08EB0C01 → 0x08EB0C00 (Thumb=1)"
+    },
+    {
+      "item": "alinhamento pc-relativo do ldr",
+      "confere": true,
+      "detalhe": "Align(0x0808EB8C,4)=0x0808EB8C"
+    },
+    {
+      "item": "retorno construído por aritmética (sem literal pc-relativo)",
+      "confere": true,
+      "detalhe": "esperado 0x0808EB91 (site+8|1); nenhum .word desse valor no trampolim = OK"
+    },
+    {
+      "item": "prólogo original reexecutado no trampolim (replay)",
+      "confere": true,
+      "detalhe": "procurando 30 b5 81 b0 6b 46 04 04 nos primeiros 200 B do trampolim"
+    },
+    {
+      "item": "endereço do pocket construído no payload",
+      "confere": true,
+      "detalhe": "0x0202B79C reconstruído a partir dos movs/lsls/adds do trampolim"
+    },
+    {
+      "item": "máscara do combo construída no payload",
+      "confere": true,
+      "detalhe": "combo A+B+DOWN → máscara 0x083 (bits do REG_KEYINPUT, ativos em 0)"
+    },
+    {
+      "item": "teste do keypad usa ands + desvio condicional",
+      "confere": true,
+      "detalhe": "push movs movs lsls movs lsls add adds ldrh ands bne movs lsls movs"
+    },
+    {
+      "item": "a ROM base é a mesma do relatório (SHA-256 conferido fora deste script)",
+      "confere": true,
+      "detalhe": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a"
+    }
+  ],
+  "desasm_site": [
+    "0x0808EB88  00 4b        ldr      r3, [pc, #0]",
+    "0x0808EB8A  18 47        bx       r3",
+    "0x0808EB8C  01 0c        lsrs     r1, r0, #0x10",
+    "0x0808EB8E  eb 08        lsrs     r3, r5, #3"
+  ],
+  "desasm_tramp": [
+    "0x08EB0C00  4f b4        push     {r0, r1, r2, r3, r6}",
+    "0x08EB0C02  83 22        movs     r2, #0x83",
+    "0x08EB0C04  04 21        movs     r1, #4",
+    "0x08EB0C06  09 06        lsls     r1, r1, #0x18",
+    "0x08EB0C08  01 26        movs     r6, #1",
+    "0x08EB0C0A  36 02        lsls     r6, r6, #8",
+    "0x08EB0C0C  31 44        add      r1, r6",
+    "0x08EB0C0E  30 31        adds     r1, #0x30",
+    "0x08EB0C10  09 88        ldrh     r1, [r1]",
+    "0x08EB0C12  11 40        ands     r1, r2",
+    "0x08EB0C14  31 d1        bne      #0x8eb0c7a",
+    "0x08EB0C16  02 20        movs     r0, #2",
+    "0x08EB0C18  00 06        lsls     r0, r0, #0x18",
+    "0x08EB0C1A  02 26        movs     r6, #2",
+    "0x08EB0C1C  36 04        lsls     r6, r6, #0x10",
+    "0x08EB0C1E  30 44        add      r0, r6",
+    "0x08EB0C20  b7 26        movs     r6, #0xb7",
+    "0x08EB0C22  36 02        lsls     r6, r6, #8",
+    "0x08EB0C24  30 44        add      r0, r6",
+    "0x08EB0C26  9c 30        adds     r0, #0x9c",
+    "0x08EB0C28  00 68        ldr      r0, [r0]",
+    "0x08EB0C2A  63 22        movs     r2, #0x63",
+    "0x08EB0C2C  12 04        lsls     r2, r2, #0x10",
+    "0x08EB0C2E  01 32        adds     r2, #1"
+  ]
+}

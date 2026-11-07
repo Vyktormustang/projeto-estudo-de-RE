@@ -34,6 +34,11 @@ roda "shim:smoke"             python3 tools/gba_shim/shim_smoke.py
 roda "mod:bench (emulador)"   python3 tests/teste_mod_bench.py
 roda "mod:apply (relatório)"  python3 scripts/apply_mod.py --self-test
 
+# auditorias do plano do Linear (VYK-58/59/60): ver docs/VYK59_AUDITORIA_HOOK_V3.md
+roda "vyk59:auditoria-v42"    python3 scripts/auditoria_vyk59.py --self-test
+roda "vyk59:auditoria-v3"     python3 scripts/auditoria_vyk59_v3.py --self-test
+roda "vyk60:sempre-escreve"   python3 scripts/teste_vyk60_sempre_escreve.py --self-test
+
 echo "===============================" | tee -a "$LOG"
 echo "resumo: $FALHAS de $TOTAL falharam — log: $LOG" | tee -a "$LOG"
 exit "$FALHAS"
