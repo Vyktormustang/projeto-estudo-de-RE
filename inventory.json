@@ -1,0 +1,86 @@
+{
+  "projeto": "gba-re",
+  "versao_inventario": 1,
+  "atualizado_utc": "2026-10-14T16:42:50+00:00",
+  "rom": {
+    "status": "COPIA_REGISTRADA",
+    "observacao": "Nenhuma ROM fornecida ate o momento. O original do usuario permanece com o usuario; so serao usadas copias de trabalho. A ROM nunca entra em repositorios publicos.",
+    "caminho_copia_trabalho": "/home/user/gba-re/rom/pokemon_firered_bpre_trabalho.gba",
+    "nome_original_informado": null,
+    "sha256": "6035a98faf09f5f6db880f0ab436c54f35e33c5738d899345d8242930da0b4ae",
+    "tamanho_bytes": 16777216,
+    "titulo_cabecalho_indicio": "POKEMON FIRE",
+    "game_code_indicio": "BPRE"
+  },
+  "ambiente_execucao": {
+    "sistema": "Linux Debian 13 (trixie) x86_64, kernel 6.1.158",
+    "nota": "Briefing cita Windows; o sandbox real e Linux. Scripts sao multiplataforma; equivalentes Windows fornecidos sob demanda. Detalhes: logs/2026-10-14_fase0_ambiente.md",
+    "python": "3.13.16",
+    "pip": "26.2.1",
+    "java": "OpenJDK 11 (Ghidra >= 11 exige JDK 17 — pendente)",
+    "git": "2.47.3",
+    "capstone_py": "instalado nesta sessao (ver scripts/setup_env.sh)",
+    "ram_total_gb": 1.9,
+    "disco_livre_gb": 21,
+    "internet": true
+  },
+  "arquivos": [
+    {
+      "caminho": "README.md",
+      "papel": "visao geral e instrucoes",
+      "sha256": "ver logs/2026-10-14_fase0_ambiente.md (secao manifesto)"
+    },
+    {
+      "caminho": "scripts/gba_ident.py",
+      "papel": "Fase 1 — identificacao/triagem de ROM",
+      "sha256": "ver logs/2026-10-14_fase0_ambiente.md (secao manifesto)"
+    },
+    {
+      "caminho": "scripts/setup_env.sh",
+      "papel": "setup minimo idempotente (capstone)",
+      "sha256": "ver logs/2026-10-14_fase0_ambiente.md (secao manifesto)"
+    },
+    {
+      "caminho": "functions.csv",
+      "papel": "registro de funcoes e classificacoes"
+    },
+    {
+      "caminho": "hypotheses.md",
+      "papel": "hipoteses, evidencias e testes pendentes"
+    },
+    {
+      "caminho": "progress.md",
+      "papel": "progresso, obstaculos e proximas acoes"
+    },
+    {
+      "caminho": "reports/fixture_sintetico_ident.json",
+      "papel": "Fase 1 — relatorio_json",
+      "sha256": "73568ccb4ba411a94ae6994d89b19367430df1bbe7704c3eabf6a23a6b3d9847"
+    },
+    {
+      "caminho": "reports/fixture_sintetico_strings.tsv",
+      "papel": "Fase 1 — strings_tsv",
+      "sha256": "7a0c5a147aa32d16976e85c91511217db2327b7984320b4e2e8456bc5fec1621"
+    },
+    {
+      "caminho": "reports/fixture_sintetico_regioes.tsv",
+      "papel": "Fase 1 — regioes_tsv",
+      "sha256": "400c8123e9ae8d958362361d8c44a6a0837592d6a1b929e11823556422968b54"
+    },
+    {
+      "caminho": "reports/pokemon_firered_bpre_trabalho_ident.json",
+      "papel": "Fase 1 — relatorio_json",
+      "sha256": "7bdd1b2f7d4f223d4a4cadad0b4373095664078198b56a0c5469f67253953a7c"
+    },
+    {
+      "caminho": "reports/pokemon_firered_bpre_trabalho_strings.tsv",
+      "papel": "Fase 1 — strings_tsv",
+      "sha256": "56add4565c4503b0c09d24d946f9fc9f9d76bcbb4b4df3a2a9bc4e6f885fb33c"
+    },
+    {
+      "caminho": "reports/pokemon_firered_bpre_trabalho_regioes.tsv",
+      "papel": "Fase 1 — regioes_tsv",
+      "sha256": "b555161e5ecab9566a3f605d5a166cc0cebb774369fa435bba4666560146faee"
+    }
+  ]
+}

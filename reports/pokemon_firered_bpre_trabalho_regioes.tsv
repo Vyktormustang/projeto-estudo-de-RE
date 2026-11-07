@@ -1,0 +1,257 @@
+offset_hex	endereco_gba_hex	classe	entropia	pct_00_ff	thumb_bl	arm_bl	densidade_bl_por_kib
+0x00000000	0x08000000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.5719	0.1247	1308	0	20.44
+0x00010000	0x08010000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.5297	0.0899	1133	0	17.7
+0x00020000	0x08020000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.4294	0.0898	1127	0	17.61
+0x00030000	0x08030000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.4875	0.0881	1795	0	28.05
+0x00040000	0x08040000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6618	0.1057	1757	0	27.45
+0x00050000	0x08050000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.4833	0.1262	2285	0	35.7
+0x00060000	0x08060000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.2332	0.1277	2644	0	41.31
+0x00070000	0x08070000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.5095	0.1282	1847	0	28.86
+0x00080000	0x08080000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.5254	0.1199	2512	0	39.25
+0x00090000	0x08090000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.4969	0.1298	1789	0	27.95
+0x000a0000	0x080a0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6097	0.1037	1857	0	29.02
+0x000b0000	0x080b0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.618	0.1046	1744	0	27.25
+0x000c0000	0x080c0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.535	0.1197	1964	0	30.69
+0x000d0000	0x080d0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6079	0.1053	1602	0	25.03
+0x000e0000	0x080e0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6276	0.106	1869	0	29.2
+0x000f0000	0x080f0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6007	0.1218	1843	0	28.8
+0x00100000	0x08100000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.5904	0.1138	2542	0	39.72
+0x00110000	0x08110000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6539	0.1017	2612	0	40.81
+0x00120000	0x08120000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.5677	0.1129	2455	0	38.36
+0x00130000	0x08130000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.578	0.1236	2473	0	38.64
+0x00140000	0x08140000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6459	0.1145	2295	0	35.86
+0x00150000	0x08150000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.6431	0.1031	1764	0	27.56
+0x00160000	0x08160000	MISTO (codigo esparso, dados estruturados ou strings)	5.9537	0.1503	0	17	0.27
+0x00170000	0x08170000	MISTO (codigo esparso, dados estruturados ou strings)	5.5927	0.1791	12	5	0.27
+0x00180000	0x08180000	MISTO (codigo esparso, dados estruturados ou strings)	5.046	0.1951	15	9	0.38
+0x00190000	0x08190000	MISTO (codigo esparso, dados estruturados ou strings)	5.1685	0.1785	19	6	0.39
+0x001a0000	0x081a0000	MISTO (codigo esparso, dados estruturados ou strings)	6.0214	0.1828	7	6	0.2
+0x001b0000	0x081b0000	MISTO (codigo esparso, dados estruturados ou strings)	5.5653	0.2132	30	3	0.52
+0x001c0000	0x081c0000	MISTO (codigo esparso, dados estruturados ou strings)	5.8595	0.242	12	8	0.31
+0x001d0000	0x081d0000	MISTO (codigo esparso, dados estruturados ou strings)	6.2025	0.1847	217	24	3.77
+0x001e0000	0x081e0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	5.93	0.2838	645	21	10.41
+0x001f0000	0x081f0000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	1.9822	0.7957	34	31	1.02
+0x00200000	0x08200000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	1.8768	0.8143	171	37	3.25
+0x00210000	0x08210000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	1.8676	0.8154	144	26	2.66
+0x00220000	0x08220000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	1.8914	0.8133	132	37	2.64
+0x00230000	0x08230000	MISTO (codigo esparso, dados estruturados ou strings)	4.5941	0.5005	31	2	0.52
+0x00240000	0x08240000	MISTO (codigo esparso, dados estruturados ou strings)	5.5547	0.3398	158	8	2.59
+0x00250000	0x08250000	MISTO (codigo esparso, dados estruturados ou strings)	4.8333	0.4844	4	0	0.06
+0x00260000	0x08260000	MISTO (codigo esparso, dados estruturados ou strings)	5.1552	0.3331	43	9	0.81
+0x00270000	0x08270000	MISTO (codigo esparso, dados estruturados ou strings)	5.8989	0.3121	53	31	1.31
+0x00280000	0x08280000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	6.7382	0.1691	87	30	1.83
+0x00290000	0x08290000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	6.7653	0.1555	125	38	2.55
+0x002a0000	0x082a0000	MISTO (codigo esparso, dados estruturados ou strings)	5.047	0.4026	0	0	0.0
+0x002b0000	0x082b0000	MISTO (codigo esparso, dados estruturados ou strings)	5.004	0.3731	0	0	0.0
+0x002c0000	0x082c0000	MISTO (codigo esparso, dados estruturados ou strings)	5.379	0.3442	0	0	0.0
+0x002d0000	0x082d0000	MISTO (codigo esparso, dados estruturados ou strings)	6.0516	0.1557	0	0	0.0
+0x002e0000	0x082e0000	MISTO (codigo esparso, dados estruturados ou strings)	5.2312	0.0043	0	0	0.0
+0x002f0000	0x082f0000	MISTO (codigo esparso, dados estruturados ou strings)	5.5847	0.0027	0	0	0.0
+0x00300000	0x08300000	MISTO (codigo esparso, dados estruturados ou strings)	5.1809	0.0102	0	0	0.0
+0x00310000	0x08310000	MISTO (codigo esparso, dados estruturados ou strings)	5.391	0.0136	0	0	0.0
+0x00320000	0x08320000	MISTO (codigo esparso, dados estruturados ou strings)	5.1441	0.0061	0	0	0.0
+0x00330000	0x08330000	MISTO (codigo esparso, dados estruturados ou strings)	5.4465	0.0067	0	0	0.0
+0x00340000	0x08340000	MISTO (codigo esparso, dados estruturados ou strings)	5.2956	0.0363	0	0	0.0
+0x00350000	0x08350000	MISTO (codigo esparso, dados estruturados ou strings)	4.3032	0.4993	45	0	0.7
+0x00360000	0x08360000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	3.1539	0.6742	106	6	1.75
+0x00370000	0x08370000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	3.6644	0.6007	54	26	1.25
+0x00380000	0x08380000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	3.8547	0.58	60	13	1.14
+0x00390000	0x08390000	MISTO (codigo esparso, dados estruturados ou strings)	4.0089	0.5636	72	17	1.39
+0x003a0000	0x083a0000	MISTO (codigo esparso, dados estruturados ou strings)	5.7578	0.2626	2	0	0.03
+0x003b0000	0x083b0000	MISTO (codigo esparso, dados estruturados ou strings)	4.2987	0.4606	15	1	0.25
+0x003c0000	0x083c0000	MISTO (codigo esparso, dados estruturados ou strings)	5.6679	0.3461	51	9	0.94
+0x003d0000	0x083d0000	MISTO (codigo esparso, dados estruturados ou strings)	5.8036	0.2827	23	3	0.41
+0x003e0000	0x083e0000	MISTO (codigo esparso, dados estruturados ou strings)	5.4943	0.3539	17	5	0.34
+0x003f0000	0x083f0000	MISTO (codigo esparso, dados estruturados ou strings)	6.2098	0.2563	55	28	1.3
+0x00400000	0x08400000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	6.7338	0.1486	148	27	2.73
+0x00410000	0x08410000	MISTO (codigo esparso, dados estruturados ou strings)	6.3293	0.1928	232	22	3.97
+0x00420000	0x08420000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.1794	0.0835	45	33	1.22
+0x00430000	0x08430000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.1908	0.0927	53	27	1.25
+0x00440000	0x08440000	MISTO (codigo esparso, dados estruturados ou strings)	5.8542	0.1886	31	10	0.64
+0x00450000	0x08450000	MISTO (codigo esparso, dados estruturados ou strings)	5.5759	0.3683	29	36	1.02
+0x00460000	0x08460000	MISTO (codigo esparso, dados estruturados ou strings)	6.2999	0.1953	201	11	3.31
+0x00470000	0x08470000	MISTO (codigo esparso, dados estruturados ou strings)	5.9069	0.3529	56	4	0.94
+0x00480000	0x08480000	MISTO (codigo esparso, dados estruturados ou strings)	4.949	0.3994	8	14	0.34
+0x00490000	0x08490000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	2.1978	0.633	0	17	0.27
+0x004a0000	0x084a0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	6.9531	0.1602	283	103	6.03
+0x004b0000	0x084b0000	CODIGO_CANDIDATO (padroes BL Thumb/ARM densos)	6.804	0.1015	506	109	9.61
+0x004c0000	0x084c0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	6.5686	0.1606	417	78	7.73
+0x004d0000	0x084d0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.4269	0.0322	313	92	6.33
+0x004e0000	0x084e0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.7284	0.0257	314	117	6.73
+0x004f0000	0x084f0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.5684	0.0306	219	126	5.39
+0x00500000	0x08500000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.5235	0.0288	250	115	5.7
+0x00510000	0x08510000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.4581	0.048	74	29	1.61
+0x00520000	0x08520000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6942	0.0483	55	49	1.62
+0x00530000	0x08530000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6921	0.0389	50	38	1.38
+0x00540000	0x08540000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6493	0.0451	56	49	1.64
+0x00550000	0x08550000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6606	0.058	59	47	1.66
+0x00560000	0x08560000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3684	0.0748	89	31	1.88
+0x00570000	0x08570000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3335	0.0799	77	33	1.72
+0x00580000	0x08580000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.4907	0.0493	65	27	1.44
+0x00590000	0x08590000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.5979	0.0595	54	47	1.58
+0x005a0000	0x085a0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.7579	0.0365	26	43	1.08
+0x005b0000	0x085b0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3827	0.0783	69	32	1.58
+0x005c0000	0x085c0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.618	0.0509	56	53	1.7
+0x005d0000	0x085d0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.5291	0.0496	57	40	1.52
+0x005e0000	0x085e0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3583	0.0706	86	44	2.03
+0x005f0000	0x085f0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.4275	0.0723	72	50	1.91
+0x00600000	0x08600000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3575	0.0658	86	34	1.88
+0x00610000	0x08610000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6778	0.0393	96	50	2.28
+0x00620000	0x08620000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6489	0.0483	46	91	2.14
+0x00630000	0x08630000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6689	0.055	83	69	2.38
+0x00640000	0x08640000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.5391	0.0314	96	72	2.62
+0x00650000	0x08650000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3647	0.0383	101	75	2.75
+0x00660000	0x08660000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3777	0.0295	80	75	2.42
+0x00670000	0x08670000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6014	0.0321	82	62	2.25
+0x00680000	0x08680000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.5889	0.0226	50	92	2.22
+0x00690000	0x08690000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.4967	0.0355	115	81	3.06
+0x006a0000	0x086a0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.6752	0.0271	161	118	4.36
+0x006b0000	0x086b0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.3326	0.0273	40	38	1.22
+0x006c0000	0x086c0000	MISTO (codigo esparso, dados estruturados ou strings)	6.2987	0.0268	0	68	1.06
+0x006d0000	0x086d0000	MISTO (codigo esparso, dados estruturados ou strings)	6.1518	0.0235	0	73	1.14
+0x006e0000	0x086e0000	MISTO (codigo esparso, dados estruturados ou strings)	6.2808	0.0277	0	45	0.7
+0x006f0000	0x086f0000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.0391	0.0305	15	49	1.0
+0x00700000	0x08700000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	7.0615	0.1088	219	13	3.62
+0x00710000	0x08710000	MISTO (codigo esparso, dados estruturados ou strings)	5.5251	0.4333	55	15	1.09
+0x00720000	0x08720000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00730000	0x08730000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00740000	0x08740000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00750000	0x08750000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00760000	0x08760000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00770000	0x08770000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00780000	0x08780000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00790000	0x08790000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x007a0000	0x087a0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x007b0000	0x087b0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x007c0000	0x087c0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x007d0000	0x087d0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x007e0000	0x087e0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x007f0000	0x087f0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00800000	0x08800000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0954	0.9941	0	0	0.0
+0x00810000	0x08810000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00820000	0x08820000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00830000	0x08830000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00840000	0x08840000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00850000	0x08850000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00860000	0x08860000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00870000	0x08870000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00880000	0x08880000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00890000	0x08890000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x008a0000	0x088a0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x008b0000	0x088b0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x008c0000	0x088c0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x008d0000	0x088d0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x008e0000	0x088e0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x008f0000	0x088f0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00900000	0x08900000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00910000	0x08910000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00920000	0x08920000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00930000	0x08930000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00940000	0x08940000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00950000	0x08950000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00960000	0x08960000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00970000	0x08970000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00980000	0x08980000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00990000	0x08990000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x009a0000	0x089a0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x009b0000	0x089b0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x009c0000	0x089c0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x009d0000	0x089d0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x009e0000	0x089e0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x009f0000	0x089f0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a00000	0x08a00000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a10000	0x08a10000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a20000	0x08a20000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a30000	0x08a30000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a40000	0x08a40000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a50000	0x08a50000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a60000	0x08a60000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a70000	0x08a70000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a80000	0x08a80000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00a90000	0x08a90000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00aa0000	0x08aa0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ab0000	0x08ab0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ac0000	0x08ac0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ad0000	0x08ad0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ae0000	0x08ae0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00af0000	0x08af0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b00000	0x08b00000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b10000	0x08b10000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b20000	0x08b20000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b30000	0x08b30000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b40000	0x08b40000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b50000	0x08b50000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b60000	0x08b60000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b70000	0x08b70000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b80000	0x08b80000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00b90000	0x08b90000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ba0000	0x08ba0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00bb0000	0x08bb0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00bc0000	0x08bc0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00bd0000	0x08bd0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00be0000	0x08be0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00bf0000	0x08bf0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c00000	0x08c00000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c10000	0x08c10000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c20000	0x08c20000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c30000	0x08c30000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c40000	0x08c40000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c50000	0x08c50000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c60000	0x08c60000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c70000	0x08c70000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c80000	0x08c80000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00c90000	0x08c90000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ca0000	0x08ca0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00cb0000	0x08cb0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00cc0000	0x08cc0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00cd0000	0x08cd0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ce0000	0x08ce0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00cf0000	0x08cf0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00d00000	0x08d00000	MISTO (codigo esparso, dados estruturados ou strings)	6.294	0.1483	274	19	4.58
+0x00d10000	0x08d10000	MISTO (codigo esparso, dados estruturados ou strings)	6.0709	0.1272	442	20	7.22
+0x00d20000	0x08d20000	ALTA_ENTROPIA (dados comprimidos/criptografados ou recursos graficos/audio)	6.5809	0.1306	199	9	3.25
+0x00d30000	0x08d30000	MISTO (codigo esparso, dados estruturados ou strings)	5.3726	0.3715	154	25	2.8
+0x00d40000	0x08d40000	MISTO (codigo esparso, dados estruturados ou strings)	5.2997	0.3743	133	39	2.69
+0x00d50000	0x08d50000	MISTO (codigo esparso, dados estruturados ou strings)	5.2948	0.37	161	23	2.88
+0x00d60000	0x08d60000	MISTO (codigo esparso, dados estruturados ou strings)	5.475	0.3525	157	21	2.78
+0x00d70000	0x08d70000	MISTO (codigo esparso, dados estruturados ou strings)	5.3454	0.3678	143	38	2.83
+0x00d80000	0x08d80000	MISTO (codigo esparso, dados estruturados ou strings)	5.3277	0.3791	146	24	2.66
+0x00d90000	0x08d90000	MISTO (codigo esparso, dados estruturados ou strings)	5.4728	0.3574	117	14	2.05
+0x00da0000	0x08da0000	MISTO (codigo esparso, dados estruturados ou strings)	4.9895	0.4111	196	8	3.19
+0x00db0000	0x08db0000	MISTO (codigo esparso, dados estruturados ou strings)	5.3031	0.373	146	32	2.78
+0x00dc0000	0x08dc0000	MISTO (codigo esparso, dados estruturados ou strings)	5.207	0.3813	187	11	3.09
+0x00dd0000	0x08dd0000	MISTO (codigo esparso, dados estruturados ou strings)	5.4655	0.3548	157	18	2.73
+0x00de0000	0x08de0000	MISTO (codigo esparso, dados estruturados ou strings)	5.2921	0.3777	134	19	2.39
+0x00df0000	0x08df0000	MISTO (codigo esparso, dados estruturados ou strings)	5.1858	0.386	131	24	2.42
+0x00e00000	0x08e00000	MISTO (codigo esparso, dados estruturados ou strings)	5.2987	0.3756	127	26	2.39
+0x00e10000	0x08e10000	MISTO (codigo esparso, dados estruturados ou strings)	5.3371	0.3743	151	31	2.84
+0x00e20000	0x08e20000	MISTO (codigo esparso, dados estruturados ou strings)	5.3861	0.3594	163	23	2.91
+0x00e30000	0x08e30000	MISTO (codigo esparso, dados estruturados ou strings)	5.2433	0.3769	202	28	3.59
+0x00e40000	0x08e40000	MISTO (codigo esparso, dados estruturados ou strings)	5.1947	0.342	257	20	4.33
+0x00e50000	0x08e50000	MISTO (codigo esparso, dados estruturados ou strings)	6.4188	0.1611	166	27	3.02
+0x00e60000	0x08e60000	MISTO (codigo esparso, dados estruturados ou strings)	5.3951	0.3559	120	13	2.08
+0x00e70000	0x08e70000	MISTO (codigo esparso, dados estruturados ou strings)	5.3597	0.3559	209	12	3.45
+0x00e80000	0x08e80000	MISTO (codigo esparso, dados estruturados ou strings)	6.4644	0.1673	155	12	2.61
+0x00e90000	0x08e90000	MISTO (codigo esparso, dados estruturados ou strings)	5.8453	0.2812	155	14	2.64
+0x00ea0000	0x08ea0000	MISTO (codigo esparso, dados estruturados ou strings)	6.4902	0.1886	195	37	3.62
+0x00eb0000	0x08eb0000	BAIXA_ENTROPIA (tabelas, area esparsa ou dados repetitivos)	0.5392	0.9608	7	2	0.14
+0x00ec0000	0x08ec0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ed0000	0x08ed0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ee0000	0x08ee0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ef0000	0x08ef0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f00000	0x08f00000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f10000	0x08f10000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f20000	0x08f20000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f30000	0x08f30000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f40000	0x08f40000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f50000	0x08f50000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f60000	0x08f60000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f70000	0x08f70000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f80000	0x08f80000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00f90000	0x08f90000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00fa0000	0x08fa0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00fb0000	0x08fb0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00fc0000	0x08fc0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00fd0000	0x08fd0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00fe0000	0x08fe0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0
+0x00ff0000	0x08ff0000	PREENCHIMENTO_00_FF (provavel espaco nao utilizado)	0.0	1.0	0	0	0.0

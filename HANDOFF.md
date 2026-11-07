@@ -1,70 +1,86 @@
-# HANDOFF — Continue daqui (qualquer agente)
+# HANDOFF — continue daqui (qualquer agente)
 
-> Se você está pegando este projeto do zero, leia na ordem:
-> **1) este arquivo → 2) `MEMORIA_CONSOLIDADA.md` → 3) `progress.md` (log por ciclo).**
-> A ROM comercial NÃO está aqui: coloque uma cópia de Pokémon FireRed (mesma família
-> PT-BR modificada descrita em `inventory.json`) em `rom/` antes de reproduzir.
+> Ordem de leitura: **1) este arquivo → 2) `MEMORIA_CONSOLIDADA.md` →
+> 3) `progress.md`** (log por ciclo).
+> A ROM comercial NÃO está aqui: coloque uma cópia em `rom/` (ou aponte com
+> `--rom`) antes de reproduzir a validação final.
 
 ---
 
 ## 0. Estado resumido (1 parágrafo)
-Fases 0–6 rodadas: ROM identificada/censada, callgraph, decoder de texto, driver
-headless mGBA, mochila mapeada (slot 0 @ `0x020258B8`, `{id:u16,qty:u16}`, 4 B/slot).
-Objetivo atual: **mod menu = combo de botões preenche a mochila**. Hook v3 montado
-(`rom_mod/BAG_MOD_v3.gba`) e estável no jogo, mas o **combo ainda não dispara** — o
-bug aberto é onde ler as teclas naquele contexto tela (ou mudar a rotina-trampo).
 
-## 1. O que NÃO refazer (causas-raiz já provadas)
-- **BL Thumb alcança só ±4 MB.** Hookar `0x08000B08 → 0x08EB0C00` (~15,4 MB) é
-  impossível por BL e trava a tela de copyright. Resolvido por **veneer** em
-  `0x08000A38` (`01 4b 18 47 01 0c eb 08`). Não tente BL distante de novo.
-- `scripts/gba_disasm.py::encode_bl_thumb` e `gba_hook_code.py` têm **bug de sinal**
-  em bls negativos (bit-S nunca ligado). Trata qualquer trampo gerado por eles como
-  suspeito. Patch a pendência mais valiosa do repo.
-- Espelho de teclas `0x03003118` é **contexto-dependente** (zera na cena-bedroom —
-  bug aberto). Não confiar sem validar no contexto.
-- Artefatos `_DBG_pal.gba`, `_EMPTYPS.gba`, `BAG_MOD_cheat.gba`,
-  `HOOK_VALIDADO_paleta_OK.gba` foram gerados pelo encoder bugado: descarte-os
-  como evidência.
+O mod está **mecanicamente pronto e provado em emulador**. O motivo de o v3 não
+disparar **não era o combo de teclas**: era o `ldr` do veneer apontando 4 bytes
+adiante do literal (`bx` para lixo em 1238 callsites de `SetGpuReg`) — mais o
+keypad ser ativo-baixo. O toolkit agora monta o mod a partir de mnemônicos,
+**simula** antes de gravar e o emulador é próprio (libmgba compilada aqui),
+com CPU, memória e breakpoints. Falta **uma** coisa: rodar na ROM do usuário e
+tirar o print da mochila cheia.
 
-## 2. Próximos passos, em ordem, com comandos
-0. `bash scripts/setup_env.sh` (python-capstone; já funciona aqui).
-1. **Diagnosticar gating do combo (ciclo atual).**
-   a. Rodar state_bedroom com um **payload sempre-escreve** (`str 0xAAAA` em
-      `0x020258B8` sem checar teclas) → se **não** escrever : a rotina SetGpuReg não
-      roda naquela tela → trocar rotina-trampo (candidatas: função per-frame do vblank
-      / ReadKeys). Se **escrever**: gating é só o espelho de teclas.
-      ```
-      python3 scripts/gba_libretro_emu.py --rom rom_mod/<debug>.gba \
-        --load-state emu/state_v3st1.bin --frames 900 --save-state out.bin
-      python3 scripts/gba_state_dump.py out.bin --read 0x020258B8:0x04
-      ```
-   b. Fonte robusta de teclas: ler `0x04000130` (REG_KEYINPUT, ativo-baixo) == XOR;
-      ou achar o "keys mirror" universal via diff-sweep com state durante hold.
-2. **Unidades do mod**: combo final = L+R+START (`0x0308` ativo-alto) com nota de
-   colisão L+R=help (documentado). Alternativa documentada: START+SELECT.
-3. **Validação de aceitação** (só então chamar de "concluído"):
-   boot → logo GAME FREAK → Nidorino → overworld com state → combo →
-   botão START abre menu → **screenshot da mochila cheia** → estável ≥ 60 s.
-4. Regenerar o mod quando precisar: `python3 scripts/apply_mod_v3.py` (montador
-   one-shot, asserts de pré-condição inclusos, sha256 reportado; fonte de bytes:
-   `reports/site_v3.hex` + `reports/tramp_v3.hex`). ROM modificada sha256 esperada:
-   `348025c1...2215a3`.
+## 1. Números que agora são FATO (não repita a investigação)
 
-## 3. Cheatsheet técnico (números já provados)
-- SetGpuReg @ `0x08000A38`; site overwrite = 8 B: `01 4b 18 47 | .word TRAMP+1`.
-- Tramp @ `0x08EB0C00` (run 0xFF, ver `reports/freespace_map.tsv`), 158 B builder-
-  revisado; salva/restore `{r0-r3}`, replay do prólogo, retorno `bx` pra `0x08000A43`
-  (bit0=1 mantém Thumb).
-- BL certo (replicado contra 6.000 BLs reais, ≡ capstone): S-bit + campo 23-bit
-  H10:L11 — fórmula em `MEMORIA_CONSOLIDADA.md` §5.
-- Save-state mGBA: IWRAM blob @ `0x19000`, EWRAM @ `0x21000`; slot-0 de bolsa no blob
-  @ `0x468B8` (== VA `0x020258B8`).
-- Emulador: `scripts/gba_libretro_emu.py` (input: `--input F:BTN:HOLD`; snaps md5 =
-  detector de tela travada).
-- Original ROM baseline: GAME FREAK logo @ ~480 f; Nidorino @ ~1380 f (timing-check).
+- Site `0x08000A38` = prólogo de `SetGpuReg` (`30 b5 00 06 04 0e 09 04`),
+  **1238 callsites** (`reports/..._callsites.tsv`).
+- Veneer correto **8 B**: `00 4b | 18 47 | 01 0c eb 08`
+  — `ldr r3,[pc,#0]` lê `Align(0x08000A3C,4)+0 = 0x08000A3C`.
+  ⚠ O v3 usava `#4` (lê `0x08000A40`) com o literal em `0x08000A3C` → **lixo**.
+- `REG_KEYINPUT` `0x04000130` = **ativo-baixo** (solto = `0x3FF`).
+  Combo L+R+START = `0x308`. Teste correto: `(k & 0x308) == 0`.
+- Mochila `0x020258B8`, slot `{id:u16, qty:u16}` → escrever como **um** `u32`
+  `(qty<<16)|id` (duas stores deixam estado meio-escrito visível).
+- Trampolim `0x08EB0C00` é run 0xFF e cabe numa ROM de 16 MiB (`0xEB0C00`),
+  **não** numa de 8 MiB → `apply_mod.py` checa e recusa/estica.
+- Save-state mGBA: **0x61000 B**; IWRAM @ `0x19000`, EWRAM @ `0x21000`;
+  mochila no blob @ `0x21000 + 0x258B8 = 0x468B8`.
+- ARM7TDMI **não tem Thumb-2**: `adds rX, rY` monta 32 bits e vira lixo —
+  usar `add rX, rY`. O montador (`gba_modkit.montar`) recusa 4 B fora de BL.
+
+## 2. Próximos passos, em ordem
+
+0. Ambiente (uma vez por sessão):
+   ```bash
+   bash scripts/setup_env.sh
+   make -C tools/gba_shim -j$(nproc)      # ~2 min; gera build/gba_shim.so (1,3 MB)
+   bash scripts/run_all_tests.sh          # 14 verificações, todas devem passar
+   ```
+1. **Validação no FireRed** (única pendência real):
+   ```bash
+   python3 scripts/apply_mod.py --rom rom/<sua_copia>.gba -o rom_mod/MOD_BAG.gba
+   # confira no relatório: sha256, site, trampolim e a simulação (off/on)
+   ```
+   No emulador: chegar ao overworld, segurar **L+R+START** por ~2 s (o hook roda
+   milhares de vezes por quadro — não precisa de timing), abrir o menu START →
+   MOCHILA → screenshot. Se o combo colidir com a ajuda nativa do jogo, refaça
+   com `--combo START+SELECT`.
+   Se a mochila não mudar: rode `python3 scripts/gba_emu.py --rom rom_mod/MOD_BAG.gba
+   --load-state <state do overworld> --input 10:L:90 --input 10:R:90 --input 10:START:90
+   --read 0x020258B8:32` e compare. (A ROM continua em `0x020258B8`? O save-state
+   é de uma versão da ROM sem o mod? Anote o que mudou.)
+2. **Se precisar mexer no payload**: edite `gba_modkit.PADRAO` (lista de
+   `(id, qtd)`); `--payload tudo` injeta os 8 primeiros da tabela Gen 3.
+3. **Regenerar a prova de bancada** (não precisa de ROM comercial):
+   ```bash
+   python3 tests/fixtures/make_bench_rom.py     # ROM própria, 0 conteúdo de jogo
+   python3 tests/teste_mod_bench.py             # 10 checks no mGBA real
+   ```
+4. **Escopo maior (opcional)**: menu in-game de escolha de itens. Exige achar o
+   handler do menu de mochila e uma tabela de itens; hoje o mod só preenche os
+   slots. Não comece sem a validação do passo 1.
+
+## 3. Ferramentas (o que usar em vez do quê)
+
+| Preciso de… | Use | NÃO use |
+|---|---|---|
+| rodar a ROM | `scripts/gba_emu.py` | `deprecated/gba_libretro_emu.py` (GLIBC 2.38) |
+| montar/alterar o mod | `scripts/gba_modkit.py` | hex na mão, `apply_mod_v3.py` (apagado) |
+| aplicar na ROM | `scripts/apply_mod.py` | — |
+| ler o save-state | `scripts/gba_state_dump.py` | — |
+| ler memória AO VIVO | `Emu.read/write` (`gba_emu.py`) | `retro_get_memory_data` (não publica) |
+| teclas | `Emu.keys_held()` / `REG_KEYINPUT` | o espelho `0x03003118` (contexto-dependente) |
 
 ## 4. Regras de convivência
+
 - FATO/HIPÓTESE rotulados; nunca claim sem evidência; ROM/jogo nunca entra em git
-  (`.gitignore` já pronto).
+  (`.gitignore` já pronto, com exceção só para `tests/fixtures/*.gba`, que é ROM
+  de bancada **nossa**).
 - Relatório enxuto por ciclo + ETA em toda resposta do agente.
