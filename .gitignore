@@ -1,10 +1,23 @@
-# --- GBA RE (projeto anterior) ---
+# --- ROMs (nunca versionar: nem a comercial, nem cópias de trabalho) ---
 rom/*.gba
 rom_mod/*.gba
-emu/*.bin
+*.gba
+!tests/fixtures/*.gba
 deliver/
 *.pyc
 __pycache__/
+
+# --- build do emulador (compilar local: make -C tools/gba_shim) ---
+tools/gba_shim/build/
+tools/gba_shim/build/mgba-src/
+*.o
+*.so
+
+# --- logs/artefatos gerados localmente ---
+logs/gba_emu_runs.jsonl
+logs/*.log
+emu/run/
+reports/mod_*.json
 
 # --- FORJA ---
 forja/web/node_modules/

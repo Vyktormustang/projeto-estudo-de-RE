@@ -1,0 +1,120 @@
+{
+  "ancoras": {
+    "BULBASAUR": {
+      "hex": "BC CF C6 BC BB CD BB CF CC",
+      "encontradas": 3,
+      "offsets_hex": [
+        "0x0018e283",
+        "0x0018e2d1",
+        "0x00245eeb"
+      ]
+    },
+    "IVYSAUR": {
+      "hex": "C3 D0 D3 CD BB CF CC",
+      "encontradas": 1,
+      "offsets_hex": [
+        "0x00245ef6"
+      ]
+    },
+    "VENUSAUR": {
+      "hex": "D0 BF C8 CF CD BB CF CC",
+      "encontradas": 4,
+      "offsets_hex": [
+        "0x00245f01",
+        "0x00456539",
+        "0x0047e5bc",
+        "0x0047e828"
+      ]
+    },
+    "CHARMANDER": {
+      "hex": "BD C2 BB CC C7 BB C8 BE BF CC",
+      "encontradas": 3,
+      "offsets_hex": [
+        "0x0018e1a0",
+        "0x0018e1f3",
+        "0x00245f0c"
+      ]
+    },
+    "POTION": {
+      "hex": "CA C9 CE C3 C9 C8",
+      "encontradas": 5,
+      "offsets_hex": [
+        "0x001a5f5f",
+        "0x001a6150",
+        "0x001b32d0",
+        "0x001b57b0",
+        "0x001b6336"
+      ]
+    },
+    "POUND": {
+      "hex": "CA C9 CF C8 BE",
+      "encontradas": 2,
+      "offsets_hex": [
+        "0x0024fcf9",
+        "0x003e83de"
+      ]
+    },
+    "POK[e]MON": {
+      "hex": "CA C9 C5 ?? C7 C9 C8",
+      "encontradas": 1811,
+      "offsets_hex": [
+        "0x0017227e",
+        "0x001722bb",
+        "0x001722d4",
+        "0x00172374",
+        "0x00172388",
+        "0x00172503",
+        "0x00172581",
+        "0x00172650"
+      ],
+      "byte_pos3_hex": "0x1B",
+      "mapeado_como": "é"
+    }
+  },
+  "byte_e_empirico": {
+    "byte": "0x1B",
+    "mapeado_como": "é"
+  },
+  "tabela_especies": {
+    "base_bulbasaur_hex": "0x0018e283",
+    "addr_gba_hex": "0x0818e283",
+    "vizinhanca_slot_11B": [
+      {
+        "idx_relativo": -2,
+        "offset_hex": "0x0018e26d",
+        "raw_hex": "c1cfbbacffc8e3e7e7d5ab",
+        "decodificado": "GUA?"
+      },
+      {
+        "idx_relativo": -1,
+        "offset_hex": "0x0018e278",
+        "raw_hex": "00bfe7e8d9001b00e9e100",
+        "decodificado": " Este é um "
+      },
+      {
+        "idx_relativo": 0,
+        "offset_hex": "0x0018e283",
+        "raw_hex": "bccfc6bcbbcdbbcfccad00",
+        "decodificado": "BULBASAUR. "
+      },
+      {
+        "idx_relativo": 1,
+        "offset_hex": "0x0018e28e",
+        "raw_hex": "00000000000000000000fe",
+        "decodificado": "          ¶"
+      },
+      {
+        "idx_relativo": 2,
+        "offset_hex": "0x0018e299",
+        "raw_hex": "0600e7e9e4d9e600da17d7",
+        "decodificado": "É super fác"
+      },
+      {
+        "idx_relativo": 3,
+        "offset_hex": "0x0018e2a4",
+        "raw_hex": "dde000e8e6d9dde2d5aee0",
+        "decodificado": "il treina-l"
+      }
+    ]
+  }
+}

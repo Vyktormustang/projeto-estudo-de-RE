@@ -1,0 +1,99 @@
+{
+  "transicao_thumb": {
+    "addr_thumb_hex": "0x080003a4",
+    "via": "BX com literal rastreado",
+    "instr_boot_arm": 13
+  },
+  "motivo_parada": "transição ARM→Thumb localizada",
+  "instrucoes_tracadas": 13,
+  "trace": [
+    {
+      "addr": "0x08000000",
+      "bytes": "7f0000ea",
+      "mn": "b",
+      "op": "#0x8000204",
+      "acao": "salto p/ 0x08000204"
+    },
+    {
+      "addr": "0x08000204",
+      "bytes": "1200a0e3",
+      "mn": "mov",
+      "op": "r0, #0x12"
+    },
+    {
+      "addr": "0x08000208",
+      "bytes": "00f029e1",
+      "mn": "msr",
+      "op": "cpsr_fc, r0"
+    },
+    {
+      "addr": "0x0800020c",
+      "bytes": "28d09fe5",
+      "mn": "ldr",
+      "op": "sp, [pc, #0x28]",
+      "literal_de": "0x0800023c",
+      "literal_valor": "0x03007fa0"
+    },
+    {
+      "addr": "0x08000210",
+      "bytes": "1f00a0e3",
+      "mn": "mov",
+      "op": "r0, #0x1f"
+    },
+    {
+      "addr": "0x08000214",
+      "bytes": "00f029e1",
+      "mn": "msr",
+      "op": "cpsr_fc, r0"
+    },
+    {
+      "addr": "0x08000218",
+      "bytes": "18d09fe5",
+      "mn": "ldr",
+      "op": "sp, [pc, #0x18]",
+      "literal_de": "0x08000238",
+      "literal_valor": "0x03007e40"
+    },
+    {
+      "addr": "0x0800021c",
+      "bytes": "1c109fe5",
+      "mn": "ldr",
+      "op": "r1, [pc, #0x1c]",
+      "literal_de": "0x08000240",
+      "literal_valor": "0x03007ffc"
+    },
+    {
+      "addr": "0x08000220",
+      "bytes": "20008fe2",
+      "mn": "add",
+      "op": "r0, pc, #0x20"
+    },
+    {
+      "addr": "0x08000224",
+      "bytes": "000081e5",
+      "mn": "str",
+      "op": "r0, [r1]"
+    },
+    {
+      "addr": "0x08000228",
+      "bytes": "14109fe5",
+      "mn": "ldr",
+      "op": "r1, [pc, #0x14]",
+      "literal_de": "0x08000244",
+      "literal_valor": "0x080003a5"
+    },
+    {
+      "addr": "0x0800022c",
+      "bytes": "0fe0a0e1",
+      "mn": "mov",
+      "op": "lr, pc"
+    },
+    {
+      "addr": "0x08000230",
+      "bytes": "11ff2fe1",
+      "mn": "bx",
+      "op": "r1",
+      "acao": "BX r1=0x080003a5 → modo THUMB"
+    }
+  ]
+}

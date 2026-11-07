@@ -1,0 +1,1 @@
+{"utc": "2026-10-14T18:32:09+00:00", "ferramenta": "gba_callgraph.py", "versao": "1.0.0", "duracao_s": 0.164, "saidas": {"dot": "/home/user/gba-re/callgraph/callgraph.dot", "edges": "/home/user/gba-re/callgraph/edges.tsv", "metrics": "/home/user/gba-re/callgraph/callgraph_metrics.json"}}

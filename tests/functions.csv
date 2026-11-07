@@ -1,0 +1,5 @@
+endereco_hex,tamanho_hex,nome,modo_cpu,confianca,origem,evidencia,historico_renomeacao
+0x08000100,-,MAIN,THUMB,CONFIRMADO,teste,e,e
+0x08000140,-,FUN_B,THUMB,CONFIRMADO,teste,e,e
+0x08000180,-,FUN_C,THUMB,CONFIRMADO,teste,e,e
+0x080001c0,-,FUN_D,THUMB,CONFIRMADO,teste,e,e
