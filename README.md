@@ -1,3 +1,11 @@
+## FireRed Gen1–9 — progresso atual
+
+A linha Gen1–9 está em **[firered_gen1_9/](firered_gen1_9/README.md)**. Última versão validada: **V42**. [Publicação e download no Drive](firered_gen1_9/docs/PUBLICACAO_V42.md) · [Auditoria parcial de Cosmog](firered_gen1_9/docs/PROGRESSO_COSMOG_V42.md).
+
+ROMs e saves não entram no Git. O conteúdo abaixo descreve o projeto histórico BAG_MOD de 16 MiB; **não misturar bases, offsets ou saves**.
+
+---
+
 # gba-re 🔧 Engenharia Reversa de GBA + Mod Menu (item cheat)
 
 ![plataforma](https://img.shields.io/badge/plataforma-Game%20Boy%20Advance-blue)

@@ -1,6 +1,20 @@
-# --- GBA RE (projeto anterior) ---
-rom/*.gba
-rom_mod/*.gba
+# --- GBA RE / ROMs & saves comerciais ou sinteticos (nunca commitar) ---
+*.gba
+**/*.gba
+*.sav
+**/*.sav
+*.srm
+**/*.srm
+*.ss0
+*.ss1
+*.ss2
+*.ss3
+*.state
+*.st[0-9]
+*.agb
+google_drive/
+rom/
+rom_mod/
 emu/*.bin
 deliver/
 *.pyc

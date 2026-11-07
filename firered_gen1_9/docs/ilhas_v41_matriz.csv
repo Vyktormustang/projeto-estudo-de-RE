@@ -1,0 +1,17 @@
+mystic_item,aurora_item,flag_084A,flag_084B,menu,destinos,requisitos_preparados_sinteticamente
+False,False,False,False,255,ilhas comuns,True
+False,False,True,False,255,ilhas comuns,True
+False,False,False,True,255,ilhas comuns,True
+False,False,True,True,255,ilhas comuns,True
+True,False,False,False,255,ilhas comuns,True
+True,False,True,False,54,Navel Rock,True
+True,False,False,True,255,ilhas comuns,True
+True,False,True,True,54,Navel Rock,True
+False,True,False,False,255,ilhas comuns,True
+False,True,True,False,255,ilhas comuns,True
+False,True,False,True,55,Birth Island,True
+False,True,True,True,55,Birth Island,True
+True,True,False,False,255,ilhas comuns,True
+True,True,True,False,54,Navel Rock,True
+True,True,False,True,55,Birth Island,True
+True,True,True,True,56,Navel Rock;Birth Island,True

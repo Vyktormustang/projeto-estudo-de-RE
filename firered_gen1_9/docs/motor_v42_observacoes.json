@@ -1,0 +1,747 @@
+[
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 0,
+    "header": 123,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 1,
+    "header": 124,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 2,
+    "header": 125,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 3,
+    "header": 126,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 4,
+    "header": 127,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 5,
+    "header": 128,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 6,
+    "header": 129,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 7,
+    "header": 130,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 8,
+    "header": 131,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 9,
+    "header": 123,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 600,
+    "value": 65535,
+    "header": 123,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 0,
+    "header": 123,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 1,
+    "header": 124,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 2,
+    "header": 125,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 3,
+    "header": 126,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 4,
+    "header": 127,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 5,
+    "header": 128,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 6,
+    "header": 129,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 7,
+    "header": 130,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 8,
+    "header": 131,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 9,
+    "header": 123,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "variant_quantiles",
+    "minute": 1320,
+    "value": 65535,
+    "header": 123,
+    "rolls": 100,
+    "type_null_rolls": 10
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 1,
+    "player": [
+      15,
+      13
+    ],
+    "steps": 0,
+    "next_stage": 1
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 2,
+    "player": [
+      12,
+      14
+    ],
+    "steps": 4,
+    "next_stage": 2
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 3,
+    "player": [
+      15,
+      9
+    ],
+    "steps": 8,
+    "next_stage": 3
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 4,
+    "player": [
+      18,
+      14
+    ],
+    "steps": 8,
+    "next_stage": 4
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 5,
+    "player": [
+      13,
+      11
+    ],
+    "steps": 8,
+    "next_stage": 5
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 6,
+    "player": [
+      17,
+      11
+    ],
+    "steps": 4,
+    "next_stage": 6
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 7,
+    "player": [
+      15,
+      13
+    ],
+    "steps": 4,
+    "next_stage": 7
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 8,
+    "player": [
+      12,
+      14
+    ],
+    "steps": 4,
+    "next_stage": 8
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 9,
+    "player": [
+      18,
+      14
+    ],
+    "steps": 6,
+    "next_stage": 9
+  },
+  {
+    "probe": "deoxys_puzzle_stage",
+    "interaction": 10,
+    "player": [
+      15,
+      14
+    ],
+    "steps": 3,
+    "next_stage": 10
+  },
+  {
+    "probe": "deoxys_puzzle_solved",
+    "interaction": 11,
+    "steps": 3,
+    "total_steps": 52
+  },
+  {
+    "probe": "native_event_capture",
+    "species": 386,
+    "level": 30,
+    "fought_flag": "02E4",
+    "hidden_flag": "0099",
+    "saved_and_reloaded": true,
+    "synthetic_arrival": true,
+    "ball": "synthetic Master Ball"
+  },
+  {
+    "probe": "earned_ticket_trip",
+    "destination": [
+      2,
+      59
+    ],
+    "tickets_injected": false,
+    "progress_and_rainbow_synthetic": true
+  },
+  {
+    "probe": "earned_ticket_trip",
+    "destination": [
+      2,
+      58
+    ],
+    "tickets_injected": false,
+    "progress_and_rainbow_synthetic": true
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 0,
+    "flag_bits": 0,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 0,
+    "flag_bits": 1,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 0,
+    "flag_bits": 2,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 0,
+    "flag_bits": 3,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 1,
+    "flag_bits": 0,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 1,
+    "flag_bits": 1,
+    "menu": 54
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 1,
+    "flag_bits": 2,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 1,
+    "flag_bits": 3,
+    "menu": 54
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 2,
+    "flag_bits": 0,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 2,
+    "flag_bits": 1,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 2,
+    "flag_bits": 2,
+    "menu": 55
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 2,
+    "flag_bits": 3,
+    "menu": 55
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 3,
+    "flag_bits": 0,
+    "menu": 255
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 3,
+    "flag_bits": 1,
+    "menu": 54
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 3,
+    "flag_bits": 2,
+    "menu": 55
+  },
+  {
+    "probe": "ferry_matrix",
+    "item_bits": 3,
+    "flag_bits": 3,
+    "menu": 56
+  },
+  {
+    "probe": "ferry_stage",
+    "stage": 1,
+    "menu": 57
+  },
+  {
+    "probe": "ferry_stage",
+    "stage": 4,
+    "menu": 57
+  },
+  {
+    "probe": "native_ferry_trip",
+    "destination": "NAVEL",
+    "group": 2,
+    "map": 59,
+    "synthetic_tickets_and_progress": true,
+    "native_buttons_only_after_prepare": true
+  },
+  {
+    "probe": "native_ferry_trip",
+    "destination": "BIRTH",
+    "group": 2,
+    "map": 58,
+    "synthetic_tickets_and_progress": true,
+    "native_buttons_only_after_prepare": true
+  },
+  {
+    "probe": "fresh_game",
+    "item": 370,
+    "quantity": 0,
+    "flag": "084A",
+    "enabled": false
+  },
+  {
+    "probe": "fresh_game",
+    "item": 371,
+    "quantity": 0,
+    "flag": "084B",
+    "enabled": false
+  },
+  {
+    "probe": "v42_capacity",
+    "aurora_repaired_despite_mystic_failure": true,
+    "full_no_grant": true,
+    "one_free_partial": true,
+    "retry_second_only": true,
+    "full_owned_repair": true,
+    "capture_flags_preserved": true
+  },
+  {
+    "probe": "native_event_capture",
+    "species": 250,
+    "level": 70,
+    "fought_flag": "02F3",
+    "hidden_flag": "009C",
+    "saved_and_reloaded": true,
+    "synthetic_arrival": true,
+    "ball": "synthetic Master Ball"
+  },
+  {
+    "probe": "native_event_capture",
+    "species": 249,
+    "level": 70,
+    "fought_flag": "02F2",
+    "hidden_flag": "009B",
+    "saved_and_reloaded": true,
+    "synthetic_arrival": true,
+    "ball": "synthetic Master Ball"
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 0,
+    "flags_before": 0,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 0,
+    "flags_before": 1,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 0,
+    "flags_before": 2,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 0,
+    "flags_before": 3,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 1,
+    "flags_before": 0,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 1,
+    "flags_before": 1,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 1,
+    "flags_before": 2,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 1,
+    "flags_before": 3,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 2,
+    "flags_before": 0,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 2,
+    "flags_before": 1,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 2,
+    "flags_before": 2,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 2,
+    "flags_before": 3,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 3,
+    "flags_before": 0,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 3,
+    "flags_before": 1,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 3,
+    "flags_before": 2,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_delivery_matrix",
+    "items_before": 3,
+    "flags_before": 3,
+    "items_after": [
+      1,
+      1
+    ],
+    "flags_after": [
+      1,
+      1
+    ]
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 3,
+    "stage": 5,
+    "rainbow": false,
+    "tea": false,
+    "granted": false
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 3,
+    "stage": 5,
+    "rainbow": false,
+    "tea": true,
+    "granted": false
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 3,
+    "stage": 4,
+    "rainbow": true,
+    "tea": false,
+    "granted": false
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 3,
+    "stage": 1,
+    "rainbow": true,
+    "tea": false,
+    "granted": false
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 0,
+    "stage": 5,
+    "rainbow": true,
+    "tea": false,
+    "granted": false
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 4,
+    "stage": 5,
+    "rainbow": true,
+    "tea": false,
+    "granted": false
+  },
+  {
+    "probe": "v42_guard",
+    "scene": 3,
+    "stage": 0,
+    "rainbow": true,
+    "tea": false,
+    "granted": false
+  },
+  {
+    "probe": "v42_legacy_flash",
+    "upgraded_from_v41_without_map_reentry": true,
+    "earned_items_persist": true,
+    "v42_v41_v42": true
+  }
+]

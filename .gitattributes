@@ -1,0 +1,5 @@
+*.bin binary
+# Preserve CSV evidence bytes (including native csv.writer CRLF endings).
+*.csv whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Historical source copy is intentionally byte-preserved, including trailing spaces.
+firered_gen1_9/legado/v3_original/scripts/gba_hook_code.py whitespace=-blank-at-eol

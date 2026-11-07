@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-06",
+  "version": "v41",
+  "read_only": true,
+  "new_rom": false,
+  "rom_sha256": "662225325c50af5aeb568da97a10110cff300aff55e1a6ec87f0d11c1a5f5d50",
+  "core_version": "0.10.5",
+  "core_commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+  "core_sha256": "07ab56ae80ed30486eff67ab4907b345f46ebb5e60f47f98869dc534df18dad9",
+  "tests_run": 9,
+  "passed": 9,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "elapsed_seconds": 144.618,
+  "structural_methods": 4,
+  "mgba_methods": 5,
+  "observations": 36,
+  "ferry_combinations": 16,
+  "progression_controls": 2,
+  "native_ferry_trips": 2,
+  "captures": 3,
+  "deoxys_puzzle": {
+    "interactions": 11,
+    "walking_steps": 52,
+    "counters_injected": false
+  },
+  "normal_ticket_acquisition_verified": false,
+  "continuous_campaign_route_tested": false,
+  "return_ferry_trip_tested": false,
+  "historical_suites_rerun": false,
+  "tests": [
+    {
+      "id": "test_ilhas_v41.IslandStructureTests.test_gift_scripts_not_promoted_to_normal_acquisition_and_reject_bad_input",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41.IslandStructureTests.test_map_root_progress_and_two_ticket_flag_gates",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41.IslandStructureTests.test_native_event_paths_not_raw_species_matches",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41.IslandStructureTests.test_reproducible_cli_exclusive_output_and_unchanged_rom",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41_mgba.IslandNativeTests.test_deoxys_full_triangle_puzzle_capture_and_persistence",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41_mgba.IslandNativeTests.test_ferry_ticket_and_flag_matrix_and_actual_two_destinations",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41_mgba.IslandNativeTests.test_fresh_game_does_not_start_with_tickets_or_enable_flags",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41_mgba.IslandNativeTests.test_hooh_coordinate_trigger_capture_and_persistence",
+      "status": "passed"
+    },
+    {
+      "id": "test_ilhas_v41_mgba.IslandNativeTests.test_lugia_native_interaction_capture_and_persistence",
+      "status": "passed"
+    }
+  ],
+  "preparation": "Synthetic arrivals via disposable warp copies and native flash into exact v41; synthetic progress/tickets/flags for ferry; synthetic Master Balls for capture",
+  "development_notes": "Adjusted arrival to avoid accidental sailor dialogue; completed paragraph breaks before asserting menus; final full run passed"
+}

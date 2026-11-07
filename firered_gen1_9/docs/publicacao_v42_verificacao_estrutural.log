@@ -1,0 +1,20 @@
+test_bad_input_rejected_and_item_ids_are_actual_rainbow_not_tea (test_motor_v42.MotorV42BuildTests.test_bad_input_rejected_and_item_ids_are_actual_rainbow_not_tea) ... ok
+test_cli_new_output_only_and_input_unchanged (test_motor_v42.MotorV42BuildTests.test_cli_new_output_only_and_input_unchanged) ... ok
+test_exact_rebuild_and_only_declared_three_ranges (test_motor_v42.MotorV42BuildTests.test_exact_rebuild_and_only_declared_three_ranges) ... ok
+test_previous_encounters_guide_events_and_evolutions_identical (test_motor_v42.MotorV42BuildTests.test_previous_encounters_guide_events_and_evolutions_identical) ... ok
+test_all_inventory_flag_combinations_idempotent_and_no_capture_reset (test_motor_v42.TicketScriptTests.test_all_inventory_flag_combinations_idempotent_and_no_capture_reset) ... ok
+test_full_bag_partial_delivery_retry_and_repair_without_room (test_motor_v42.TicketScriptTests.test_full_bag_partial_delivery_retry_and_repair_without_room) ... ok
+test_progress_pass_and_questlog_guards (test_motor_v42.TicketScriptTests.test_progress_pass_and_questlog_guards) ... ok
+test_text_bounds_and_reservations (test_motor_v42.TicketScriptTests.test_text_bounds_and_reservations) ... ok
+test_each_pair_of_exits_has_collision_free_path (test_trajetos_v42.IslandTopologyTests.test_each_pair_of_exits_has_collision_free_path) ... ok
+test_reciprocal_graph_and_complete_routes (test_trajetos_v42.IslandTopologyTests.test_reciprocal_graph_and_complete_routes) ... ok
+test_v41_geometry_unchanged_and_wrong_input_rejected (test_trajetos_v42.IslandTopologyTests.test_v41_geometry_unchanged_and_wrong_input_rejected) ... ok
+test_path_respects_collision_and_unselected_warps (test_trajetos_v42.PathAlgorithmTests.test_path_respects_collision_and_unselected_warps) ... ok
+test_native_breeding_table_is_not_undiscovered (test_cosmog_v42.CosmogStructureTests.test_native_breeding_table_is_not_undiscovered) ... ok
+test_rejects_nonexact_rom_and_keeps_input (test_cosmog_v42.CosmogStructureTests.test_rejects_nonexact_rom_and_keeps_input) ... ok
+test_sources_and_level_rules (test_cosmog_v42.CosmogStructureTests.test_sources_and_level_rules) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 13.624s
+
+OK

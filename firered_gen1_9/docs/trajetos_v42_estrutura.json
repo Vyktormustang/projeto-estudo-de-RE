@@ -1,0 +1,833 @@
+{
+  "version": "v42",
+  "rom_sha256": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "read_only": true,
+  "native_travel_certified_by_this_parser": false,
+  "maps": [
+    {
+      "group": 2,
+      "number": 0,
+      "name": "NavelRock_Exterior",
+      "width": 20,
+      "height": 23,
+      "header": "0x846cc8",
+      "warps": [
+        {
+          "index": 0,
+          "x": 9,
+          "y": 8,
+          "elevation": 3,
+          "behavior": "0x60",
+          "destination": [
+            2,
+            36
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 9,
+          "y": 16,
+          "elevation": 3,
+          "behavior": "0x65",
+          "destination": [
+            2,
+            59
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 36,
+      "name": "NavelRock_1F",
+      "width": 17,
+      "height": 26,
+      "header": "0x8470b8",
+      "warps": [
+        {
+          "index": 0,
+          "x": 8,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            54
+          ],
+          "destination_id": 0
+        },
+        {
+          "index": 1,
+          "x": 8,
+          "y": 23,
+          "elevation": 3,
+          "behavior": "0x65",
+          "destination": [
+            2,
+            0
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 37,
+      "name": "NavelRock_Summit",
+      "width": 19,
+      "height": 25,
+      "header": "0x8470d4",
+      "warps": [
+        {
+          "index": 0,
+          "x": 10,
+          "y": 18,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            42
+          ],
+          "destination_id": 1
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 38,
+      "name": "NavelRock_Base",
+      "width": 21,
+      "height": 23,
+      "header": "0x8470f0",
+      "warps": [
+        {
+          "index": 0,
+          "x": 13,
+          "y": 20,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            53
+          ],
+          "destination_id": 1
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 39,
+      "name": "NavelRock_SummitPath_2F",
+      "width": 7,
+      "height": 7,
+      "header": "0x84710c",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            55
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            40
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 40,
+      "name": "NavelRock_SummitPath_3F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847128",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            39
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            41
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 41,
+      "name": "NavelRock_SummitPath_4F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847144",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            40
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            42
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 42,
+      "name": "NavelRock_SummitPath_5F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847160",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            41
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            37
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 43,
+      "name": "NavelRock_BasePath_B1F",
+      "width": 7,
+      "height": 7,
+      "header": "0x84717c",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            55
+          ],
+          "destination_id": 2
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            44
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 44,
+      "name": "NavelRock_BasePath_B2F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847198",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            43
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            45
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 45,
+      "name": "NavelRock_BasePath_B3F",
+      "width": 7,
+      "height": 7,
+      "header": "0x8471b4",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            44
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            46
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 46,
+      "name": "NavelRock_BasePath_B4F",
+      "width": 7,
+      "height": 7,
+      "header": "0x8471d0",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            45
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            47
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 47,
+      "name": "NavelRock_BasePath_B5F",
+      "width": 7,
+      "height": 7,
+      "header": "0x8471ec",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            46
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            48
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 48,
+      "name": "NavelRock_BasePath_B6F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847208",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            47
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            49
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 49,
+      "name": "NavelRock_BasePath_B7F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847224",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            48
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            50
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 50,
+      "name": "NavelRock_BasePath_B8F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847240",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            49
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            51
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 51,
+      "name": "NavelRock_BasePath_B9F",
+      "width": 7,
+      "height": 7,
+      "header": "0x84725c",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            50
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            52
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 52,
+      "name": "NavelRock_BasePath_B10F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847278",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            51
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            53
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 53,
+      "name": "NavelRock_BasePath_B11F",
+      "width": 7,
+      "height": 7,
+      "header": "0x847294",
+      "warps": [
+        {
+          "index": 0,
+          "x": 2,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            52
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 4,
+          "y": 4,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            38
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 54,
+      "name": "NavelRock_B1F",
+      "width": 17,
+      "height": 7,
+      "header": "0x8472b0",
+      "warps": [
+        {
+          "index": 0,
+          "x": 4,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            36
+          ],
+          "destination_id": 0
+        },
+        {
+          "index": 1,
+          "x": 11,
+          "y": 5,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            55
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 55,
+      "name": "NavelRock_Fork",
+      "width": 30,
+      "height": 100,
+      "header": "0x8472cc",
+      "warps": [
+        {
+          "index": 0,
+          "x": 13,
+          "y": 95,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            54
+          ],
+          "destination_id": 1
+        },
+        {
+          "index": 1,
+          "x": 3,
+          "y": 1,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            39
+          ],
+          "destination_id": 0
+        },
+        {
+          "index": 2,
+          "x": 26,
+          "y": 1,
+          "elevation": 3,
+          "behavior": "0x61",
+          "destination": [
+            2,
+            43
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 56,
+      "name": "BirthIsland_Exterior",
+      "width": 30,
+      "height": 30,
+      "header": "0x8472e8",
+      "warps": [
+        {
+          "index": 0,
+          "x": 15,
+          "y": 24,
+          "elevation": 3,
+          "behavior": "0x65",
+          "destination": [
+            2,
+            58
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 58,
+      "name": "BirthIsland_Harbor",
+      "width": 17,
+      "height": 13,
+      "header": "0x847320",
+      "warps": [
+        {
+          "index": 0,
+          "x": 8,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x60",
+          "destination": [
+            2,
+            56
+          ],
+          "destination_id": 0
+        }
+      ]
+    },
+    {
+      "group": 2,
+      "number": 59,
+      "name": "NavelRock_Harbor",
+      "width": 17,
+      "height": 13,
+      "header": "0x84733c",
+      "warps": [
+        {
+          "index": 0,
+          "x": 8,
+          "y": 2,
+          "elevation": 3,
+          "behavior": "0x60",
+          "destination": [
+            2,
+            0
+          ],
+          "destination_id": 1
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "start": [
+        2,
+        59
+      ],
+      "goal": [
+        2,
+        37
+      ],
+      "transitions": 9
+    },
+    {
+      "start": [
+        2,
+        37
+      ],
+      "goal": [
+        2,
+        38
+      ],
+      "transitions": 17
+    },
+    {
+      "start": [
+        2,
+        38
+      ],
+      "goal": [
+        2,
+        59
+      ],
+      "transitions": 16
+    },
+    {
+      "start": [
+        2,
+        58
+      ],
+      "goal": [
+        2,
+        56
+      ],
+      "transitions": 1
+    },
+    {
+      "start": [
+        2,
+        56
+      ],
+      "goal": [
+        2,
+        58
+      ],
+      "transitions": 1
+    }
+  ]
+}

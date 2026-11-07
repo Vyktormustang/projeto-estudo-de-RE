@@ -1,0 +1,4 @@
+journey,species,level,group,map,party_count,save_continue,personality
+test_birth_roundtrip_full_puzzle_and_deoxys,386,30,2,56,2,True,9ff999dd
+test_navel_roundtrip_hooh_and_lugia,250,70,2,37,2,True,13df5c8a
+test_navel_roundtrip_hooh_and_lugia,249,70,2,38,3,True,30c96c17

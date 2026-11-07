@@ -1,0 +1,335 @@
+mapa_fixo,grupo,mapa_id,objeto_id,pokedex_nacional,pokemon,categoria,situacao_fixo,x_original,y_original,mapa_selvagem,metodo,nivel_min,nivel_max,chance_por_encontro_pct
+Viridian Forest,1,0,12,885,dreepy,comum,retirado do mapa,48,40,Mt Moon B 2F,grama/caverna,12,12,1
+Viridian Forest,1,0,13,278,wingull,comum,retirado do mapa,13,5,Three Island Bond Bridge,surf,35,40,4
+Viridian Forest,1,0,14,831,wooloo,comum,retirado do mapa,21,18,Route 5,grama/caverna,15,15,1
+Viridian Forest,1,0,15,602,tynamo,comum,retirado do mapa,49,36,Route 24,grama/caverna,8,8,1
+Viridian Forest,1,0,16,307,meditite,comum,retirado do mapa,26,61,Mt Ember Exterior,grama/caverna,30,30,1
+Viridian Forest,1,0,17,940,wattrel,comum,retirado do mapa,13,39,Route 22,grama/caverna,5,5,1
+Mt Moon 1F,1,1,15,318,carvanha,comum,retirado do mapa,2,6,Six Island Ruin Valley,surf,15,25,5
+Mt Moon 1F,1,1,16,613,cubchoo,comum,retirado do mapa,7,16,Seafoam Islands B 1F,grama/caverna,26,26,4
+Mt Moon 1F,1,1,17,850,sizzlipede,comum,retirado do mapa,44,25,Route 12,grama/caverna,28,28,4
+Mt Moon 1F,1,1,18,582,vanillite,comum,retirado do mapa,37,15,Route 14,grama/caverna,29,29,4
+Mt Moon 1F,1,1,19,653,fennekin,comum,retirado do mapa,26,5,Route 17,grama/caverna,29,29,5
+Mt Moon 1F,1,1,20,341,corphish,comum,retirado do mapa,8,32,Celadon City,surf,10,20,30
+Mt Moon B 1F,1,2,1,498,tepig,comum,retirado do mapa,5,7,Route 7,grama/caverna,19,19,4
+Mt Moon B 1F,1,2,2,258,mudkip,comum,retirado do mapa,14,18,Route 12,surf,10,20,30
+Mt Moon B 1F,1,2,3,333,swablu,comum,retirado do mapa,43,27,Cerulean Cave B 1F,grama/caverna,67,67,5
+Mt Moon B 1F,1,2,4,255,torchic,comum,retirado do mapa,41,4,Route 1,grama/caverna,4,4,4
+Mt Moon B 1F,1,2,5,588,karrablast,comum,retirado do mapa,36,36,Four Island Icefall Cave Back,grama/caverna,51,51,5
+Mt Moon B 1F,1,2,6,595,joltik,comum,retirado do mapa,5,18,Seafoam Islands B 2F,grama/caverna,32,32,4
+Mt Moon B 2F,1,3,12,996,frigibax,comum,retirado do mapa,23,13,Seafoam Islands B 4F,grama/caverna,34,34,5
+Mt Moon B 2F,1,3,13,557,dwebble,comum,retirado do mapa,29,7,Mt Ember Ruby Path 1F,grama/caverna,40,40,4
+Mt Moon B 2F,1,3,14,529,drilbur,comum,retirado do mapa,12,28,Mt Ember Summit Path 1F,grama/caverna,39,39,4
+Mt Moon B 2F,1,3,15,878,cufant,comum,retirado do mapa,14,5,Route 22,grama/caverna,5,5,4
+Mt Moon B 2F,1,3,16,370,luvdisc,comum,retirado do mapa,24,31,Four Island,surf,5,35,30
+Mt Moon B 2F,1,3,17,325,spoink,comum,retirado do mapa,24,18,Mt Moon 1F,grama/caverna,7,7,4
+Digletts Cave B 1F,1,37,1,978,tatsugiri,comum,retirado do mapa,74,66,Fuchsia City,surf,20,25,30
+Digletts Cave B 1F,1,37,2,741,oricorio,comum,retirado do mapa,22,23,Mt Ember Ruby Path B 1F Stairs,grama/caverna,32,32,5
+Digletts Cave B 1F,1,37,3,968,orthworm,comum,retirado do mapa,11,14,Route 14,grama/caverna,23,23,4
+Digletts Cave B 1F,1,37,4,489,phione,lendario/mitico,preservado,38,36,,,,,
+Digletts Cave B 1F,1,37,5,632,durant,comum,retirado do mapa,42,38,Cerulean Cave B 1F,grama/caverna,64,64,4
+Digletts Cave B 1F,1,37,6,962,bombirdier,comum,retirado do mapa,60,51,Pokemon Tower 4F,grama/caverna,17,17,4
+Victory Road 1F,1,39,8,904,overqwil,comum,retirado do mapa,19,17,Six Island Ruin Valley,grama/caverna,41,41,5
+Victory Road 1F,1,39,9,903,sneasler,comum,retirado do mapa,11,14,Pokemon Mansion 1F,grama/caverna,26,26,4
+Victory Road 1F,1,39,10,892,urshifu,lendario/mitico,preservado,4,8,,,,,
+Victory Road 1F,1,39,11,987,flutter-mane,paradox,preservado,5,14,Cerulean Cave 2F,grama/caverna,55,55,10
+Victory Road 1F,1,39,12,799,guzzlord,ultra beast,preservado,8,5,Victory Road 2F,grama/caverna,34,34,10
+Victory Road 1F,1,39,13,793,nihilego,ultra beast,preservado,15,12,Mt Ember Summit Path 2F,grama/caverna,32,32,10
+Victory Road 2F,1,40,14,801,magearna,lendario/mitico,preservado,22,11,,,,,
+Victory Road 2F,1,40,15,490,manaphy,lendario/mitico,preservado,29,16,,,,,
+Victory Road 2F,1,40,16,802,marshadow,lendario/mitico,preservado,48,6,,,,,
+Victory Road 2F,1,40,17,151,mew,lendario/mitico,preservado,23,19,,,,,
+Victory Road 2F,1,40,18,1025,pecharunt,lendario/mitico,preservado,46,10,,,,,
+Victory Road 2F,1,40,19,494,victini,lendario/mitico,preservado,16,8,,,,,
+Victory Road 3F,1,41,13,781,dhelmise,comum,retirado do mapa,39,3,Pokemon Mansion 3F,grama/caverna,28,28,10
+Victory Road 3F,1,41,14,902,basculegion,comum,retirado do mapa,33,6,Route 25,surf,25,30,5
+Victory Road 3F,1,41,15,1017,ogerpon,lendario/mitico,preservado,23,10,,,,,
+Victory Road 3F,1,41,16,1014,okidogi,lendario/mitico,preservado,19,6,,,,,
+Victory Road 3F,1,41,17,986,brute-bonnet,paradox,preservado,38,15,Six Island Ruin Valley,grama/caverna,43,43,10
+Victory Road 3F,1,41,18,995,iron-thorns,paradox,preservado,19,14,Mt Ember Ruby Path B 2F Stairs,grama/caverna,30,30,4
+Safari Zone Center,1,63,2,797,celesteela,ultra beast,preservado,30,14,Seven Island Sevault Canyon Entrance,grama/caverna,41,41,10
+Safari Zone Center,1,63,3,1002,chien-pao,lendario/mitico,preservado,16,12,,,,,
+Safari Zone Center,1,63,4,1004,chi-yu,lendario/mitico,preservado,35,27,,,,,
+Safari Zone Center,1,63,5,984,great-tusk,paradox,preservado,31,21,Seafoam Islands B 2F,grama/caverna,32,32,10
+Safari Zone Center,1,63,6,991,iron-bundle,paradox,preservado,12,29,Five Island Resort Gorgeous,surf,35,40,5
+Safari Zone Center,1,63,7,992,iron-hands,paradox,preservado,40,26,Seafoam Islands B 4F,grama/caverna,32,32,10
+Safari Zone East,1,64,5,926,fidough,comum,retirado do mapa,23,20,Four Island Icefall Cave 1F,grama/caverna,48,48,4
+Safari Zone East,1,64,6,843,silicobra,comum,retirado do mapa,15,26,Mt Ember Ruby Path B 1F,grama/caverna,42,42,4
+Safari Zone East,1,64,7,610,axew,comum,retirado do mapa,34,22,Seafoam Islands B 3F,grama/caverna,32,32,4
+Safari Zone East,1,64,8,449,hippopotas,comum,retirado do mapa,40,19,Mt Ember Ruby Path B 3F,grama/caverna,36,36,4
+Safari Zone East,1,64,9,331,cacnea,comum,retirado do mapa,11,29,Viridian Forest,grama/caverna,4,4,4
+Safari Zone East,1,64,10,684,swirlix,comum,retirado do mapa,12,14,Viridian Forest,grama/caverna,3,3,4
+Safari Zone North,1,65,4,304,aron,comum,retirado do mapa,28,28,Mt Ember Summit Path 3F,grama/caverna,37,37,4
+Safari Zone North,1,65,5,170,chinchou,comum,retirado do mapa,45,32,Five Island,surf,5,15,30
+Safari Zone North,1,65,6,739,crabrawler,comum,retirado do mapa,38,10,Route 2,grama/caverna,4,4,4
+Safari Zone North,1,65,7,559,scraggy,comum,retirado do mapa,35,24,Route 2,grama/caverna,5,5,5
+Safari Zone North,1,65,8,677,espurr,comum,retirado do mapa,11,32,Route 3,grama/caverna,7,7,10
+Safari Zone North,1,65,9,345,lileep,comum,retirado do mapa,22,20,Viridian Forest,grama/caverna,5,5,10
+Safari Zone West,1,66,5,993,iron-jugulis,paradox,preservado,11,17,Cerulean Cave B 1F,grama/caverna,52,52,10
+Safari Zone West,1,66,6,994,iron-moth,paradox,preservado,31,8,Mt Ember Exterior,grama/caverna,32,32,10
+Safari Zone West,1,66,7,798,kartana,ultra beast,preservado,9,10,Cerulean Cave 1F,grama/caverna,52,52,10
+Safari Zone West,1,66,8,989,sandy-shocks,paradox,preservado,19,25,Four Island Icefall Cave B 1F,grama/caverna,30,30,5
+Safari Zone West,1,66,9,985,scream-tail,paradox,preservado,25,9,Six Island Water Path,grama/caverna,41,41,10
+Safari Zone West,1,66,10,773,silvally,lendario/mitico,preservado,38,16,,,,,
+Cerulean Cave 1F,1,72,10,795,pheromosa,ultra beast,preservado,33,6,Seafoam Islands 1F,grama/caverna,31,31,10
+Cerulean Cave 1F,1,72,11,787,tapu-bulu,lendario/mitico,preservado,22,6,,,,,
+Cerulean Cave 1F,1,72,12,788,tapu-fini,lendario/mitico,preservado,18,7,,,,,
+Cerulean Cave 1F,1,72,13,244,entei,lendario/mitico,preservado,24,17,,,,,
+Cerulean Cave 1F,1,72,14,378,regice,lendario/mitico,preservado,14,10,,,,,
+Cerulean Cave 1F,1,72,15,377,regirock,lendario/mitico,preservado,10,6,,,,,
+Cerulean Cave 2F,1,73,14,721,volcanion,lendario/mitico,preservado,30,10,,,,,
+Cerulean Cave 2F,1,73,15,807,zeraora,lendario/mitico,preservado,10,4,,,,,
+Cerulean Cave 2F,1,73,16,964,palafin,comum,retirado do mapa,17,10,Celadon City,surf,20,30,5
+Cerulean Cave 2F,1,73,17,646,kyurem,lendario/mitico,preservado,7,8,,,,,
+Cerulean Cave 2F,1,73,18,888,zacian,lendario/mitico,preservado,6,12,,,,,
+Cerulean Cave 2F,1,73,19,889,zamazenta,lendario/mitico,preservado,25,14,,,,,
+Rock Tunnel 1F,1,81,11,789,cosmog,lendario/mitico,preservado,12,12,,,,,
+Rock Tunnel 1F,1,81,12,349,feebas,comum,retirado do mapa,23,5,One Island,surf,35,40,4
+Rock Tunnel 1F,1,81,13,261,poochyena,comum,retirado do mapa,9,29,Victory Road 1F,grama/caverna,46,46,1
+Rock Tunnel 1F,1,81,14,296,makuhita,comum,retirado do mapa,5,12,Mt Ember Ruby Path B 2F Stairs,grama/caverna,30,30,1
+Rock Tunnel 1F,1,81,15,263,zigzagoon,comum,retirado do mapa,39,23,Mt Ember Ruby Path B 1F,grama/caverna,30,30,1
+Rock Tunnel 1F,1,81,16,848,toxel,comum,retirado do mapa,35,4,Six Island Water Path,grama/caverna,50,50,1
+Rock Tunnel B 1F,1,82,27,898,calyrex,lendario/mitico,preservado,18,2,,,,,
+Rock Tunnel B 1F,1,82,28,701,hawlucha,comum,retirado do mapa,29,23,Pokemon Mansion 2F,grama/caverna,26,26,4
+Rock Tunnel B 1F,1,82,29,883,arctovish,comum,retirado do mapa,11,2,Seven Island Tanoby Ruins,surf,35,40,5
+Rock Tunnel B 1F,1,82,30,881,arctozolt,comum,retirado do mapa,38,16,Seafoam Islands B 1F,grama/caverna,24,24,10
+Rock Tunnel B 1F,1,82,31,882,dracovish,comum,retirado do mapa,38,2,Six Island Water Path,surf,35,40,5
+Rock Tunnel B 1F,1,82,32,864,cursola,comum,retirado do mapa,18,35,Route 21 North,grama/caverna,27,27,4
+Seafoam Islands 1F,1,83,4,805,stakataka,ultra beast,preservado,34,9,Mt Ember Ruby Path 1F,grama/caverna,32,32,10
+Seafoam Islands 1F,1,83,5,785,tapu-koko,lendario/mitico,preservado,9,10,,,,,
+Seafoam Islands 1F,1,83,6,786,tapu-lele,lendario/mitico,preservado,30,15,,,,,
+Seafoam Islands 1F,1,83,7,1003,ting-lu,lendario/mitico,preservado,15,15,,,,,
+Seafoam Islands 1F,1,83,8,796,xurkitree,ultra beast,preservado,28,11,Power Plant,grama/caverna,31,31,5
+Seafoam Islands 1F,1,83,9,482,azelf,lendario/mitico,preservado,8,14,,,,,
+Seafoam Islands B 1F,1,84,5,931,squawkabilly,comum,retirado do mapa,27,13,Route 11,grama/caverna,13,13,10
+Seafoam Islands B 1F,1,84,6,413,wormadam,comum,retirado do mapa,30,17,Route 9,grama/caverna,13,13,10
+Seafoam Islands B 1F,1,84,7,352,kecleon,comum,retirado do mapa,33,4,Route 24,grama/caverna,12,12,10
+Seafoam Islands B 1F,1,84,8,337,lunatone,comum,retirado do mapa,29,4,Mt Ember Ruby Path B 3F,grama/caverna,34,34,5
+Seafoam Islands B 1F,1,84,9,455,carnivine,comum,retirado do mapa,11,19,Seafoam Islands B 2F,grama/caverna,28,28,4
+Seafoam Islands B 1F,1,84,10,203,girafarig,comum,retirado do mapa,32,10,One Island Kindle Road,grama/caverna,37,37,4
+Seafoam Islands B 2F,1,85,4,207,gligar,comum,retirado do mapa,22,10,Route 9,grama/caverna,11,11,10
+Seafoam Islands B 2F,1,85,5,871,pincurchin,comum,retirado do mapa,12,7,Route 25,grama/caverna,13,13,10
+Seafoam Islands B 2F,1,85,6,877,morpeko,comum,retirado do mapa,16,19,Mt Moon B 2F,grama/caverna,10,10,10
+Seafoam Islands B 2F,1,85,7,863,perrserker,comum,retirado do mapa,16,6,Route 25,grama/caverna,11,11,10
+Seafoam Islands B 2F,1,85,8,336,seviper,comum,retirado do mapa,6,7,Route 23,grama/caverna,42,42,5
+Seafoam Islands B 2F,1,85,9,874,stonjourner,comum,retirado do mapa,5,18,Mt Ember Ruby Path B 2F Stairs,grama/caverna,40,40,10
+Seafoam Islands B 3F,1,86,7,638,cobalion,lendario/mitico,preservado,19,3,,,,,
+Seafoam Islands B 3F,1,86,8,896,glastrier,lendario/mitico,preservado,8,8,,,,,
+Seafoam Islands B 3F,1,86,9,647,keldeo,lendario/mitico,preservado,15,18,,,,,
+Seafoam Islands B 3F,1,86,10,481,mesprit,lendario/mitico,preservado,21,15,,,,,
+Seafoam Islands B 3F,1,86,11,243,raikou,lendario/mitico,preservado,15,13,,,,,
+Seafoam Islands B 3F,1,86,12,895,regidrago,lendario/mitico,preservado,16,9,,,,,
+Pokemon Tower 3F,1,90,5,894,regieleki,lendario/mitico,preservado,8,15,,,,,
+Pokemon Tower 3F,1,90,6,897,spectrier,lendario/mitico,preservado,10,2,,,,,
+Pokemon Tower 3F,1,90,7,245,suicune,lendario/mitico,preservado,7,10,,,,,
+Pokemon Tower 3F,1,90,8,642,thundurus,lendario/mitico,preservado,15,11,,,,,
+Pokemon Tower 3F,1,90,9,480,uxie,lendario/mitico,preservado,11,11,,,,,
+Pokemon Tower 3F,1,90,10,1023,iron-crown,paradox,preservado,12,15,Victory Road 1F,grama/caverna,32,32,10
+Pokemon Tower 4F,1,91,7,778,mimikyu,comum,retirado do mapa,18,13,Route 23,grama/caverna,32,32,4
+Pokemon Tower 4F,1,91,8,976,veluza,comum,retirado do mapa,15,6,Six Island Water Path,surf,20,35,30
+Pokemon Tower 4F,1,91,9,764,comfey,comum,retirado do mapa,6,8,Seafoam Islands B 3F,grama/caverna,32,32,10
+Pokemon Tower 4F,1,91,10,369,relicanth,comum,retirado do mapa,11,9,Cerulean Cave 1F,surf,45,55,5
+Pokemon Tower 4F,1,91,11,916,oinkologne,comum,retirado do mapa,11,4,Route 8,grama/caverna,17,17,5
+Pokemon Tower 4F,1,91,12,241,miltank,comum,retirado do mapa,4,14,Rock Tunnel B 1F,grama/caverna,17,17,10
+Pokemon Tower 5F,1,92,8,626,bouffalant,comum,retirado do mapa,5,5,Pokemon Tower 5F,grama/caverna,20,20,5
+Pokemon Tower 5F,1,92,9,711,gourgeist,comum,retirado do mapa,12,14,Rock Tunnel B 1F,grama/caverna,17,17,10
+Pokemon Tower 5F,1,92,10,681,aegislash,comum,retirado do mapa,8,10,Pokemon Mansion 3F,grama/caverna,28,28,5
+Pokemon Tower 5F,1,92,11,703,carbink,comum,retirado do mapa,14,8,Mt Ember Ruby Path B 1F Stairs,grama/caverna,22,22,4
+Pokemon Tower 5F,1,92,12,849,toxtricity,comum,retirado do mapa,10,2,Route 15,grama/caverna,25,25,5
+Pokemon Tower 5F,1,92,13,855,polteageist,comum,retirado do mapa,4,12,Victory Road 2F,grama/caverna,48,48,10
+Pokemon Tower 6F,1,93,6,1005,roaring-moon,paradox,preservado,4,8,Victory Road 3F,grama/caverna,32,32,10
+Pokemon Tower 6F,1,93,7,491,darkrai,lendario/mitico,preservado,11,12,,,,,
+Pokemon Tower 6F,1,93,8,485,heatran,lendario/mitico,preservado,11,7,,,,,
+Pokemon Tower 6F,1,93,9,385,jirachi,lendario/mitico,preservado,15,9,,,,,
+Pokemon Tower 6F,1,93,10,645,landorus,lendario/mitico,preservado,17,13,,,,,
+Pokemon Tower 6F,1,93,11,380,latias,lendario/mitico,preservado,7,12,,,,,
+Four Island Icefall Cave 1F,1,111,3,1010,iron-leaves,paradox,preservado,7,17,Three Island Port,grama/caverna,30,30,5
+Four Island Icefall Cave 1F,1,111,4,1006,iron-valiant,paradox,preservado,9,12,Route 14,grama/caverna,30,30,5
+Four Island Icefall Cave 1F,1,111,5,251,celebi,lendario/mitico,preservado,8,4,,,,,
+Four Island Icefall Cave 1F,1,111,6,719,diancie,lendario/mitico,preservado,3,11,,,,,
+Four Island Icefall Cave 1F,1,111,7,648,meloetta,lendario/mitico,preservado,3,15,,,,,
+Four Island Icefall Cave 1F,1,111,8,800,necrozma,lendario/mitico,preservado,15,8,,,,,
+Four Island Icefall Cave B 1F,1,112,3,649,genesect,lendario/mitico,preservado,11,7,,,,,
+Four Island Icefall Cave B 1F,1,112,4,381,latios,lendario/mitico,preservado,18,6,,,,,
+Four Island Icefall Cave B 1F,1,112,5,809,melmetal,lendario/mitico,preservado,14,11,,,,,
+Four Island Icefall Cave B 1F,1,112,6,382,kyogre,lendario/mitico,preservado,18,15,,,,,
+Four Island Icefall Cave B 1F,1,112,7,1008,miraidon,lendario/mitico,preservado,10,12,,,,,
+Four Island Icefall Cave B 1F,1,112,8,483,dialga,lendario/mitico,preservado,19,11,,,,,
+Four Island Icefall Cave Back,1,113,5,716,xerneas,lendario/mitico,preservado,6,4,,,,,
+Four Island Icefall Cave Back,1,113,6,717,yveltal,lendario/mitico,preservado,12,21,,,,,
+Four Island Icefall Cave Back,1,113,7,890,eternatus,lendario/mitico,preservado,12,9,,,,,
+Four Island Icefall Cave Back,1,113,8,493,arceus,lendario/mitico,preservado,13,2,,,,,
+Route 1,3,19,3,152,chikorita,comum,retirado do mapa,16,15,Four Island Icefall Cave B 1F,grama/caverna,45,45,10
+Route 1,3,19,4,191,sunkern,comum,retirado do mapa,19,28,Route 10,grama/caverna,14,14,1
+Route 1,3,19,5,280,ralts,comum,retirado do mapa,19,35,Route 22,grama/caverna,5,5,1
+Route 1,3,19,6,917,tarountula,comum,retirado do mapa,17,9,Mt Ember Exterior,grama/caverna,42,42,1
+Route 1,3,19,7,270,lotad,comum,retirado do mapa,15,22,Two Island Cape Brink,surf,35,40,4
+Route 1,3,19,8,273,seedot,comum,retirado do mapa,16,5,Mt Ember Summit Path 1F,grama/caverna,37,37,1
+Route 2,3,20,8,824,blipbug,comum,retirado do mapa,17,24,Route 4,grama/caverna,12,12,1
+Route 2,3,20,9,872,snom,comum,retirado do mapa,20,33,Route 24,grama/caverna,12,12,1
+Route 2,3,20,10,265,wurmple,comum,retirado do mapa,3,59,Route 2,grama/caverna,5,5,1
+Route 2,3,20,11,293,whismur,comum,retirado do mapa,14,17,Four Island Icefall Cave 1F,grama/caverna,23,23,1
+Route 2,3,20,12,821,rookidee,comum,retirado do mapa,17,60,One Island Kindle Road,grama/caverna,40,40,1
+Route 2,3,20,13,300,skitty,comum,retirado do mapa,18,77,Route 15,grama/caverna,29,29,1
+Route 3,3,21,10,374,beldum,comum,retirado do mapa,42,9,Seven Island Sevault Canyon,grama/caverna,20,20,1
+Route 3,3,21,11,436,bronzor,comum,retirado do mapa,67,12,Victory Road 3F,grama/caverna,44,44,4
+Route 3,3,21,12,443,gible,comum,retirado do mapa,16,8,Mt Ember Summit Path 3F,grama/caverna,39,39,4
+Route 3,3,21,13,599,klink,comum,retirado do mapa,74,14,Mt Ember Ruby Path B 1F Stairs,grama/caverna,44,44,4
+Route 3,3,21,14,209,snubbull,comum,retirado do mapa,74,10,Three Island Berry Forest,grama/caverna,40,40,1
+Route 3,3,21,15,712,bergmite,comum,retirado do mapa,78,13,Pokemon Mansion 3F,grama/caverna,32,32,4
+Route 4,3,22,8,570,zorua,comum,retirado do mapa,17,6,Mt Moon B 1F,grama/caverna,5,5,4
+Route 4,3,22,9,974,cetoddle,comum,retirado do mapa,63,12,Five Island Memorial Pillar,grama/caverna,6,6,5
+Route 4,3,22,10,592,frillish,comum,retirado do mapa,79,15,Five Island Memorial Pillar,surf,5,15,30
+Route 4,3,22,11,942,maschiff,comum,retirado do mapa,70,9,Mt Moon 1F,grama/caverna,7,7,10
+Route 4,3,22,12,624,pawniard,comum,retirado do mapa,99,10,Route 1,grama/caverna,3,3,5
+Route 4,3,22,13,682,spritzee,comum,retirado do mapa,58,11,Route 3,grama/caverna,5,5,4
+Route 5,3,23,1,803,poipole,ultra beast,preservado,31,8,Route 9,grama/caverna,14,14,10
+Route 5,3,23,2,414,mothim,comum,retirado do mapa,17,33,Route 25,grama/caverna,14,14,10
+Route 5,3,23,3,980,clodsire,comum,retirado do mapa,16,29,Route 10,grama/caverna,11,11,10
+Route 5,3,23,4,479,rotom,comum,retirado do mapa,24,30,Mt Moon 1F,grama/caverna,10,10,10
+Route 5,3,23,5,338,solrock,comum,retirado do mapa,32,17,Pokemon Tower 6F,grama/caverna,19,19,4
+Route 5,3,23,6,421,cherrim,comum,retirado do mapa,21,2,Four Island Icefall Cave 1F,grama/caverna,45,45,10
+Route 6,3,24,7,335,zangoose,comum,retirado do mapa,11,32,Three Island Bond Bridge,grama/caverna,37,37,4
+Route 6,3,24,8,359,absol,comum,retirado do mapa,17,20,Three Island Port,grama/caverna,20,20,10
+Route 6,3,24,9,539,sawk,comum,retirado do mapa,7,13,Cerulean Cave B 1F,grama/caverna,64,64,4
+Route 6,3,24,10,538,throh,comum,retirado do mapa,8,19,Route 21 North,grama/caverna,19,19,5
+Route 6,3,24,11,678,meowstic,comum,retirado do mapa,2,23,Cerulean Cave 2F,grama/caverna,61,61,4
+Route 6,3,24,12,594,alomomola,comum,retirado do mapa,16,9,Route 11,surf,20,30,5
+Route 7,3,25,2,827,nickit,comum,retirado do mapa,16,5,Digletts Cave B 1F,grama/caverna,31,31,1
+Route 7,3,25,3,714,noibat,comum,retirado do mapa,16,14,Two Island Cape Brink,grama/caverna,40,40,1
+Route 7,3,25,4,163,hoothoot,comum,retirado do mapa,9,9,Route 18,grama/caverna,22,22,1
+Route 7,3,25,5,283,surskit,comum,retirado do mapa,12,4,Seven Island Tanoby Ruins,surf,35,40,4
+Route 7,3,25,6,276,taillow,comum,retirado do mapa,5,16,Route 21 North,grama/caverna,17,17,1
+Route 7,3,25,7,287,slakoth,comum,retirado do mapa,5,10,Cerulean Cave 2F,grama/caverna,64,64,1
+Route 8,3,26,16,946,bramblin,comum,retirado do mapa,38,13,Viridian Forest,grama/caverna,6,6,1
+Route 8,3,26,17,420,cherubi,comum,retirado do mapa,23,3,Three Island Port,grama/caverna,5,5,1
+Route 8,3,26,18,548,petilil,comum,retirado do mapa,37,17,Five Island Meadow,grama/caverna,50,50,1
+Route 8,3,26,19,433,chingling,comum,retirado do mapa,63,7,One Island Treasure Beach,grama/caverna,40,40,1
+Route 8,3,26,20,328,trapinch,comum,retirado do mapa,32,9,Route 6,grama/caverna,15,15,10
+Route 8,3,26,21,309,electrike,comum,retirado do mapa,17,13,Seven Island Sevault Canyon Entrance,grama/caverna,15,15,1
+Route 9,3,27,13,780,drampa,comum,retirado do mapa,68,8,Four Island Icefall Cave B 1F,grama/caverna,23,23,4
+Route 9,3,27,14,621,druddigon,comum,retirado do mapa,58,10,Seafoam Islands 1F,grama/caverna,24,24,10
+Route 9,3,27,15,776,turtonator,comum,retirado do mapa,63,6,Mt Ember Summit Path 2F,grama/caverna,38,38,5
+Route 9,3,27,16,765,oranguru,comum,retirado do mapa,62,10,Pokemon Tower 5F,grama/caverna,17,17,4
+Route 9,3,27,17,561,sigilyph,comum,retirado do mapa,8,8,Pokemon Tower 7F,grama/caverna,17,17,5
+Route 9,3,27,18,869,alcremie,comum,retirado do mapa,12,10,Route 8,grama/caverna,20,20,10
+Route 10,3,28,11,412,burmy,comum,retirado do mapa,20,14,Seafoam Islands B 2F,grama/caverna,30,30,1
+Route 10,3,28,12,955,flittle,comum,retirado do mapa,7,13,Pokemon Tower 7F,grama/caverna,25,25,1
+Route 10,3,28,13,840,applin,comum,retirado do mapa,13,14,Pokemon Mansion 2F,grama/caverna,26,26,1
+Route 10,3,28,14,290,nincada,comum,retirado do mapa,13,9,Route 16,grama/caverna,18,18,1
+Route 10,3,28,15,868,milcery,comum,retirado do mapa,19,28,Route 4,grama/caverna,12,12,1
+Route 10,3,28,16,835,yamper,comum,retirado do mapa,18,38,Route 8,grama/caverna,17,17,1
+Route 11,3,29,14,875,eiscue,comum,retirado do mapa,46,3,Four Island Icefall Cave Back,grama/caverna,49,49,10
+Route 11,3,29,15,870,falinks,comum,retirado do mapa,51,8,Four Island Icefall Cave 1F,grama/caverna,40,40,10
+Route 11,3,29,16,707,klefki,comum,retirado do mapa,47,13,Victory Road 2F,grama/caverna,46,46,5
+Route 11,3,29,17,676,furfrou,comum,retirado do mapa,42,6,Seafoam Islands B 3F,grama/caverna,34,34,5
+Route 11,3,29,18,779,bruxish,comum,retirado do mapa,16,11,Three Island Bond Bridge,surf,20,35,30
+Route 11,3,29,19,845,cramorant,comum,retirado do mapa,10,11,Viridian City,surf,20,25,30
+Route 12,3,30,15,694,helioptile,comum,retirado do mapa,10,5,Two Island Cape Brink,grama/caverna,40,40,1
+Route 12,3,30,16,363,spheal,comum,retirado do mapa,18,116,Fuchsia City,surf,30,35,4
+Route 12,3,30,17,371,bagon,comum,retirado do mapa,21,79,Seafoam Islands B 4F,grama/caverna,36,36,4
+Route 12,3,30,18,633,deino,comum,retirado do mapa,16,78,Mt Ember Ruby Path B 2F,grama/caverna,44,44,4
+Route 12,3,30,19,704,goomy,comum,retirado do mapa,8,89,Mt Ember Ruby Path 1F,grama/caverna,42,42,4
+Route 12,3,30,20,782,jangmo-o,comum,retirado do mapa,18,74,Pokemon Mansion 1F,grama/caverna,26,26,1
+Route 13,3,31,12,555,darmanitan,comum,retirado do mapa,19,5,Mt Ember Ruby Path B 3F,grama/caverna,18,18,4
+Route 13,3,31,13,670,floette,comum,retirado do mapa,31,7,Route 24,grama/caverna,8,8,4
+Route 13,3,31,14,671,florges,comum,retirado do mapa,8,17,Four Island Icefall Cave Back,grama/caverna,40,40,10
+Route 13,3,31,15,1016,fezandipiti,lendario/mitico,preservado,53,13,,,,,
+Route 13,3,31,16,1015,munkidori,lendario/mitico,preservado,62,8,,,,,
+Route 13,3,31,17,806,blacephalon,ultra beast,preservado,66,6,Mt Ember Ruby Path B 3F,grama/caverna,32,32,10
+Route 14,3,32,16,322,numel,comum,retirado do mapa,8,40,Mt Moon 1F,grama/caverna,7,7,4
+Route 14,3,32,17,616,shelmet,comum,retirado do mapa,6,53,Route 13,grama/caverna,29,29,4
+Route 14,3,32,18,1012,poltchageist,comum,retirado do mapa,13,54,Mt Moon B 1F,grama/caverna,6,6,4
+Route 14,3,32,19,390,chimchar,comum,retirado do mapa,8,28,Route 11,grama/caverna,15,15,4
+Route 14,3,32,20,155,cyndaquil,comum,retirado do mapa,7,44,Route 6,grama/caverna,15,15,4
+Route 14,3,32,21,252,treecko,comum,retirado do mapa,11,47,Route 10,grama/caverna,14,14,4
+Route 15,3,33,15,808,meltan,lendario/mitico,preservado,57,7,,,,,
+Route 15,3,33,16,361,snorunt,comum,retirado do mapa,65,11,Power Plant,grama/caverna,26,26,1
+Route 15,3,33,17,965,varoom,comum,retirado do mapa,18,8,Cerulean Cave 1F,grama/caverna,61,61,1
+Route 15,3,33,18,742,cutiefly,comum,retirado do mapa,20,13,Route 23,grama/caverna,42,42,4
+Route 15,3,33,19,158,totodile,comum,retirado do mapa,22,6,Route 20,surf,10,20,30
+Route 15,3,33,20,679,honedge,comum,retirado do mapa,6,12,Victory Road 2F,grama/caverna,46,46,4
+Route 16,3,34,11,615,cryogonal,comum,retirado do mapa,39,7,Seafoam Islands B 1F,grama/caverna,22,22,10
+Route 16,3,34,12,982,dudunsparce,comum,retirado do mapa,6,9,Route 12,grama/caverna,25,25,10
+Route 16,3,34,13,866,mr-rime,comum,retirado do mapa,3,13,Seafoam Islands 1F,grama/caverna,22,22,10
+Route 16,3,34,14,862,obstagoon,comum,retirado do mapa,7,16,Route 17,grama/caverna,26,26,10
+Route 16,3,34,15,977,dondozo,comum,retirado do mapa,35,6,Route 23,surf,25,30,5
+Route 16,3,34,16,884,duraludon,comum,retirado do mapa,14,17,Route 13,grama/caverna,25,25,10
+Route 18,3,36,4,285,shroomish,comum,retirado do mapa,16,2,Cerulean Cave 2F,grama/caverna,64,64,1
+Route 18,3,36,5,957,tinkatink,comum,retirado do mapa,23,5,Cerulean Cave 1F,grama/caverna,61,61,1
+Route 18,3,36,6,343,baltoy,comum,retirado do mapa,5,8,Three Island Berry Forest,grama/caverna,40,40,1
+Route 18,3,36,7,316,gulpin,comum,retirado do mapa,54,10,Seafoam Islands 1F,grama/caverna,33,33,4
+Route 18,3,36,8,669,flabebe,comum,retirado do mapa,21,11,Pokemon Tower 4F,grama/caverna,15,15,5
+Route 18,3,36,9,597,ferroseed,comum,retirado do mapa,5,17,Rock Tunnel 1F,grama/caverna,15,15,4
+Route 19,3,37,13,674,pancham,comum,retirado do mapa,14,50,Route 1,grama/caverna,3,3,5
+Route 19,3,37,14,410,shieldon,comum,retirado do mapa,6,21,Route 22,grama/caverna,3,3,5
+Route 19,3,37,15,672,skiddo,comum,retirado do mapa,5,39,Six Island Pattern Bush,grama/caverna,6,6,10
+Route 19,3,37,16,327,spinda,comum,retirado do mapa,9,46,Route 2,grama/caverna,4,4,10
+Route 19,3,37,17,891,kubfu,lendario/mitico,preservado,19,46,,,,,
+Route 19,3,37,18,193,yanma,comum,retirado do mapa,4,43,Route 2,grama/caverna,2,2,10
+Route 20,3,38,12,303,mawile,comum,retirado do mapa,96,12,Route 22,grama/caverna,2,2,10
+Route 20,3,38,13,302,sableye,comum,retirado do mapa,64,16,Route 1,grama/caverna,2,2,10
+Route 20,3,38,14,314,illumise,comum,retirado do mapa,78,16,Route 4,grama/caverna,12,12,5
+Route 20,3,38,15,320,wailmer,comum,retirado do mapa,86,5,Five Island Resort Gorgeous,surf,35,40,4
+Route 20,3,38,16,666,vivillon,comum,retirado do mapa,37,10,Route 9,grama/caverna,15,15,10
+Route 20,3,38,17,587,emolga,comum,retirado do mapa,117,16,Route 11,grama/caverna,12,12,10
+Route 21 North,3,39,7,550,basculin,comum,retirado do mapa,7,12,Pallet Town,surf,20,30,5
+Route 21 North,3,39,8,357,tropius,comum,retirado do mapa,14,40,Route 15,grama/caverna,28,28,4
+Route 21 North,3,39,9,556,maractus,comum,retirado do mapa,9,26,Route 14,grama/caverna,27,27,10
+Route 21 North,3,39,10,925,maushold,comum,retirado do mapa,4,38,Mt Ember Exterior,grama/caverna,36,36,5
+Route 21 North,3,39,11,324,torkoal,comum,retirado do mapa,12,30,Mt Ember Ruby Path 1F,grama/caverna,38,38,5
+Route 21 North,3,39,12,586,sawsbuck,comum,retirado do mapa,15,9,One Island Treasure Beach,grama/caverna,37,37,4
+Route 21 South,3,40,6,618,stunfisk,comum,retirado do mapa,6,41,Mt Ember Summit Path 3F,grama/caverna,35,35,5
+Route 21 South,3,40,7,876,indeedee,comum,retirado do mapa,20,43,Two Island Cape Brink,grama/caverna,37,37,4
+Route 21 South,3,40,8,867,runerigus,comum,retirado do mapa,4,29,Three Island Port,grama/caverna,20,20,10
+Route 21 South,3,40,9,631,heatmor,comum,retirado do mapa,13,29,Cerulean Cave 2F,grama/caverna,61,61,4
+Route 21 South,3,40,10,442,spiritomb,comum,retirado do mapa,5,36,Digletts Cave B 1F,grama/caverna,21,21,5
+Route 21 South,3,40,11,745,lycanroc,comum,retirado do mapa,10,15,Mt Ember Ruby Path B 3F,grama/caverna,20,20,5
+Route 22,3,41,2,755,morelull,comum,retirado do mapa,39,5,Six Island Pattern Bush,grama/caverna,30,30,1
+Route 22,3,41,3,339,barboach,comum,retirado do mapa,42,9,Seven Island Trainer Tower,surf,35,40,4
+Route 22,3,41,4,686,inkay,comum,retirado do mapa,7,11,One Island Kindle Road,grama/caverna,40,40,1
+Route 22,3,41,5,517,munna,comum,retirado do mapa,21,18,Pokemon Tower 7F,grama/caverna,18,18,1
+Route 22,3,41,6,355,duskull,comum,retirado do mapa,23,5,Mt Moon B 2F,grama/caverna,11,11,1
+Route 22,3,41,7,353,shuppet,comum,retirado do mapa,25,16,Pokemon Tower 3F,grama/caverna,17,17,1
+Route 23,3,42,8,766,passimian,comum,retirado do mapa,5,104,Pokemon Tower 4F,grama/caverna,20,20,5
+Route 23,3,42,9,973,flamigo,comum,retirado do mapa,12,52,Seven Island Sevault Canyon Entrance,grama/caverna,50,50,5
+Route 23,3,42,10,967,cyclizar,comum,retirado do mapa,9,135,Route 18,grama/caverna,28,28,5
+Route 23,3,42,11,880,dracozolt,comum,retirado do mapa,7,144,Four Island Icefall Cave 1F,grama/caverna,29,29,10
+Route 23,3,42,12,865,sirfetchd,comum,retirado do mapa,14,58,Five Island Meadow,grama/caverna,47,47,4
+Route 23,3,42,13,1013,sinistcha,comum,retirado do mapa,18,31,Victory Road 1F,grama/caverna,46,46,10
+Route 24,3,43,9,366,clamperl,comum,retirado do mapa,6,26,Three Island Berry Forest,surf,35,40,4
+Route 24,3,43,10,408,cranidos,comum,retirado do mapa,10,25,Route 2,grama/caverna,5,5,5
+Route 24,3,43,11,347,anorith,comum,retirado do mapa,15,12,Mt Moon B 1F,grama/caverna,5,5,10
+Route 24,3,43,12,636,larvesta,comum,retirado do mapa,6,7,Viridian Forest,grama/caverna,5,5,10
+Route 24,3,43,13,629,vullaby,comum,retirado do mapa,16,37,Viridian Forest,grama/caverna,3,3,10
+Route 24,3,43,14,299,nosepass,comum,retirado do mapa,10,34,Route 3,grama/caverna,7,7,10
+Route 25,3,44,14,222,corsola,comum,retirado do mapa,47,16,Seafoam Islands B 4F,surf,30,40,4
+Route 25,3,44,15,313,volbeat,comum,retirado do mapa,12,7,Five Island Memorial Pillar,grama/caverna,12,12,10
+Route 25,3,44,16,312,minun,comum,retirado do mapa,62,8,Route 10,grama/caverna,13,13,4
+Route 25,3,44,17,311,plusle,comum,retirado do mapa,5,3,Mt Ember Summit Path 2F,grama/caverna,40,40,4
+Route 25,3,44,18,771,pyukumuku,comum,retirado do mapa,60,16,One Island Treasure Beach,surf,35,40,4
+Route 25,3,44,19,351,castform,comum,retirado do mapa,51,9,Route 5,grama/caverna,15,15,10
+One Island Kindle Road,3,45,30,492,shaymin,lendario/mitico,preservado,7,19,,,,,
+One Island Kindle Road,3,45,31,893,zarude,lendario/mitico,preservado,11,137,,,,,
+One Island Kindle Road,3,45,32,718,zygarde,lendario/mitico,preservado,20,104,,,,,
+One Island Kindle Road,3,45,33,384,rayquaza,lendario/mitico,preservado,5,128,,,,,
+One Island Treasure Beach,3,46,3,484,palkia,lendario/mitico,preservado,15,23,,,,,
+One Island Treasure Beach,3,46,4,644,zekrom,lendario/mitico,preservado,8,32,,,,,
+Five Island Resort Gorgeous,3,54,9,383,groudon,lendario/mitico,preservado,67,2,,,,,
+Five Island Resort Gorgeous,3,54,10,1007,koraidon,lendario/mitico,preservado,58,3,,,,,
+Five Island Resort Gorgeous,3,54,11,486,regigigas,lendario/mitico,preservado,52,16,,,,,
+Five Island Resort Gorgeous,3,54,12,487,giratina,lendario/mitico,preservado,9,9,,,,,
+Five Island Resort Gorgeous,3,54,13,720,hoopa,lendario/mitico,preservado,45,3,,,,,
+Five Island Resort Gorgeous,3,54,14,643,reshiram,lendario/mitico,preservado,47,8,,,,,
+Five Island Meadow,3,56,8,990,iron-treads,paradox,preservado,8,5,Mt Ember Ruby Path B 1F,grama/caverna,30,30,4
+Five Island Meadow,3,56,9,988,slither-wing,paradox,preservado,12,37,Five Island Meadow,grama/caverna,41,41,10
+Five Island Meadow,3,56,10,1001,wo-chien,lendario/mitico,preservado,10,10,,,,,
+Five Island Meadow,3,56,11,905,enamorus,lendario/mitico,preservado,2,11,,,,,
+Five Island Meadow,3,56,12,641,tornadus,lendario/mitico,preservado,19,34,,,,,
+Five Island Meadow,3,56,13,640,virizion,lendario/mitico,preservado,20,29,,,,,
+Five Island Memorial Pillar,3,57,6,379,registeel,lendario/mitico,preservado,8,40,,,,,
+Five Island Memorial Pillar,3,57,7,639,terrakion,lendario/mitico,preservado,2,14,,,,,
+Five Island Memorial Pillar,3,57,8,1020,gouging-fire,paradox,preservado,9,32,Mt Ember Summit Path 3F,grama/caverna,31,31,10
+Five Island Memorial Pillar,3,57,9,1022,iron-boulder,paradox,preservado,21,6,Mt Ember Summit Path 1F,grama/caverna,31,31,10
+Five Island Memorial Pillar,3,57,10,1021,raging-bolt,paradox,preservado,6,48,Route 23,grama/caverna,32,32,10
+Five Island Memorial Pillar,3,57,11,1009,walking-wake,paradox,preservado,17,36,Seafoam Islands B 4F,surf,35,40,5

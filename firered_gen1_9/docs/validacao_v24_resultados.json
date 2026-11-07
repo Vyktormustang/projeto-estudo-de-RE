@@ -1,0 +1,162 @@
+{
+  "version": "v24",
+  "date": "2026-11-05",
+  "base_sha256": "e7de31338f37b22995734d2f855aef82d965c348a83609606f8f2f08d42ba361",
+  "output_sha256": "5fe26a76ee13a85a8dbccecc61ce3f89ed7f44a49d221b8621acb4a0966e36d2",
+  "output_bytes": 33554432,
+  "payload_sha256": "d13a59fe1ba0a04b24a344d8f0f185033ea9ca3e06052b6d3435d8db007610fc",
+  "payload_bytes": 870,
+  "core_version": "mGBA libretro 0.10.5",
+  "core_source_commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+  "core_sha256": "574d504a8b49338ee883f1461a92460a21c239f5620b47cea87d83ff848b0429",
+  "payload_compiler": "Zig 0.17.0",
+  "independent_payload_rebuild_identical": true,
+  "rom_rebuild_identical": true,
+  "tests": 60,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 579.422,
+  "test_ids": [
+    "test_motor_v24.MotorV24BuildTests.test_corruption_payload_and_reapplication_rejected.test_corruption_payload_and_reapplication_rejected",
+    "test_motor_v24.MotorV24BuildTests.test_exact_three_ranges_and_all_v23_encounters_preserved.test_exact_three_ranges_and_all_v23_encounters_preserved",
+    "test_motor_v24.MotorV24DataTests.test_exclusive_output.test_exclusive_output",
+    "test_motor_v24.MotorV24DataTests.test_payload_vectors_reservation_and_shared_extension_bounds.test_payload_vectors_reservation_and_shared_extension_bounds",
+    "test_motor_v24.MotorV24DataTests.test_rejects_wrong_rom.test_rejects_wrong_rom",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_budew_riolu_day_only_other_evolutions_and_item_modes_unchanged.test_budew_riolu_day_only_other_evolutions_and_item_modes_unchanged",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_clock_start_hour_day_rollovers_and_saved_old_playtime.test_clock_start_hour_day_rollovers_and_saved_old_playtime",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_eevee_day_night_thresholds_everstone_and_sylveon_priority.test_eevee_day_night_thresholds_everstone_and_sylveon_priority",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_flash_save_reload_keeps_clock_phase_and_native_format.test_flash_save_reload_keeps_clock_phase_and_native_format",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_indoor_cave_underwater_fade_and_disabled_transfer_not_tinted.test_indoor_cave_underwater_fade_and_disabled_transfer_not_tinted",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_invalid_pointer_and_fields_safe_default.test_invalid_pointer_and_fields_safe_default",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_live_field_menu_progress_and_restore_without_writes_during_play.test_live_field_menu_progress_and_restore_without_writes_during_play",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_live_night_palette_field_party_and_return.test_live_night_palette_field_party_and_return",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_phases_boundaries.test_phases_boundaries",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_real_battle_evolution_day_night_and_clock_progress.test_real_battle_evolution_day_night_and_clock_progress",
+    "test_motor_v24_mgba.MotorV24ClockRegressionTests.test_tint_terrain_only_all_four_phases_preserves_source_ui_obj.test_tint_terrain_only_all_four_phases_preserves_source_ui_obj",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_cold_migration_deferred_outside_normal_outdoor_field.test_cold_migration_deferred_outside_normal_outdoor_field",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_corrupt_foreign_and_out_of_range_records_fail_closed.test_corrupt_foreign_and_out_of_range_records_fail_closed",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_cycles_boundaries_native_stop_start_reset_and_unknown_mode.test_cycles_boundaries_native_stop_start_reset_and_unknown_mode",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_lazy_existing_migration_precedes_clock_and_preserves_legacy_tms.test_lazy_existing_migration_precedes_clock_and_preserves_legacy_tms",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_live_two_complete_world_days_and_paused_time.test_live_two_complete_world_days_and_paused_time",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_native_flash_v23_saturated_to_v24_and_v24_roundtrip.test_native_flash_v23_saturated_to_v24_and_v24_roundtrip",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_native_pokedude_temporary_pocket_cannot_initialize_clock.test_native_pokedude_temporary_pocket_cannot_initialize_clock",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_native_v24_v23_v24_downgrade_preserves_but_does_not_advance_record.test_native_v24_v23_v24_downgrade_preserves_but_does_not_advance_record",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_postcap_all_sixteen_encounter_maps_and_phase_boundaries.test_postcap_all_sixteen_encounter_maps_and_phase_boundaries",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_postcap_live_night_palette_party_menu_and_return.test_postcap_live_night_palette_party_menu_and_return",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_postcap_real_battle_eevee_evolutions_day_and_night.test_postcap_real_battle_eevee_evolutions_day_and_night",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_precap_native_frames_seconds_hours_and_exact_transition.test_precap_native_frames_seconds_hours_and_exact_transition",
+    "test_motor_v24_mgba.MotorV24ClockTests.test_unsafe_pointers_fields_and_getter_read_only_abi.test_unsafe_pointers_fields_and_getter_read_only_abi",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_all_100_native_slot_rolls_sixteen_maps_day_night_levels_and_checksums.test_all_100_native_slot_rolls_sixteen_maps_day_night_levels_and_checksums",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_live_new_routes_night_species_after_test_only_warps.test_live_new_routes_night_species_after_test_only_warps",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_live_route1_sign_both_periods_original_directions_and_control_return.test_live_route1_sign_both_periods_original_directions_and_control_return",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_live_walking_night_encounter_and_native_sweet_scent_on_route1.test_live_walking_night_encounter_and_native_sweet_scent_on_route1",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_repel_still_blocks_lower_levels_but_unchecked_generation_works.test_repel_still_blocks_lower_levels_but_unchecked_generation_works",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_selector_boundaries_maps_area_guards_and_no_rng_or_save_writes.test_selector_boundaries_maps_area_guards_and_no_rng_or_save_writes",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_sign_native_helper_uses_only_transient_result_not_saved_flags.test_sign_native_helper_uses_only_transient_result_not_saved_flags",
+    "test_motor_v24_mgba.MotorV24EncounterRegressionTests.test_water_and_nonpilot_cave_generation_identical_to_native_at_night.test_water_and_nonpilot_cave_generation_identical_to_native_at_night",
+    "test_treino_ev_mgba.TreinoMGBATests.test_510_e_evs_253_255_sao_preservados.test_510_e_evs_253_255_sao_preservados",
+    "test_treino_ev_mgba.TreinoMGBATests.test_60_segundos_com_rascunho_nao_alteram_equipe.test_60_segundos_com_rascunho_nao_alteram_equipe",
+    "test_treino_ev_mgba.TreinoMGBATests.test_cancelar_descarta_rascunho.test_cancelar_descarta_rascunho",
+    "test_treino_ev_mgba.TreinoMGBATests.test_confirmar_so_redistribui_pontos_e_preserva_outros_dados.test_confirmar_so_redistribui_pontos_e_preserva_outros_dados",
+    "test_treino_ev_mgba.TreinoMGBATests.test_contextos_inseguros_e_checksum_invalido_nao_editam.test_contextos_inseguros_e_checksum_invalido_nao_editam",
+    "test_treino_ev_mgba.TreinoMGBATests.test_copia_desatualizada_nao_sobrescreve_equipe.test_copia_desatualizada_nao_sobrescreve_equipe",
+    "test_treino_ev_mgba.TreinoMGBATests.test_hp_desmaiado_ferido_e_underflow.test_hp_desmaiado_ferido_e_underflow",
+    "test_treino_ev_mgba.TreinoMGBATests.test_limite_255_transferencia_parcial_e_saldo.test_limite_255_transferencia_parcial_e_saldo",
+    "test_treino_ev_mgba.TreinoMGBATests.test_seis_slots_e_troca_na_tela.test_seis_slots_e_troca_na_tela",
+    "test_motor_v24_gameplay_mgba.MotorV24GameplayTests.test_capture_day_and_night_identity_ball_consumption_and_flash_reload.test_capture_day_and_night_identity_ball_consumption_and_flash_reload",
+    "test_motor_v24_gameplay_mgba.MotorV24GameplayTests.test_natural_pallet_route1_roundtrip_day_and_night.test_natural_pallet_route1_roundtrip_day_and_night",
+    "test_motor_v24_gameplay_mgba.MotorV24GameplayTests.test_night_escape_returns_control_without_adding_pokemon.test_night_escape_returns_control_without_adding_pokemon",
+    "test_motor_v24_gameplay_mgba.MotorV24GameplayTests.test_poke_ball_capture_consumption_and_native_ball_metadata.test_poke_ball_capture_consumption_and_native_ball_metadata",
+    "test_motor_v24_gameplay_mgba.MotorV24GameplayTests.test_synthetic_v23_flash_migrates_party_items_map_and_night_time.test_synthetic_v23_flash_migrates_party_items_map_and_night_time",
+    "test_motor_v24_regressions.MotorV24ExperienceTests.test_batalha_natural_sem_editar_hp_atributos_nivel_ou_exp.test_batalha_natural_sem_editar_hp_atributos_nivel_ou_exp",
+    "test_motor_v24_regressions.MotorV24ExperienceTests.test_subida_nivel10_para11_e_retorno_ao_mapa.test_subida_nivel10_para11_e_retorno_ao_mapa",
+    "test_motor_v24_regressions.MotorV24SoundproofTests.test_growl_e_hyper_voice_nativos_continuam_bloqueados.test_growl_e_hyper_voice_nativos_continuam_bloqueados",
+    "test_motor_v24_regressions.MotorV24SoundproofTests.test_historico_soundproof_nativo_e_acao_seguinte.test_historico_soundproof_nativo_e_acao_seguinte",
+    "test_motor_v24_estojo_mgba.MotorV24BagTests.test_all_287_tm_hm_counts_and_clock_survive_native_flash.test_all_287_tm_hm_counts_and_clock_survive_native_flash",
+    "test_motor_v24_estojo_mgba.MotorV24BagTests.test_all_58_legacy_and_229_modern.test_all_58_legacy_and_229_modern",
+    "test_motor_v24_estojo_mgba.MotorV24BagTests.test_live_pages_teaching_and_help_option.test_live_pages_teaching_and_help_option",
+    "test_motor_v24_estojo_mgba.MotorV24BagTests.test_native_bag_backup_preserves_extension.test_native_bag_backup_preserves_extension",
+    "test_motor_v24_estojo_mgba.MotorV24BagTests.test_quantity_limits_and_neighbors.test_quantity_limits_and_neighbors"
+  ],
+  "selection": {
+    "build": 5,
+    "precap_clock_regression": 11,
+    "clock_extension": 13,
+    "encounter_regression": 8,
+    "ev_iv": 9,
+    "gameplay": 5,
+    "battle_regression": 4,
+    "active_clock_tm_case": 5
+  },
+  "patch_ranges": [
+    {
+      "file_offset": "0x101664",
+      "bytes": 8
+    },
+    {
+      "file_offset": "0x10dd038",
+      "bytes": 8
+    },
+    {
+      "file_offset": "0x10e6000",
+      "bytes": 870
+    }
+  ],
+  "clock_storage": {
+    "save1_offset": "0x3658",
+    "bytes": 8,
+    "parent_reservation": "T9X1, +0x34D8, 400 bytes",
+    "magic": "CK24",
+    "data_bits": "minute 11, frame 6, CRC 15",
+    "crc_polynomial": "0x4599",
+    "crc_seed": "0x1D0F",
+    "crc_input": "17 bits MSB-first, non-reflected, xorout 0"
+  },
+  "cold_migration_gate": {
+    "callback2": "0x080F172D",
+    "map_types": [
+      1,
+      2,
+      3,
+      6
+    ],
+    "reason": "Never migrate a temporary tutorial/link bag; wait for normal outdoor field if T9X1 is absent. Already-owned storage has no context restriction."
+  },
+  "evidence": {
+    "consecutive_complete_world_cycles": 2,
+    "live_cycle_frames": 172800,
+    "deterministic_encounter_slot_cases": 3200,
+    "postcap_period_boundaries_times_maps": "10 x 16",
+    "single_bit_record_corruptions": 64,
+    "native_flash_bytes": 131072,
+    "cross_version_flash": [
+      "v23 to v24 below cap",
+      "v23 saturated to v24",
+      "v24 roundtrip after cap",
+      "v24 to v23 to v24 with frozen metadata while downgraded"
+    ],
+    "full_item_stock_roundtrip": "58 legacy + 229 modern TM/HM IDs, active saturated clock",
+    "native_pokedude": "temporary pocket cannot trigger cold migration; demo cancellation preserves original legacy modern TMs",
+    "live_postcap": [
+      "two full cycles",
+      "paused state",
+      "menus",
+      "night field palette / party exclusion",
+      "Eevee battle evolutions day and night"
+    ],
+    "clock_record_recovery": "none; foreign/corrupt data is preserved, not repaired",
+    "sign_journey": "Synthetic initial Repel; normal movement/automatic sign reading; disposable warp copies only shorten access to Routes 9-12, where levels exceed the starter and Repel does not block the tested encounters."
+  },
+  "limitations": [
+    "Native playtime display remains 999:59:59; only the project world clock continues.",
+    "No elapsed time recovery from old frozen versions, downgrade, or initial cold-migration deferral.",
+    "No RTC, offline progression, lifetime post-cap hours, or HH:MM HUD.",
+    "No personal saves or cross-version savestates.",
+    "Not full campaign, real link/peripheral validation, all corruption cases, or full Scarlet/Violet fidelity."
+  ],
+  "publication": {
+    "drive": false,
+    "commit_or_push": false
+  }
+}

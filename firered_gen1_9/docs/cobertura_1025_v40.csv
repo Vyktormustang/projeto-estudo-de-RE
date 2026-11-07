@@ -1,0 +1,1026 @@
+pokedex,pokemon,geracao,categoria,rota,local,periodo,nivel,chance_nominal_slot_pct,referencia_offset,ocorrencias_tabelas,condicoes_e_pendencias,captura_individual_nesta_auditoria
+1,bulbasaur,1,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,40-40,4,007B5B88,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+2,ivysaur,1,comum,tabela_elegivel,PokemonTower_5F,ambos,14-14,10,007B5A08,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+3,venusaur,1,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,31-31,5,007B5E04,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+4,charmander,1,comum,tabela_elegivel,Route9,dia,14-14,4,007B6C6C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+5,charmeleon,1,comum,tabela_elegivel,Route9,dia,13-13,4,007B6C70,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+6,charizard,1,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,24-24,10,007B5DA4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+7,squirtle,1,comum,tabela_elegivel,Route19,ambos,10-20,30,007B6FB0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+8,wartortle,1,comum,tabela_elegivel,SixIsland_GreenPath,ambos,35-40,4,007B6788,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+9,blastoise,1,comum,tabela_elegivel,SeafoamIslands_B3F,ambos,30-40,4,007B58C4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+10,caterpie,1,comum,tabela_elegivel,ViridianForest,dia,4-4,20,007B50BC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+11,metapod,1,comum,tabela_elegivel,ViridianForest,dia,5-5,5,007B50D4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+12,butterfree,1,comum,tabela_elegivel,SixIsland_PatternBush,dia,9-9,5,007B5FFC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+13,weedle,1,comum,tabela_elegivel,Route24,dia,7-7,20,007B7254,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+14,kakuna,1,comum,tabela_elegivel,ViridianForest,dia,5-5,5,007B50D8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+15,beedrill,1,comum,tabela_elegivel,Route3,dia,8-8,5,007B6A7C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+16,pidgey,1,comum,tabela_elegivel,Route1,dia,3-3,20,007B69F4,16,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+17,pidgeotto,1,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,37-37,20,007B5DE8,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+18,pidgeot,1,comum,tabela_elegivel,PokemonMansion_B1F,dia,34-34,5,007B538C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+19,rattata,1,comum,tabela_elegivel,Route2,dia,3-3,20,007B6A2C,11,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+20,raticate,1,comum,tabela_elegivel,Route17,noite,22-22,10,0112C7A0,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+21,spearow,1,comum,tabela_elegivel,Route3,dia,6-6,20,007B6A64,26,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+22,fearow,1,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,36-36,10,007B63DC,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+23,ekans,1,comum,tabela_elegivel,Route11,dia,14-14,20,007B6D08,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+24,arbok,1,comum,tabela_elegivel,VictoryRoad_1F,dia,44-44,5,007B5238,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+25,pikachu,1,comum,tabela_elegivel,PowerPlant,dia,22-22,10,007B5AB0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+26,raichu,1,comum,tabela_elegivel,PokemonTower_3F,ambos,17-17,4,007B59AC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+27,sandshrew,1,comum,tabela_elegivel,DiglettsCave_B1F,noite,17-17,10,0112CBC8,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+28,sandslash,1,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,42-42,5,007B5DAC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+29,nidoran-f,1,comum,tabela_elegivel,Route3,dia,6-6,1,007B6A8C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+30,nidorina,1,comum,tabela_elegivel,Route14,dia,26-26,5,007B6EAC,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+31,nidoqueen,1,comum,tabela_elegivel,Route14,dia,26-26,10,007B6EA8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+32,nidoran-m,1,comum,tabela_elegivel,Route3,dia,6-6,10,007B6A74,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+33,nidorino,1,comum,tabela_elegivel,Route4,dia,8-8,4,007B6AC0,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+34,nidoking,1,comum,tabela_elegivel,CeruleanCave_2F,dia,58-58,5,007B5670,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+35,clefairy,1,comum,tabela_elegivel,MtMoon_B2F,dia,10-10,5,007B5180,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+36,clefable,1,comum,tabela_elegivel,Route16,dia,18-18,10,007B6F0C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+37,vulpix,1,comum,tabela_elegivel,PowerPlant,dia,35-35,1,007B5ACC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+38,ninetales,1,comum,tabela_elegivel,Route17,dia,27-27,10,007B6F50,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+39,jigglypuff,1,comum,tabela_elegivel,Route3,dia,3-3,5,007B6A80,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+40,wigglytuff,1,comum,tabela_elegivel,Route4,dia,12-12,5,007B6AB4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+41,zubat,1,comum,tabela_elegivel,MtMoon_1F,dia,7-7,20,007B50F4,21,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+42,golbat,1,comum,tabela_elegivel,CeruleanCave_2F,dia,49-49,20,007B5658,39,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+43,oddish,1,comum,tabela_elegivel,Route12,dia,24-24,20,007B6D8C,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+44,gloom,1,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,36-36,10,007B645C,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+45,vileplume,1,comum,tabela_elegivel,Route9,dia,17-17,5,007B6C64,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+46,paras,1,comum,tabela_elegivel,MtMoon_B1F,dia,7-7,20,007B512C,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+47,parasect,1,comum,tabela_elegivel,CeruleanCave_2F,dia,52-52,10,007B5664,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+48,venonat,1,comum,tabela_elegivel,SixIsland_PatternBush,noite,14-14,10,0112CA78,9,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+49,venomoth,1,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,37-37,4,007B5E08,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+50,diglett,1,comum,tabela_elegivel,DiglettsCave_B1F,dia,18-18,20,007B51E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+51,dugtrio,1,comum,tabela_elegivel,DiglettsCave_B1F,dia,29-29,4,007B520C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+52,meowth,1,comum,tabela_elegivel,Route5,dia,10-10,20,007B6B20,13,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+53,persian,1,comum,tabela_elegivel,OneIsland_KindleRoad,dia,37-37,4,007B6350,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+54,psyduck,1,comum,tabela_elegivel,ThreeIsland_BerryForest,ambos,5-20,60,007B5E20,104,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+55,golduck,1,comum,tabela_elegivel,SeafoamIslands_B3F,dia,32-32,10,007B5890,9,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+56,mankey,1,comum,tabela_elegivel,Route23,dia,32-32,20,007B71D0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+57,primeape,1,comum,tabela_elegivel,CeruleanCave_1F,dia,52-52,10,007B55C8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+58,growlithe,1,comum,tabela_elegivel,PokemonMansion_1F,dia,30-30,10,007B52D8,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+59,arcanine,1,comum,tabela_elegivel,SeafoamIslands_B1F,dia,33-33,4,007B5830,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+60,poliwag,1,comum,tabela_elegivel,Route6,noite,13-13,10,0112C538,30,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+61,poliwhirl,1,comum,tabela_elegivel,FiveIsland_MemorialPillar,ambos,35-40,4,007B66F0,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+62,poliwrath,1,comum,tabela_elegivel,Route10,ambos,30-35,4,007B6CC8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+63,abra,1,comum,tabela_elegivel,Route24,dia,10-10,10,007B7268,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+64,kadabra,1,comum,tabela_elegivel,CeruleanCave_B1F,dia,58-58,20,007B56AC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+65,alakazam,1,comum,tabela_elegivel,SixIsland_RuinValley,dia,49-49,10,007B685C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+66,machop,1,comum,tabela_elegivel,VictoryRoad_1F,dia,32-32,20,007B5220,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+67,machoke,1,comum,tabela_elegivel,CeruleanCave_1F,dia,46-46,10,007B55C4,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+68,machamp,1,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,45-45,10,007B5F68,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+69,bellsprout,1,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,48-48,4,007B5F48,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+70,weepinbell,1,comum,tabela_elegivel,MtMoon_1F,dia,9-9,10,007B5100,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+71,victreebel,1,comum,tabela_elegivel,Route10,dia,17-17,5,007B6CA0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+72,tentacool,1,comum,tabela_elegivel,FourIsland_IcefallCave_Back,ambos,5-20,60,007B5F98,49,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+73,tentacruel,1,comum,tabela_elegivel,FourIsland_IcefallCave_Back,ambos,35-45,4,007B5FA4,15,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+74,geodude,1,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,33-33,20,007B5B2C,65,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+75,graveler,1,comum,tabela_elegivel,MtMoon_B1F,dia,8-8,5,007B5148,19,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+76,golem,1,comum,tabela_elegivel,Route9,dia,17-17,5,007B6C68,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+77,ponyta,1,comum,tabela_elegivel,MtEmber_Exterior,ambos,30-30,20,007B5AD8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+78,rapidash,1,comum,tabela_elegivel,MtEmber_Exterior,ambos,39-39,4,007B5AFC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+79,slowpoke,1,comum,tabela_elegivel,Route24,ambos,10-20,30,007B7290,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+80,slowbro,1,comum,tabela_elegivel,FiveIsland_Meadow,ambos,35-40,5,007B6668,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+81,magnemite,1,comum,tabela_elegivel,PowerPlant,dia,25-25,10,007B5AAC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+82,magneton,1,comum,tabela_elegivel,CeruleanCave_1F,dia,49-49,20,007B55B8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+83,farfetchd,1,comum,tabela_elegivel,Route2,dia,2-2,10,007B6A40,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+84,doduo,1,comum,tabela_elegivel,Route16,dia,20-20,10,007B6F18,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+85,dodrio,1,comum,tabela_elegivel,SeafoamIslands_B2F,dia,34-34,5,007B5864,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+86,seel,1,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,ambos,5-35,60,007B5EA4,11,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+87,dewgong,1,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,49-49,10,007B5E80,10,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+88,grimer,1,comum,tabela_elegivel,PokemonMansion_1F,dia,28-28,5,007B52E0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+89,muk,1,comum,tabela_elegivel,Route23,dia,34-34,10,007B71D8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+90,shellder,1,comum,tabela_elegivel,VermilionCity,ambos,20-30,5,007B7448,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+91,cloyster,1,comum,tabela_elegivel,Route21_North,ambos,30-35,4,007B7088,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+92,gastly,1,comum,tabela_elegivel,PokemonTower_3F,ambos,15-15,20,007B5988,35,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+93,haunter,1,comum,tabela_elegivel,PokemonTower_7F,ambos,23-23,10,007B5A7C,60,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+94,gengar,1,comum,tabela_elegivel,CeruleanCave_2F,noite,52-52,10,0112D098,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+95,onix,1,comum,tabela_elegivel,VictoryRoad_1F,dia,43-43,10,007B522C,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+96,drowzee,1,comum,tabela_elegivel,Route24,noite,12-12,10,0112C494,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+97,hypno,1,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,37-37,4,007B5E0C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+98,krabby,1,comum,tabela_elegivel,FiveIsland_ResortGorgeous,ambos,5-15,30,007B6594,19,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+99,kingler,1,comum,tabela_elegivel,SevenIsland_TanobyRuins,ambos,20-35,30,007B69AC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+100,voltorb,1,comum,tabela_elegivel,PowerPlant,dia,22-22,20,007B5AA0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+101,electrode,1,comum,tabela_elegivel,CeruleanCave_1F,dia,58-58,5,007B55D0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+102,exeggcute,1,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,35-35,5,007B5E00,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+103,exeggutor,1,comum,tabela_elegivel,Route16,dia,22-22,5,007B6F1C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+104,cubone,1,comum,tabela_elegivel,PokemonTower_3F,ambos,15-15,5,007B59A4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+105,marowak,1,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,52-52,10,007B6964,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+106,hitmonlee,1,comum,tabela_elegivel,SeafoamIslands_1F,dia,28-28,5,007B57F4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+107,hitmonchan,1,comum,tabela_elegivel,SixIsland_WaterPath,dia,50-50,4,007B67E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+108,lickitung,1,comum,tabela_elegivel,Route1,dia,2-2,10,007B6A08,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+109,koffing,1,comum,tabela_elegivel,PokemonMansion_1F,dia,28-28,20,007B52C8,9,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+110,weezing,1,comum,tabela_elegivel,PokemonMansion_1F,dia,32-32,5,007B52E4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+111,rhyhorn,1,comum,tabela_elegivel,Route22,dia,5-5,5,007B7168,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+112,rhydon,1,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,36-36,10,007B5C04,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+113,chansey,1,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,40-40,5,007B5C0C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+114,tangela,1,comum,tabela_elegivel,Route21_North,dia,22-22,20,007B7044,14,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+115,kangaskhan,1,comum,tabela_elegivel,DiglettsCave_B1F,dia,20-20,10,007B51FC,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+116,horsea,1,comum,tabela_elegivel,Route25,ambos,30-35,4,007B731C,105,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+117,seadra,1,comum,tabela_elegivel,SixIsland_RuinValley,ambos,10-20,30,007B6888,22,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+118,goldeen,1,comum,tabela_elegivel,PalletTown,ambos,10-20,30,007B7360,24,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+119,seaking,1,comum,tabela_elegivel,CinnabarIsland,ambos,20-30,5,007B752C,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+120,staryu,1,comum,tabela_elegivel,CeruleanCave_B1F,ambos,50-60,4,007B56F0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+121,starmie,1,comum,tabela_elegivel,PalletTown,ambos,30-35,4,007B7368,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+122,mr-mime,1,comum,tabela_elegivel,PokemonMansion_2F,dia,32-32,4,007B5320,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+123,scyther,1,comum,tabela_elegivel,SixIsland_WaterPath,dia,48-48,5,007B67E0,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+124,jynx,1,comum,tabela_elegivel,FourIsland_IcefallCave_Back,noite,45-45,10,0112CCA8,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+125,electabuzz,1,comum,tabela_elegivel,PowerPlant,dia,32-32,4,007B5AC4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+126,magmar,1,comum,tabela_elegivel,Route5,dia,16-16,5,007B6B3C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+127,pinsir,1,comum,tabela_elegivel,PokemonMansion_1F,dia,32-32,4,007B52E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+128,tauros,1,comum,tabela_elegivel,PokemonTower_3F,ambos,19-19,5,007B59A0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+129,magikarp,1,comum,tabela_elegivel,SixIsland_WaterPath,ambos,35-40,4,007B680C,107,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+130,gyarados,1,comum,tabela_elegivel,Route6,ambos,25-30,5,007B6B98,49,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+131,lapras,1,comum,tabela_elegivel,FourIsland_IcefallCave_Back,ambos,30-45,1,007B5FA8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+132,ditto,1,comum,tabela_elegivel,PokemonMansion_B1F,dia,30-30,10,007B537C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+133,eevee,1,comum,tabela_elegivel,SeafoamIslands_B1F,dia,28-28,5,007B582C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+134,vaporeon,1,comum,tabela_elegivel,Route11,ambos,30-35,4,007B6D4C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+135,jolteon,1,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,31-31,5,007B64F0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+136,flareon,1,comum,tabela_elegivel,SeafoamIslands_B4F,dia,26-26,10,007B5918,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+137,porygon,1,comum,tabela_elegivel,Route22,dia,2-2,10,007B7160,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+138,omanyte,1,comum,tabela_elegivel,CeruleanCave_1F,ambos,40-50,4,007B55FC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+139,omastar,1,comum,tabela_elegivel,FourIsland_IcefallCave_Back,ambos,35-45,5,007B5FA0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+140,kabuto,1,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,ambos,5-15,4,007B5EB0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+141,kabutops,1,comum,tabela_elegivel,OneIsland_TreasureBeach,ambos,35-40,5,007B640C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+142,aerodactyl,1,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,26-26,10,007B5C58,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+143,snorlax,1,comum,tabela_elegivel,Route15,dia,25-25,10,007B6EDC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+144,articuno,1,lendario/mitico,evento_nativo,SeafoamIslands_B4F,,50,,0018BB98,0,flag de ocultacao 0082; condicoes do evento; acesso/captura nao certificados,nao
+145,zapdos,1,lendario/mitico,evento_nativo,PowerPlant,,50,,0018C1A4,0,flag de ocultacao 005D; condicoes do evento; acesso/captura nao certificados,nao
+146,moltres,1,lendario/mitico,evento_nativo,MtEmber_Summit,,50,,0018C51F,0,flag de ocultacao 0052; condicoes do evento; acesso/captura nao certificados,nao
+147,dratini,1,comum,tabela_elegivel,SixIsland_PatternBush,dia,14-14,1,007B600C,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+148,dragonair,1,comum,tabela_elegivel,PokemonTower_3F,ambos,13-13,10,007B5994,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+149,dragonite,1,comum,tabela_elegivel,PokemonMansion_3F,dia,30-30,10,007B5340,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+150,mewtwo,1,lendario/mitico,evento_nativo,CeruleanCave_B1F,,70,,0018AEE1,0,flag de ocultacao 0081; condicoes do evento; acesso/captura nao certificados,nao
+151,mew,1,lendario/mitico,fixo_adicional,VictoryRoad_2F,,,,007BA5B8,0,Objeto 17; flag 5097; acesso/acionamento/captura nao certificados,nao
+152,chikorita,2,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,45-45,10,007B5F30,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+153,bayleef,2,comum,tabela_elegivel,MtMoon_B2F,dia,11-11,4,007B5184,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+154,meganium,2,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,41-41,5,007B6938,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+155,cyndaquil,2,comum,tabela_elegivel,Route6,dia,15-15,4,007B6B78,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+156,quilava,2,comum,tabela_elegivel,SixIsland_RuinValley,dia,15-15,10,007B6858,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+157,typhlosion,2,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,22-22,10,007B5D00,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+158,totodile,2,comum,tabela_elegivel,Route20,ambos,10-20,30,007B6FFC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+159,croconaw,2,comum,tabela_elegivel,OneIsland_KindleRoad,ambos,35-40,4,007B6370,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+160,feraligatr,2,comum,tabela_elegivel,CeruleanCity,ambos,30-35,4,007B7400,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+161,sentret,2,comum,tabela_elegivel,FiveIsland_Meadow,dia,15-15,10,007B6638,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+162,furret,2,comum,tabela_elegivel,Route10,dia,14-14,10,007B6C98,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+163,hoothoot,2,comum,tabela_elegivel,Route1,noite,3-3,10,0112C340,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+164,noctowl,2,comum,tabela_elegivel,Route12,noite,22-22,10,0112C688,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+165,ledyba,2,comum,tabela_elegivel,SixIsland_PatternBush,dia,9-9,4,007B6004,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+166,ledian,2,comum,tabela_elegivel,MtMoon_1F,dia,8-8,5,007B5110,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+167,spinarak,2,comum,tabela_elegivel,SixIsland_PatternBush,dia,9-9,20,007B5FE4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+168,ariados,2,comum,tabela_elegivel,SixIsland_PatternBush,noite,6-6,10,0112CA7C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+169,crobat,2,comum,tabela_elegivel,Route7,dia,22-22,10,007B6BF0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+170,chinchou,2,comum,tabela_elegivel,FiveIsland,ambos,5-15,30,007B760C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+171,lanturn,2,comum,tabela_elegivel,Route19,ambos,20-30,5,007B6FB4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+172,pichu,2,comum,tabela_elegivel,Route1,dia,4-4,1,007B6A20,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+173,cleffa,2,comum,tabela_elegivel,MtMoon_1F,noite,7-7,10,0112CB20,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+174,igglybuff,2,comum,tabela_elegivel,VictoryRoad_2F,dia,48-48,1,007B5284,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+175,togepi,2,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,40-40,1,007B6500,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+176,togetic,2,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,48-48,4,007B5E8C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+177,natu,2,comum,tabela_elegivel,SixIsland_RuinValley,dia,15-15,20,007B684C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+178,xatu,2,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,40-40,10,007B5C50,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+179,mareep,2,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,52-52,1,007B6980,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+180,flaaffy,2,comum,tabela_elegivel,Route25,dia,9-9,4,007B72F8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+181,ampharos,2,comum,tabela_elegivel,SixIsland_WaterPath,dia,48-48,10,007B67D4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+182,bellossom,2,comum,tabela_elegivel,Route8,dia,20-20,10,007B6C24,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+183,marill,2,comum,tabela_elegivel,FiveIsland_WaterLabyrinth,ambos,35-40,4,007B65E8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+184,azumarill,2,comum,tabela_elegivel,OneIsland,ambos,35-40,5,007B7578,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+185,sudowoodo,2,comum,tabela_elegivel,RockTunnel_B1F,dia,13-13,5,007B57A0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+186,politoed,2,comum,tabela_elegivel,FiveIsland_MemorialPillar,ambos,35-40,5,007B66EC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+187,hoppip,2,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,10-10,20,007B66AC,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+188,skiploom,2,comum,tabela_elegivel,PokemonMansion_3F,dia,36-36,10,007B5344,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+189,jumpluff,2,comum,tabela_elegivel,Route13,dia,26-26,5,007B6E28,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+190,aipom,2,comum,tabela_elegivel,Route3,dia,7-7,10,007B6A70,11,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+191,sunkern,2,comum,tabela_elegivel,Route10,dia,14-14,1,007B6CAC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+192,sunflora,2,comum,tabela_elegivel,Route6,dia,12-12,10,007B6B64,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+193,yanma,2,comum,tabela_elegivel,Route2,dia,2-2,10,007B6A3C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+194,wooper,2,comum,tabela_elegivel,SixIsland_RuinValley,ambos,5-20,60,007B6884,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+195,quagsire,2,comum,tabela_elegivel,Route21_North,ambos,10-20,30,007B7080,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+196,espeon,2,comum,tabela_elegivel,SeafoamIslands_B3F,dia,24-24,10,007B5894,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+197,umbreon,2,comum,tabela_elegivel,Route23,dia,34-34,10,007B71E4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+198,murkrow,2,comum,tabela_elegivel,Route22,noite,4-4,10,0112C3B0,41,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+199,slowking,2,comum,tabela_elegivel,OneIsland_KindleRoad,ambos,35-40,5,007B636C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+200,misdreavus,2,comum,tabela_elegivel,MtMoon_B2F,dia,10-10,10,007B5178,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+201,unown,2,comum,tanoby_condicional,SevenIsland_TanobyRuins_MoneanChamber,ambos,25-25,20,007B4F34,70,Tanoby: desbloqueio por FLAG 0849; puzzle/acesso nao certificados,nao
+202,wobbuffet,2,comum,tabela_elegivel,CeruleanCave_2F,dia,58-58,5,007B5674,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+203,girafarig,2,comum,tabela_elegivel,OneIsland_KindleRoad,dia,37-37,4,007B634C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+204,pineco,2,comum,tabela_elegivel,ViridianForest,dia,5-5,1,007B50E8,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+205,forretress,2,comum,tabela_elegivel,RockTunnel_1F,dia,17-17,5,007B5768,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+206,dunsparce,2,comum,tabela_elegivel,ThreeIsland_Port,ambos,15-15,20,007B6558,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+207,gligar,2,comum,tabela_elegivel,Route9,dia,11-11,10,007B6C54,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+208,steelix,2,comum,tabela_elegivel,PowerPlant,dia,26-26,4,007B5AC0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+209,snubbull,2,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,40-40,1,007B5E14,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+210,granbull,2,comum,tabela_elegivel,MtEmber_Exterior,ambos,40-40,5,007B5AF4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+211,qwilfish,2,comum,tabela_elegivel,FourIsland,ambos,15-25,5,007B75C4,10,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+212,scizor,2,comum,tabela_elegivel,VictoryRoad_3F,dia,46-46,10,007B52A0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+213,shuckle,2,comum,tabela_elegivel,Route12,dia,26-26,10,007B6DA0,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+214,heracross,2,comum,tabela_elegivel,SixIsland_PatternBush,dia,15-15,10,007B5FF8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+215,sneasel,2,comum,tabela_elegivel,Route11,dia,11-11,10,007B6D18,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+216,teddiursa,2,comum,tabela_elegivel,Route2,dia,4-4,4,007B6A50,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+217,ursaring,2,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,36-36,10,007B64E0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+218,slugma,2,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,26-26,20,007B5CEC,9,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+219,magcargo,2,comum,tabela_elegivel,Route24,dia,13-13,10,007B7264,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+220,swinub,2,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,25-25,20,007B5EF0,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+221,piloswine,2,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,42-42,10,007B5CA0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+222,corsola,2,comum,tabela_elegivel,SeafoamIslands_B4F,ambos,30-40,4,007B5948,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+223,remoraid,2,comum,tabela_elegivel,ViridianCity,ambos,30-35,4,007B73B4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+224,octillery,2,comum,tabela_elegivel,Route23,ambos,20-25,30,007B720C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+225,delibird,2,comum,tabela_elegivel,SeafoamIslands_1F,noite,22-22,10,0112D10C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+226,mantine,2,comum,tabela_elegivel,ThreeIsland_BerryForest,ambos,35-40,5,007B5E28,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+227,skarmory,2,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,30-30,5,007B6970,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+228,houndour,2,comum,tabela_elegivel,Route2,noite,4-4,10,0112C37C,15,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+229,houndoom,2,comum,tabela_elegivel,Route23,noite,34-34,10,0112C84C,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+230,kingdra,2,comum,tabela_elegivel,ViridianCity,ambos,25-30,5,007B73B0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+231,phanpy,2,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,15-15,4,007B693C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+232,donphan,2,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,22-22,4,007B5CBC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+233,porygon2,2,comum,tabela_elegivel,PokemonMansion_2F,dia,28-28,5,007B5318,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+234,stantler,2,comum,tabela_elegivel,Route16,dia,20-20,10,007B6F10,11,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+235,smeargle,2,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,40-40,1,007B63F8,12,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+236,tyrogue,2,comum,tabela_elegivel,CeruleanCave_B1F,dia,61-61,1,007B56D4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+237,hitmontop,2,comum,tabela_elegivel,SixIsland_RuinValley,dia,49-49,4,007B6870,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+238,smoochum,2,comum,tabela_elegivel,PokemonTower_6F,ambos,15-15,10,007B5A40,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+239,elekid,2,comum,tabela_elegivel,Route1,dia,3-3,10,007B6A00,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+240,magby,2,comum,tabela_elegivel,Route1,dia,3-3,10,007B69FC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+241,miltank,2,comum,tabela_elegivel,RockTunnel_B1F,dia,17-17,10,007B578C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+242,blissey,2,comum,tabela_elegivel,Route16,dia,22-22,10,007B6F14,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+243,raikou,2,lendario/mitico,fixo_adicional,SeafoamIslands_B3F,,,,007BD69C,0,Objeto 11; flag 50F3; acesso/acionamento/captura nao certificados,nao
+244,entei,2,lendario/mitico,fixo_adicional,CeruleanCave_1F,,,,007BC77C,0,Objeto 13; flag 50F4; acesso/acionamento/captura nao certificados,nao
+245,suicune,2,lendario/mitico,fixo_adicional,PokemonTower_3F,,,,007BD9CC,0,Objeto 7; flag 50F5; acesso/acionamento/captura nao certificados,nao
+246,larvitar,2,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,15-15,4,007B6974,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+247,pupitar,2,comum,tabela_elegivel,Route25,dia,12-12,5,007B72F4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+248,tyranitar,2,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,30-30,10,007B5D54,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+249,lugia,2,lendario/mitico,evento_nativo,NavelRock_Base,,70,,0018DB20,0,flag de ocultacao 009B; condicoes do evento; acesso/captura nao certificados; verificar bilhete/evento de acesso a ilha,nao
+250,ho-oh,2,lendario/mitico,evento_nativo,NavelRock_Summit,,70,,0018D9E7,0,variavel 4001 = 0; gatilho de coordenada; acesso/captura nao certificados; verificar bilhete/evento de acesso a ilha,nao
+251,celebi,2,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_1F,,,,007BED30,0,Objeto 5; flag 50FB; acesso/acionamento/captura nao certificados,nao
+252,treecko,3,comum,tabela_elegivel,Route10,dia,14-14,4,007B6CA4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+253,grovyle,3,comum,tabela_elegivel,PokemonTower_7F,ambos,15-15,10,007B5A74,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+254,sceptile,3,comum,tabela_elegivel,PokemonMansion_2F,dia,28-28,10,007B5314,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+255,torchic,3,comum,tabela_elegivel,Route1,dia,4-4,4,007B6A14,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+256,combusken,3,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,48-48,4,007B5F80,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+257,blaziken,3,comum,tabela_elegivel,SixIsland_RuinValley,dia,25-25,5,007B6864,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+258,mudkip,3,comum,tabela_elegivel,Route12,ambos,10-20,30,007B6DC8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+259,marshtomp,3,comum,tabela_elegivel,SixIsland_OutcastIsland,ambos,35-40,4,007B673C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+260,swampert,3,comum,tabela_elegivel,FuchsiaCity,ambos,25-30,5,007B74E0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+261,poochyena,3,comum,tabela_elegivel,Route2,noite,4-4,10,0112C378,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+262,mightyena,3,comum,tabela_elegivel,Route10,dia,13-13,10,007B6C94,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+263,zigzagoon,3,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,30-30,1,007B5C70,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+264,linoone,3,comum,tabela_elegivel,Route11,dia,13-13,10,007B6D14,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+265,wurmple,3,comum,tabela_elegivel,Route2,dia,5-5,1,007B6A58,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+266,silcoon,3,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,37-37,4,007B64F8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+267,beautifly,3,comum,tabela_elegivel,MtMoon_1F,dia,8-8,10,007B5108,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+268,cascoon,3,comum,tabela_elegivel,Route23,dia,44-44,5,007B71EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+269,dustox,3,comum,tabela_elegivel,Route4,dia,8-8,10,007B6AAC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+270,lotad,3,comum,tabela_elegivel,TwoIsland_CapeBrink,ambos,35-40,4,007B6494,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+271,lombre,3,comum,tabela_elegivel,FiveIsland,ambos,35-40,4,007B7614,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+272,ludicolo,3,comum,tabela_elegivel,Route25,ambos,20-25,30,007B7314,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+273,seedot,3,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,37-37,1,007B5B54,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+274,nuzleaf,3,comum,tabela_elegivel,RockTunnel_B1F,dia,15-15,4,007B57A4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+275,shiftry,3,comum,tabela_elegivel,DiglettsCave_B1F,dia,17-17,4,007B5208,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+276,taillow,3,comum,tabela_elegivel,Route21_North,dia,17-17,1,007B706C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+277,swellow,3,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,40-40,4,007B63EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+278,wingull,3,comum,tabela_elegivel,ThreeIsland_BondBridge,ambos,35-40,4,007B6518,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+279,pelipper,3,comum,tabela_elegivel,VermilionCity,ambos,10-20,30,007B7444,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+280,ralts,3,comum,tabela_elegivel,Route22,dia,5-5,1,007B7174,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+281,kirlia,3,comum,tabela_elegivel,Route13,dia,28-28,4,007B6E34,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+282,gardevoir,3,comum,tabela_elegivel,Route15,dia,27-27,10,007B6ED8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+283,surskit,3,comum,tabela_elegivel,SevenIsland_TanobyRuins,ambos,35-40,4,007B69B4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+284,masquerain,3,comum,tabela_elegivel,SeafoamIslands_B3F,dia,28-28,4,007B58A4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+285,shroomish,3,comum,tabela_elegivel,CeruleanCave_2F,dia,64-64,1,007B5680,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+286,breloom,3,comum,tabela_elegivel,Route18,dia,29-29,5,007B6F90,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+287,slakoth,3,comum,tabela_elegivel,CeruleanCave_2F,dia,64-64,1,007B5684,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+288,vigoroth,3,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,10-10,10,007B66BC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+289,slaking,3,comum,tabela_elegivel,PokemonMansion_B1F,dia,30-30,10,007B5380,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+290,nincada,3,comum,tabela_elegivel,Route16,dia,18-18,1,007B6F2C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+291,ninjask,3,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,37-37,4,007B6474,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+292,shedinja,3,comum,tabela_elegivel,Route15,dia,29-29,4,007B6EEC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+293,whismur,3,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,23-23,1,007B5F1C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+294,loudred,3,comum,tabela_elegivel,Route12,dia,27-27,5,007B6DA8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+295,exploud,3,comum,tabela_elegivel,Route7,dia,19-19,10,007B6BE4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+296,makuhita,3,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,30-30,1,007B5DC0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+297,hariyama,3,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,47-47,4,007B6940,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+298,azurill,3,comum,tabela_elegivel,Route11,dia,12-12,1,007B6D30,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+299,nosepass,3,comum,tabela_elegivel,Route3,dia,7-7,10,007B6A78,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+300,skitty,3,comum,tabela_elegivel,Route5,noite,13-13,10,0112C500,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+301,delcatty,3,comum,tabela_elegivel,Route5,dia,15-15,4,007B6B40,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+302,sableye,3,comum,tabela_elegivel,Route1,dia,2-2,10,007B6A04,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+303,mawile,3,comum,tabela_elegivel,Route22,dia,2-2,10,007B715C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+304,aron,3,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,37-37,4,007B5BD8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+305,lairon,3,comum,tabela_elegivel,Route25,dia,13-13,10,007B72E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+306,aggron,3,comum,tabela_elegivel,ThreeIsland_Port,ambos,25-25,5,007B6570,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+307,meditite,3,comum,tabela_elegivel,MtEmber_Exterior,ambos,30-30,1,007B5B00,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+308,medicham,3,comum,tabela_elegivel,PokemonTower_4F,ambos,13-13,10,007B59CC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+309,electrike,3,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,15-15,1,007B6944,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+310,manectric,3,comum,tabela_elegivel,SixIsland_WaterPath,dia,47-47,4,007B67EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+311,plusle,3,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,40-40,4,007B5B84,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+312,minun,3,comum,tabela_elegivel,Route10,dia,13-13,4,007B6CA8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+313,volbeat,3,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,12-12,10,007B66C0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+314,illumise,3,comum,tabela_elegivel,Route8,noite,16-16,10,0112C5A8,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+315,roselia,3,comum,tabela_elegivel,Route7,dia,17-17,4,007B6BFC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+316,gulpin,3,comum,tabela_elegivel,SeafoamIslands_1F,dia,33-33,4,007B57F8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+317,swalot,3,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,51-51,5,007B5E84,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+318,carvanha,3,comum,tabela_elegivel,SixIsland_RuinValley,ambos,15-25,5,007B688C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+319,sharpedo,3,comum,tabela_elegivel,CeruleanCity,ambos,20-30,5,007B73FC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+320,wailmer,3,comum,tabela_elegivel,FiveIsland_ResortGorgeous,ambos,35-40,4,007B659C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+321,wailord,3,comum,tabela_elegivel,FiveIsland,ambos,35-40,5,007B7610,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+322,numel,3,comum,tabela_elegivel,OneIsland_KindleRoad,noite,31-31,10,0112C884,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+323,camerupt,3,comum,tabela_elegivel,MtEmber_RubyPath_1F,noite,34-34,10,0112CF84,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+324,torkoal,3,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,38-38,5,007B5C08,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+325,spoink,3,comum,tabela_elegivel,MtMoon_1F,dia,7-7,4,007B5114,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+326,grumpig,3,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,37-37,5,007B5B48,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+327,spinda,3,comum,tabela_elegivel,Route2,dia,4-4,10,007B6A38,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+328,trapinch,3,comum,tabela_elegivel,Route6,dia,15-15,10,007B6B6C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+329,vibrava,3,comum,tabela_elegivel,RockTunnel_1F,dia,13-13,4,007B5770,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+330,flygon,3,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,24-24,10,007B5CFC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+331,cacnea,3,comum,tabela_elegivel,ViridianForest,dia,4-4,4,007B50DC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+332,cacturne,3,comum,tabela_elegivel,VictoryRoad_3F,dia,44-44,5,007B52AC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+333,swablu,3,comum,tabela_elegivel,CeruleanCave_B1F,dia,67-67,5,007B56C8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+334,altaria,3,comum,tabela_elegivel,Route7,dia,18-18,10,007B6BE8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+335,zangoose,3,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,37-37,4,007B64F4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+336,seviper,3,comum,tabela_elegivel,Route23,dia,42-42,5,007B71E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+337,lunatone,3,comum,tabela_elegivel,MtMoon_B2F,noite,10-10,10,0112CB94,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+338,solrock,3,comum,tabela_elegivel,PokemonTower_6F,ambos,19-19,4,007B5A54,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+339,barboach,3,comum,tabela_elegivel,SevenIsland_TrainerTower,ambos,35-40,4,007B68DC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+340,whiscash,3,comum,tabela_elegivel,Route10,ambos,20-30,5,007B6CC4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+341,corphish,3,comum,tabela_elegivel,CeladonCity,ambos,10-20,30,007B7490,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+342,crawdaunt,3,comum,tabela_elegivel,Route20,ambos,20-30,5,007B7000,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+343,baltoy,3,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,40-40,1,007B5E10,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+344,claydol,3,comum,tabela_elegivel,MtEmber_Exterior,ambos,35-35,10,007B5AE8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+345,lileep,3,comum,tabela_elegivel,ViridianForest,dia,5-5,10,007B50C8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+346,cradily,3,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,16-16,5,007B66C4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+347,anorith,3,comum,tabela_elegivel,MtMoon_B1F,dia,5-5,10,007B5134,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+348,armaldo,3,comum,tabela_elegivel,RockTunnel_1F,dia,16-16,10,007B5760,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+349,feebas,3,comum,tabela_elegivel,OneIsland,ambos,35-40,4,007B757C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+350,milotic,3,comum,tabela_elegivel,Route22,ambos,25-30,5,007B718C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+351,castform,3,comum,tabela_elegivel,Route5,dia,15-15,10,007B6B34,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+352,kecleon,3,comum,tabela_elegivel,Route24,dia,12-12,10,007B7260,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+353,shuppet,3,comum,tabela_elegivel,Route25,noite,13-13,10,0112C4C8,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+354,banette,3,comum,tabela_elegivel,PokemonMansion_3F,noite,30-30,10,0112CD58,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+355,duskull,3,comum,tabela_elegivel,Route25,noite,14-14,10,0112C4CC,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+356,dusclops,3,comum,tabela_elegivel,VictoryRoad_3F,dia,44-44,5,007B52A8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+357,tropius,3,comum,tabela_elegivel,Route15,dia,28-28,4,007B6EF0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+358,chimecho,3,comum,tabela_elegivel,SeafoamIslands_B4F,dia,34-34,5,007B5920,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+359,absol,3,comum,tabela_elegivel,ThreeIsland_Port,ambos,20-20,10,007B656C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+360,wynaut,3,comum,tabela_elegivel,Route10,dia,15-15,10,007B6C90,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+361,snorunt,3,comum,tabela_elegivel,SeafoamIslands_B1F,noite,22-22,10,0112CEA4,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+362,glalie,3,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,noite,27-27,10,0112CC74,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+363,spheal,3,comum,tabela_elegivel,FuchsiaCity,ambos,30-35,4,007B74E4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+364,sealeo,3,comum,tabela_elegivel,FiveIsland_Meadow,ambos,35-40,4,007B666C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+365,walrein,3,comum,tabela_elegivel,Route13,ambos,30-35,4,007B6E54,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+366,clamperl,3,comum,tabela_elegivel,ThreeIsland_BerryForest,ambos,35-40,4,007B5E2C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+367,huntail,3,comum,tabela_elegivel,SixIsland_GreenPath,ambos,35-40,5,007B6784,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+368,gorebyss,3,comum,tabela_elegivel,CeruleanCave_B1F,ambos,55-65,5,007B56EC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+369,relicanth,3,comum,tabela_elegivel,CeruleanCave_1F,ambos,45-55,5,007B55F8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+370,luvdisc,3,comum,tabela_elegivel,FourIsland,ambos,5-35,30,007B75C0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+371,bagon,3,comum,tabela_elegivel,SeafoamIslands_B4F,dia,36-36,4,007B5924,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+372,shelgon,3,comum,tabela_elegivel,Route4,dia,10-10,4,007B6ABC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+373,salamence,3,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,30-30,10,007B5DF4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+374,beldum,3,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,20-20,1,007B697C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+375,metang,3,comum,tabela_elegivel,Route6,dia,13-13,10,007B6B60,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+376,metagross,3,comum,tabela_elegivel,PokemonMansion_1F,dia,30-30,10,007B52D0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+377,regirock,3,lendario/mitico,fixo_adicional,CeruleanCave_1F,,,,007BC7AC,0,Objeto 15; flag 5179; acesso/acionamento/captura nao certificados,nao
+378,regice,3,lendario/mitico,fixo_adicional,CeruleanCave_1F,,,,007BC794,0,Objeto 14; flag 517A; acesso/acionamento/captura nao certificados,nao
+379,registeel,3,lendario/mitico,fixo_adicional,FiveIsland_MemorialPillar,,,,007C57E4,0,Objeto 6; flag 517B; acesso/acionamento/captura nao certificados,nao
+380,latias,3,lendario/mitico,fixo_adicional,PokemonTower_6F,,,,007BDEFC,0,Objeto 11; flag 517C; acesso/acionamento/captura nao certificados,nao
+381,latios,3,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_B1F,,,,007BEE1C,0,Objeto 4; flag 517D; acesso/acionamento/captura nao certificados,nao
+382,kyogre,3,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_B1F,,,,007BEE4C,0,Objeto 6; flag 517E; acesso/acionamento/captura nao certificados,nao
+383,groudon,3,lendario/mitico,fixo_adicional,FiveIsland_ResortGorgeous,,,,007C54D8,0,Objeto 9; flag 517F; acesso/acionamento/captura nao certificados,nao
+384,rayquaza,3,lendario/mitico,fixo_adicional,OneIsland_KindleRoad,,,,007C50B8,0,Objeto 33; flag 5180; acesso/acionamento/captura nao certificados,nao
+385,jirachi,3,lendario/mitico,fixo_adicional,PokemonTower_6F,,,,007BDECC,0,Objeto 9; flag 5181; acesso/acionamento/captura nao certificados,nao
+386,deoxys,3,lendario/mitico,evento_nativo,BirthIsland_Exterior,,30,,0018DC5D,0,flag de ocultacao 009A; condicoes do evento; acesso/captura nao certificados; verificar bilhete/evento de acesso a ilha,nao
+387,turtwig,4,comum,tabela_elegivel,FiveIsland_WaterLabyrinth,ambos,5-15,30,007B65E0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+388,grotle,4,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,33-33,20,007B63D0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+389,torterra,4,comum,tabela_elegivel,MtEmber_Exterior,ambos,30-30,4,007B5AF8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+390,chimchar,4,comum,tabela_elegivel,Route11,dia,15-15,4,007B6D2C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+391,monferno,4,comum,tabela_elegivel,Route11,dia,12-12,4,007B6D28,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+392,infernape,4,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,24-24,10,007B5CA4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+393,piplup,4,comum,tabela_elegivel,SixIsland_OutcastIsland,ambos,20-35,30,007B6734,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+394,prinplup,4,comum,tabela_elegivel,Route11,ambos,10-20,30,007B6D44,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+395,empoleon,4,comum,tabela_elegivel,Route19,ambos,30-35,4,007B6FB8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+396,starly,4,comum,tabela_elegivel,Route2,dia,4-4,10,007B6A34,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+397,staravia,4,comum,tabela_elegivel,Route8,dia,18-18,20,007B6C18,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+398,staraptor,4,comum,tabela_elegivel,ThreeIsland_Port,ambos,15-15,20,007B655C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+399,bidoof,4,comum,tabela_elegivel,Route5,dia,13-13,20,007B6B24,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+400,bibarel,4,comum,tabela_elegivel,Route22,ambos,30-35,4,007B7190,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+401,kricketot,4,comum,tabela_elegivel,Route25,dia,9-9,1,007B7300,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+402,kricketune,4,comum,tabela_elegivel,MtMoon_1F,dia,9-9,5,007B510C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+403,shinx,4,comum,tabela_elegivel,SixIsland_RuinValley,dia,20-20,1,007B6874,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+404,luxio,4,comum,tabela_elegivel,PowerPlant,dia,25-25,10,007B5AA8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+405,luxray,4,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,27-27,10,007B5EFC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+406,budew,4,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,31-31,20,007B64D8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+407,roserade,4,comum,tabela_elegivel,PokemonMansion_B1F,dia,26-26,4,007B5394,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+408,cranidos,4,comum,tabela_elegivel,Route2,dia,5-5,5,007B6A44,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+409,rampardos,4,comum,tabela_elegivel,DiglettsCave_B1F,dia,16-16,10,007B51F8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+410,shieldon,4,comum,tabela_elegivel,Route22,dia,3-3,5,007B7164,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+411,bastiodon,4,comum,tabela_elegivel,PokemonTower_6F,ambos,18-18,10,007B5A38,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+412,burmy,4,comum,tabela_elegivel,SeafoamIslands_B2F,dia,30-30,1,007B5874,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+413,wormadam,4,comum,tabela_elegivel,Route9,dia,13-13,10,007B6C5C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+414,mothim,4,comum,tabela_elegivel,Route25,dia,14-14,10,007B72E4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+415,combee,4,comum,tabela_elegivel,FiveIsland_Meadow,dia,50-50,1,007B6654,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+416,vespiquen,4,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,49-49,4,007B6978,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+417,pachirisu,4,comum,tabela_elegivel,CeruleanCave_B1F,dia,55-55,10,007B56B4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+418,buizel,4,comum,tabela_elegivel,SixIsland_GreenPath,ambos,20-35,30,007B6780,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+419,floatzel,4,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,ambos,35-40,5,007B5EAC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+420,cherubi,4,comum,tabela_elegivel,ThreeIsland_Port,ambos,5-5,1,007B6580,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+421,cherrim,4,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,45-45,10,007B5EF8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+422,shellos,4,comum,tabela_elegivel,FourIsland_IcefallCave_Back,ambos,20-35,30,007B5F9C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+423,gastrodon,4,comum,tabela_elegivel,Route24,ambos,20-30,5,007B7294,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+424,ambipom,4,comum,tabela_elegivel,Route8,dia,19-19,5,007B6C30,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+425,drifloon,4,comum,tabela_elegivel,PokemonTower_7F,ambos,18-18,10,007B5A70,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+426,drifblim,4,comum,tabela_elegivel,RockTunnel_1F,dia,16-16,10,007B575C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+427,buneary,4,comum,tabela_elegivel,SixIsland_PatternBush,dia,6-6,10,007B5FF4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+428,lopunny,4,comum,tabela_elegivel,Route15,dia,26-26,5,007B6EE4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+429,mismagius,4,comum,tabela_elegivel,PokemonTower_4F,ambos,17-17,10,007B59C8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+430,honchkrow,4,comum,tabela_elegivel,Route23,noite,34-34,10,0112C848,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+431,glameow,4,comum,tabela_elegivel,SixIsland_WaterPath,dia,10-10,20,007B67CC,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+432,purugly,4,comum,tabela_elegivel,FiveIsland_Meadow,dia,48-48,10,007B6630,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+433,chingling,4,comum,tabela_elegivel,Route10,noite,11-11,10,0112C618,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+434,stunky,4,comum,tabela_elegivel,Route7,noite,18-18,10,0112C574,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+435,skuntank,4,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,45-45,20,007B5F64,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+436,bronzor,4,comum,tabela_elegivel,VictoryRoad_3F,dia,44-44,4,007B52B4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+437,bronzong,4,comum,tabela_elegivel,Route16,dia,23-23,4,007B6F28,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+438,bonsly,4,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,34-34,10,007B5C4C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+439,mime-jr,4,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,53-53,4,007B5E90,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+440,happiny,4,comum,tabela_elegivel,SeafoamIslands_B3F,dia,30-30,1,007B58AC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+441,chatot,4,comum,tabela_elegivel,Route16,dia,18-18,20,007B6F08,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+442,spiritomb,4,comum,tabela_elegivel,CeruleanCave_2F,noite,52-52,10,0112D09C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+443,gible,4,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,39-39,4,007B5BDC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+444,gabite,4,comum,tabela_elegivel,DiglettsCave_B1F,dia,15-15,10,007B51F4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+445,garchomp,4,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,30-30,10,007B5CAC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+446,munchlax,4,comum,tabela_elegivel,CeruleanCave_B1F,dia,58-58,20,007B56B0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+447,riolu,4,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,35-35,20,007B5B30,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+448,lucario,4,comum,tabela_elegivel,VictoryRoad_3F,dia,40-40,10,007B5298,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+449,hippopotas,4,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,36-36,4,007B5D0C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+450,hippowdon,4,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,34-34,10,007B5BFC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+451,skorupi,4,comum,tabela_elegivel,PokemonMansion_B1F,dia,30-30,10,007B5378,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+452,drapion,4,comum,tabela_elegivel,CeruleanCave_B1F,noite,55-55,10,0112D0D4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+453,croagunk,4,comum,tabela_elegivel,PokemonMansion_2F,dia,30-30,10,007B5308,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+454,toxicroak,4,comum,tabela_elegivel,PokemonTower_6F,ambos,19-19,10,007B5A44,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+455,carnivine,4,comum,tabela_elegivel,SeafoamIslands_B2F,dia,28-28,4,007B586C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+456,finneon,4,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,ambos,5-35,30,007B5EA8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+457,lumineon,4,comum,tabela_elegivel,Route13,ambos,20-30,5,007B6E50,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+458,mantyke,4,comum,tabela_elegivel,OneIsland_KindleRoad,ambos,20-35,30,007B6368,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+459,snover,4,comum,tabela_elegivel,SeafoamIslands_B4F,noite,34-34,10,0112CF4C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+460,abomasnow,4,comum,tabela_elegivel,Route6,dia,16-16,5,007B6B74,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+461,weavile,4,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,29-29,10,007B5F3C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+462,magnezone,4,comum,tabela_elegivel,PowerPlant,dia,24-24,10,007B5AB4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+463,lickilicky,4,comum,tabela_elegivel,OneIsland_KindleRoad,dia,31-31,10,007B6340,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+464,rhyperior,4,comum,tabela_elegivel,DiglettsCave_B1F,dia,22-22,5,007B5204,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+465,tangrowth,4,comum,tabela_elegivel,Route12,dia,23-23,10,007B6D98,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+466,electivire,4,comum,tabela_elegivel,Route21_North,dia,25-25,10,007B7054,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+467,magmortar,4,comum,tabela_elegivel,Route12,dia,22-22,10,007B6D94,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+468,togekiss,4,comum,tabela_elegivel,Route7,dia,22-22,10,007B6BEC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+469,yanmega,4,comum,tabela_elegivel,Route16,dia,22-22,5,007B6F20,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+470,leafeon,4,comum,tabela_elegivel,FiveIsland_Meadow,dia,41-41,5,007B6644,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+471,glaceon,4,comum,tabela_elegivel,SeafoamIslands_B2F,dia,22-22,10,007B5858,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+472,gliscor,4,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,33-33,10,007B5B40,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+473,mamoswine,4,comum,tabela_elegivel,SeafoamIslands_1F,dia,22-22,10,007B57E8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+474,porygon-z,4,comum,tabela_elegivel,PokemonTower_7F,ambos,23-23,4,007B5A8C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+475,gallade,4,comum,tabela_elegivel,Route18,dia,26-26,10,007B6F80,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+476,probopass,4,comum,tabela_elegivel,VictoryRoad_2F,dia,45-45,10,007B5264,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+477,dusknoir,4,comum,tabela_elegivel,CeruleanCave_B1F,dia,52-52,10,007B56C0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+478,froslass,4,comum,tabela_elegivel,SeafoamIslands_B2F,noite,24-24,10,0112CEE4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+479,rotom,4,comum,tabela_elegivel,MtMoon_1F,dia,10-10,10,007B5104,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+480,uxie,4,lendario/mitico,fixo_adicional,PokemonTower_3F,,,,007BD9FC,0,Objeto 9; flag 51E0; acesso/acionamento/captura nao certificados,nao
+481,mesprit,4,lendario/mitico,fixo_adicional,SeafoamIslands_B3F,,,,007BD684,0,Objeto 10; flag 51E1; acesso/acionamento/captura nao certificados,nao
+482,azelf,4,lendario/mitico,fixo_adicional,SeafoamIslands_1F,,,,007BD2A8,0,Objeto 9; flag 51E2; acesso/acionamento/captura nao certificados,nao
+483,dialga,4,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_B1F,,,,007BEE7C,0,Objeto 8; flag 51E3; acesso/acionamento/captura nao certificados,nao
+484,palkia,4,lendario/mitico,fixo_adicional,OneIsland_TreasureBeach,,,,007C5144,0,Objeto 3; flag 51E4; acesso/acionamento/captura nao certificados,nao
+485,heatran,4,lendario/mitico,fixo_adicional,PokemonTower_6F,,,,007BDEB4,0,Objeto 8; flag 51E5; acesso/acionamento/captura nao certificados,nao
+486,regigigas,4,lendario/mitico,fixo_adicional,FiveIsland_ResortGorgeous,,,,007C5508,0,Objeto 11; flag 51E6; acesso/acionamento/captura nao certificados,nao
+487,giratina,4,lendario/mitico,fixo_adicional,FiveIsland_ResortGorgeous,,,,007C5520,0,Objeto 12; flag 51E7; acesso/acionamento/captura nao certificados,nao
+488,cresselia,4,lendario/mitico,tabela_excluida_condicional,SevenIsland_TanobyRuins_DilfordChamber,ambos,25-25,20,007B4FE0,1,Tanoby: desbloqueio por FLAG 0849; puzzle/acesso nao certificados,nao
+489,phione,4,lendario/mitico,fixo_adicional,DiglettsCave_B1F,,,,007BA20C,0,Objeto 4; flag 51E9; acesso/acionamento/captura nao certificados,nao
+490,manaphy,4,lendario/mitico,fixo_adicional,VictoryRoad_2F,,,,007BA588,0,Objeto 15; flag 51EA; acesso/acionamento/captura nao certificados,nao
+491,darkrai,4,lendario/mitico,fixo_adicional,PokemonTower_6F,,,,007BDE9C,0,Objeto 7; flag 51EB; acesso/acionamento/captura nao certificados,nao
+492,shaymin,4,lendario/mitico,fixo_adicional,OneIsland_KindleRoad,,,,007C5070,0,Objeto 30; flag 51EC; acesso/acionamento/captura nao certificados,nao
+493,arceus,4,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_Back,,,,007BEF68,0,Objeto 8; flag 51ED; acesso/acionamento/captura nao certificados,nao
+494,victini,5,lendario/mitico,fixo_adicional,VictoryRoad_2F,,,,007BA5E8,0,Objeto 19; flag 51EE; acesso/acionamento/captura nao certificados,nao
+495,snivy,5,comum,tabela_elegivel,Route15,dia,22-22,10,007B6ED4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+496,servine,5,comum,tabela_elegivel,Route6,dia,15-15,10,007B6B68,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+497,serperior,5,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,31-31,5,007B646C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+498,tepig,5,comum,tabela_elegivel,Route7,dia,19-19,4,007B6C00,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+499,pignite,5,comum,tabela_elegivel,RockTunnel_B1F,dia,15-15,10,007B5794,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+500,emboar,5,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,31-31,5,007B63E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+501,oshawott,5,comum,tabela_elegivel,SeafoamIslands_1F,dia,29-29,20,007B57DC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+502,dewott,5,comum,tabela_elegivel,CeruleanCave_B1F,ambos,50-60,30,007B56E8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+503,samurott,5,comum,tabela_elegivel,Route12,ambos,30-35,4,007B6DD0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+504,patrat,5,comum,tabela_elegivel,PokemonMansion_B1F,dia,32-32,1,007B5398,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+505,watchog,5,comum,tabela_elegivel,Route23,dia,40-40,20,007B71D4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+506,lillipup,5,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,8-8,1,007B66D4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+507,herdier,5,comum,tabela_elegivel,MtEmber_Exterior,ambos,38-38,20,007B5ADC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+508,stoutland,5,comum,tabela_elegivel,PokemonMansion_B1F,dia,38-38,10,007B5384,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+509,purrloin,5,comum,tabela_elegivel,FiveIsland_Meadow,noite,10-10,10,0112C964,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+510,liepard,5,comum,tabela_elegivel,MtMoon_B2F,dia,10-10,10,007B5174,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+511,pansage,5,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,44-44,5,007B5CB0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+512,simisage,5,comum,tabela_elegivel,Route6,dia,16-16,5,007B6B70,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+513,pansear,5,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,44-44,5,007B5D58,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+514,simisear,5,comum,tabela_elegivel,OneIsland_KindleRoad,dia,34-34,20,007B6330,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+515,panpour,5,comum,tabela_elegivel,SeafoamIslands_B1F,dia,31-31,20,007B5814,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+516,simipour,5,comum,tabela_elegivel,TwoIsland_CapeBrink,ambos,20-35,30,007B648C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+517,munna,5,comum,tabela_elegivel,Route5,noite,12-12,10,0112C504,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+518,musharna,5,comum,tabela_elegivel,PokemonTower_6F,ambos,21-21,5,007B5A48,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+519,pidove,5,comum,tabela_elegivel,Route22,dia,4-4,10,007B7154,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+520,tranquill,5,comum,tabela_elegivel,Route18,dia,24-24,20,007B6F78,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+521,unfezant,5,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,54-54,5,007B696C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+522,blitzle,5,comum,tabela_elegivel,Route3,dia,7-7,1,007B6A90,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+523,zebstrika,5,comum,tabela_elegivel,Route5,dia,16-16,5,007B6B38,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+524,roggenrola,5,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,29-29,10,007B5B34,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+525,boldore,5,comum,tabela_elegivel,VictoryRoad_1F,dia,32-32,20,007B5224,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+526,gigalith,5,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,28-28,10,007B5CA8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+527,woobat,5,comum,tabela_elegivel,MtMoon_B1F,noite,5-5,10,0112CB58,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+528,swoobat,5,comum,tabela_elegivel,Route5,dia,12-12,10,007B6B2C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+529,drilbur,5,comum,tabela_elegivel,DiglettsCave_B1F,noite,15-15,10,0112CBCC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+530,excadrill,5,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,34-34,10,007B5C00,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+531,audino,5,comum,tabela_elegivel,PokemonMansion_B1F,dia,34-34,20,007B5374,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+532,timburr,5,comum,tabela_elegivel,Route22,dia,3-3,20,007B7150,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+533,gurdurr,5,comum,tabela_elegivel,ThreeIsland_Port,ambos,10-10,10,007B6564,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+534,conkeldurr,5,comum,tabela_elegivel,SeafoamIslands_B4F,dia,28-28,4,007B5928,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+535,tympole,5,comum,tabela_elegivel,SeafoamIslands_B2F,dia,32-32,20,007B584C,11,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+536,palpitoad,5,comum,tabela_elegivel,Route10,ambos,10-20,30,007B6CC0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+537,seismitoad,5,comum,tabela_elegivel,VermilionCity,ambos,30-35,4,007B744C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+538,throh,5,comum,tabela_elegivel,Route21_North,dia,19-19,5,007B705C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+539,sawk,5,comum,tabela_elegivel,CeruleanCave_B1F,dia,64-64,4,007B56D0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+540,sewaddle,5,comum,tabela_elegivel,Route24,dia,7-7,20,007B7258,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+541,swadloon,5,comum,tabela_elegivel,CeruleanCave_1F,dia,49-49,20,007B55BC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+542,leavanny,5,comum,tabela_elegivel,ThreeIsland_Port,ambos,30-30,4,007B657C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+543,venipede,5,comum,tabela_elegivel,Route25,dia,8-8,20,007B72DC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+544,whirlipede,5,comum,tabela_elegivel,MtMoon_B1F,dia,8-8,20,007B5130,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+545,scolipede,5,comum,tabela_elegivel,SeafoamIslands_B4F,dia,32-32,10,007B5914,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+546,cottonee,5,comum,tabela_elegivel,Route2,dia,5-5,1,007B6A54,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+547,whimsicott,5,comum,tabela_elegivel,PokemonMansion_3F,dia,32-32,5,007B5354,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+548,petilil,5,comum,tabela_elegivel,FiveIsland_Meadow,dia,50-50,1,007B6650,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+549,lilligant,5,comum,tabela_elegivel,Route18,dia,22-22,4,007B6F94,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+550,basculin,5,comum,tabela_elegivel,PalletTown,ambos,20-30,5,007B7364,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+551,sandile,5,comum,tabela_elegivel,DiglettsCave_B1F,dia,17-17,10,007B51F0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+552,krokorok,5,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,15-15,20,007B6958,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+553,krookodile,5,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,26-26,10,007B5DA8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+554,darumaka,5,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,26-26,20,007B5C9C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+555,darmanitan,5,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,18-18,4,007B5D10,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+556,maractus,5,comum,tabela_elegivel,Route14,dia,27-27,10,007B6EA4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+557,dwebble,5,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,40-40,4,007B5C10,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+558,crustle,5,comum,tabela_elegivel,CeruleanCave_1F,dia,55-55,4,007B55D8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+559,scraggy,5,comum,tabela_elegivel,Route11,noite,13-13,10,0112C654,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+560,scrafty,5,comum,tabela_elegivel,PokemonTower_7F,ambos,19-19,5,007B5A84,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+561,sigilyph,5,comum,tabela_elegivel,PokemonTower_7F,ambos,17-17,5,007B5A80,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+562,yamask,5,comum,tabela_elegivel,PokemonMansion_B1F,noite,30-30,10,0112CD88,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+563,cofagrigus,5,comum,tabela_elegivel,Route21_North,dia,21-21,10,007B7050,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+564,tirtouga,5,comum,tabela_elegivel,Route4,ambos,10-20,30,007B6AD8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+565,carracosta,5,comum,tabela_elegivel,OneIsland,ambos,20-35,30,007B7574,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+566,archen,5,comum,tabela_elegivel,VictoryRoad_3F,dia,32-32,20,007B5294,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+567,archeops,5,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,31-31,5,007B5F0C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+568,trubbish,5,comum,tabela_elegivel,MtMoon_B2F,dia,9-9,10,007B516C,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+569,garbodor,5,comum,tabela_elegivel,CeruleanCave_1F,dia,46-46,10,007B55C0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+570,zorua,5,comum,tabela_elegivel,MtMoon_B1F,dia,5-5,4,007B514C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+571,zoroark,5,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,34-34,10,007B64E4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+572,minccino,5,comum,tabela_elegivel,Route11,dia,15-15,20,007B6D0C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+573,cinccino,5,comum,tabela_elegivel,OneIsland_KindleRoad,dia,36-36,10,007B6334,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+574,gothita,5,comum,tabela_elegivel,Route5,dia,15-15,10,007B6B30,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+575,gothorita,5,comum,tabela_elegivel,Route11,dia,15-15,5,007B6D20,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+576,gothitelle,5,comum,tabela_elegivel,PokemonTower_6F,ambos,17-17,5,007B5A4C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+577,solosis,5,comum,tabela_elegivel,PokemonMansion_B1F,dia,26-26,1,007B539C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+578,duosion,5,comum,tabela_elegivel,PokemonTower_6F,ambos,14-14,10,007B5A3C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+579,reuniclus,5,comum,tabela_elegivel,PokemonTower_4F,ambos,18-18,10,007B59D4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+580,ducklett,5,comum,tabela_elegivel,Route21_North,ambos,20-30,5,007B7084,10,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+581,swanna,5,comum,tabela_elegivel,Route4,ambos,20-30,5,007B6ADC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+582,vanillite,5,comum,tabela_elegivel,Route14,dia,29-29,4,007B6EB8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+583,vanillish,5,comum,tabela_elegivel,MtMoon_B1F,dia,9-9,10,007B513C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+584,vanilluxe,5,comum,tabela_elegivel,SeafoamIslands_B1F,dia,22-22,10,007B5820,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+585,deerling,5,comum,tabela_elegivel,FiveIsland_Meadow,dia,10-10,20,007B662C,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+586,sawsbuck,5,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,37-37,4,007B63F0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+587,emolga,5,comum,tabela_elegivel,Route11,dia,12-12,10,007B6D10,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+588,karrablast,5,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,51-51,5,007B5F78,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+589,escavalier,5,comum,tabela_elegivel,RockTunnel_B1F,dia,16-16,10,007B5790,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+590,foongus,5,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,12-12,20,007B66B0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+591,amoonguss,5,comum,tabela_elegivel,Route8,dia,17-17,4,007B6C34,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+592,frillish,5,comum,tabela_elegivel,FiveIsland_MemorialPillar,ambos,5-15,30,007B66E8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+593,jellicent,5,comum,tabela_elegivel,SevenIsland_TrainerTower,ambos,20-35,30,007B68D4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+594,alomomola,5,comum,tabela_elegivel,Route11,ambos,20-30,5,007B6D48,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+595,joltik,5,comum,tabela_elegivel,Route10,noite,15-15,10,0112C61C,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+596,galvantula,5,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,31-31,5,007B5F44,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+597,ferroseed,5,comum,tabela_elegivel,RockTunnel_1F,dia,15-15,4,007B576C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+598,ferrothorn,5,comum,tabela_elegivel,RockTunnel_1F,dia,17-17,10,007B5758,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+599,klink,5,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,44-44,4,007B5D60,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+600,klang,5,comum,tabela_elegivel,MtMoon_B1F,dia,10-10,10,007B5140,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+601,klinklang,5,comum,tabela_elegivel,Route13,dia,26-26,10,007B6E24,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+602,tynamo,5,comum,tabela_elegivel,PowerPlant,noite,25-25,10,0112CE6C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+603,eelektrik,5,comum,tabela_elegivel,SixIsland_WaterPath,dia,15-15,10,007B67D8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+604,eelektross,5,comum,tabela_elegivel,ThreeIsland_Port,ambos,25-25,4,007B6578,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+605,elgyem,5,comum,tabela_elegivel,Route22,dia,5-5,4,007B7170,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+606,beheeyem,5,comum,tabela_elegivel,PokemonTower_5F,ambos,17-17,4,007B5A18,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+607,litwick,5,comum,tabela_elegivel,FiveIsland_MemorialPillar,noite,14-14,10,0112C99C,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+608,lampent,5,comum,tabela_elegivel,PokemonTower_5F,ambos,17-17,10,007B5A00,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+609,chandelure,5,comum,tabela_elegivel,CeruleanCave_1F,dia,58-58,5,007B55D4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+610,axew,5,comum,tabela_elegivel,SeafoamIslands_B3F,dia,32-32,4,007B58A0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+611,fraxure,5,comum,tabela_elegivel,FiveIsland_Meadow,dia,15-15,5,007B6640,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+612,haxorus,5,comum,tabela_elegivel,Route18,dia,25-25,10,007B6F84,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+613,cubchoo,5,comum,tabela_elegivel,SeafoamIslands_B1F,dia,26-26,4,007B5834,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+614,beartic,5,comum,tabela_elegivel,SeafoamIslands_B4F,noite,32-32,10,0112CF50,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+615,cryogonal,5,comum,tabela_elegivel,SeafoamIslands_B1F,dia,22-22,10,007B581C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+616,shelmet,5,comum,tabela_elegivel,Route13,dia,29-29,4,007B6E30,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+617,accelgor,5,comum,tabela_elegivel,Route10,dia,17-17,5,007B6C9C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+618,stunfisk,5,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,35-35,5,007B5BD0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+619,mienfoo,5,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,36-36,20,007B5B68,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+620,mienshao,5,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,36-36,10,007B6460,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+621,druddigon,5,comum,tabela_elegivel,SeafoamIslands_1F,dia,24-24,10,007B57EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+622,golett,5,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,10-10,10,007B6924,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+623,golurk,5,comum,tabela_elegivel,RockTunnel_1F,dia,17-17,5,007B5764,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+624,pawniard,5,comum,tabela_elegivel,Route1,dia,3-3,5,007B6A0C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+625,bisharp,5,comum,tabela_elegivel,PokemonTower_7F,ambos,19-19,10,007B5A78,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+626,bouffalant,5,comum,tabela_elegivel,PokemonTower_5F,ambos,20-20,5,007B5A10,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+627,rufflet,5,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,29-29,10,007B64DC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+628,braviary,5,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,50-50,10,007B6960,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+629,vullaby,5,comum,tabela_elegivel,ViridianForest,dia,3-3,10,007B50D0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+630,mandibuzz,5,comum,tabela_elegivel,VictoryRoad_3F,dia,43-43,10,007B529C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+631,heatmor,5,comum,tabela_elegivel,CeruleanCave_2F,dia,61-61,4,007B567C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+632,durant,5,comum,tabela_elegivel,CeruleanCave_B1F,dia,64-64,4,007B56CC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+633,deino,5,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,44-44,4,007B5CB8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+634,zweilous,5,comum,tabela_elegivel,PokemonTower_5F,ambos,13-13,10,007B5A04,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+635,hydreigon,5,comum,tabela_elegivel,PokemonMansion_2F,dia,30-30,10,007B5310,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+636,larvesta,5,comum,tabela_elegivel,ViridianForest,dia,5-5,10,007B50C4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+637,volcarona,5,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,31-31,10,007B5BC4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+638,cobalion,5,lendario/mitico,fixo_adicional,SeafoamIslands_B3F,,,,007BD63C,0,Objeto 7; flag 527E; acesso/acionamento/captura nao certificados,nao
+639,terrakion,5,lendario/mitico,fixo_adicional,FiveIsland_MemorialPillar,,,,007C57FC,0,Objeto 7; flag 527F; acesso/acionamento/captura nao certificados,nao
+640,virizion,5,lendario/mitico,fixo_adicional,FiveIsland_Meadow,,,,007C572C,0,Objeto 13; flag 5280; acesso/acionamento/captura nao certificados,nao
+641,tornadus,5,lendario/mitico,fixo_adicional,FiveIsland_Meadow,,,,007C5714,0,Objeto 12; flag 5281; acesso/acionamento/captura nao certificados,nao
+642,thundurus,5,lendario/mitico,fixo_adicional,PokemonTower_3F,,,,007BD9E4,0,Objeto 8; flag 5282; acesso/acionamento/captura nao certificados,nao
+643,reshiram,5,lendario/mitico,fixo_adicional,FiveIsland_ResortGorgeous,,,,007C5550,0,Objeto 14; flag 5283; acesso/acionamento/captura nao certificados,nao
+644,zekrom,5,lendario/mitico,fixo_adicional,OneIsland_TreasureBeach,,,,007C515C,0,Objeto 4; flag 5284; acesso/acionamento/captura nao certificados,nao
+645,landorus,5,lendario/mitico,fixo_adicional,PokemonTower_6F,,,,007BDEE4,0,Objeto 10; flag 5285; acesso/acionamento/captura nao certificados,nao
+646,kyurem,5,lendario/mitico,fixo_adicional,CeruleanCave_2F,,,,007BC9A4,0,Objeto 17; flag 5286; acesso/acionamento/captura nao certificados,nao
+647,keldeo,5,lendario/mitico,fixo_adicional,SeafoamIslands_B3F,,,,007BD66C,0,Objeto 9; flag 5287; acesso/acionamento/captura nao certificados,nao
+648,meloetta,5,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_1F,,,,007BED60,0,Objeto 7; flag 5288; acesso/acionamento/captura nao certificados,nao
+649,genesect,5,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_B1F,,,,007BEE04,0,Objeto 3; flag 5289; acesso/acionamento/captura nao certificados,nao
+650,chespin,6,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,42-42,4,007B5DB4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+651,quilladin,6,comum,tabela_elegivel,Route21_North,dia,24-24,10,007B704C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+652,chesnaught,6,comum,tabela_elegivel,Route18,dia,25-25,10,007B6F88,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+653,fennekin,6,comum,tabela_elegivel,Route17,dia,29-29,5,007B6F58,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+654,braixen,6,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,37-37,4,007B5B4C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+655,delphox,6,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,24-24,10,007B5C54,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+656,froakie,6,comum,tabela_elegivel,Route13,ambos,10-20,30,007B6E4C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+657,frogadier,6,comum,tabela_elegivel,CeruleanCity,ambos,10-20,30,007B73F8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+658,greninja,6,comum,tabela_elegivel,Route4,ambos,30-35,4,007B6AE0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+659,bunnelby,6,comum,tabela_elegivel,PokemonMansion_2F,dia,32-32,20,007B5304,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+660,diggersby,6,comum,tabela_elegivel,MtMoon_B2F,dia,12-12,5,007B517C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+661,fletchling,6,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,31-31,10,007B63D4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+662,fletchinder,6,comum,tabela_elegivel,Route4,dia,8-8,10,007B6AB0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+663,talonflame,6,comum,tabela_elegivel,Route8,dia,17-17,10,007B6C28,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+664,scatterbug,6,comum,tabela_elegivel,ViridianForest,dia,4-4,20,007B50C0,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+665,spewpa,6,comum,tabela_elegivel,Route15,dia,24-24,20,007B6ED0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+666,vivillon,6,comum,tabela_elegivel,Route9,dia,15-15,10,007B6C58,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+667,litleo,6,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,26-26,20,007B5D44,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+668,pyroar,6,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,34-34,10,007B5B78,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+669,flabebe,6,comum,tabela_elegivel,PokemonTower_4F,ambos,15-15,5,007B59DC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+670,floette,6,comum,tabela_elegivel,Route24,dia,8-8,4,007B7274,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+671,florges,6,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,40-40,10,007B5F70,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+672,skiddo,6,comum,tabela_elegivel,SixIsland_PatternBush,dia,6-6,10,007B5FF0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+673,gogoat,6,comum,tabela_elegivel,Route17,dia,25-25,10,007B6F4C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+674,pancham,6,comum,tabela_elegivel,Route1,dia,3-3,5,007B6A10,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+675,pangoro,6,comum,tabela_elegivel,PokemonTower_3F,ambos,18-18,10,007B599C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+676,furfrou,6,comum,tabela_elegivel,SeafoamIslands_B3F,dia,34-34,5,007B589C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+677,espurr,6,comum,tabela_elegivel,Route3,dia,7-7,10,007B6A6C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+678,meowstic,6,comum,tabela_elegivel,CeruleanCave_2F,dia,61-61,4,007B5678,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+679,honedge,6,comum,tabela_elegivel,VictoryRoad_2F,dia,46-46,4,007B5278,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+680,doublade,6,comum,tabela_elegivel,Route4,dia,10-10,10,007B6AA8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+681,aegislash,6,comum,tabela_elegivel,PokemonMansion_3F,dia,28-28,5,007B5350,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+682,spritzee,6,comum,tabela_elegivel,Route3,dia,5-5,4,007B6A88,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+683,aromatisse,6,comum,tabela_elegivel,Route17,dia,25-25,4,007B6F60,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+684,swirlix,6,comum,tabela_elegivel,ViridianForest,dia,3-3,4,007B50E0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+685,slurpuff,6,comum,tabela_elegivel,Route12,dia,23-23,4,007B6DAC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+686,inkay,6,comum,tabela_elegivel,OneIsland_KindleRoad,dia,40-40,1,007B6354,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+687,malamar,6,comum,tabela_elegivel,Route7,dia,18-18,5,007B6BF4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+688,binacle,6,comum,tabela_elegivel,MtMoon_B2F,dia,9-9,20,007B5168,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+689,barbaracle,6,comum,tabela_elegivel,ThreeIsland_BondBridge,ambos,35-40,5,007B6514,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+690,skrelp,6,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,45-45,20,007B5F2C,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+691,dragalge,6,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,45-45,20,007B5E70,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+692,clauncher,6,comum,tabela_elegivel,SeafoamIslands_B2F,dia,30-30,10,007B5850,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+693,clawitzer,6,comum,tabela_elegivel,SevenIsland_TrainerTower,ambos,35-40,5,007B68D8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+694,helioptile,6,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,40-40,1,007B6478,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+695,heliolisk,6,comum,tabela_elegivel,SixIsland_RuinValley,dia,20-20,4,007B686C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+696,tyrunt,6,comum,tabela_elegivel,RockTunnel_1F,dia,16-16,20,007B5750,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+697,tyrantrum,6,comum,tabela_elegivel,CeruleanCave_2F,dia,55-55,10,007B5668,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+698,amaura,6,comum,tabela_elegivel,Route22,dia,4-4,10,007B7158,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+699,aurorus,6,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,41-41,5,007B5F7C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+700,sylveon,6,comum,tabela_elegivel,SixIsland_WaterPath,dia,41-41,5,007B67E4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+701,hawlucha,6,comum,tabela_elegivel,PokemonMansion_2F,dia,26-26,4,007B5324,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+702,dedenne,6,comum,tabela_elegivel,Route10,dia,16-16,20,007B6C88,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+703,carbink,6,comum,tabela_elegivel,RockTunnel_B1F,noite,16-16,10,0112D17C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+704,goomy,6,comum,tabela_elegivel,MtEmber_RubyPath_1F,dia,42-42,4,007B5C14,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+705,sliggoo,6,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,42-42,10,007B5D48,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+706,goodra,6,comum,tabela_elegivel,OneIsland_KindleRoad,dia,31-31,10,007B6338,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+707,klefki,6,comum,tabela_elegivel,VictoryRoad_2F,dia,46-46,5,007B5270,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+708,phantump,6,comum,tabela_elegivel,PokemonTower_4F,ambos,16-16,20,007B59C4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+709,trevenant,6,comum,tabela_elegivel,VictoryRoad_1F,dia,44-44,4,007B5240,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+710,pumpkaboo,6,comum,tabela_elegivel,MtMoon_B1F,dia,7-7,5,007B5144,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+711,gourgeist,6,comum,tabela_elegivel,RockTunnel_B1F,dia,17-17,10,007B5798,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+712,bergmite,6,comum,tabela_elegivel,SeafoamIslands_B2F,noite,30-30,10,0112CED8,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+713,avalugg,6,comum,tabela_elegivel,SeafoamIslands_B2F,dia,24-24,10,007B585C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+714,noibat,6,comum,tabela_elegivel,MtMoon_1F,noite,9-9,10,0112CB24,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+715,noivern,6,comum,tabela_elegivel,VictoryRoad_1F,noite,43-43,10,0112CDC4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+716,xerneas,6,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_Back,,,,007BEF20,0,Objeto 5; flag 52CC; acesso/acionamento/captura nao certificados,nao
+717,yveltal,6,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_Back,,,,007BEF38,0,Objeto 6; flag 52CD; acesso/acionamento/captura nao certificados,nao
+718,zygarde,6,lendario/mitico,fixo_adicional,OneIsland_KindleRoad,,,,007C50A0,0,Objeto 32; flag 52CE; acesso/acionamento/captura nao certificados,nao
+719,diancie,6,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_1F,,,,007BED48,0,Objeto 6; flag 52CF; acesso/acionamento/captura nao certificados,nao
+720,hoopa,6,lendario/mitico,fixo_adicional,FiveIsland_ResortGorgeous,,,,007C5538,0,Objeto 13; flag 52D0; acesso/acionamento/captura nao certificados,nao
+721,volcanion,6,lendario/mitico,fixo_adicional,CeruleanCave_2F,,,,007BC95C,0,Objeto 14; flag 52D1; acesso/acionamento/captura nao certificados,nao
+722,rowlet,7,comum,tabela_elegivel,FiveIsland_Meadow,ambos,5-15,30,007B6664,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+723,dartrix,7,comum,tabela_elegivel,Route24,dia,13-13,5,007B726C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+724,decidueye,7,comum,tabela_elegivel,PokemonMansion_B1F,dia,28-28,5,007B5388,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+725,litten,7,comum,tabela_elegivel,MtEmber_Exterior,ambos,33-33,10,007B5AE0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+726,torracat,7,comum,tabela_elegivel,Route24,dia,14-14,5,007B7270,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+727,incineroar,7,comum,tabela_elegivel,Route21_North,dia,26-26,5,007B7060,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+728,popplio,7,comum,tabela_elegivel,ThreeIsland_BerryForest,ambos,20-35,30,007B5E24,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+729,brionne,7,comum,tabela_elegivel,TwoIsland_CapeBrink,ambos,35-40,5,007B6490,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+730,primarina,7,comum,tabela_elegivel,Route20,ambos,30-35,4,007B7004,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+731,pikipek,7,comum,tabela_elegivel,Route4,dia,10-10,20,007B6AA0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+732,trumbeak,7,comum,tabela_elegivel,Route18,dia,22-22,10,007B6F7C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+733,toucannon,7,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,47-47,10,007B5F6C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+734,yungoos,7,comum,tabela_elegivel,SixIsland_RuinValley,dia,44-44,20,007B6850,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+735,gumshoos,7,comum,tabela_elegivel,MtMoon_B2F,dia,11-11,4,007B5188,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+736,grubbin,7,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,53-53,4,007B5F84,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+737,charjabug,7,comum,tabela_elegivel,Route16,dia,18-18,4,007B6F24,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+738,vikavolt,7,comum,tabela_elegivel,PowerPlant,dia,34-34,5,007B5ABC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+739,crabrawler,7,comum,tabela_elegivel,Route2,dia,4-4,4,007B6A4C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+740,crabominable,7,comum,tabela_elegivel,SeafoamIslands_B4F,dia,34-34,10,007B5910,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+741,oricorio,7,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,32-32,5,007B5D5C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+742,cutiefly,7,comum,tabela_elegivel,Route23,dia,42-42,4,007B71F4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+743,ribombee,7,comum,tabela_elegivel,Route7,dia,20-20,5,007B6BF8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+744,rockruff,7,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,36-36,20,007B5C48,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+745,lycanroc,7,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,20-20,5,007B5D04,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+746,wishiwashi,7,comum,tabela_elegivel,SeafoamIslands_B4F,ambos,25-30,30,007B5940,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+747,mareanie,7,comum,tabela_elegivel,Route4,dia,6-6,10,007B6AA4,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+748,toxapex,7,comum,tabela_elegivel,SixIsland_RuinValley,ambos,20-25,4,007B6890,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+749,mudbray,7,comum,tabela_elegivel,ViridianForest,dia,3-3,10,007B50CC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+750,mudsdale,7,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,28-28,5,007B5C60,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+751,dewpider,7,comum,tabela_elegivel,Route6,ambos,20-25,30,007B6B94,8,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+752,araquanid,7,comum,tabela_elegivel,Route12,ambos,20-30,5,007B6DCC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+753,fomantis,7,comum,tabela_elegivel,SixIsland_WaterPath,dia,44-44,10,007B67D0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+754,lurantis,7,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,34-34,5,007B64EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+755,morelull,7,comum,tabela_elegivel,ViridianForest,noite,5-5,10,0112C3EC,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+756,shiinotic,7,comum,tabela_elegivel,Route21_North,noite,24-24,10,0112C810,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+757,salandit,7,comum,tabela_elegivel,MtMoon_1F,dia,8-8,20,007B50F8,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+758,salazzle,7,comum,tabela_elegivel,MtEmber_RubyPath_B2F,dia,32-32,5,007B5CB4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+759,stufful,7,comum,tabela_elegivel,Route2,dia,3-3,20,007B6A30,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+760,bewear,7,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,38-38,5,007B63E4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+761,bounsweet,7,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,48-48,1,007B5E94,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+762,steenee,7,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,8-8,10,007B66B4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+763,tsareena,7,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,48-48,10,007B6928,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+764,comfey,7,comum,tabela_elegivel,SeafoamIslands_B3F,dia,32-32,10,007B5888,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+765,oranguru,7,comum,tabela_elegivel,PokemonTower_5F,ambos,17-17,4,007B5A1C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+766,passimian,7,comum,tabela_elegivel,PokemonTower_4F,ambos,20-20,5,007B59D8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+767,wimpod,7,comum,tabela_elegivel,Route14,dia,24-24,20,007B6E98,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+768,golisopod,7,comum,tabela_elegivel,Route24,ambos,30-35,4,007B7298,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+769,sandygast,7,comum,tabela_elegivel,PokemonTower_5F,ambos,16-16,20,007B59FC,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+770,palossand,7,comum,tabela_elegivel,PokemonTower_4F,ambos,17-17,4,007B59E0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+771,pyukumuku,7,comum,tabela_elegivel,OneIsland_TreasureBeach,ambos,35-40,4,007B6410,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+772,type-null,7,lendario/mitico,tabela_excluida_condicional,SixIsland_AlteringCave,ambos,20-20,10,007B77E4,1,Altering Cave: VAR 4024 = 7; selecao/acesso nao certificados,nao
+773,silvally,7,lendario/mitico,fixo_adicional,SafariZone_West,,,,007BC388,0,Objeto 10; flag 5305; acesso/acionamento/captura nao certificados,nao
+774,minior,7,comum,tabela_elegivel,Route24,dia,11-11,10,007B725C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+775,komala,7,comum,tabela_elegivel,PokemonMansion_2F,dia,32-32,5,007B531C,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+776,turtonator,7,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,38-38,5,007B5B80,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+777,togedemaru,7,comum,tabela_elegivel,CeruleanCave_2F,dia,52-52,10,007B5660,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+778,mimikyu,7,comum,tabela_elegivel,Route23,dia,32-32,4,007B71F0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+779,bruxish,7,comum,tabela_elegivel,ThreeIsland_BondBridge,ambos,20-35,30,007B6510,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+780,drampa,7,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,23-23,4,007B5F4C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+781,dhelmise,7,comum,tabela_elegivel,PokemonMansion_3F,dia,28-28,10,007B534C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+782,jangmo-o,7,comum,tabela_elegivel,PokemonMansion_1F,dia,26-26,1,007B52F4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+783,hakamo-o,7,comum,tabela_elegivel,FiveIsland_Meadow,dia,10-10,10,007B6634,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+784,kommo-o,7,comum,tabela_elegivel,ThreeIsland_BondBridge,dia,31-31,10,007B64E8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+785,tapu-koko,7,lendario/mitico,fixo_adicional,SeafoamIslands_1F,,,,007BD248,0,Objeto 5; flag 5311; acesso/acionamento/captura nao certificados,nao
+786,tapu-lele,7,lendario/mitico,fixo_adicional,SeafoamIslands_1F,,,,007BD260,0,Objeto 6; flag 5312; acesso/acionamento/captura nao certificados,nao
+787,tapu-bulu,7,lendario/mitico,fixo_adicional,CeruleanCave_1F,,,,007BC74C,0,Objeto 11; flag 5313; acesso/acionamento/captura nao certificados,nao
+788,tapu-fini,7,lendario/mitico,fixo_adicional,CeruleanCave_1F,,,,007BC764,0,Objeto 12; flag 5314; acesso/acionamento/captura nao certificados,nao
+789,cosmog,7,lendario/mitico,fixo_adicional,RockTunnel_1F,,,,007BCDD4,0,Objeto 11; flag 5315; acesso/acionamento/captura nao certificados,nao
+790,cosmoem,7,lendario/mitico,evolucao_configurada,Cosmog -> Cosmoem,qualquer (regra simplificada da base),43,,006B7BE8,0,Obter Cosmog; validar evolucao completa e disponibilidade de copias,nao
+791,solgaleo,7,lendario/mitico,evolucao_configurada,Cosmoem -> solgaleo,qualquer (regra simplificada da base),53,,006B7C28,0,Obter Cosmog; validar evolucao completa e disponibilidade de copias,nao
+792,lunala,7,lendario/mitico,evolucao_configurada,Cosmoem -> lunala,qualquer (regra simplificada da base),54,,006B7C30,0,Obter Cosmog; validar evolucao completa e disponibilidade de copias; manter Cosmoem ate nivel 54 (nao evoluir no 53),nao
+793,nihilego,7,ultra beast,tabela_elegivel,MtEmber_SummitPath_2F,ambos,32-32,10,007B5B70,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+794,buzzwole,7,ultra beast,tabela_elegivel,SevenIsland_SevaultCanyon,dia,43-43,10,007B6968,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+795,pheromosa,7,ultra beast,tabela_elegivel,SeafoamIslands_1F,dia,31-31,10,007B57E0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+796,xurkitree,7,ultra beast,tabela_elegivel,PowerPlant,dia,31-31,5,007B5AB8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+797,celesteela,7,ultra beast,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,41-41,10,007B6930,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+798,kartana,7,ultra beast,tabela_elegivel,CeruleanCave_1F,dia,52-52,10,007B55CC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+799,guzzlord,7,ultra beast,tabela_elegivel,VictoryRoad_2F,dia,34-34,10,007B526C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+800,necrozma,7,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_1F,,,,007BED78,0,Objeto 8; flag 5320; acesso/acionamento/captura nao certificados,nao
+801,magearna,7,lendario/mitico,fixo_adicional,VictoryRoad_2F,,,,007BA570,0,Objeto 14; flag 5321; acesso/acionamento/captura nao certificados,nao
+802,marshadow,7,lendario/mitico,fixo_adicional,VictoryRoad_2F,,,,007BA5A0,0,Objeto 16; flag 5322; acesso/acionamento/captura nao certificados,nao
+803,poipole,7,ultra beast,tabela_elegivel,Route9,dia,14-14,10,007B6C60,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+804,naganadel,7,ultra beast,tabela_elegivel,Route13,dia,22-22,10,007B6E18,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+805,stakataka,7,ultra beast,tabela_elegivel,MtEmber_RubyPath_1F,dia,32-32,10,007B5BF8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+806,blacephalon,7,ultra beast,tabela_elegivel,MtEmber_RubyPath_B3F,dia,32-32,10,007B5CF8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+807,zeraora,7,lendario/mitico,fixo_adicional,CeruleanCave_2F,,,,007BC974,0,Objeto 15; flag 5327; acesso/acionamento/captura nao certificados,nao
+808,meltan,7,lendario/mitico,fixo_adicional,Route15,,,,007C3910,0,Objeto 15; flag 5328; acesso/acionamento/captura nao certificados,nao
+809,melmetal,7,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_B1F,,,,007BEE34,0,Objeto 5; flag 5329; acesso/acionamento/captura nao certificados,nao
+810,grookey,8,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,35-35,20,007B5DEC,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+811,thwackey,8,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,14-14,4,007B66D0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+812,rillaboom,8,comum,tabela_elegivel,Route15,dia,26-26,10,007B6EE0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+813,scorbunny,8,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,30-30,10,007B5CF4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+814,raboot,8,comum,tabela_elegivel,Route25,dia,11-11,5,007B72F0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+815,cinderace,8,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,31-31,10,007B5B3C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+816,sobble,8,comum,tabela_elegivel,CeruleanCave_1F,ambos,40-50,30,007B55F4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+817,drizzile,8,comum,tabela_elegivel,SeafoamIslands_B3F,ambos,35-40,5,007B58C0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+818,inteleon,8,comum,tabela_elegivel,CinnabarIsland,ambos,30-35,4,007B7530,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+819,skwovet,8,comum,tabela_elegivel,Route3,dia,6-6,20,007B6A68,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+820,greedent,8,comum,tabela_elegivel,PokemonMansion_3F,dia,26-26,4,007B535C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+821,rookidee,8,comum,tabela_elegivel,OneIsland_KindleRoad,dia,40-40,1,007B6358,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+822,corvisquire,8,comum,tabela_elegivel,Route24,dia,8-8,4,007B7278,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+823,corviknight,8,comum,tabela_elegivel,PokemonTower_5F,ambos,18-18,10,007B5A0C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+824,blipbug,8,comum,tabela_elegivel,Route4,dia,12-12,1,007B6AC4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+825,dottler,8,comum,tabela_elegivel,Route17,dia,28-28,5,007B6F54,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+826,orbeetle,8,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,45-45,10,007B5E74,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+827,nickit,8,comum,tabela_elegivel,Route1,noite,3-3,10,0112C344,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+828,thievul,8,comum,tabela_elegivel,VictoryRoad_2F,dia,46-46,4,007B527C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+829,gossifleur,8,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,30-30,20,007B6454,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+830,eldegoss,8,comum,tabela_elegivel,Route12,dia,26-26,5,007B6DA4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+831,wooloo,8,comum,tabela_elegivel,Route5,dia,15-15,1,007B6B48,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+832,dubwool,8,comum,tabela_elegivel,Route21_North,dia,20-20,10,007B7058,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+833,chewtle,8,comum,tabela_elegivel,SeafoamIslands_B3F,ambos,25-30,30,007B58BC,9,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+834,drednaw,8,comum,tabela_elegivel,SixIsland_OutcastIsland,ambos,35-40,5,007B6738,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+835,yamper,8,comum,tabela_elegivel,Route8,dia,17-17,1,007B6C3C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+836,boltund,8,comum,tabela_elegivel,RockTunnel_1F,dia,16-16,10,007B5754,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+837,rolycoly,8,comum,tabela_elegivel,MtEmber_RubyPath_B3F,dia,18-18,1,007B5D18,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+838,carkol,8,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,34-34,10,007B5D9C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+839,coalossal,8,comum,tabela_elegivel,MtEmber_Exterior,ambos,33-33,10,007B5AEC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+840,applin,8,comum,tabela_elegivel,PokemonMansion_2F,dia,26-26,1,007B532C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+841,flapple,8,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,47-47,10,007B5E78,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+842,appletun,8,comum,tabela_elegivel,SeafoamIslands_B2F,dia,26-26,5,007B5860,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+843,silicobra,8,comum,tabela_elegivel,MtEmber_RubyPath_B1F,dia,42-42,4,007B5C64,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+844,sandaconda,8,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,29-29,10,007B5BC0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+845,cramorant,8,comum,tabela_elegivel,ViridianCity,ambos,20-25,30,007B73AC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+846,arrokuda,8,comum,tabela_elegivel,CinnabarIsland,ambos,10-20,30,007B7528,6,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+847,barraskewda,8,comum,tabela_elegivel,FiveIsland_WaterLabyrinth,ambos,35-40,5,007B65E4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+848,toxel,8,comum,tabela_elegivel,SixIsland_WaterPath,dia,50-50,1,007B67F0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+849,toxtricity,8,comum,tabela_elegivel,Route15,dia,25-25,5,007B6EE8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+850,sizzlipede,8,comum,tabela_elegivel,Route12,dia,28-28,4,007B6DB0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+851,centiskorch,8,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,32-32,10,007B5B74,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+852,clobbopus,8,comum,tabela_elegivel,VictoryRoad_2F,dia,42-42,10,007B5260,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+853,grapploct,8,comum,tabela_elegivel,Route17,dia,22-22,4,007B6F5C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+854,sinistea,8,comum,tabela_elegivel,PokemonTower_3F,ambos,16-16,20,007B598C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+855,polteageist,8,comum,tabela_elegivel,VictoryRoad_2F,dia,48-48,10,007B5268,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+856,hatenna,8,comum,tabela_elegivel,PokemonTower_3F,ambos,20-20,1,007B59B4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+857,hattrem,8,comum,tabela_elegivel,PokemonTower_5F,ambos,15-15,5,007B5A14,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+858,hatterene,8,comum,tabela_elegivel,ThreeIsland_BerryForest,dia,32-32,10,007B5DF0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+859,impidimp,8,comum,tabela_elegivel,PokemonTower_5F,ambos,17-17,1,007B5A20,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+860,morgrem,8,comum,tabela_elegivel,PokemonTower_4F,ambos,14-14,10,007B59D0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+861,grimmsnarl,8,comum,tabela_elegivel,Route23,dia,34-34,10,007B71DC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+862,obstagoon,8,comum,tabela_elegivel,Route17,dia,26-26,10,007B6F48,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+863,perrserker,8,comum,tabela_elegivel,Route25,dia,11-11,10,007B72EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+864,cursola,8,comum,tabela_elegivel,Route21_North,dia,27-27,4,007B7068,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+865,sirfetchd,8,comum,tabela_elegivel,FiveIsland_Meadow,dia,47-47,4,007B664C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+866,mr-rime,8,comum,tabela_elegivel,SeafoamIslands_1F,dia,22-22,10,007B57E4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+867,runerigus,8,comum,tabela_elegivel,ThreeIsland_Port,ambos,20-20,10,007B6568,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+868,milcery,8,comum,tabela_elegivel,Route4,dia,12-12,1,007B6AC8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+869,alcremie,8,comum,tabela_elegivel,Route8,dia,20-20,10,007B6C20,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+870,falinks,8,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,40-40,10,007B5F00,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+871,pincurchin,8,comum,tabela_elegivel,Route25,dia,13-13,10,007B72E0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+872,snom,8,comum,tabela_elegivel,Route24,dia,12-12,1,007B7280,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+873,frosmoth,8,comum,tabela_elegivel,FourIsland_IcefallCave_Back,noite,47-47,10,0112CCAC,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+874,stonjourner,8,comum,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,40-40,10,007B5DA0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+875,eiscue,8,comum,tabela_elegivel,FourIsland_IcefallCave_Back,dia,49-49,10,007B5F74,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+876,indeedee,8,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,37-37,4,007B6470,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+877,morpeko,8,comum,tabela_elegivel,MtMoon_B2F,dia,10-10,10,007B5170,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+878,cufant,8,comum,tabela_elegivel,Route22,dia,5-5,4,007B716C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+879,copperajah,8,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,38-38,5,007B6468,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+880,dracozolt,8,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,29-29,10,007B5F04,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+881,arctozolt,8,comum,tabela_elegivel,SeafoamIslands_B1F,dia,24-24,10,007B5824,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+882,dracovish,8,comum,tabela_elegivel,SixIsland_WaterPath,ambos,35-40,5,007B6808,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+883,arctovish,8,comum,tabela_elegivel,SevenIsland_TanobyRuins,ambos,35-40,5,007B69B0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+884,duraludon,8,comum,tabela_elegivel,Route13,dia,25-25,10,007B6E20,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+885,dreepy,8,comum,tabela_elegivel,MtMoon_B2F,dia,12-12,1,007B5190,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+886,drakloak,8,comum,tabela_elegivel,PokemonTower_3F,ambos,14-14,10,007B5998,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+887,dragapult,8,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,31-31,10,007B63E0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+888,zacian,8,lendario/mitico,fixo_adicional,CeruleanCave_2F,,,,007BC9BC,0,Objeto 18; flag 5378; acesso/acionamento/captura nao certificados,nao
+889,zamazenta,8,lendario/mitico,fixo_adicional,CeruleanCave_2F,,,,007BC9D4,0,Objeto 19; flag 5379; acesso/acionamento/captura nao certificados,nao
+890,eternatus,8,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_Back,,,,007BEF50,0,Objeto 7; flag 537A; acesso/acionamento/captura nao certificados,nao
+891,kubfu,8,lendario/mitico,fixo_adicional,Route19,,,,007C3FCC,0,Objeto 17; flag 537B; acesso/acionamento/captura nao certificados,nao
+892,urshifu,8,lendario/mitico,fixo_adicional,VictoryRoad_1F,,,,007BA38C,0,Objeto 10; flag 537C; acesso/acionamento/captura nao certificados,nao
+893,zarude,8,lendario/mitico,fixo_adicional,OneIsland_KindleRoad,,,,007C5088,0,Objeto 31; flag 537D; acesso/acionamento/captura nao certificados,nao
+894,regieleki,8,lendario/mitico,fixo_adicional,PokemonTower_3F,,,,007BD99C,0,Objeto 5; flag 537E; acesso/acionamento/captura nao certificados,nao
+895,regidrago,8,lendario/mitico,fixo_adicional,SeafoamIslands_B3F,,,,007BD6B4,0,Objeto 12; flag 537F; acesso/acionamento/captura nao certificados,nao
+896,glastrier,8,lendario/mitico,fixo_adicional,SeafoamIslands_B3F,,,,007BD654,0,Objeto 8; flag 5380; acesso/acionamento/captura nao certificados,nao
+897,spectrier,8,lendario/mitico,fixo_adicional,PokemonTower_3F,,,,007BD9B4,0,Objeto 6; flag 5381; acesso/acionamento/captura nao certificados,nao
+898,calyrex,8,lendario/mitico,fixo_adicional,RockTunnel_B1F,,,,007BD124,0,Objeto 27; flag 5382; acesso/acionamento/captura nao certificados,nao
+899,wyrdeer,8,comum,tabela_elegivel,ThreeIsland_Port,ambos,10-10,10,007B6560,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+900,kleavor,8,comum,tabela_elegivel,SixIsland_RuinValley,dia,18-18,10,007B6854,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+901,ursaluna,8,comum,tabela_elegivel,PokemonMansion_3F,dia,30-30,10,007B5348,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+902,basculegion,8,comum,tabela_elegivel,Route25,ambos,25-30,5,007B7318,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+903,sneasler,8,comum,tabela_elegivel,PokemonMansion_1F,dia,26-26,4,007B52EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+904,overqwil,8,comum,tabela_elegivel,SixIsland_RuinValley,dia,41-41,5,007B6868,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+905,enamorus,8,lendario/mitico,fixo_adicional,FiveIsland_Meadow,,,,007C56FC,0,Objeto 11; flag 5389; acesso/acionamento/captura nao certificados,nao
+906,sprigatito,9,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,32-32,10,007B6458,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+907,floragato,9,comum,tabela_elegivel,Route5,dia,14-14,4,007B6B44,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+908,meowscarada,9,comum,tabela_elegivel,PokemonMansion_1F,dia,28-28,10,007B52DC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+909,fuecoco,9,comum,tabela_elegivel,Route25,dia,9-9,4,007B72FC,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+910,crocalor,9,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,15-15,10,007B692C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+911,skeledirge,9,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,24-24,10,007B5D4C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+912,quaxly,9,comum,tabela_elegivel,SeafoamIslands_B4F,dia,32-32,20,007B5908,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+913,quaxwell,9,comum,tabela_elegivel,Route6,ambos,30-35,4,007B6B9C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+914,quaquaval,9,comum,tabela_elegivel,CeladonCity,ambos,30-40,4,007B7498,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+915,lechonk,9,comum,tabela_elegivel,Route1,dia,3-3,20,007B69F8,5,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+916,oinkologne,9,comum,tabela_elegivel,Route8,dia,17-17,5,007B6C2C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+917,tarountula,9,comum,tabela_elegivel,MtEmber_Exterior,ambos,42-42,1,007B5B04,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+918,spidops,9,comum,tabela_elegivel,Route8,dia,15-15,4,007B6C38,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+919,nymble,9,comum,tabela_elegivel,SixIsland_PatternBush,dia,14-14,10,007B5FEC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+920,lokix,9,comum,tabela_elegivel,CeruleanCave_B1F,dia,67-67,5,007B56C4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+921,pawmi,9,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,50-50,1,007B6948,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+922,pawmo,9,comum,tabela_elegivel,PokemonMansion_2F,dia,36-36,10,007B530C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+923,pawmot,9,comum,tabela_elegivel,PokemonTower_3F,ambos,17-17,4,007B59A8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+924,tandemaus,9,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,10-10,20,007B6920,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+925,maushold,9,comum,tabela_elegivel,MtEmber_Exterior,ambos,36-36,5,007B5AF0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+926,fidough,9,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,48-48,4,007B5F10,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+927,dachsbun,9,comum,tabela_elegivel,OneIsland_KindleRoad,dia,34-34,5,007B6348,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+928,smoliv,9,comum,tabela_elegivel,Route5,dia,13-13,10,007B6B28,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+929,dolliv,9,comum,tabela_elegivel,Route18,dia,27-27,4,007B6F98,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+930,arboliva,9,comum,tabela_elegivel,OneIsland_TreasureBeach,dia,35-35,10,007B63D8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+931,squawkabilly,9,comum,tabela_elegivel,Route11,dia,13-13,10,007B6D1C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+932,nacli,9,comum,tabela_elegivel,RockTunnel_B1F,dia,17-17,20,007B5788,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+933,naclstack,9,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,30-30,10,007B5B6C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+934,garganacl,9,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,33-33,10,007B5BCC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+935,charcadet,9,comum,tabela_elegivel,Route8,dia,16-16,10,007B6C1C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+936,armarouge,9,comum,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,27-27,10,007B5F34,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+937,ceruledge,9,comum,tabela_elegivel,SevenIsland_SevaultCanyon,dia,46-46,10,007B695C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+938,tadbulb,9,comum,tabela_elegivel,PowerPlant,dia,22-22,20,007B5AA4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+939,bellibolt,9,comum,tabela_elegivel,Route11,dia,17-17,5,007B6D24,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+940,wattrel,9,comum,tabela_elegivel,Route22,dia,5-5,1,007B7178,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+941,kilowattrel,9,comum,tabela_elegivel,SixIsland_PatternBush,dia,20-20,5,007B6000,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+942,maschiff,9,comum,tabela_elegivel,MtMoon_1F,dia,7-7,10,007B50FC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+943,mabosstiff,9,comum,tabela_elegivel,Route13,dia,27-27,10,007B6E1C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+944,shroodle,9,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,45-45,20,007B5EF4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+945,grafaiai,9,comum,tabela_elegivel,FourIsland_IcefallCave_1F,dia,23-23,4,007B5F14,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+946,bramblin,9,comum,tabela_elegivel,ViridianForest,dia,6-6,1,007B50E4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+947,brambleghast,9,comum,tabela_elegivel,PokemonTower_6F,ambos,18-18,4,007B5A50,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+948,toedscool,9,comum,tabela_elegivel,DiglettsCave_B1F,dia,19-19,20,007B51EC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+949,toedscruel,9,comum,tabela_elegivel,MtEmber_RubyPath_B1F_Stairs,dia,28-28,10,007B5D50,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+950,klawf,9,comum,tabela_elegivel,MtEmber_SummitPath_3F,ambos,37-37,5,007B5BD4,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+951,capsakid,9,comum,tabela_elegivel,Route21_North,dia,23-23,20,007B7048,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+952,scovillain,9,comum,tabela_elegivel,MtEmber_SummitPath_1F,ambos,35-35,5,007B5B44,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+953,rellor,9,comum,tabela_elegivel,SixIsland_PatternBush,dia,9-9,20,007B5FE8,4,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+954,rabsca,9,comum,tabela_elegivel,MtEmber_SummitPath_2F,ambos,38-38,5,007B5B7C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+955,flittle,9,comum,tabela_elegivel,PokemonTower_7F,ambos,25-25,1,007B5A94,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+956,espathra,9,comum,tabela_elegivel,Route13,dia,25-25,5,007B6E2C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+957,tinkatink,9,comum,tabela_elegivel,CeruleanCave_1F,dia,61-61,1,007B55E4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+958,tinkatuff,9,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,8-8,4,007B66CC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+959,tinkaton,9,comum,tabela_elegivel,CeruleanCave_B1F,dia,55-55,10,007B56B8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+960,wiglett,9,comum,tabela_elegivel,OneIsland_TreasureBeach,ambos,20-35,30,007B6408,10,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+961,wugtrio,9,comum,tabela_elegivel,FourIsland,ambos,15-25,4,007B75C8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+962,bombirdier,9,comum,tabela_elegivel,PokemonTower_4F,ambos,17-17,4,007B59E4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+963,finizen,9,comum,tabela_elegivel,Route22,ambos,20-25,30,007B7188,3,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+964,palafin,9,comum,tabela_elegivel,CeladonCity,ambos,20-30,5,007B7494,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+965,varoom,9,comum,tabela_elegivel,CeruleanCave_1F,dia,61-61,1,007B55E0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+966,revavroom,9,comum,tabela_elegivel,OneIsland_KindleRoad,dia,30-30,5,007B6344,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+967,cyclizar,9,comum,tabela_elegivel,Route18,dia,28-28,5,007B6F8C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+968,orthworm,9,comum,tabela_elegivel,Route14,dia,23-23,4,007B6EB4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+969,glimmet,9,comum,tabela_elegivel,MtMoon_B1F,dia,6-6,10,007B5138,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+970,glimmora,9,comum,tabela_elegivel,VictoryRoad_1F,dia,40-40,10,007B5228,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+971,greavard,9,comum,tabela_elegivel,Route22,noite,4-4,10,0112C3B4,7,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+972,houndstone,9,comum,tabela_elegivel,RockTunnel_B1F,dia,16-16,5,007B579C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+973,flamigo,9,comum,tabela_elegivel,SevenIsland_SevaultCanyon_Entrance,dia,50-50,5,007B6934,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+974,cetoddle,9,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,6-6,5,007B66C8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+975,cetitan,9,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,41-41,5,007B5E88,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+976,veluza,9,comum,tabela_elegivel,SixIsland_WaterPath,ambos,20-35,30,007B6804,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+977,dondozo,9,comum,tabela_elegivel,Route23,ambos,25-30,5,007B7210,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+978,tatsugiri,9,comum,tabela_elegivel,FuchsiaCity,ambos,20-25,30,007B74DC,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+979,annihilape,9,comum,tabela_elegivel,Route14,dia,22-22,10,007B6E9C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+980,clodsire,9,comum,tabela_elegivel,Route10,dia,11-11,10,007B6C8C,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+981,farigiraf,9,comum,tabela_elegivel,Route14,dia,23-23,10,007B6EA0,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+982,dudunsparce,9,comum,tabela_elegivel,Route12,dia,25-25,10,007B6D9C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+983,kingambit,9,comum,tabela_elegivel,FourIsland_IcefallCave_Entrance,dia,40-40,10,007B5E7C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+984,great-tusk,9,paradox,tabela_elegivel,SeafoamIslands_B2F,dia,32-32,10,007B5854,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+985,scream-tail,9,paradox,tabela_elegivel,SixIsland_WaterPath,dia,41-41,10,007B67DC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+986,brute-bonnet,9,paradox,tabela_elegivel,SixIsland_RuinValley,dia,43-43,10,007B6860,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+987,flutter-mane,9,paradox,tabela_elegivel,CeruleanCave_2F,dia,55-55,10,007B566C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+988,slither-wing,9,paradox,tabela_elegivel,FiveIsland_Meadow,dia,41-41,10,007B663C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+989,sandy-shocks,9,paradox,tabela_elegivel,FourIsland_IcefallCave_B1F,dia,30-30,5,007B5F40,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+990,iron-treads,9,paradox,tabela_elegivel,MtEmber_RubyPath_B1F,dia,30-30,4,007B5C68,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+991,iron-bundle,9,paradox,tabela_elegivel,FiveIsland_ResortGorgeous,ambos,35-40,5,007B6598,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+992,iron-hands,9,paradox,tabela_elegivel,SeafoamIslands_B4F,dia,32-32,10,007B590C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+993,iron-jugulis,9,paradox,tabela_elegivel,CeruleanCave_B1F,dia,52-52,10,007B56BC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+994,iron-moth,9,paradox,tabela_elegivel,MtEmber_Exterior,ambos,32-32,10,007B5AE4,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+995,iron-thorns,9,paradox,tabela_elegivel,MtEmber_RubyPath_B2F_Stairs,dia,30-30,4,007B5DB8,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+996,frigibax,9,comum,tabela_elegivel,SeafoamIslands_B4F,dia,34-34,5,007B591C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+997,arctibax,9,comum,tabela_elegivel,FiveIsland_MemorialPillar,dia,14-14,10,007B66B8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+998,baxcalibur,9,comum,tabela_elegivel,SeafoamIslands_B3F,dia,30-30,10,007B588C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+999,gimmighoul,9,comum,tabela_elegivel,PokemonTower_6F,ambos,17-17,20,007B5A34,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1000,gholdengo,9,comum,tabela_elegivel,OneIsland_KindleRoad,dia,31-31,10,007B633C,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1001,wo-chien,9,lendario/mitico,fixo_adicional,FiveIsland_Meadow,,,,007C56E4,0,Objeto 10; flag 53E9; acesso/acionamento/captura nao certificados,nao
+1002,chien-pao,9,lendario/mitico,fixo_adicional,SafariZone_Center,,,,007BBE9C,0,Objeto 3; flag 53EA; acesso/acionamento/captura nao certificados,nao
+1003,ting-lu,9,lendario/mitico,fixo_adicional,SeafoamIslands_1F,,,,007BD278,0,Objeto 7; flag 53EB; acesso/acionamento/captura nao certificados,nao
+1004,chi-yu,9,lendario/mitico,fixo_adicional,SafariZone_Center,,,,007BBEB4,0,Objeto 4; flag 53EC; acesso/acionamento/captura nao certificados,nao
+1005,roaring-moon,9,paradox,tabela_elegivel,VictoryRoad_3F,dia,32-32,10,007B52A4,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1006,iron-valiant,9,paradox,tabela_elegivel,Route14,dia,30-30,5,007B6EB0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1007,koraidon,9,lendario/mitico,fixo_adicional,FiveIsland_ResortGorgeous,,,,007C54F0,0,Objeto 10; flag 53EF; acesso/acionamento/captura nao certificados,nao
+1008,miraidon,9,lendario/mitico,fixo_adicional,FourIsland_IcefallCave_B1F,,,,007BEE64,0,Objeto 7; flag 53F0; acesso/acionamento/captura nao certificados,nao
+1009,walking-wake,9,paradox,tabela_elegivel,SeafoamIslands_B4F,ambos,35-40,5,007B5944,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1010,iron-leaves,9,paradox,tabela_elegivel,ThreeIsland_Port,ambos,30-30,5,007B6574,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1011,dipplin,9,comum,tabela_elegivel,FiveIsland_Meadow,dia,50-50,4,007B6648,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1012,poltchageist,9,comum,tabela_elegivel,MtMoon_B1F,dia,6-6,4,007B5150,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1013,sinistcha,9,comum,tabela_elegivel,VictoryRoad_1F,dia,46-46,10,007B5230,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1014,okidogi,9,lendario/mitico,fixo_adicional,VictoryRoad_3F,,,,007BA7E4,0,Objeto 16; flag 53F6; acesso/acionamento/captura nao certificados,nao
+1015,munkidori,9,lendario/mitico,fixo_adicional,Route13,,,,007C351C,0,Objeto 16; flag 53F7; acesso/acionamento/captura nao certificados,nao
+1016,fezandipiti,9,lendario/mitico,fixo_adicional,Route13,,,,007C3504,0,Objeto 15; flag 53F8; acesso/acionamento/captura nao certificados,nao
+1017,ogerpon,9,lendario/mitico,fixo_adicional,VictoryRoad_3F,,,,007BA7CC,0,Objeto 15; flag 53F9; acesso/acionamento/captura nao certificados,nao
+1018,archaludon,9,comum,tabela_elegivel,TwoIsland_CapeBrink,dia,31-31,10,007B6464,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1019,hydrapple,9,comum,tabela_elegivel,Route17,dia,22-22,10,007B6F44,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1020,gouging-fire,9,paradox,tabela_elegivel,MtEmber_SummitPath_3F,ambos,31-31,10,007B5BC8,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1021,raging-bolt,9,paradox,tabela_elegivel,Route23,dia,32-32,10,007B71E0,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1022,iron-boulder,9,paradox,tabela_elegivel,MtEmber_SummitPath_1F,ambos,31-31,10,007B5B38,1,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1023,iron-crown,9,paradox,tabela_elegivel,VictoryRoad_1F,dia,32-32,10,007B5234,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1024,terapagos,9,lendario/mitico,tabela_elegivel,PokemonMansion_1F,dia,32-32,20,007B52CC,2,Acesso ao mapa/metodo e filtros de encontro nao certificados,nao
+1025,pecharunt,9,lendario/mitico,fixo_adicional,VictoryRoad_2F,,,,007BA5D0,0,Objeto 18; flag 5401; acesso/acionamento/captura nao certificados,nao

@@ -1,0 +1,423 @@
+{
+  "rom_sha256": "10214ba64a38a543d381db9d41eb37f46458a0926057d028dda2839b1f87e7e1",
+  "core_sha256": "07ab56ae80ed30486eff67ab4907b345f46ebb5e60f47f98869dc534df18dad9",
+  "scope": "Isolated direct calls with synthetic state, no live captures, map travel or evolution scenes",
+  "observations": [
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 0,
+      "header": 123,
+      "species": 568,
+      "level": 8,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 1,
+      "header": 124,
+      "species": 921,
+      "level": 5,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 2,
+      "header": 125,
+      "species": 664,
+      "level": 22,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 3,
+      "header": 126,
+      "species": 509,
+      "level": 14,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 4,
+      "header": 127,
+      "species": 915,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 5,
+      "header": 128,
+      "species": 531,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 6,
+      "header": 129,
+      "species": 737,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 7,
+      "header": 130,
+      "species": 772,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 8,
+      "header": 131,
+      "species": 585,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 9,
+      "header": 123,
+      "species": 568,
+      "level": 8,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 600,
+      "variable": "4024",
+      "value": 65535,
+      "header": 123,
+      "species": 568,
+      "level": 8,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 0,
+      "header": 123,
+      "species": 568,
+      "level": 8,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 1,
+      "header": 124,
+      "species": 921,
+      "level": 5,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 2,
+      "header": 125,
+      "species": 664,
+      "level": 22,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 3,
+      "header": 126,
+      "species": 509,
+      "level": 14,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 4,
+      "header": 127,
+      "species": 915,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 5,
+      "header": 128,
+      "species": 531,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 6,
+      "header": 129,
+      "species": 737,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 7,
+      "header": 130,
+      "species": 772,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 8,
+      "header": 131,
+      "species": 585,
+      "level": 20,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 9,
+      "header": 123,
+      "species": 568,
+      "level": 8,
+      "quantile": 40
+    },
+    {
+      "probe": "altering_header_and_generation",
+      "minute": 1320,
+      "variable": "4024",
+      "value": 65535,
+      "header": 123,
+      "species": 568,
+      "level": 8,
+      "quantile": 40
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 52,
+      "minute": 600,
+      "item": 0,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 53,
+      "minute": 600,
+      "item": 0,
+      "target": 791
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 54,
+      "minute": 600,
+      "item": 0,
+      "target": 792
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 55,
+      "minute": 600,
+      "item": 0,
+      "target": 792
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 100,
+      "minute": 600,
+      "item": 0,
+      "target": 792
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 54,
+      "minute": 600,
+      "item": 195,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 52,
+      "minute": 1320,
+      "item": 0,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 53,
+      "minute": 1320,
+      "item": 0,
+      "target": 791
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 54,
+      "minute": 1320,
+      "item": 0,
+      "target": 792
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 55,
+      "minute": 1320,
+      "item": 0,
+      "target": 792
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 100,
+      "minute": 1320,
+      "item": 0,
+      "target": 792
+    },
+    {
+      "probe": "evolution",
+      "source": 790,
+      "level": 54,
+      "minute": 1320,
+      "item": 195,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 42,
+      "minute": 600,
+      "item": 0,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 43,
+      "minute": 600,
+      "item": 0,
+      "target": 790
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 44,
+      "minute": 600,
+      "item": 0,
+      "target": 790
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 100,
+      "minute": 600,
+      "item": 0,
+      "target": 790
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 43,
+      "minute": 600,
+      "item": 195,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 42,
+      "minute": 1320,
+      "item": 0,
+      "target": 0
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 43,
+      "minute": 1320,
+      "item": 0,
+      "target": 790
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 44,
+      "minute": 1320,
+      "item": 0,
+      "target": 790
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 100,
+      "minute": 1320,
+      "item": 0,
+      "target": 790
+    },
+    {
+      "probe": "evolution",
+      "source": 789,
+      "level": 43,
+      "minute": 1320,
+      "item": 195,
+      "target": 0
+    },
+    {
+      "probe": "tanoby_header_and_generation",
+      "minute": 600,
+      "flag": "0849",
+      "locked_header": 65535,
+      "unlocked_header": 3,
+      "species": 488,
+      "level": 25,
+      "quantile": 20
+    },
+    {
+      "probe": "tanoby_header_and_generation",
+      "minute": 1320,
+      "flag": "0849",
+      "locked_header": 65535,
+      "unlocked_header": 3,
+      "species": 488,
+      "level": 25,
+      "quantile": 20
+    }
+  ]
+}

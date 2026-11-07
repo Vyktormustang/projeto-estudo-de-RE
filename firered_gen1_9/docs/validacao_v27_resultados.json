@@ -1,0 +1,200 @@
+{
+  "version": "v27",
+  "date": "2026-11-05",
+  "base_version": "v26",
+  "base_sha256": "ffba283f8d01885f9a8a3d5300135adeae008e6434a7c5c80ec7f695c1445ba7",
+  "output_sha256": "f48ce3b2b4328637d47004722907ca9bfb5b6e523f1ed8a6b1bfbe93fd266673",
+  "output_bytes": 33554432,
+  "payload_sha256": "7833d1441ed13cf9e5ba30fdd738e23eda5a4ea64392d7643889c5dcb97f3c66",
+  "payload_bytes": 300,
+  "policy_sha256": "df28a63470ab854ea3c5063764008f7503911db811ff9948a243e0428ac412a6",
+  "core_version": "mGBA libretro 0.10.5",
+  "core_source_commit": "26b7884bc25a5933960f3cdcd98bac1ae14d42e2",
+  "core_sha256": "574d504a8b49338ee883f1461a92460a21c239f5620b47cea87d83ff848b0429",
+  "payload_compiler": "Zig 0.17.0",
+  "independent_payload_rebuild_identical": true,
+  "rom_rebuild_identical": true,
+  "tests": 85,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 415.032,
+  "run_mode": "parallel, 3 isolated worker processes; wall time",
+  "test_ids": [
+    "test_motor_v27.MotorV27BuildTests.test_corruption_and_reapplication_rejected",
+    "test_motor_v27.MotorV27BuildTests.test_documented_guide_matches_generated_tables",
+    "test_motor_v27.MotorV27BuildTests.test_new_routes_special_slots_and_snorlax_preserved",
+    "test_motor_v27.MotorV27BuildTests.test_only_six_ranges_and_all_original_wild_tables_preserved",
+    "test_motor_v27.MotorV27BuildTests.test_protected_poipole_retained_and_protected_replacements_rejected",
+    "test_motor_v27.MotorV27BuildTests.test_v23_distribution_policy_slots_and_old_payloads_untouched",
+    "test_motor_v27.MotorV27DataTests.test_exclusive_output",
+    "test_motor_v27.MotorV27DataTests.test_payload_policy_and_vectors",
+    "test_motor_v27.MotorV27DataTests.test_rejects_wrong_rom",
+    "test_motor_v27.MotorV27DataTests.test_script_preserves_original_message_and_branches_to_valid_texts",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_all_1440_minutes_leading_zeroes_and_invalid_values",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_busy_native_oam_and_affine_matrix_are_never_borrowed",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_context_fade_script_invalid_save_and_oam_disabled_hide_release",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_exact_pixels_and_only_owned_vram_palette_oam_modified",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_live_original_sign_and_expanded_guide_hide_hud",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_live_rollovers_and_saturated_native_play_time_remains_separate",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_live_start_party_help_and_return_without_overlay",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_new_wrapper_matches_v24_clock_and_save_bytes_and_preserves_abi",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_repeated_release_reacquire_and_separate_native_resets_no_leaks",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_resource_exhaustion_tiles_metadata_and_palettes_fail_closed",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_suppressed_native_oam_transfer_cleans_old_hud_without_affine_write",
+    "test_motor_v27_hud_mgba.MotorV27HudTests.test_unsupported_display_modes_hide_without_vram_or_palette_writes",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_all_64_single_bit_errors_foreign_records_and_invalid_pointers_refused",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_cold_migration_uses_real_legacy_pocket_and_refuses_foreign_extension",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_default_shown_and_read_only_no_automatic_bag_migration",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_hidden_keeps_pre_and_postcap_world_clock_running_and_releases_resources",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_live_native_settings_button_modes_and_select_remain_independent",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_live_select_hold_once_and_show_hide_without_changing_native_options",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_native_hidden_flash_reload_and_v26_downgrade_preserves_setting",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_native_navigation_chords_and_abi_pass_through",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_owned_preference_toggle_only_eight_save_bytes_and_clock_unchanged",
+    "test_motor_v27_preferences_mgba.MotorV27PreferenceTests.test_title_temporary_screens_fades_and_inactive_options_cannot_toggle",
+    "test_motor_v27_regressions.MotorV27BagTests.test_all_287_tm_hm_counts_and_clock_survive_native_flash",
+    "test_motor_v27_regressions.MotorV27BagTests.test_all_58_legacy_and_229_modern",
+    "test_motor_v27_regressions.MotorV27BagTests.test_live_pages_teaching_and_help_option",
+    "test_motor_v27_regressions.MotorV27BagTests.test_native_bag_backup_preserves_extension",
+    "test_motor_v27_regressions.MotorV27BagTests.test_quantity_limits_and_neighbors",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_cold_migration_deferred_outside_normal_outdoor_field",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_corrupt_foreign_and_out_of_range_records_fail_closed",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_cycles_boundaries_native_stop_start_reset_and_unknown_mode",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_lazy_existing_migration_precedes_clock_and_preserves_legacy_tms",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_live_two_complete_world_days_and_paused_time",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_native_pokedude_temporary_pocket_cannot_initialize_clock",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_postcap_live_night_palette_party_menu_and_return",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_postcap_real_battle_eevee_evolutions_day_and_night",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_precap_native_frames_seconds_hours_and_exact_transition",
+    "test_motor_v27_regressions.MotorV27ClockTests.test_unsafe_pointers_fields_and_getter_read_only_abi",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_all_100_native_slot_rolls_twenty_maps_day_night_levels_and_checksums",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_live_new_routes_night_species_after_test_only_warps",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_live_route1_sign_both_periods_original_directions_and_control_return",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_live_walking_night_encounter_and_native_sweet_scent_on_route1",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_postcap_twenty_maps_with_panel_shown_and_hidden",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_repel_still_blocks_lower_levels_but_unchecked_generation_works",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_selector_boundaries_maps_area_guards_and_no_rng_or_save_writes",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_sign_native_helper_uses_only_transient_result_not_saved_flags",
+    "test_motor_v27_mgba.MotorV27EncounterTests.test_water_and_nonpilot_cave_generation_identical_to_native_at_night",
+    "test_motor_v27_regressions.MotorV27ExperienceTests.test_batalha_natural_sem_editar_hp_atributos_nivel_ou_exp",
+    "test_motor_v27_regressions.MotorV27ExperienceTests.test_subida_nivel10_para11_e_retorno_ao_mapa",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_budew_riolu_day_only_other_evolutions_and_item_modes_unchanged",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_clock_start_hour_day_rollovers_and_saved_old_playtime",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_eevee_day_night_thresholds_everstone_and_sylveon_priority",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_flash_save_reload_keeps_clock_phase_and_native_format",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_indoor_cave_underwater_fade_and_disabled_transfer_not_tinted",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_invalid_pointer_and_fields_safe_default",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_live_field_menu_progress_and_restore_without_writes_during_play",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_live_night_palette_field_party_and_return",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_phases_boundaries",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_real_battle_evolution_day_night_and_clock_progress",
+    "test_motor_v27_regressions.MotorV27PriorClockTests.test_tint_terrain_only_all_four_phases_preserves_source_ui_obj",
+    "test_motor_v27_regressions.MotorV27SoundproofTests.test_growl_e_hyper_voice_nativos_continuam_bloqueados",
+    "test_motor_v27_regressions.MotorV27SoundproofTests.test_historico_soundproof_nativo_e_acao_seguinte",
+    "test_motor_v27_gameplay_mgba.MotorV27GameplayTests.test_capture_day_and_night_identity_ball_consumption_and_flash_reload",
+    "test_motor_v27_gameplay_mgba.MotorV27GameplayTests.test_native_v26_v27_flash_pre_and_postcap_and_downgrade_roundtrip",
+    "test_motor_v27_gameplay_mgba.MotorV27GameplayTests.test_natural_pallet_route1_roundtrip_day_and_night",
+    "test_motor_v27_gameplay_mgba.MotorV27GameplayTests.test_night_escape_returns_control_without_adding_pokemon",
+    "test_motor_v27_gameplay_mgba.MotorV27GameplayTests.test_poke_ball_capture_consumption_and_native_ball_metadata",
+    "test_treino_ev_mgba.TreinoMGBATests.test_510_e_evs_253_255_sao_preservados",
+    "test_treino_ev_mgba.TreinoMGBATests.test_60_segundos_com_rascunho_nao_alteram_equipe",
+    "test_treino_ev_mgba.TreinoMGBATests.test_cancelar_descarta_rascunho",
+    "test_treino_ev_mgba.TreinoMGBATests.test_confirmar_so_redistribui_pontos_e_preserva_outros_dados",
+    "test_treino_ev_mgba.TreinoMGBATests.test_contextos_inseguros_e_checksum_invalido_nao_editam",
+    "test_treino_ev_mgba.TreinoMGBATests.test_copia_desatualizada_nao_sobrescreve_equipe",
+    "test_treino_ev_mgba.TreinoMGBATests.test_hp_desmaiado_ferido_e_underflow",
+    "test_treino_ev_mgba.TreinoMGBATests.test_limite_255_transferencia_parcial_e_saldo",
+    "test_treino_ev_mgba.TreinoMGBATests.test_seis_slots_e_troca_na_tela"
+  ],
+  "synthetic_only": true,
+  "personal_saves_used": false,
+  "new_areas": [
+    "MAP_ROUTE13",
+    "MAP_ROUTE14",
+    "MAP_ROUTE15",
+    "MAP_ROUTE16"
+  ],
+  "total_areas": 20,
+  "prior_areas_preserved": 16,
+  "new_night_slots": {
+    "MAP_ROUTE13": [
+      3,
+      4
+    ],
+    "MAP_ROUTE14": [
+      2,
+      3
+    ],
+    "MAP_ROUTE15": [
+      2,
+      3
+    ],
+    "MAP_ROUTE16": [
+      2,
+      3
+    ]
+  },
+  "protected_slots_preserved": [
+    "Route13: Naganadel, slot2, Lv22, 10%",
+    "Route14: Iron Valiant, slot7, Lv30, 5%",
+    "Route15: Snorlax, slot4, Lv25, 10%",
+    "Route9: Poipole, slot5, Lv14, 10%"
+  ],
+  "patch_ranges": [
+    {
+      "offset": "00164340",
+      "size": 8
+    },
+    {
+      "offset": "007C20D8",
+      "size": 4
+    },
+    {
+      "offset": "010EC000",
+      "size": 300
+    },
+    {
+      "offset": "010ED000",
+      "size": 1360
+    },
+    {
+      "offset": "010ED600",
+      "size": 42
+    },
+    {
+      "offset": "010ED700",
+      "size": 1554
+    }
+  ],
+  "hud_clock_options_unchanged_from_v26": true,
+  "new_save_fields": 0,
+  "story_scripts_changed": false,
+  "guide_changed": "Route1 original directions plus 20-area period guide",
+  "coverage": {
+    "formatter_minutes": 1440,
+    "bitmap_minutes": 1440,
+    "live_world_frames": 172800,
+    "hidden_continuity_checks_frames": 120,
+    "encounter_quantile_cases": 4000,
+    "postcap_selector_cases_with_visible_hidden_preference": 400,
+    "guide_rows": 480,
+    "policy_rows": 40,
+    "tm_hm_quantities_with_clock_and_hidden_preference": 287
+  },
+  "native_flash_paths": [
+    "v26 -> v27 -> v26 -> v27, default visible, pre/post cap",
+    "v27 -> v27 -> v26 -> v27, hidden, pre/post cap"
+  ],
+  "command": "MOTOR_V27_ROM=deliver/v27/FireRed_Gen1-9_motor_v27.gba MOTOR_V27_BASE=deliver/v26/FireRed_Gen1-9_motor_v26.gba MGBA_CORE=/path/mgba_libretro.so TREINO_TEST_ROM=deliver/v27/FireRed_Gen1-9_motor_v27.gba python firered_gen1_9/scripts/validar_motor_v27.py --jobs 3 --log /tmp/v27-final.log",
+  "limitations": [
+    "Selected regression suite, not full campaign or real hardware",
+    "New-route walking begins after test-only warps, not a full story/access journey",
+    "Quantile cases are deterministic, not measured natural walking frequencies",
+    "No RTC/offline progression or real network-link certification",
+    "No personal save used or certified",
+    "Hidden clock progress has dedicated 120-frame probes; long two-day probe uses default visible preference",
+    "Clock-only ABI probes use preserved v24 vector; live flows use current hooks",
+    "Distribution is project design, not official Scarlet/Violet tables or full fidelity"
+  ]
+}

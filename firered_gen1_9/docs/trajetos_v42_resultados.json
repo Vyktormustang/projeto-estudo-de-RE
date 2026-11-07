@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "tests": 6,
+  "expected": 6,
+  "seconds": 98.001,
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "rom_sha256": "6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a",
+  "base_sha256": "662225325c50af5aeb568da97a10110cff300aff55e1a6ec87f0d11c1a5f5d50",
+  "core_sha256": "07ab56ae80ed30486eff67ab4907b345f46ebb5e60f47f98869dc534df18dad9",
+  "roms_unchanged": true,
+  "classes": [
+    "test_trajetos_v42.PathAlgorithmTests",
+    "test_trajetos_v42.IslandTopologyTests",
+    "test_trajetos_v42_mgba.ContinuousIslandJourneys"
+  ],
+  "synthetic_preparation": true,
+  "island_teleports": false
+}

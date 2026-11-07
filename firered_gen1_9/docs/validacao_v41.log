@@ -1,0 +1,20 @@
+test_all_nine_variants_one_type_null_no_species_removed (test_motor_v41.MotorV41BuildTests.test_all_nine_variants_one_type_null_no_species_removed) ... ok
+test_complete_reproducible_csv (test_motor_v41.MotorV41BuildTests.test_complete_reproducible_csv) ... ok
+test_exact_hash_rebuild_and_only_30_changed_bytes (test_motor_v41.MotorV41BuildTests.test_exact_hash_rebuild_and_only_30_changed_bytes) ... ok
+test_fixed_native_events_and_evolutions_identical (test_motor_v41.MotorV41BuildTests.test_fixed_native_events_and_evolutions_identical) ... ok
+test_mystery_event_script_and_no_local_selector (test_motor_v41.MotorV41BuildTests.test_mystery_event_script_and_no_local_selector) ... ok
+test_night_tables_and_guide_preserved (test_motor_v41.MotorV41BuildTests.test_night_tables_and_guide_preserved) ... ok
+test_original_variant7_and_all_other_maps_unchanged (test_motor_v41.MotorV41BuildTests.test_original_variant7_and_all_other_maps_unchanged) ... ok
+test_reject_wrong_input_existing_output_and_links (test_motor_v41.MotorV41BuildTests.test_reject_wrong_input_existing_output_and_links) ... ok
+test_68_existing_night_selectors_preserved_at_boundaries (test_motor_v41_mgba.MotorV41NativeTests.test_68_existing_night_selectors_preserved_at_boundaries) ... ok
+test_all_variants_1800_quantiles_plus_invalid_fallback_day_night (test_motor_v41_mgba.MotorV41NativeTests.test_all_variants_1800_quantiles_plus_invalid_fallback_day_night) ... ok
+test_cosmoem_level_priority_not_time_branch_and_everstone (test_motor_v41_mgba.MotorV41NativeTests.test_cosmoem_level_priority_not_time_branch_and_everstone) ... ok
+test_cosmog_threshold_and_everstone_day_and_night (test_motor_v41_mgba.MotorV41NativeTests.test_cosmog_threshold_and_everstone_day_and_night) ... ok
+test_live_walk_capture_day_night_flash_and_v40_roundtrip (test_motor_v41_mgba.MotorV41NativeTests.test_live_walk_capture_day_night_flash_and_v40_roundtrip) ... ok
+test_repel_blocks_type_null_and_unchecked_generation_works (test_motor_v41_mgba.MotorV41NativeTests.test_repel_blocks_type_null_and_unchecked_generation_works) ... ok
+test_tanoby_flag_gate_and_cresselia_native_generation (test_motor_v41_mgba.MotorV41NativeTests.test_tanoby_flag_gate_and_cresselia_native_generation) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 84.083s
+
+OK

@@ -1,0 +1,19 @@
+test_1025_unique_species_and_exclusive_structural_categories (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_1025_unique_species_and_exclusive_structural_categories) ... ok
+test_active_and_parked_shared_objects_are_distinct (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_active_and_parked_shared_objects_are_distinct) ... ok
+test_cli_requires_new_output_and_never_changes_rom (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_cli_requires_new_output_and_never_changes_rom) ... ok
+test_conditional_locations_are_not_promoted_to_ordinary_access (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_conditional_locations_are_not_promoted_to_ordinary_access) ... ok
+test_cosmog_chain_and_evolution_table_layout (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_cosmog_chain_and_evolution_table_layout) ... ok
+test_csv_determinism_and_no_certification_leak (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_csv_determinism_and_no_certification_leak) ... ok
+test_native_decoder_rejects_unknown_and_operand_false_positives (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_native_decoder_rejects_unknown_and_operand_false_positives) ... ok
+test_native_events_reachable_from_actual_map_roots (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_native_events_reachable_from_actual_map_roots) ... ok
+test_night_data_and_raw_tables_are_separately_accounted (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_night_data_and_raw_tables_are_separately_accounted) ... ok
+test_wrong_rom_and_corruption_rejected (test_auditoria_obtencao_v40.AcquisitionAuditTests.test_wrong_rom_and_corruption_rejected) ... ok
+test_altering_all_variants_and_invalid_fallback_type_null_only_at_seven (test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_altering_all_variants_and_invalid_fallback_type_null_only_at_seven) ... ok
+test_cosmoem_level_priority_not_time_branch_and_everstone (test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_cosmoem_level_priority_not_time_branch_and_everstone) ... ok
+test_cosmog_threshold_and_everstone_day_and_night (test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_cosmog_threshold_and_everstone_day_and_night) ... ok
+test_tanoby_flag_gate_and_cresselia_native_generation (test_auditoria_obtencao_v40_mgba.AcquisitionNativeProbes.test_tanoby_flag_gate_and_cresselia_native_generation) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 23.245s
+
+OK
