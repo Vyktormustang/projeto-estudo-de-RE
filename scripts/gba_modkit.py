@@ -163,8 +163,12 @@ COMBOS = {
     "L+R+A":     0x03 << 9 | 0x03 << 8 | 0x01,
 }
 
-# máscaras de hardware: L=0x200, R=0x100, START=0x008, SELECT=0x004, A=0x001
-MASKS_HW = {"L": 0x200, "R": 0x100, "START": 0x008, "SELECT": 0x004, "A": 0x001}
+# Bits do REG_KEYINPUT (ativo-baixo), ordem de hardware.
+# A base FireRed Gen1-9 V42 usa SELECT e L/R para telas de AJUDA, então o combo
+# precisa poder ser montado com as demais teclas (B e direções).
+MASKS_HW = {"A": 0x001, "B": 0x002, "SELECT": 0x004, "START": 0x008,
+            "RIGHT": 0x010, "LEFT": 0x020, "UP": 0x040, "DOWN": 0x080,
+            "R": 0x100, "L": 0x200}
 
 
 def combo_mask(combo: str) -> int:
@@ -210,11 +214,13 @@ def payload_mochila(itens: list[tuple[int, int]], combo: str = "L+R+START",
                     ptr_bolsa: int | None = None) -> str:
     """Assembly Thumb do payload: `if (KEYINPUT & mask) == mask { bag[0..n] = itens }`.
 
-    Regras de ouro (aprendidas na simulação de 2026-11-07, ver HANDOFF §2):
+    Regras de ouro (reconfirmadas em 2026-11-07 na base FireRed Gen1-9 V42):
       * **REG_KEYINPUT 0x04000130 é ATIVO-BAIXO**: botão pressionado = bit ZERO.
-        Logo o teste NÃO pode ser `(k & mask) == mask` (daria verdadeiro com
-        tudo solto, pois 0x3FF & 0x308 == 0x308) e sim `(k & mask) == 0`:
-        nenhum bit do combo sobrou em 1 ⇒ L, R e START estão todos pressionados.
+        O teste correto é **`(k & mask) == 0`**: se nenhum bit do combo sobrou em
+        1, todas as teclas estão pressionadas. Com o combo solto o resultado é
+        diferente de zero, então não dispara. (Houve uma tentativa de inverter
+        para `== mask` em 2026-11-07: ERRADA — quebrou um caso que funcionava.
+        Não repita.)
       * ARM7TDMI não tem Thumb-2: nada de `adds rX, rY` (monta como 32 bits) —
         usar `add rX, rY` (16 bits). O montador recusa 4 B fora de BL.
       * Nada de literal pc-relativo no payload: endereços são construídos por
