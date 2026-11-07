@@ -57,7 +57,7 @@ REGIAO = {"EWRAM": 0x02000000, "IWRAM": 0x03000000, "IO": 0x04000000,
 class Emu:
     """Wrapper fino sobre o shim C. Uma instância = um core mGBA."""
 
-    def __init__(self, shim: pathlib.Path | str = SHIM_DEFAULT):
+    def __init__(self, shim: pathlib.Path | str = SHIM_DEFAULT, verbose: bool = False):
         shim = pathlib.Path(shim)
         if not shim.is_file():
             raise FileNotFoundError(
@@ -96,6 +96,11 @@ class Emu:
         L.gs_cpsr.restype = C.c_uint32
         L.gs_frame_counter.restype = C.c_int
         L.gs_keys_active.restype = C.c_uint32
+        L.gs_log.argtypes = [C.c_int]
+        try:
+            L.gs_log(0xFF if verbose else 0x01)   # máscara mLogLevel: 0x01 = só FATAL
+        except AttributeError:
+            pass
         if not L.gs_new():
             raise RuntimeError("gs_new() falhou: core mGBA não inicializou")
         self._rom = None
@@ -124,7 +129,11 @@ class Emu:
         self.close()
 
     # ---------------- execução ----------------
+    _mask_manual = 0
+
     def keys(self, mask: int) -> None:
+        """Aplica um estado de botões manual (base da agenda)."""
+        self._mask_manual = mask
         self.lib.gs_keys(mask)
 
     def hold(self, *nomes: str) -> None:
@@ -144,11 +153,17 @@ class Emu:
         self._agenda.append((frame, hold, mask))
 
     def _aplicar_agenda(self) -> None:
-        """Se houver agenda, ela manda no keypad; senão respeita hold()/release()."""
+        """Agenda de toques SOMADA ao estado manual de hold()/release().
+
+        Antes a agenda substituía o keypad: assim que houvesse qualquer item
+        agendado, um `hold("L","R","START")` era ignorado e todo frame ia com
+        máscara 0 (bug encontrado em 2026-11-07 ao depurar o combo na ROM PT-BR).
+        Agora o estado manual é a base e os toques agendados entram por OR.
+        """
         if not self._agenda:
             return
         t = self.frames_total
-        mask = 0
+        mask = self._mask_manual
         for inicio, hold, m in self._agenda:
             if inicio <= t < inicio + hold:
                 mask |= m

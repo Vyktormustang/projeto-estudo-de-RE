@@ -206,7 +206,8 @@ def carregar(reg: str, valor: int, tmp: str = "r6") -> list[str]:
 
 
 def payload_mochila(itens: list[tuple[int, int]], combo: str = "L+R+START",
-                    base_bolsa: int = 0x020258B8) -> str:
+                    base_bolsa: int = 0x020258B8,
+                    ptr_bolsa: int | None = None) -> str:
     """Assembly Thumb do payload: `if (KEYINPUT & mask) == mask { bag[0..n] = itens }`.
 
     Regras de ouro (aprendidas na simulação de 2026-11-07, ver HANDOFF §2):
@@ -227,7 +228,14 @@ def payload_mochila(itens: list[tuple[int, int]], combo: str = "L+R+START",
     L += ["ldrh r1, [r1]",
           "ands r1, r2",       # r1 = bits do combo que NÃO estão pressionados
           "bne fim"]           # diferentes de zero => combo incompleto
-    L += carregar("r0", base_bolsa)
+    if ptr_bolsa is not None:
+        # variante "SaveBlock": os slots vivem atrás de um ponteiro de pocket
+        # (ERR_POCKET { ItemSlot* slots; u8 capacity; }). Ler o ponteiro em
+        # runtime sobrevive a mudanças de layout entre bases da ROM.
+        L += carregar("r0", ptr_bolsa)
+        L += ["ldr r0, [r0]"]
+    else:
+        L += carregar("r0", base_bolsa)
     for item_id, qty in itens:
         # Slot = u32 little-endian {id:u16, qty:u16} -> (qty<<16)|id.
         # UMA store de 32 bits em vez de str+strh: sem estado "meio escrito".
@@ -373,7 +381,8 @@ def simular(site: bytes, va_site: int, tramp: bytes, va_tramp: int,
 # --------------------------------------------------------------------------- #
 def receita(rotina: str = "SetGpuReg", combo: str = "L+R+START",
             itens: list[tuple[int, int]] | None = None,
-            va_tramp: int = 0x08EB0C00) -> dict:
+            va_tramp: int = 0x08EB0C00, site_va: int | None = None,
+            prologo: bytes | None = None, payload_asm: str | None = None) -> dict:
     """Monta site + trampolim e devolve os bytes prontos para aplicar.
 
     Layout do trampolim (o retorno tem de cair em `site+8`, onde o fluxo
@@ -388,19 +397,20 @@ def receita(rotina: str = "SetGpuReg", combo: str = "L+R+START",
          volta : movs r3,#hi ; lsls r3,#8 ; adds r3,#lo ; bx r3
     """
     itens = itens or PADRAO
-    rot = ROTINAS[rotina]
-    va_site = rot["va"]
-    prologo = rot["prologo"]
-    payload = payload_mochila(itens, combo)
+    if site_va is None:
+        rot = ROTINAS[rotina]
+        va_site, prologo = rot["va"], rot["prologo"]
+    else:
+        va_site = site_va
+        if prologo is None:
+            raise ModError("site_va exige os 8 bytes originais (parâmetro prologo)")
+        if len(prologo) != 8 or not _prologo_aceitavel(prologo):
+            raise ModError(f"prólogo não realocável em {va_site:#x}: {prologo.hex(' ')}")
+    payload = payload_asm or payload_mochila(itens, combo)
     corpo_payload = montar(payload, va_tramp)
     va_replay = va_tramp + len(corpo_payload)
-    texto_replay = ("push {r4, r5, lr}\n"
-                    "lsls r0, r0, #24\n"
-                    "lsrs r4, r0, #24\n"
-                    "lsls r1, r1, #16\n")
-    replay = montar(texto_replay, va_replay)
-    if replay != prologo:
-        raise ModError(f"replay do prólogo diverge do original: {replay.hex()} != {prologo.hex()}")
+    # replay = os próprios 8 bytes originais (já validados como realocáveis)
+    replay = prologo
     va_volta = va_replay + len(replay)
     destino = (va_site + 8) | 1        # bit Thumb ligado
     bits = montar("\n".join(carregar("r3", destino)) + "\nbx r3", va_volta)
@@ -446,6 +456,104 @@ def aplicador(rom_base: bytes, r: dict, rotina: str = "SetGpuReg",
     rom[fo_site:fo_site + 8] = r["site"]
     rom[fo_tramp:fim_tramp] = r["tramp"]
     return bytes(rom)
+
+
+# --------------------------------------------------------------------------- #
+# Descoberta do site NA ROM (não assumir endereço)
+# --------------------------------------------------------------------------- #
+def _capstone_md():
+    cs = _capstone()
+    md = cs.Cs(cs.CS_ARCH_ARM, cs.CS_MODE_THUMB)
+    md.detail = True
+    return md
+
+
+def contar_chamadas(rom: bytes, alvo: int, janela: int = 0x20000) -> int:
+    """Conta `bl` que caem em `alvo` nas primeiras `janela` bytes da ROM.
+
+    É o mesmo critério que elegeu `0x08000A38` como site no FireRed original
+    (1238 callsites). Aqui a conta é feita NA SUA ROM — porque a base pode ser
+    outra (a imagem PT-BR Gen1-9 do Drive é uma base diferente: o prólogo em
+    0x08000A38 não existe nela).
+    """
+    md = _capstone_md()
+    n = 0
+    for off in range(0, min(len(rom) - 4, janela), 2):
+        ins = next(md.disasm(rom[off:off + 4], 0x08000000 + off, count=1), None)
+        if ins is None:
+            continue
+        if ins.mnemonic == "bl" and ins.size == 4:
+            try:
+                if int(ins.op_str.split("#")[1], 16) == alvo:
+                    n += 1
+            except (IndexError, ValueError):
+                pass
+    return n
+
+
+# instruções que dependem do PC: copiadas para outro endereço, mudam de destino
+_RELATIVAS = ("b", "bl", "bx", "blx", "cbz", "cbnz", "adr")
+
+
+def _prologo_aceitavel(b: bytes) -> bool:
+    """Os 8 B iniciais desta função podem ser COPIADOS para outro endereço?
+
+    Regra dura: nenhuma das instruções da janela pode ser relativa ao PC
+    (`b`/`bl`/`bx`/`adr`/`ldr rX,[pc,#…]`) nem alterar o fluxo (pop/svc). Se
+    for, o "replay" no trampolim saltaria para outro lugar. Também exigimos que
+    a janela termine em fronteira de instrução (não cortar um BL de 4 B no meio).
+    """
+    if len(b) < 8:
+        return False
+    ins = list(_capstone_md().disasm(b[:8], 0x08000000))
+    if not ins or sum(i.size for i in ins) != 8:
+        return False
+    for i in ins:
+        if i.mnemonic in _RELATIVAS or i.mnemonic.startswith("b") and i.mnemonic != "bic":
+            return False
+        if "pc" in i.op_str:
+            return False
+        if i.mnemonic in ("pop", "svc", "bkpt", "udf"):
+            return False
+    return True
+
+
+def descobrir_sites(rom: bytes, max_candidatos: int = 5,
+                    janela: int = 0x20000) -> list[dict]:
+    """Lista funções-alvo frequentes com prólogo realocável, ordenadas por uso.
+
+    Estratégia (determinística, sem achismo):
+      1. varre a ROM em Thumb, coleta alvos de `bl` e a frequência;
+      2. mantém só alvos cujo código começa com prólogo realocável de 8 B;
+      3. ordena por número de chamadas (o "toda hora" do jogo).
+    O candidato preferido continua sendo `SetGpuReg` quando a ROM é a mesma
+    base do estudo; nas outras, o ranking dá o substituto natural.
+    """
+    md = _capstone_md()
+    freq: dict[int, int] = {}
+    for off in range(0, min(len(rom) - 4, janela), 2):
+        ins = next(md.disasm(rom[off:off + 4], 0x08000000 + off, count=1), None)
+        if ins is None or ins.mnemonic != "bl" or ins.size != 4:
+            continue
+        try:
+            alvo = int(ins.op_str.split("#")[1], 16)
+        except (IndexError, ValueError):
+            continue
+        freq[alvo] = freq.get(alvo, 0) + 1
+
+    saida = []
+    for va, n in sorted(freq.items(), key=lambda kv: -kv[1]):
+        off = va - 0x08000000
+        if off < 0 or off + 8 > len(rom):
+            continue
+        prologo = rom[off:off + 8]
+        if not _prologo_aceitavel(prologo):
+            continue
+        saida.append({"va": va, "chamadas": n, "prologo": prologo,
+                      "desasm": desmontar(prologo, va)})
+        if len(saida) >= max_candidatos:
+            break
+    return saida
 
 
 def self_test() -> int:
