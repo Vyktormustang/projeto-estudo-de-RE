@@ -570,3 +570,24 @@ Progresso estimado do projeto: **~62%**.
 * No jogo (state_bt7): overworld estável; combo L+R+START 170f: SEM preenchimento da bolsa; START solo não abre menu (3 runs idênticos — suspeita 'input-mudo' do state); A,A,B,START muda md5 → core-input funciona.
 * Achado ruim: **0x03003118 como espelho de teclado zera no contexto bedroom-v3st1** (estado contexto-dependente!). Pede-se major-fonte-padrão de teclas.
 * Casa-organizadora: usuário pediu arquivos do projeto → atualização desta memória + empacotamento (sem ROM original).
+
+
+### Ciclo 35 — 2026-11-07 (CAUSA-RAIZ do mod + emulador próprio + mod v4 provado)
+
+- **Diagnóstico fechado**: o site do v3 tinha `ldr r3,[pc,#4]` com o literal em
+  `va+4` → lia 4 B adiante (`0x08000A40`) e fazia `bx` para lixo em 1238
+  callsites. Não era o combo. (Detalhe em MEMORIA_CONSOLIDADA §c35.)
+- **Keypad ativo-baixo** provado: `(k&mask)==mask` é verdade com tudo solto.
+- **Emulador novo** (`tools/gba_shim` + `scripts/gba_emu.py`): libmgba 0.10.5
+  compilada no sandbox (o core do .deb exigia GLIBC 2.38 e não expunha memória).
+  Agora: memória ao vivo, CPU, breakpoints, save-state 0x61000.
+- **`scripts/gba_modkit.py`**: montador (keystone) com trava ARMv4T, veneer
+  `ldr #0`, payload por mnemônicos e **simulação unicorn obrigatória**.
+- **`scripts/apply_mod.py`**: aplica com C1/C2 + relatório (substitui
+  apply_mod_v3.py, apagado).
+- **`tests/fixtures/make_bench_rom.py`** + **`tests/teste_mod_bench.py`**:
+  ROM de bancada própria (0 conteúdo de jogo) e prova no mGBA — combo enche os
+  8 slots, sem combo nada, estável 600 frames.
+- Bateria: 14 verificações (11 self-tests + fixture + shim + mod em emulador),
+  todas verdes. `emu/` (4,6 MB) removido; driver libretro em `deprecated/`.
+- Pendência: screenshot da mochila no FireRed (precisa da ROM do usuário).

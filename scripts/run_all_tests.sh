@@ -32,6 +32,7 @@ done
 roda "fixture:make_bench_rom" python3 tests/fixtures/make_bench_rom.py --self-test
 roda "shim:smoke"             python3 tools/gba_shim/shim_smoke.py
 roda "mod:bench (emulador)"   python3 tests/teste_mod_bench.py
+roda "mod:apply (relatório)"  python3 scripts/apply_mod.py --self-test
 
 echo "===============================" | tee -a "$LOG"
 echo "resumo: $FALHAS de $TOTAL falharam — log: $LOG" | tee -a "$LOG"

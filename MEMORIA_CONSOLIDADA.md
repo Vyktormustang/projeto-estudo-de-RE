@@ -83,3 +83,55 @@ Nota de colisão: L+R abre a ajuda nativa do jogo — combo escolhido L+R+START 
   seq A,A,B,START muda md5 ✓;
 - RESTA VALIDAR as PNGs v3_480/v3_2900 (brancas — boot ≠ boot?): procurar primeiro frame
   com texto real vs branco puro.
+
+---
+
+## c35 (2026-11-07) — CAUSA-RAIZ do "combo não dispara" + emulador próprio + mod v4
+
+### O bug que ninguém tinha achado (FATO, provado por decodificação)
+`site @0x08000A38 = 01 4b | 18 47 | 01 0c eb 08`.
+`ldr r3,[pc,#4]` em `0x08000A38` lê **Align(0x08000A3C,4)+4 = 0x08000A40**; o
+literal estava em **0x08000A3C** → `r3 = 0x08EB0C01` interpretado como
+instruções (`lsrs r1,r0,#16` / `lsrs r3,r5,#3`) → `bx` para lixo em **toda**
+chamada de `SetGpuReg` (1238 callsites). O trampolim NUNCA executou; o combo
+nunca foi a causa. Correção: `ldr r3,[pc,#0]` (`00 4b`), literal em `va+4`.
+
+### Segundo bug (FATO)
+`REG_KEYINPUT 0x04000130` é **ativo-baixo**: `(k & mask) == mask` é VERDADEIRO
+com o combo solto (0x3FF & 0x308 == 0x308) → encheria a mochila sem apertar
+nada. Teste correto: `(k & mask) == 0`.
+
+### Terceiro (achado pelo teste de bancada)
+`str`(id) + `strh`(qtd) = duas stores → leitor pode ver `{id novo, qty antiga}`.
+Agora **um** `str` de 32 bits com `(qty<<16)|id`.
+
+### Quarto (alcance)
+`0x08EB0C00` (offset 0xEB0C00) cabe numa ROM de 16 MiB; NÃO cabe em 8 MiB.
+`gba_modkit.aplicador` recusa ou estica (0xFF), explícito.
+
+### Emulador (substitui o core libretro — causa-raiz dupla do driver antigo)
+1. `mgba_libretro.so` do Debian 13 exige **GLIBC 2.38**; sandbox tem 2.36 →
+   `GLIBC_2.38 not found` (era o self-test vermelho desde sempre).
+2. O core publica **zero** descritores de memória (ciclo 22) → sem EWRAM/IWRAM/CPU.
+Novo: `tools/gba_shim` (C sobre libmgba 0.10.5 compilada aqui, sha256 do tarball
+fixado) + `scripts/gba_emu.py`. Dá leitura/escrita de qualquer região, `pc()`,
+`reg()`, breakpoints, `keys_held()`, save-state binário, PNG. `emu/` (4,6 MB de
+.deb/core que não carrega) removido.
+
+### Fatos novos do mGBA (úteis para sempre)
+- `GBASerializedState` = **0x61000 B**; IWRAM @0x19000, EWRAM @0x21000;
+  mochila @ `0x21000+0x258B8 = 0x468B8`. **Não existe SAVE (flash) no blob** —
+  a nota antiga "SAVE @0x61000" era ler além do fim.
+- Ler `0x04000130` pelo barramento devolve o **espelho de IO**, atualizado só
+  quando o jogo lê o registrador. Para inspecionar input: `keysActive` (shim).
+- ARM7TDMI não tem Thumb-2: `adds rX, rY` → 32 bits. Sempre `add rX, rY`.
+
+### Prova (tests/teste_mod_bench.py — ROM de bancada PRÓPRIA, 0 conteúdo de jogo)
+`tests/fixtures/make_bench_rom.py` gera laço Thumb que chama rotina com o
+prólogo exato do `SetGpuReg`, mochila em EWRAM no mesmo endereço e contador.
+Resultado no mGBA: sem combo → nada; L+R+START → 8 slots
+(`0001x99 0002x99 0003x99 0004x99 000Dx99 0013x99 002Dx99 0039x99`); só L+R →
+nada; 600 frames com combo sem travar (contador 398.809 → 438.747).
+
+### Pendência única
+FireRed real → screenshot da mochila. Depende da ROM do usuário.
