@@ -1,0 +1,331 @@
+{
+  "data": "2026-11-07",
+  "emulador": "mGBA 0.10.5 (libmgba compilada) + tools/gba_shim",
+  "rom_bancada_sha256": "4bf5ba1032128918a6e02cf23c93ea09eb7ba85201d88e1b35cbd4fbd0d915e8",
+  "rom_mod_sha256": "796296fd608c5a7709167a147a3955e44c65b372be76e766a5865fec1bb6cc9c",
+  "site": {
+    "va": "0x08000A38",
+    "bytes": "00 4b 18 47 01 00 02 08",
+    "desasm": [
+      "08000A38: 004b     ldr      r3, [pc, #0]",
+      "08000A3A: 1847     bx       r3"
+    ],
+    "v3_incorreto": "01 4b 18 47 01 0c eb 08 (ldr #4 lê 0x08000A40, literal em 0x08000A3C)"
+  },
+  "tramp": {
+    "va": "0x08020000",
+    "bytes": 148,
+    "desasm": [
+      "08020000: 4fb4     push     {r0, r1, r2, r3, r6}",
+      "08020002: 0322     movs     r2, #3",
+      "08020004: 1202     lsls     r2, r2, #8",
+      "08020006: 0832     adds     r2, #8",
+      "08020008: 0421     movs     r1, #4",
+      "0802000A: 0906     lsls     r1, r1, #0x18",
+      "0802000C: 0126     movs     r6, #1",
+      "0802000E: 3602     lsls     r6, r6, #8",
+      "08020010: 3144     add      r1, r6",
+      "08020012: 3031     adds     r1, #0x30",
+      "08020014: 0988     ldrh     r1, [r1]",
+      "08020016: 1140     ands     r1, r2",
+      "08020018: 30d1     bne      #0x802007c",
+      "0802001A: 0220     movs     r0, #2",
+      "0802001C: 0006     lsls     r0, r0, #0x18",
+      "0802001E: 0226     movs     r6, #2",
+      "08020020: 3604     lsls     r6, r6, #0x10",
+      "08020022: 3044     add      r0, r6",
+      "08020024: 5826     movs     r6, #0x58",
+      "08020026: 3602     lsls     r6, r6, #8",
+      "08020028: 3044     add      r0, r6",
+      "0802002A: b830     adds     r0, #0xb8",
+      "0802002C: 6322     movs     r2, #0x63",
+      "0802002E: 1204     lsls     r2, r2, #0x10",
+      "08020030: 0132     adds     r2, #1",
+      "08020032: 0260     str      r2, [r0]",
+      "08020034: 0430     adds     r0, #4",
+      "08020036: 6322     movs     r2, #0x63",
+      "08020038: 1204     lsls     r2, r2, #0x10",
+      "0802003A: 0232     adds     r2, #2",
+      "0802003C: 0260     str      r2, [r0]",
+      "0802003E: 0430     adds     r0, #4",
+      "08020040: 6322     movs     r2, #0x63",
+      "08020042: 1204     lsls     r2, r2, #0x10",
+      "08020044: 0332     adds     r2, #3",
+      "08020046: 0260     str      r2, [r0]",
+      "08020048: 0430     adds     r0, #4",
+      "0802004A: 6322     movs     r2, #0x63",
+      "0802004C: 1204     lsls     r2, r2, #0x10",
+      "0802004E: 0432     adds     r2, #4",
+      "08020050: 0260     str      r2, [r0]",
+      "08020052: 0430     adds     r0, #4",
+      "08020054: 6322     movs     r2, #0x63",
+      "08020056: 1204     lsls     r2, r2, #0x10",
+      "08020058: 0d32     adds     r2, #0xd",
+      "0802005A: 0260     str      r2, [r0]",
+      "0802005C: 0430     adds     r0, #4",
+      "0802005E: 6322     movs     r2, #0x63",
+      "08020060: 1204     lsls     r2, r2, #0x10",
+      "08020062: 1332     adds     r2, #0x13",
+      "08020064: 0260     str      r2, [r0]",
+      "08020066: 0430     adds     r0, #4",
+      "08020068: 6322     movs     r2, #0x63",
+      "0802006A: 1204     lsls     r2, r2, #0x10",
+      "0802006C: 2d32     adds     r2, #0x2d",
+      "0802006E: 0260     str      r2, [r0]",
+      "08020070: 0430     adds     r0, #4",
+      "08020072: 6322     movs     r2, #0x63",
+      "08020074: 1204     lsls     r2, r2, #0x10",
+      "08020076: 3932     adds     r2, #0x39",
+      "08020078: 0260     str      r2, [r0]",
+      "0802007A: 0430     adds     r0, #4",
+      "0802007C: 4fbc     pop      {r0, r1, r2, r3, r6}",
+      "0802007E: 30b5     push     {r4, r5, lr}",
+      "08020080: 0006     lsls     r0, r0, #0x18",
+      "08020082: 040e     lsrs     r4, r0, #0x18",
+      "08020084: 0904     lsls     r1, r1, #0x10",
+      "08020086: 0823     movs     r3, #8",
+      "08020088: 1b06     lsls     r3, r3, #0x18",
+      "0802008A: 0a26     movs     r6, #0xa",
+      "0802008C: 3602     lsls     r6, r6, #8",
+      "0802008E: 3344     add      r3, r6",
+      "08020090: 4133     adds     r3, #0x41",
+      "08020092: 1847     bx       r3"
+    ]
+  },
+  "combo": {
+    "nome": "L+R+START",
+    "mask_keyinput": "0x308",
+    "regra": "ativo-baixo: (K & mask) == 0"
+  },
+  "execucoes": [
+    {
+      "caso": "sem_combo",
+      "frames": 140,
+      "mochila": [
+        {
+          "slot": 0,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 1,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 2,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 3,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 4,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 5,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 6,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 7,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        }
+      ],
+      "contador_site": 178472,
+      "md5_tela": "6effd0d4d16f0ab4a7fdb22736df402c"
+    },
+    {
+      "caso": "combo_L+R+START",
+      "frames": 110,
+      "mochila": [
+        {
+          "slot": 0,
+          "id": 1,
+          "qtd": 99,
+          "nome": "Master Ball"
+        },
+        {
+          "slot": 1,
+          "id": 2,
+          "qtd": 99,
+          "nome": "Ultra Ball"
+        },
+        {
+          "slot": 2,
+          "id": 3,
+          "qtd": 99,
+          "nome": "Great Ball"
+        },
+        {
+          "slot": 3,
+          "id": 4,
+          "qtd": 99,
+          "nome": "Poké Ball"
+        },
+        {
+          "slot": 4,
+          "id": 13,
+          "qtd": 99,
+          "nome": "Potion"
+        },
+        {
+          "slot": 5,
+          "id": 19,
+          "qtd": 99,
+          "nome": "Full Restore"
+        },
+        {
+          "slot": 6,
+          "id": 45,
+          "qtd": 99,
+          "nome": "Sacred Ash"
+        },
+        {
+          "slot": 7,
+          "id": 57,
+          "qtd": 99,
+          "nome": "Rare Candy"
+        }
+      ],
+      "contador_site": 121483,
+      "md5_tela": "6effd0d4d16f0ab4a7fdb22736df402c"
+    },
+    {
+      "caso": "so_L+R",
+      "frames": 110,
+      "mochila": [
+        {
+          "slot": 0,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 1,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 2,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 3,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 4,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 5,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 6,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 7,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        }
+      ],
+      "contador_site": 139993,
+      "md5_tela": "6effd0d4d16f0ab4a7fdb22736df402c"
+    },
+    {
+      "caso": "so_START",
+      "frames": 110,
+      "mochila": [
+        {
+          "slot": 0,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 1,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 2,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 3,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 4,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 5,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 6,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        },
+        {
+          "slot": 7,
+          "id": 0,
+          "qtd": 0,
+          "nome": "—"
+        }
+      ],
+      "contador_site": 139993,
+      "md5_tela": "6effd0d4d16f0ab4a7fdb22736df402c"
+    }
+  ],
+  "estabilidade_600f": {
+    "contador_antes": 398809,
+    "contador_depois": 438747,
+    "vivo": true
+  }
+}

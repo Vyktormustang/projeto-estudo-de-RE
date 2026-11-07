@@ -17,7 +17,7 @@ tools/gba_shim/build/mgba-src/
 logs/gba_emu_runs.jsonl
 logs/*.log
 emu/run/
-reports/mod_*.json
+# relatórios de mod são evidência versionada (reports/mod_*) — não ignorar
 
 # --- FORJA ---
 forja/web/node_modules/
