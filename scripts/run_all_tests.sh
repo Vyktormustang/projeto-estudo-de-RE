@@ -39,6 +39,20 @@ roda "vyk59:auditoria-v42"    python3 scripts/auditoria_vyk59.py --self-test
 roda "vyk59:auditoria-v3"     python3 scripts/auditoria_vyk59_v3.py --self-test
 roda "vyk60:sempre-escreve"   python3 scripts/teste_vyk60_sempre_escreve.py --self-test
 
+# auditoria da V42 (motor Gen 1-9): estruturais sempre; nativas se houver ROM e
+# core. Sem a ROM (não versionada) o script sai em 2 — isso NÃO derruba a bateria.
+if bash v42/scripts/run_cosmog_tests.sh >>"$LOG" 2>&1; then
+  echo "=== [v42:cosmog] ===" | tee -a "$LOG"; echo "  PASSOU" | tee -a "$LOG"
+else
+  rc=$?
+  echo "=== [v42:cosmog] ===" | tee -a "$LOG"
+  if [ "$rc" -eq 2 ]; then
+    echo "  SEM ROM (esperado) — pulado" | tee -a "$LOG"
+  else
+    echo "  FALHOU" | tee -a "$LOG"; FALHAS=$((FALHAS + 1))
+  fi
+fi
+
 echo "===============================" | tee -a "$LOG"
 echo "resumo: $FALHAS de $TOTAL falharam — log: $LOG" | tee -a "$LOG"
 exit "$FALHAS"
