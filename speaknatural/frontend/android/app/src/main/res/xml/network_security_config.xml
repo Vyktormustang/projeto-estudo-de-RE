@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Por que liberar HTTP (cleartext) na rede local?
+
+  O servidor Python do SpeakNatural roda no seu PC e NÃO tem certificado HTTPS.
+  O app precisa chamar http://192.168.x.x:8000. Desde o Android 9, HTTP puro é
+  bloqueado por padrão - este arquivo abre a exceção.
+
+  Segurança: a exceção vale para a rede em que o celular está (LAN/Wi-Fi de
+  casa). Nada é exposto para a internet e o servidor não guarda áudio: os
+  arquivos são apagados logo depois da análise.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

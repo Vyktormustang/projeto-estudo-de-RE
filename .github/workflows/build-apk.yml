@@ -1,0 +1,227 @@
+name: SpeakNatural — APK
+
+# Gera o app-debug.apk SEM Android Studio, direto nos servidores do GitHub.
+#
+# Como usar (passo a passo no README, seção 5):
+#   1. suba o projeto para o GitHub;
+#   2. aba "Actions" -> "SpeakNatural — APK" -> "Run workflow";
+#   3. quando terminar (5–8 min), abra o run e baixe o artifact
+#      "speaknatural-apk" — dentro dele está o app-debug.apk.
+#
+# O build roda automaticamente a cada push que mexa em speaknatural/**.
+
+on:
+  push:
+    branches:
+      - main
+      - 'arena/**'
+    paths:
+      - 'speaknatural/**'
+      - '.github/workflows/build-apk.yml'
+  pull_request:
+    paths:
+      - 'speaknatural/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+    inputs:
+      upload_artifact:
+        description: 'Publicar o APK como artifact para download'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # necessário para publicar o APK numa Release (download direto)
+
+concurrency:
+  group: speaknatural-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # A pasta do app (frontend Vite + projeto Android do Capacitor)
+  APP_DIR: speaknatural/frontend
+  # Versão do Node e do Java exigidas pelo Capacitor 6 / AGP 8.2
+  NODE_VERSION: '22'
+  JAVA_VERSION: '17'
+
+jobs:
+  apk:
+    name: Build do app-debug.apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    defaults:
+      run:
+        working-directory: speaknatural/frontend
+
+    steps:
+      - name: 1. Baixar o código
+        uses: actions/checkout@v4
+
+      - name: 2. Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: speaknatural/frontend/package-lock.json
+
+      - name: 3. JDK ${{ env.JAVA_VERSION }} (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: 4. Gradle (com cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: 5. Conferir o Android SDK (já vem na imagem do runner)
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK" ] || [ ! -d "$SDK" ]; then
+            echo "::error::ANDROID_HOME/ANDROID_SDK_ROOT não definido no runner"
+            exit 1
+          fi
+          echo "SDK em: $SDK"
+          echo "platforms: $(ls "$SDK/platforms" 2>/dev/null | tr '\n' ' ')"
+          echo "build-tools: $(ls "$SDK/build-tools" 2>/dev/null | tr '\n' ' ')"
+          if [ ! -d "$SDK/platforms/android-34" ]; then
+            echo "::warning::platform android-34 não encontrada; o Gradle vai tentar baixar"
+          fi
+          # Garante que o Gradle ache o SDK mesmo sem local.properties
+          echo "sdk.dir=$SDK" > android/local.properties
+
+      - name: 6. Instalar dependências do frontend (versões fixadas)
+        run: npm ci --no-audit --no-fund
+
+      - name: 7. Checagem de tipos (TypeScript)
+        run: npm run typecheck
+
+      - name: 8. Testes unitários (vitest)
+        run: npm test
+
+      - name: 9. Compilar o app web (Vite -> dist/)
+        run: npm run build
+
+      - name: 10. Sincronizar o web app com o projeto Android
+        run: npx cap sync android
+
+      - name: 11. Conferir manifesto (microfone + HTTP na rede local)
+        run: |
+          set -euo pipefail
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.RECORD_AUDIO' "$MANIFEST" \
+            || { echo "::error::AndroidManifest.xml sem permissão de microfone"; exit 1; }
+          grep -q 'android.permission.INTERNET' "$MANIFEST" \
+            || { echo "::error::AndroidManifest.xml sem permissão de internet"; exit 1; }
+          grep -q 'usesCleartextTraffic="true"' "$MANIFEST" \
+            || { echo "::error::AndroidManifest.xml sem cleartext (HTTP na LAN)"; exit 1; }
+          test -f android/app/src/main/res/xml/network_security_config.xml \
+            || { echo "::error::Falta network_security_config.xml"; exit 1; }
+          test -f android/app/src/main/assets/public/index.html \
+            || { echo "::error::cap sync não copiou o dist/ para assets/public"; exit 1; }
+          echo "Manifesto OK."
+
+      - name: 12. Build do APK debug (Gradle)
+        working-directory: speaknatural/frontend/android
+        run: |
+          set -euo pipefail
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: 13. Conferir o APK gerado
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -f "$APK" || { echo "::error::APK não foi gerado"; exit 1; }
+          ls -lh "$APK"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+          if [ -x "$BUILD_TOOLS/aapt2" ]]; then
+            "$BUILD_TOOLS/aapt2" dump permissions "$APK" || true
+          fi
+          unzip -l "$APK" | grep -q 'assets/public/index.html' \
+            || { echo "::error::O APK não contém o app web"; exit 1; }
+          echo "APK_OK=true" >> "$GITHUB_ENV"
+
+      - name: 14. Nome amigável do APK
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir -p ../build-out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "../build-out/SpeakNatural-${VERSION}-debug.apk"
+          ls -lh ../build-out
+
+      - name: 15. Publicar o APK como artifact
+        if: ${{ github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.upload_artifact) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: speaknatural-apk
+          path: |
+            speaknatural/frontend/android/app/build/outputs/apk/debug/app-debug.apk
+            speaknatural/build-out/SpeakNatural-*-debug.apk
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: 16. Publicar também a versão web (para abrir no PC sem Node.js)
+        if: ${{ github.event_name != 'pull_request' && (github.event_name != 'workflow_dispatch' || inputs.upload_artifact) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: speaknatural-web
+          path: speaknatural/frontend/dist/**
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: 17. Publicar o APK numa Release (link direto para baixar no celular)
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="speaknatural-v${VERSION}"
+          APK="../build-out/SpeakNatural-${VERSION}-debug.apk"
+          NOTES=$(cat <<EOF
+          ## SpeakNatural v${VERSION} — APK para Android
+
+          **Baixe o arquivo \`SpeakNatural-${VERSION}-debug.apk\` (aba *Assets* abaixo) e instale no celular.**
+
+          Como instalar:
+          1. baixe o .apk direto no celular (ou transfira por cabo/Drive);
+          2. toque no arquivo e permita "instalar apps de fontes desconhecidas";
+          3. abra o app, vá na aba **Servidor**, digite \`http://IP-DO-SEU-PC:8000\` e toque em **Testar conexão**.
+
+          Lembre-se: o APK é só a "tela"; a análise de pronúncia roda no seu PC
+          (\`start-server.bat\`). Guia completo: [speaknatural/README.md](../blob/main/speaknatural/README.md).
+
+          - commit: \`${GITHUB_SHA::7}\`
+          - gerado por: workflow "SpeakNatural — APK" (run ${GITHUB_RUN_ID})
+          EOF
+          )
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG já existe: atualizando o APK."
+            gh release upload "$TAG" "$APK" --clobber
+            gh release edit "$TAG" --notes "$NOTES" --latest
+          else
+            gh release create "$TAG" "$APK" \
+              --target "$GITHUB_SHA" \
+              --title "SpeakNatural v${VERSION} — APK" \
+              --notes "$NOTES" \
+              --latest
+          fi
+          echo "### Download direto" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 18. Resumo do build
+        run: |
+          {
+            echo "### SpeakNatural — APK pronto ✅"
+            echo ""
+            echo "Baixe o artifact **speaknatural-apk** (aba *Artifacts* no final desta página)"
+            echo "e instale o arquivo \`app-debug.apk\` no celular Android."
+            echo ""
+            echo "- Commit: \`${GITHUB_SHA::7}\`"
+            echo "- Versão: \`$(node -p "require('./package.json').version")\`"
+            echo "- Tamanho: $(du -h android/app/build/outputs/apk/debug/app-debug.apk | cut -f1)"
+            echo ""
+            echo "Depois de instalar, abra o app, vá em **Servidor**, digite"
+            echo "\`http://IP-DO-SEU-PC:8000\` e toque em **Testar conexão**."
+          } >> "$GITHUB_STEP_SUMMARY"

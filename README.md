@@ -270,3 +270,15 @@ versionado.
 
 <sub>Projeto pessoal de estudo de engenharia reversa. Não afiliado a Nintendo/
 GAME FREAK/The Pokémon Company. **A ROM comercial NÃO faz parte deste repositório.**</sub>
+
+---
+
+## Outros projetos neste repositório
+
+| Pasta | Projeto | O que é |
+|---|---|---|
+| [`speaknatural/`](speaknatural/README.md) | **SpeakNatural** 🎙️ | App para treinar pronúncia do inglês: grava sua voz, colore cada palavra (verde/amarelo/vermelho), mostra os sons IPA (esperado × ouvido) com dicas em português e salva o histórico. Backend FastAPI + faster-whisper + wav2vec2 rodando no seu PC; app React/Capacitor com APK gerado por GitHub Actions ([workflow](.github/workflows/build-apk.yml)). |
+| [`forja/`](forja/README.md) | **Forja — Sistema do Ápice** | App Android offline (WebView) com o núcleo de repetição espaçada (SM-2) em TypeScript. |
+
+> O guia do SpeakNatural, escrito para quem não programa, começa em
+> **[speaknatural/README.md](speaknatural/README.md)**.
