@@ -1,0 +1,106 @@
+# Evidência da suíte do Cosmog na V42 — gerada por v42/scripts/run_cosmog_tests.sh
+# data: 2026-11-08T00:56:16+00:00
+# ROM sha256: 6997366bea7056778e3183595d2e2f84c62a98576430db71b9459962e5bbd99a
+# log completo (NÃO versionado): /home/user/projeto-estudo-de-RE/logs/cosmog_20261108_001139.log
+
+=== [cosmog:estruturais] ===
+Ran 3 tests in 0.265s
+OK
+  PASSOU
+=== [cosmog:nativos] ===
+Synthetic parent records; direct native calls, NOT a deposit/hatch journey. ... DAYCARE_SCORE 789 132 20
+EGG_CONTRACT 2 {'valid': True, 'species': 789, 'ev': [0, 0, 0, 0, 0, 0], 'iv': [12, 22, 2, 2, 26, 26], 'hp': 19, 'max_hp': 19, 'level': 5}
+DAYCARE_SCORE 132 789 20
+DAYCARE_SCORE 789 789 0
+DAYCARE_SCORE 132 132 0
+DAYCARE_SCORE 151 132 0
+DAYCARE_SCORE 1 132 20
+NATIVE_EGG_PENDING_AFTER_STEPS 1280
+NATIVE_EGG_PICKED_SAVED {'valid': True, 'species': 789, 'ev': [0, 0, 0, 0, 0, 0], 'iv': [7, 13, 23, 30, 2, 2], 'hp': 20, 'max_hp': 20, 'level': 5}
+Ran 4 tests in 358.337s
+OK
+  PASSOU
+=== [cosmog:eclosao] ===
+Eclosão: ovo 789 → Cosmog, com passos contados pelo próprio jogo. ... HATCH_EGG_PICKED steps_to_egg=768
+HATCH_ROTA eixo_livre=RIGHT coords_inicio=(23, 22)
+HATCH_PROGRESS steps=512 s=26 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=1025 s=53 ainda_ovo=1 coords=(25, 22)
+HATCH_PROGRESS steps=1538 s=80 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=2048 s=108 ainda_ovo=1 coords=(22, 22)
+HATCH_PROGRESS steps=2561 s=137 ainda_ovo=1 coords=(29, 22)
+HATCH_PROGRESS steps=3074 s=165 ainda_ovo=1 coords=(22, 22)
+HATCH_PROGRESS steps=3584 s=193 ainda_ovo=1 coords=(32, 22)
+HATCH_PROGRESS steps=4097 s=220 ainda_ovo=1 coords=(19, 22)
+HATCH_PROGRESS steps=4610 s=248 ainda_ovo=1 coords=(32, 22)
+HATCH_PROGRESS steps=5120 s=277 ainda_ovo=1 coords=(16, 22)
+HATCH_PROGRESS steps=5632 s=304 ainda_ovo=1 coords=(34, 22)
+HATCH_PROGRESS steps=6145 s=334 ainda_ovo=1 coords=(17, 22)
+HATCH_PROGRESS steps=6658 s=363 ainda_ovo=1 coords=(34, 22)
+HATCH_PROGRESS steps=7168 s=391 ainda_ovo=1 coords=(20, 22)
+HATCH_PROGRESS steps=7681 s=419 ainda_ovo=1 coords=(31, 22)
+HATCH_PROGRESS steps=8194 s=446 ainda_ovo=1 coords=(20, 22)
+HATCH_PROGRESS steps=8704 s=472 ainda_ovo=1 coords=(28, 22)
+HATCH_PROGRESS steps=9217 s=499 ainda_ovo=1 coords=(23, 22)
+HATCH_PROGRESS steps=9730 s=526 ainda_ovo=1 coords=(28, 22)
+HATCH_PROGRESS steps=10240 s=554 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=10753 s=583 ainda_ovo=1 coords=(25, 22)
+HATCH_PROGRESS steps=11266 s=612 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=11776 s=640 ainda_ovo=1 coords=(22, 22)
+HATCH_PROGRESS steps=12289 s=669 ainda_ovo=1 coords=(29, 22)
+HATCH_PROGRESS steps=12802 s=697 ainda_ovo=1 coords=(22, 22)
+HATCH_PROGRESS steps=13312 s=725 ainda_ovo=1 coords=(32, 22)
+HATCH_PROGRESS steps=13825 s=753 ainda_ovo=1 coords=(19, 22)
+HATCH_PROGRESS steps=14338 s=782 ainda_ovo=1 coords=(32, 22)
+HATCH_PROGRESS steps=14848 s=810 ainda_ovo=1 coords=(16, 22)
+HATCH_PROGRESS steps=15360 s=839 ainda_ovo=1 coords=(34, 22)
+HATCH_PROGRESS steps=15873 s=869 ainda_ovo=1 coords=(17, 22)
+HATCH_PROGRESS steps=16386 s=897 ainda_ovo=1 coords=(34, 22)
+HATCH_PROGRESS steps=16896 s=924 ainda_ovo=1 coords=(20, 22)
+HATCH_PROGRESS steps=17409 s=953 ainda_ovo=1 coords=(31, 22)
+HATCH_PROGRESS steps=17922 s=982 ainda_ovo=1 coords=(20, 22)
+HATCH_PROGRESS steps=18432 s=1011 ainda_ovo=1 coords=(28, 22)
+HATCH_PROGRESS steps=18945 s=1039 ainda_ovo=1 coords=(23, 22)
+HATCH_PROGRESS steps=19458 s=1067 ainda_ovo=1 coords=(28, 22)
+HATCH_PROGRESS steps=19968 s=1094 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=20481 s=1122 ainda_ovo=1 coords=(25, 22)
+HATCH_PROGRESS steps=20994 s=1150 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=21504 s=1177 ainda_ovo=1 coords=(22, 22)
+HATCH_PROGRESS steps=22017 s=1204 ainda_ovo=1 coords=(29, 22)
+HATCH_PROGRESS steps=22530 s=1233 ainda_ovo=1 coords=(22, 22)
+HATCH_PROGRESS steps=23040 s=1261 ainda_ovo=1 coords=(32, 22)
+HATCH_PROGRESS steps=23553 s=1289 ainda_ovo=1 coords=(19, 22)
+HATCH_PROGRESS steps=24066 s=1318 ainda_ovo=1 coords=(32, 22)
+HATCH_PROGRESS steps=24576 s=1345 ainda_ovo=1 coords=(16, 22)
+HATCH_PROGRESS steps=25088 s=1373 ainda_ovo=1 coords=(34, 22)
+HATCH_PROGRESS steps=25601 s=1401 ainda_ovo=1 coords=(17, 22)
+HATCH_PROGRESS steps=26114 s=1429 ainda_ovo=1 coords=(34, 22)
+HATCH_PROGRESS steps=26624 s=1455 ainda_ovo=1 coords=(20, 22)
+HATCH_PROGRESS steps=27137 s=1482 ainda_ovo=1 coords=(31, 22)
+HATCH_PROGRESS steps=27650 s=1508 ainda_ovo=1 coords=(20, 22)
+HATCH_PROGRESS steps=28160 s=1535 ainda_ovo=1 coords=(28, 22)
+HATCH_PROGRESS steps=28673 s=1562 ainda_ovo=1 coords=(23, 22)
+HATCH_PROGRESS steps=29186 s=1590 ainda_ovo=1 coords=(28, 22)
+HATCH_PROGRESS steps=29696 s=1616 ainda_ovo=1 coords=(26, 22)
+HATCH_PROGRESS steps=30209 s=1642 ainda_ovo=1 coords=(25, 22)
+HATCH_PROGRESS steps=30722 s=1670 ainda_ovo=1 coords=(26, 22)
+HATCH_CUTSCENE_SUSPECT steps=30972 coords=(28, 22) — rodando frames livres + A para diálogos
+HATCH_OCCURRED steps=30972 (cutscene concluída com frames livres)
+HATCH_OCCURRED steps=30972
+HATCH_POS_SAVE ok flag_0x266=1 (segundo ovo na creche: esperado)
+HATCH_OK {'valid': True, 'species': 789, 'ev': [0, 0, 0, 0, 0, 0], 'iv': [26, 13, 2, 30, 14, 17], 'hp': 20, 'max_hp': 20, 'level': 5}
+Synthetic parent records; direct native calls, NOT a deposit/hatch journey. ... DAYCARE_SCORE 789 132 20
+EGG_CONTRACT 2 {'valid': True, 'species': 789, 'ev': [0, 0, 0, 0, 0, 0], 'iv': [12, 22, 2, 2, 26, 26], 'hp': 19, 'max_hp': 19, 'level': 5}
+DAYCARE_SCORE 132 789 20
+DAYCARE_SCORE 789 789 0
+DAYCARE_SCORE 132 132 0
+DAYCARE_SCORE 151 132 0
+DAYCARE_SCORE 1 132 20
+NATIVE_EGG_PENDING_AFTER_STEPS 1280
+NATIVE_EGG_PICKED_SAVED {'valid': True, 'species': 789, 'ev': [0, 0, 0, 0, 0, 0], 'iv': [7, 13, 23, 30, 2, 2], 'hp': 20, 'max_hp': 20, 'level': 5}
+Ran 5 tests in 2317.622s
+OK
+  PASSOU
+=== [cosmog:shim] ===
+resumo: OK
+  PASSOU
+resumo: 0 falha(s) — log: /home/user/projeto-estudo-de-RE/logs/cosmog_20261108_001139.log

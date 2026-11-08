@@ -26,3 +26,7 @@ forja/dist/
 forja/web/.vite/
 *.apk
 !forja/**/*.apk
+
+# --- ambiente de teste local ---
+.venv/
+reports/v42/*INCOMPLETA*
