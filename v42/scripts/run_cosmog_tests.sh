@@ -139,15 +139,14 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   say "[core] $CORE"
   roda "cosmog:nativos"   python3 -B -m unittest -v tests.test_cosmog_v42_mgba
 
-  # A eclosão custa ~13 min (30 972 passos reais). Fica FORA do caminho padrão:
-  # exige COSMOG_HATCH_TEST=1. Já foi certificada em duas execuções
-  # independentes (reports/v42/EVIDENCIA_COSMOG_V42.txt, commit de97ada).
-  if [ "${COSMOG_HATCH_TEST:-0}" = "1" ]; then
-    roda "cosmog:eclosao" python3 -B -m unittest -v tests.test_cosmog_hatch_v42_mgba
-  else
-    say "=== [cosmog:eclosao] ==="
-    say "  PULADO por escolha: defina COSMOG_HATCH_TEST=1 para reexecutar (~13 min)"
-  fi
+  # ECLOSÃO: CORTADA da bateria por decisão do projeto.
+  # Custa ~13 min (30 972 passos reais) e já está certificada em duas execuções
+  # independentes (reports/v42/EVIDENCIA_COSMOG_V42.txt). O teste continua no
+  # repositório para quem quiser reproduzir, mas NÃO é chamado aqui nem por
+  # variável de ambiente: se precisar, rode à mão:
+  #   python3 -m unittest -v tests.test_cosmog_hatch_v42_mgba
+  say "=== [cosmog:eclosao] ==="
+  say "  CORTADO (decisão do projeto) — certificação em reports/v42/EVIDENCIA_COSMOG_V42.txt"
   # sonda do shim próprio: prova que o .so abre a V42 e que a leitura de memória
   # pelo barramento custa microssegundos (é a razão de existir do shim)
   if [ -f "$ROOT/tools/gba_shim/build/gba_shim.so" ]; then
@@ -158,6 +157,7 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   # cobertura de encontros selvagens lida da própria V42 (estrutural)
   roda "cosmog:encontros" python3 -B "$ROOT/v42/scripts/auditoria_encontros_v42.py"
   roda "cosmog:horario"   python3 -B "$ROOT/v42/scripts/auditoria_horario_v42.py"
+  roda "cosmog:obtencao"  python3 -B "$ROOT/v42/scripts/obtencao_total_v42.py"
 else
   # Não é sucesso: a eclosão e as nativas NÃO rodaram. Sair com 0 aqui fazia a
   # bateria agregadora anunciar "PASSOU" com a prova jamais executada — o mesmo
