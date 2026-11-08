@@ -8,11 +8,13 @@ SITE="${1:-$ROOT/site_guia}"
 command -v node >/dev/null || { echo "[ERRO] node ausente"; exit 2; }
 python3 - "$SITE" <<'PY'
 import re, pathlib, sys
-html = pathlib.Path(sys.argv[1], "index.html").read_text()
-js = re.search(r"<script>(.*)</script>", html, re.S).group(1)
-# remove só o JSON gigante para checar sintaxe do resto
-sem = re.sub(r"const DADOS = \{.*?\};\nconst lista", "const DADOS = {};\nconst lista", js, flags=re.S)
-pathlib.Path("/tmp/_guia_check.js").write_text(sem)
+# checa a sintaxe de cada <script> de cada página, removendo só o JSON gigante
+for nome in ("index", "pokemon", "mapas", "evolucoes", "eventos"):
+    html = pathlib.Path(sys.argv[1], f"{nome}.html").read_text()
+    for i, js in enumerate(re.findall(r"<script>(.*?)</script>", html, re.S)):
+        if js.strip().startswith("const DADOS"):
+            js = re.sub(r"^const DADOS\s*=.*?;\s*", "", js, count=1, flags=re.S)
+        pathlib.Path(f"/tmp/_guia_{nome}_{i}.js").write_text(js)
 PY
-node --check /tmp/_guia_check.js || exit 1
+for f in /tmp/_guia_*.js; do node --check "$f" || exit 1; done
 node "$ROOT/v42/scripts/teste_site_guia.js" "$SITE"
