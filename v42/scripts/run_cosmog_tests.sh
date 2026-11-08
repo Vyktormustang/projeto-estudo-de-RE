@@ -109,6 +109,7 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   fi
   # cobertura de encontros selvagens lida da própria V42 (estrutural)
   roda "cosmog:encontros" python3 -B "$ROOT/v42/scripts/auditoria_encontros_v42.py"
+  roda "cosmog:horario"   python3 -B "$ROOT/v42/scripts/auditoria_horario_v42.py"
 else
   say "[pulado] fonte do mGBA ausente — só estruturais rodaram"
   say "         reconstrua com: make -C tools/gba_shim libmgba"
