@@ -58,6 +58,12 @@ def read_ewram(f: Emulator) -> bytes:
     return C.string_at(ptr, size)
 
 
+# Valor REAL medido do motor (game.OBJECTS = 0x02021B24). O fallback anterior
+# (0x02020630) estava errado: só apareceu porque o self-test passou a comparar
+# com o módulo carregado — é exactamente para isso que a conferência existe.
+OBJECTS_MOTOR = 0x02021B24
+
+
 def coords_ewram(ew: bytes, objects: int | None = None):
     """`game.coords` sobre a EWRAM crua.
 
@@ -68,7 +74,7 @@ def coords_ewram(ew: bytes, objects: int | None = None):
     `game` (o self-test roda sem o motor extraído).
     """
     if objects is None:
-        objects = game.OBJECTS if game is not None else 0x02020630
+        objects = game.OBJECTS if game is not None else OBJECTS_MOTOR
     return struct.unpack_from("<hh", ew, objects - 0x02000000 + 16)
 
 
@@ -82,7 +88,7 @@ def main() -> int:
         # o self-test roda SEM o motor extraído, então o offset vem de uma
         # constante local (mesmo valor de game.OBJECTS) e não do módulo `game`.
         # Se o motor estiver disponível, confere-se que os dois coincidem.
-        OBJECTS_FALLBACK = 0x02020630
+        OBJECTS_FALLBACK = OBJECTS_MOTOR
         try:
             _importar_harness()
             objects = game.OBJECTS
