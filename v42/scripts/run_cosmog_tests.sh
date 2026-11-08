@@ -41,6 +41,7 @@ GEN="$WORK/firered_gen1_9"
 
 # testes deste repositório que complementam a suíte do motor
 cp "$ROOT/v42/tests/test_cosmog_hatch_v42_mgba.py" "$GEN/tests/" 2>/dev/null || true
+cp "$ROOT/v42/tests/test_periodo_v42_mgba.py" "$GEN/tests/" 2>/dev/null || true
 
 # o harness do motor importa gba_libretro_emu, que só existe em legado/
 mkdir -p "$WORK/harness"
@@ -158,6 +159,8 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   roda "cosmog:encontros" python3 -B "$ROOT/v42/scripts/auditoria_encontros_v42.py"
   roda "cosmog:horario"   python3 -B "$ROOT/v42/scripts/auditoria_horario_v42.py"
   roda "cosmog:obtencao"  python3 -B "$ROOT/v42/scripts/obtencao_total_v42.py"
+  # virada dia/noite EM EXECUÇÃO (relógio fixado; ~28 s)
+  roda "cosmog:periodo"   python3 -B -m unittest -v tests.test_periodo_v42_mgba
 else
   # Não é sucesso: a eclosão e as nativas NÃO rodaram. Sair com 0 aqui fazia a
   # bateria agregadora anunciar "PASSOU" com a prova jamais executada — o mesmo
