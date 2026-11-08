@@ -29,3 +29,4 @@ forja/web/.vite/
 
 # --- ambiente de teste local ---
 .venv/
+reports/v42/*INCOMPLETA*

@@ -58,6 +58,7 @@ if [ -n "${COSMOG_HATCH_MAX_STEPS:-}" ] && [ "${COSMOG_HATCH_MAX_STEPS}" -lt "$H
 fi
 
 FALHAS=0
+INCOMPLETO=0
 roda() {
   local nome="$1"; shift
   say "=== [$nome] ==="
@@ -70,6 +71,33 @@ roda() {
 exportar_evidencia() {
   local saida="$ROOT/reports/v42/EVIDENCIA_COSMOG_V42.txt"
   [ -f "$LOG" ] || return 0
+
+  # A evidência versionada é a PROVA CERTIFICADA e não pode ser degradada por
+  # uma execução parcial. Já aconteceu: uma rodada sem core/shim sobrescreveu
+  # as 106 linhas (com HATCH_OK) por 10 linhas só de estruturais. Regra nova:
+  #   - se a rodada não certificou a eclosão, NÃO toca no arquivo versionado;
+  #     grava ao lado, com o motivo no nome;
+  #   - se certificou, só substitui quando a contagem de linhas-prova não cai.
+  local certificou=0
+  grep -aq 'HATCH_OK' "$LOG" && certificou=1
+
+  if [ "$certificou" -eq 0 ]; then
+    local parcial="$ROOT/reports/v42/EVIDENCIA_COSMOG_V42.INCOMPLETA.txt"
+    {
+      echo "# Execução INCOMPLETA — a eclosão NÃO foi certificada nesta rodada."
+      echo "# data: $(date -Is)"
+      echo "# ROM sha256: $(sha256sum "$ROM" 2>/dev/null | cut -d' ' -f1)"
+      echo "# log completo (NÃO versionado): $LOG"
+      echo "# Este arquivo NÃO substitui EVIDENCIA_COSMOG_V42.txt."
+      echo
+      grep -aE '^(=== \[|  (PASSOU|FALHOU))|^Ran [0-9]+ tests|^OK|^FAILED|HATCH_[A-Z_]+|DAYCARE_SCORE|EGG_CONTRACT|NATIVE_EGG|^resumo:' "$LOG" \
+        | tr -d '\000'
+    } >"$parcial"
+    say "[evidência] rodada incompleta — prova certificada preservada; registro em $parcial"
+    return 0
+  fi
+
+  local tmp="$saida.novo"
   {
     echo "# Evidência da suíte do Cosmog na V42 — gerada por v42/scripts/run_cosmog_tests.sh"
     echo "# data: $(date -Is)"
@@ -78,7 +106,18 @@ exportar_evidencia() {
     echo
     grep -aE '^(=== \[|  (PASSOU|FALHOU))|^Ran [0-9]+ tests|^OK|^FAILED|HATCH_[A-Z_]+|DAYCARE_SCORE|EGG_CONTRACT|NATIVE_EGG|^resumo:' "$LOG" \
       | tr -d '\000'
-  } >"$saida"
+  } >"$tmp"
+
+  if [ -f "$saida" ]; then
+    local antes depois
+    antes=$(wc -l <"$saida"); depois=$(wc -l <"$tmp")
+    if [ "$depois" -lt "$antes" ]; then
+      rm -f "$tmp"
+      say "[evidência] resultado MENOR que o versionado ($depois < $antes linhas) — arquivo preservado"
+      return 0
+    fi
+  fi
+  mv "$tmp" "$saida"
   say "[evidência] $saida"
 }
 trap exportar_evidencia EXIT
@@ -99,7 +138,16 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   export MGBA_CORE="$CORE"
   say "[core] $CORE"
   roda "cosmog:nativos"   python3 -B -m unittest -v tests.test_cosmog_v42_mgba
-  roda "cosmog:eclosao"   python3 -B -m unittest -v tests.test_cosmog_hatch_v42_mgba
+
+  # A eclosão custa ~13 min (30 972 passos reais). Fica FORA do caminho padrão:
+  # exige COSMOG_HATCH_TEST=1. Já foi certificada em duas execuções
+  # independentes (reports/v42/EVIDENCIA_COSMOG_V42.txt, commit de97ada).
+  if [ "${COSMOG_HATCH_TEST:-0}" = "1" ]; then
+    roda "cosmog:eclosao" python3 -B -m unittest -v tests.test_cosmog_hatch_v42_mgba
+  else
+    say "=== [cosmog:eclosao] ==="
+    say "  PULADO por escolha: defina COSMOG_HATCH_TEST=1 para reexecutar (~13 min)"
+  fi
   # sonda do shim próprio: prova que o .so abre a V42 e que a leitura de memória
   # pelo barramento custa microssegundos (é a razão de existir do shim)
   if [ -f "$ROOT/tools/gba_shim/build/gba_shim.so" ]; then
@@ -111,9 +159,17 @@ if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   roda "cosmog:encontros" python3 -B "$ROOT/v42/scripts/auditoria_encontros_v42.py"
   roda "cosmog:horario"   python3 -B "$ROOT/v42/scripts/auditoria_horario_v42.py"
 else
-  say "[pulado] fonte do mGBA ausente — só estruturais rodaram"
-  say "         reconstrua com: make -C tools/gba_shim libmgba"
+  # Não é sucesso: a eclosão e as nativas NÃO rodaram. Sair com 0 aqui fazia a
+  # bateria agregadora anunciar "PASSOU" com a prova jamais executada — o mesmo
+  # falso verde que já custou uma sessão inteira (ver commit 1bdb28c).
+  say "[INCOMPLETO] fonte do mGBA ausente — só estruturais rodaram"
+  say "             reconstrua com: make -C tools/gba_shim libmgba"
+  INCOMPLETO=1
 fi
 
 say "resumo: $FALHAS falha(s) — log: $LOG"
+if [ "$FALHAS" -eq 0 ] && [ "$INCOMPLETO" -eq 1 ]; then
+  say "NAO CERTIFICADO: a prova nativa/eclosao nao foi executada neste ambiente"
+  exit 2
+fi
 exit "$FALHAS"

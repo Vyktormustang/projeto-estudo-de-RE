@@ -7,11 +7,26 @@
 #                            make -C tools/gba_shim -j$(nproc)
 set -u
 cd "$(dirname "$0")/.."
+
+# As dependências (capstone, keystone-engine, unicorn) NÃO podem ser instaladas
+# no Python do sistema (PEP 668), então vivem em .venv. Sem pôr .venv no PATH,
+# oito baterias caem com "No module named 'capstone'/'keystone'" e o resultado
+# parece regressão de código quando é ambiente faltando.
+if [ -x .venv/bin/python3 ]; then
+  PATH="$PWD/.venv/bin:$PATH"
+  export PATH
+else
+  echo "[AVISO] .venv ausente: as baterias que usam capstone/keystone/unicorn"
+  echo "        vão falhar por dependência, não por defeito. Crie com:"
+  echo "        python3 -m venv .venv && .venv/bin/pip install capstone keystone-engine unicorn"
+fi
+
 mkdir -p logs
 LOG="logs/tests_$(date +%Y%m%d_%H%M%S).log"
 : >"$LOG"
 FALHAS=0
 TOTAL=0
+INCOMPLETOS=0
 
 roda() {                      # roda <descrição> <comando...>
   local desc="$1"; shift
@@ -54,7 +69,11 @@ else
   rc=$?
   echo "=== [v42:cosmog] ===" | tee -a "$LOG"
   if [ "$rc" -eq 2 ]; then
-    echo "  SEM ROM (esperado) — pulado" | tee -a "$LOG"
+    # código 2 = ambiente incompleto (sem ROM ou sem core/shim). Não conta como
+    # falha de código, mas TAMBÉM não pode ser anunciado como sucesso: a prova
+    # nativa e a eclosão não rodaram. Marca-se como incompleto no resumo.
+    echo "  INCOMPLETO (sem ROM/core/shim) — prova nativa NAO executada" | tee -a "$LOG"
+    INCOMPLETOS=$((INCOMPLETOS + 1))
   else
     echo "  FALHOU" | tee -a "$LOG"; FALHAS=$((FALHAS + 1))
   fi
@@ -62,4 +81,7 @@ fi
 
 echo "===============================" | tee -a "$LOG"
 echo "resumo: $FALHAS de $TOTAL falharam — log: $LOG" | tee -a "$LOG"
+if [ "$INCOMPLETOS" -gt 0 ]; then
+  echo "ATENCAO: $INCOMPLETOS bateria(s) INCOMPLETA(s) — ambiente faltando, nao prova" | tee -a "$LOG"
+fi
 exit "$FALHAS"
