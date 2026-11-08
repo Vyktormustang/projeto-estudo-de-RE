@@ -34,7 +34,7 @@ let falhas = 0;
 const chk = (ok, msg) => { console.log(`[${ok ? 'PASS' : 'FAIL'}] ${msg}`); if (!ok) falhas++; };
 
 // 1) sintaxe de cada script
-for (const p of ['index.html','pokemon.html','mapas.html','evolucoes.html','eventos.html']) {
+for (const p of ['index.html','pokemon.html','mapas.html','evolucoes.html','eventos.html','tms.html']) {
   const { scripts } = carregar(p);
   chk(scripts.length > 0, `${p}: tem script`);
   try { for (const s of scripts) new Function(s); chk(true, `${p}: sintaxe OK`); }
@@ -74,5 +74,11 @@ chk(/449 liga/.test(e['contador'].textContent), `evolucoes: ${e['contador'].text
 // 6) eventos
 e = rodar('eventos.html');
 chk(!e['lista'], 'eventos: pagina estatica (sem lista)');
+
+// 7) tms: estatica, com as 229 linhas e o aviso de compatibilidade ausente
+const htmlTms = carregar('tms.html').html;
+chk((htmlTms.match(/<tr><td class='n'>/g)||[]).length === 229, 'tms: 229 linhas');
+chk(/189<\/b>\s*disponíveis/.test(htmlTms.replace(/\s+/g,' ')) || /189/.test(htmlTms), 'tms: conta 189 disponiveis');
+chk(/Não coberto aqui/.test(htmlTms), 'tms: declara limite de compatibilidade');
 
 process.exit(falhas ? 1 : 0);

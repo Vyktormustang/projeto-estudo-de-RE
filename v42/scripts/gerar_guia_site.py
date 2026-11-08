@@ -195,7 +195,8 @@ def coletar(rom: bytes, gen: pathlib.Path) -> dict:
         golpes[sid].sort(key=lambda x: (x["nivel"], x["golpe"]))
 
     # ---------- TMs ----------
-    tms = [{"numero": r["tm"], "golpe": r["name"], "status": r["status"]}
+    tms = [{"numero": int(r["tm"]), "golpe": r["name"], "status": r["status"],
+            "motivo": r.get("motivo", "")}
            for r in csv.DictReader((gen / "data/tms_gen9.csv").open())]
 
     pokemon = []
@@ -303,13 +304,14 @@ NAV = """<nav>
 <a href="mapas.html" __ON_mapas>Mapas</a>
 <a href="evolucoes.html" __ON_evolucoes>Evoluções</a>
 <a href="eventos.html" __ON_eventos>Eventos</a>
+<a href="tms.html" __ON_tms>TMs</a>
 </nav>"""
 
 
 def pagina(titulo: str, ativo: str, corpo: str, extra_js: str = "", dados: str = "null",
            sha: str = ROM_ESPERADA) -> str:
     nav = NAV
-    for p in ("index", "pokemon", "mapas", "evolucoes", "eventos"):
+    for p in ("index", "pokemon", "mapas", "evolucoes", "eventos", "tms"):
         nav = nav.replace(f"__ON_{p}", 'class="on"' if p == ativo else "")
     return f"""<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8">
@@ -659,6 +661,43 @@ Eevee → Espeon (dia) e Eevee → Umbreon (noite), ambas com amizade ≥ 220.</
                   json.dumps(dados, ensure_ascii=False, separators=(",", ":")))
 
 
+def gerar_tms(d: dict) -> str:
+    """Tabela das 229 TMs. O que a ROM guarda é o ITEM (numero) e o golpe que
+    ele ensina; a compatibilidade TM x espécie NAO esta nos dados extraidos,
+    entao a pagina nao a inventa — diz explicitamente que nao esta aqui."""
+    disp = [t for t in d["tms"] if t["status"] == "disponivel"]
+    indis = [t for t in d["tms"] if t["status"] != "disponivel"]
+    motivos = {}
+    for t in indis:
+        motivos[t["motivo"] or "não informado"] = motivos.get(t["motivo"] or "não informado", 0) + 1
+    lin_mot = "".join(f"<li><b>{n}</b> — {esc(m)}</li>"
+                      for m, n in sorted(motivos.items(), key=lambda x: -x[1]))
+    def rotulo(status: str) -> str:
+        # fora da f-string: backslash dentro de expressao de f-string e erro de sintaxe
+        if status == "disponivel":
+            return '<span style="color:var(--ok)">disponível</span>'
+        return '<span style="color:var(--warn)">indisponível</span>'
+
+    linhas = "".join(
+        f"<tr><td class='n'>{t['numero']:03d}</td><td>{esc(t['golpe'])}</td>"
+        f"<td>{rotulo(t['status'])}</td>"
+        f"<td class='metodo'>{esc(t['motivo'] or '—')}</td></tr>"
+        for t in d["tms"])
+    corpo = f"""
+<div class="nota">A ROM tem <b>{len(d['tms'])}</b> slots de TM: <b>{len(disp)}</b>
+disponíveis e <b>{len(indis)}</b> indisponíveis. O número e o golpe vêm da tabela
+de itens da ROM.</div>
+<div class="card"><h3>Por que {len(indis)} estão indisponíveis</h3><ul>{lin_mot}</ul></div>
+<div class="card" style="margin-top:12px"><h3>Todas as TMs ({len(d['tms'])})</h3>
+<table><thead><tr><th>TM</th><th>Golpe</th><th>Status</th><th>Motivo</th></tr></thead>
+<tbody>{linhas}</tbody></table></div>
+<div class="nota" style="margin-top:12px"><b>Não coberto aqui:</b> qual espécie pode
+aprender qual TM. Isso não foi extraído da ROM, então esta página não afirma nada
+sobre compatibilidade — consulte os golpes por nível na ficha de cada espécie.</div>
+"""
+    return pagina("TMs", "tms", corpo, "", "null", ROM_ESPERADA)
+
+
 def gerar_eventos(d: dict) -> str:
     fixos = [p for p in d["pokemon"] if p["fixos"]]
     fixos.sort(key=lambda p: p["fixos"][0]["mapa"])
@@ -740,6 +779,7 @@ def main() -> int:
         "mapas.html": gerar_mapas(d),
         "evolucoes.html": gerar_evolucoes(d),
         "eventos.html": gerar_eventos(d),
+        "tms.html": gerar_tms(d),
     }
     for nome, html in paginas.items():
         (saida / nome).write_text(html, encoding="utf-8")
