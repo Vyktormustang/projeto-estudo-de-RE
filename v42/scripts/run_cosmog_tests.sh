@@ -129,6 +129,10 @@ export COSMOG_V42_ROM="$ROM"
 
 roda "cosmog:estruturais" python3 -B -m unittest -v tests.test_cosmog_v42
 
+# site do guia: valida o que está VERSIONADO em site_guia/ (não regenera — a
+# geração exige a ROM e o motor extraído; o teste só confere o artefato entregue)
+roda "cosmog:site" bash "$ROOT/v42/scripts/teste_site_guia.sh"
+
 # nativas: só se a fonte do mGBA estiver vendorizada
 if [ -d "$ROOT/tools/gba_shim/build/mgba-src" ]; then
   CORE="${MGBA_CORE:-/tmp/mgba-lr/mgba_libretro.so}"
