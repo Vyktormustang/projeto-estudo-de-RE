@@ -47,6 +47,8 @@ gba-re/
 | `scripts/gba_hook_code.py` | 6 | Instalador de trampolim de código: troca `bl #ALVO` em site por `bl #TRAMP` (payload Thumb + chamada original) em run 0xFF de `freespace_map.tsv`; 6 validações; DRY-RUN até validação em emulador. `--self-test`. |
 | `scripts/gba_libretro_emu.py` | 4 | Driver libretro headless (mGBA core .deb, sem root): roda N frames, PNG 240×160, agenda de input `--input`, snapshots `--snap`, save-state `--save-state/--load-state`, mem-read SAVE (rg0), preload RTLD de libinih. `--self-test`. |
 | `scripts/run_all_tests.sh` | 7 | **Bateria única**: roda `--self-test` dos 8 scripts, log em `logs/tests_*.log`, exit agregado (0 = tudo OK). |
+| `scripts/skills_audit.py` | — | Auditor de skills de agente (`SKILL.md`): origem, arquivos, git hooks/postinstall, padrões ALTO/MÉDIO (curl\|bash, credenciais, prompt injection), symlinks. `--self-test`, `--json`, `--path`. Política em `docs/SKILLS.md`. |
+
 
 Registro de renomeações (sobrevive a regenerações): `names_registry.json`.
 Notas verificadas sobre a estrutura da ROM: `notes_estrutura.md`.

@@ -89,6 +89,7 @@ tirar o print da mochila cheia.
 | ler o save-state | `scripts/gba_state_dump.py` | — |
 | ler memória AO VIVO | `Emu.read/write` (`gba_emu.py`) | `retro_get_memory_data` (não publica) |
 | teclas | `Emu.keys_held()` / `REG_KEYINPUT` | o espelho `0x03003118` (contexto-dependente) |
+| descobrir/instalar skill de agente | `npx skills` + `docs/SKILLS.md` | instalar skill sem auditar |
 
 ## 4. Regras de convivência
 
@@ -96,3 +97,11 @@ tirar o print da mochila cheia.
   (`.gitignore` já pronto, com exceção só para `tests/fixtures/*.gba`, que é ROM
   de bancada **nossa**).
 - Relatório enxuto por ciclo + ETA em toda resposta do agente.
+- **Skills de agente**: antes de instalar qualquer skill de terceiros, auditar
+  com `python3 scripts/skills_audit.py --path <dir>` e seguir o checklist de
+  `docs/SKILLS.md` §4. Skill já instalada: `python3 scripts/skills_audit.py`.
+  Contexto: `find-skills` (vercel-labs) está instalada em
+  `~/.agents/skills/find-skills` — use-a quando a tarefa tiver cara de problema
+  já resolvido por skill, mas lembre que `npx skills find` dá **falso negativo**
+  neste sandbox (sem acesso a `skills.sh`); o fallback está em `docs/SKILLS.md` §5.
+
