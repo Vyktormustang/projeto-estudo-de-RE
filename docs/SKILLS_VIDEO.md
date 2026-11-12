@@ -36,14 +36,21 @@ HyperFrames busca a timeline frame a frame, render determinístico).
 | `hyperframes` | 1,5M | base: compor vídeo em HTML, legendas, transições |
 | `hyperframes-cli` | 1,5M | CLI (`npx hyperframes init/check/capture`) |
 | `media-use` | 1,4M | mídia: avatar, narração, trilha, stock |
-| `hyperframes-creative` | 917K | direção criativa/efeitos |
-| `general-video` | 661,8K | vídeo genérico |
+| `reverse-any-video` | — | recriar um vídeo existente como projeto editável |
+| `style-sampling` | — | novo episódio no estilo de um vídeo aprovado |
+| `figma` | — | trazer design do Figma para o vídeo |
 | `remotion-to-hyperframes` | 605K | migrar projeto Remotion |
-| `product-launch-video` | 539K | vídeo de lançamento de produto |
-| `faceless-explainer` | 522K | explicador sem rosto (formato YouTube) |
-| `music-to-video` | 419K | vídeo a partir de música |
-| `slideshow` | 510K | slideshow |
-| `talking-head-recut` | 408K | recut de talking head |
+| `slideshow` | 510K | slideshow / deck apresentável |
+
+> ⚠ **Correção (12/11/2026)**: o catálogo do skills.sh ainda lista
+> `hyperframes-creative` (917K), `general-video` (661K), `product-launch-video`
+> (539K), `faceless-explainer` (522K), `music-to-video` (419K),
+> `talking-head-recut` (408K) e `pr-to-video` (449K) **com instalações**, mas
+> essas pastas **não existem mais** no repositório `heygen-com/hyperframes`
+> (verificado em `skills/` no clone). Os números do diretório ficam congelados e
+> não refletem remoções. Ao instalar, use `--list` para conferir o que existe.
+> O `--list` sem `--full-depth` mostra só 9 de 16+ skills (o repo tem SKILL.md
+> na raiz, o que faz o CLI parar de descer) — use `--full-depth` para ver tudo.
 
 **`remotion-dev/skills`** — 6,9K estrelas, 13 skills; alternativa
 React/TS para vídeo. `remotion-render` 325,7K, `remotion-create` 323,6K,
@@ -126,3 +133,64 @@ python3 scripts/skills_audit.py --path /tmp/repo/skills   # auditar antes
 
 `npx skills find "video"` **não** funciona aqui (sem acesso a `skills.sh`);
 usar o fallback de `docs/SKILLS.md` §5.
+
+## 6. Arsenal instalado (12/11/2026)
+
+21 skills em `~/.agents/skills/`, linkadas a Claude Code (+ payload universal
+para Codex/Gemini CLI). Todas auditadas: **0 risco ALTO, 2 MEDIO legítimos**.
+
+| Camada | Skills | Origem |
+|---|---|---|
+| Composição | `hyperframes`, `hyperframes-cli`, `hyperframes-registry`, `media-use` | heygen-com (82,8K ⭐) |
+| React/TS | `remotion-create`, `remotion-render`, `remotion-best-practices` | remotion-dev (6,9K ⭐) |
+| Edição/processamento | `video-use`, `ffmpeg`, `moviepy`, `video-design`, `elevenlabs` | browser-use (30,9K ⭐) / digitalsamba (2,5K ⭐) |
+| Geração por modelo | `ai-video-generation`, `google-veo`, `image-to-video`, `ai-avatar-video`, `storyboard-creation`, `video-prompting-guide` | inference-sh (807 ⭐) |
+| Marketing/UGC | `ugc-ad`, `video-batch-runner` | postplusai |
+| Descoberta | `find-skills` | vercel-labs |
+
+### Como usar (ordem que funciona)
+
+```bash
+# 1) ambiente (PEP 668): venv com PIL + ffmpeg estático
+source scripts/video_env.sh --export      # deixa FFMPEG no PATH
+
+# 2) projeto HyperFrames (HTML -> vídeo, sem API paga)
+npx hyperframes init meu-video --skip-skills
+#    a skill `hyperframes` traz o contrato de render e o que cada tipo de
+#    vídeo precisa; `hyperframes-registry` tem ~450 blocos prontos
+#    (títulos, transições, gráficos, 3D) — consultar ANTES de escrever à mão
+#    efeito com nome próprio; `media-use` para narração/trilha/avatar.
+
+# 3) remotion (alternativa React), se o vídeo for parte de um app
+npx create-video@latest   # a skill remotion-create guia o scaffold
+
+# 4) editar material existente
+#    `video-use`: transcrição -> cortes por fala/silêncio (regras duras de
+#    correção); `ffmpeg`/`moviepy` para o processamento.
+
+# 5) geração paga (precisa de conta + créditos)
+#    inference.sh: `belt login` antes; ver a skill video-prompting-guide.
+```
+
+### Veredito da auditoria (manual + script)
+
+| Skill | Achado do auditor | Veredito |
+|---|---|---|
+| `hyperframes-cli` | `.aws/credentials` em `lambda.md` | **legítimo** — é pré-requisito do deploy Lambda opcional; MEDIO por webhook de callback |
+| `media-use` | `OPENAI_API_KEY` em doc de legendas | **legítimo** — exemplo de API Whisper para transcrição |
+| `video-use` | `sudo` em `install.md`, `requests.post` em `helpers/transcribe.py` | **legítimo** — instalação de ffmpeg e upload para API de transcrição |
+
+Duas lições viraram regra no `scripts/skills_audit.py`: (1) documentação
+defensiva ("Refuse `curl | bash`") e (2) linha comentada **não** contam como
+risco — antes geravam falso ALTO em justamente as skills mais cuidadosas.
+
+### O que ainda não dá para fazer aqui
+
+- `npx hyperframes` e `create-video`: precisa de Node + rede para o registry
+  npm de terceiros e para o pacote do HyperFrames (os hosts liberados cobrem
+  `registry.npmjs.org`, mas o render do HyperFrames usa Chromium — pode faltar).
+- Geração por modelo (Veo/Seedance/Higgsfield): sem conta/créditos, e sem
+  acesso aos endpoints dessas APIs daqui.
+- **O que funciona de fato, comprovado**: PIL + ffmpeg renderizando mp4
+  (prova em `scripts/video_env.sh --self-test`), e as skills de processo
+  (roteiro, storyboard, corte, prompt de vídeo) que são conhecimento, não API.

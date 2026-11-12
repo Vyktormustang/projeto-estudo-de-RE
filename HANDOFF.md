@@ -104,4 +104,12 @@ tirar o print da mochila cheia.
   `~/.agents/skills/find-skills` — use-a quando a tarefa tiver cara de problema
   já resolvido por skill, mas lembre que `npx skills find` dá **falso negativo**
   neste sandbox (sem acesso a `skills.sh`); o fallback está em `docs/SKILLS.md` §5.
+- **Vídeo**: 21 skills instaladas (HyperFrames, Remotion, ffmpeg/moviepy,
+  inference.sh, UGC) — ver `docs/SKILLS_VIDEO.md` §6. Antes de renderizar,
+  rode `bash scripts/video_env.sh` (venv com PIL + ffmpeg estático; o sistema é
+  PEP 668 e não tem ffmpeg no PATH).
+- ⚠ **Sempre** instalar skill com escopo explícito:
+  `npx skills add <repo> --skill <nome> -g -y -a claude-code -a codex -a gemini-cli`.
+  `--agent '*'` cria dezenas de diretórios de agente no `$HOME` (aconteceu: 49
+  dirs; já limpos).
 

@@ -77,7 +77,12 @@ Antes de instalar qualquer skill:
       arquivo, acesso a `~/.ssh`, `.env`, git credentials? Se sim → recusar
       por padrão.
 - [ ] **Escopo**: ela escreve fora do projeto (`~/.bashrc`, PATH, cron)?
-      Instalar em vez disso no escopo global com `-g` é o padrão aqui.
+      Instalar no escopo global com `-g` é o padrão aqui.
+- [ ] **Sempre com `-a` explícito**: `-a claude-code -a codex -a gemini-cli`.
+      **Nunca** `--agent '*'` — cria um diretório de agente por cada um dos 79
+      suportados no `$HOME` (aconteceu: 49 dirs criados e depois removidos).
+      `-a` aceita repetição; lista inválida em CSV é rejeitada (`gemini` não
+      existe, o nome é `gemini-cli`).
 - [ ] **Duplicata**: já existe skill local cobrindo o mesmo tema? Não instalar.
 - [ ] **Pós-instalação**: `diff` contra o repo oficial ou conferir
       `skillFolderHash` no `.skill-lock.json`.

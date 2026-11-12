@@ -26,3 +26,6 @@ forja/dist/
 forja/web/.vite/
 *.apk
 !forja/**/*.apk
+
+# --- ambiente das skills de video (venv local) ---
+.venv-video/

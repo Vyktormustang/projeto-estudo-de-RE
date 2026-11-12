@@ -84,3 +84,4 @@ python3 gba-re/scripts/gba_ident.py rom/jogo.gba -o gba-re/reports \
 # validar a ferramenta sem ROM (fixture sintética rotulada)
 python3 gba-re/scripts/gba_ident.py --self-test
 ```
+| `scripts/video_env.sh` | — | Prepara ambiente de vídeo (PEP 668): cria `.venv-video` com `pillow` + ffmpeg estático do wheel `imageio-ffmpeg`. `--self-test` renderiza prova. Uso: `source scripts/video_env.sh --export`. |

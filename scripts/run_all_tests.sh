@@ -39,6 +39,7 @@ roda "vyk59:auditoria-v42"    python3 scripts/auditoria_vyk59.py --self-test
 roda "vyk59:auditoria-v3"     python3 scripts/auditoria_vyk59_v3.py --self-test
 roda "vyk60:sempre-escreve"   python3 scripts/teste_vyk60_sempre_escreve.py --self-test
 roda "skills:auditor"         python3 scripts/skills_audit.py --self-test
+roda "video:ambiente"         bash scripts/video_env.sh --self-test
 
 echo "===============================" | tee -a "$LOG"
 echo "resumo: $FALHAS de $TOTAL falharam — log: $LOG" | tee -a "$LOG"

