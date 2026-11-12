@@ -130,3 +130,9 @@ checagem manual antes de aprovar uma instalação.
 - Diretório: https://skills.sh
 - `find-skills`: https://skills.sh/vercel-labs/skills/find-skills
 - CLI + docs: https://github.com/vercel-labs/skills
+
+## 9. Levantamentos já feitos
+
+- `docs/SKILLS_VIDEO.md` — skills mais usadas para criar/editar vídeo com
+  agentes (panorama por etapa, com verificação de origem e a armadilha dos
+  repositórios-espelho que inflam a contagem de instalações).
