@@ -10,31 +10,49 @@ destacados.
 
 | Arquivo | O que é |
 |---|---|
-| `calendario-2026-2027.png` | **Versão oficial** (1600×2000). Gerada por código com os dias alinhados e conferidos contra o `calendar` do Python. |
+| `calendario-biblico-2026-2027.png` | **Versão com tema bíblico** (1600×2000). Pergaminho, tinta sépia, dourado, capitular Cinzel, versículo do ano e cruz ornamental. Datas conferidas por código. |
+| `calendario-2026-2027.png` | Versão minimalista/suíça (1600×2000), mesma estrutura. |
 | `calendario-2026-2027-ilustrado-ia.png` | Versão ilustrada gerada por IA (1122×1402). Bonita, mas **contém erros de alinhamento** — não usar como calendário de referência. |
 
-## Por que a versão de IA não serve como calendário
+## Tema bíblico — elementos
 
-Modelos de imagem erram a aritmética de datas. Na imagem ilustrada há meses com
-o dia 1 na coluna errada (por exemplo, junho/2027 deveria começar na terça e
-aparece na segunda; agosto/2027 também sai deslocado). A versão em código é
-calculada, não "desenhada de memória".
+- **Paleta**: pergaminho (`#F4ECDB`), tinta sépia (`#3A2C20`), dourado
+  (`#B08D44`) e vinho para fins de semana (`#802E28`).
+- **Tipografia**: Cinzel (capitular romana, inspirada em inscrições lapidares)
+  para anos/meses e EB Garamond (serifada clássica, com algarismos *lining*)
+  para dias e versículos.
+- **Versículo por ano**, em itálico, sob o número do ano:
+  - 2026 — “O Senhor é o meu pastor; nada me faltará.” (Salmos 23:1)
+  - 2027 — “Eis que faço novas todas as coisas.” (Apocalipse 21:5)
+- **Rodapé** — “Lâmpada para os meus pés é a tua palavra · Salmos 119:105”.
+- **Ornamentos**: cruz latina sobre cada ano, filetes duplos, florões,
+  losango central na divisória e cantos ornamentados nos painéis.
+- **Textura**: ruído suave + vinheta quente geradas com NumPy (pergaminho).
 
-## Regenerar / mudar o ano
+## Gerar / mudar o ano
 
 ```bash
-pip install pillow
-python3 scripts/gen_calendario_dois_anos.py 2026 2027 images/calendario-2026-2027.png
+pip install pillow numpy
+python3 scripts/gen_calendario_biblico.py 2026 2027 images/calendario-biblico-2026-2027.png
+python3 scripts/gen_calendario_dois_anos.py  2026 2027 images/calendario-2026-2027.png   # versão minimalista
 ```
 
-Argumentos: `ano1 ano2 [saida.png]`. Sem argumentos, gera 2026/2027 no caminho
-padrão. Para outros anos basta trocar os números.
+Argumentos: `ano1 ano2 [saida.png]`. Para trocar o versículo de um ano, edite o
+dicionário `VERSICULOS` no script.
 
-## Detalhes de verificação
+## Fontes
+
+`assets/fonts/` contém Cinzel e EB Garamond (SIL Open Font License — ver
+`OFL-Cinzel.txt` e `OFL-EBGaramond.txt`), instanciadas das fontes variáveis
+oficiais do repositório google/fonts. Os arquivos `*-LF.ttf` são o EB Garamond
+com os algarismos remapeados para a variante *lining* (sem eles, o “1” de
+“23:1” e o “0” saem em estilo oldstyle, parecendo minúsculas).
+
+## Verificação
 
 - Semana iniciando no domingo (`calendar.Calendar(firstweekday=6)`).
-- Grade de cada mês comparada programaticamente com `calendar.monthdayscalendar`
-  para os 24 meses → resultado idêntico.
+- Grade dos 24 meses comparada programaticamente com
+  `calendar.monthdayscalendar` → **idêntica**.
 - Meses com 6 semanas (ex.: maio/2026, agosto/2026, janeiro/2027) exibem a
   6ª linha corretamente.
-- Feriados não estão marcados: a imagem é um calendário-base.
+- Feriados não estão marcados: as imagens são calendários-base.
